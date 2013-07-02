@@ -1,0 +1,7 @@
+mmscl	supported_mRNA	CDS	40759	41225	.	+	.	Parent=mmscl
+mmscl	supported_mRNA	exon	61468	61729	.	+	.	Parent=mmMAP_17
+mmscl	supported_mRNA	exon	63653	63768	.	+	.	Parent=mmMAP_17
+mmscl	supported_mRNA	exon	65434	65537	.	+	.	Parent=mmMAP_17
+mmscl	supported_mRNA	exon	65983	66383	.	+	.	Parent=mmMAP_17
+mmscl	RepeatMasker	Repeat	55	115	378	-	.	Target=B4;Note="(230) 61";Name="SINE/B4"
+mmscl	RepeatMasker	Repeat	160	304	1153	+	.	Target=B1_MM;Note="1 147";Name="SINE/Alu"
