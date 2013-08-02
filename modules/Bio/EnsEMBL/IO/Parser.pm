@@ -27,8 +27,7 @@ use Bio::EnsEMBL::Utils::Scalar qw/assert_ref/;
 =head2 new
 
     Constructor
-    Argument [1] : IO::File object
-    Argument [2+]: Hash of parameters for configuration, e.g. buffer sizes or 
+    Argument [1+]: Hash of parameters for configuration, e.g. buffer sizes or 
                    specific functions for handling headers or data
     Returntype   : Bio::EnsEMBL::IO::Parser
 
@@ -36,161 +35,165 @@ use Bio::EnsEMBL::Utils::Scalar qw/assert_ref/;
 
 sub new {
     my $class = shift;
-    my $fh = shift;
     my %param_hash = @_;
     
     my $self = {
-        filehandle => $fh,
-        %param_hash,
+	    current_block => undef,
+	    waiting_block => undef,
+	    record => undef,
+	    metadata => {},
+	    params => \%param_hash,
+    	    metadata_changed => 0,
     };
     bless $self, $class;
-    if (exists $self->{'metadata_function'}) {
-        $self->set_metadata_function($self->{'metadata_function'});
-    } else {
-        $self->set_metadata_function(\&default_meta);
-    }
-    
-    if (exists $self->{'data_function'}) {
-        $self->set_data_function($self->{'data_function'});
-    }
-    
-    # pre-load peek buffer
-    $self->{'next_line'} = <$fh> || throw "Unable to access file $fh for reading";
-    chomp($self->{'next_line'});
     
     return $self;
 }
 
-=head2 read_record
-    Arg [1]    : One lump of data.
-    Description: Read a single record from the file, whatever format it may take
-                 Parsers will have a default returnvalue for the data, but are
-                 intended to use a provided processor function to handle the
-                 specifics. See set_data_function() and process_record()
-                 
-                 Metadata and headers are detected and handled by spot_metadata()
-                 inside a read_record call.
-    Returntype : Data structure suited to the type of parser
+=head2 shift_block
+    Description: Wrapper for user defined functions 
+                 Loads the buffered data as current, then stores a new block of data
+                 into the waiting buffer.
+    Returntype : Void
 
+=cut
+
+sub shift_block {
+    my $self = shift;
+    $self->{'current_block'} = $self->{'waiting_block'};
+    $self->{'waiting_block'} = $self->read_block();
+}
+
+=head2 next_block
+    Description: Wrapper for user defined functions 
+                 Goes through the file blocks, either skipping or parsing metadata blocks
+    Returntype : Void
+
+=cut
+
+sub next_block {
+    my $self = shift;
+    
+    $self->shift_block();
+    $self->{'metadata_changed'} = 0;
+
+    while( defined $self->{'current_block'} && $self->is_metadata() ) {
+        if ($self->{'params'}->{'mustParseMetadata'}) {
+            $self->read_metadata();
+	    $self->{'metadata_changed'} = 1;
+        }
+        $self->shift_block();
+    }
+}
+
+=head2 next
+    Description: Business logic of the iterator
+                 Reads blocks of data from the file, determines whether they contain 
+                 metadata or an actual record, optionally processes the metadata, and
+                 terminates when a record has been loaded.
+    Returntype : True/False depending on whether a record was found.
+
+=cut
+
+sub next {
+    my $self = shift;
+
+    $self->{'record'} = undef;
+    $self->next_block();
+
+    if (defined $self->{'current_block'}) {
+            $self->read_record();
+            return 1;
+    } else {
+            return 0;
+    }
+}
+
+=head2 metadataChanged 
+    Description: whether metadata was changed since the previous record
+    Returntype : Boolean 
+=cut
+
+sub metadataChanged {
+    my $self = shift;
+    return $self->{'metadata_changed'};
+}
+
+=head2 seek
+    Description: Placeholder for user-defined seek function.
+                 Function must allow the user to request that all the subsequent 
+                 records be part of a given genomic region.
+    Returntype : Void
+=cut
+
+sub seek {
+    throw("Method not implemented. Might not be applicable to your file format.");
+}
+
+=head2 read_block
+    Description: Placeholder for user-defined IO function.
+                 Function must obtain and store the next block (e.g. line) of data from
+                 the file.
+    Returntype : Void 
+=cut
+
+sub read_block {
+    throw("Method not implemented. This is really important");
+}
+
+=head2 is_metadata
+    Description: Placeholder for user-defined metadata function.
+                 Function must determine whether $self->{'current_block'}
+                 contains metadata or not.
+    Returntype : Boolean
+=cut
+
+sub is_metadata {
+    throw("Method not implemented. This is really important");
+}
+
+=head2 read_metadata
+    Description: Placeholder for user-defined metadata function.
+                 Function must go through $self-{'current_block'},
+                 extract relevant metadata, and store it in 
+                 $self->{'metadata'}
+    Returntype : Boolean
+=cut
+
+sub read_metadata {
+    throw("Method not implemented. This is really important");
+}
+
+=head2 read_record
+    Description: Placeholder for user-defined record lexing function.
+                 Function must pre-process the data in $self->current block so that it is
+                 readily available to accessor methods.
+    Returntype : Void 
 =cut
 
 sub read_record {
     throw("Method not implemented. This is really important");
-        
 }
 
-sub seek_record {
-    throw("Method not implemented");
-}
-
-=head2 spot_metadata
-    Arg [1]    : String containing the line contents
-    Description: Calling wrapper for user-defined metadata functions. See also
-                 set_metadata_function and default_meta
-    Returntype : Boolean
+=head2 open
+    Description: Placeholder for user-defined filehandling function.
+                 Function must prepare input streams.
+    Returntype : True/False on success/failure
 =cut
 
-sub spot_metadata {
-    my $self = shift;
-    my $line = shift;
-    my $function = $self->metadata_function;
-    return $function->($line);
+sub open {
+    throw("Method not implemented. This is really important");
 }
 
-=head2 set_metadata_function
-    Arg [1]     : Coderef pointing to the subroutine that processes metadata
-    Description : Sets the metadata processing function for the parser.
-                  
-    Example     : # The subroutine should take the form of:             
-                  sub {
-                      my $line = shift;
-                      # detect the presence of metadata
-                      my $meta = $line if ($meta=~/^#/);
-                      #Êmake an early exit if no meta
-                      unless ($meta) {return}
-                      # process the meta from scope of your code
-                      $meta =~ /gene_id=(.*);/;
-                      $self->gene_id($1);
-                      # $self refers to your object, not the parser
-                      $variable_in_caller_scope = $meta;
-                      return 1;
-                      # announce to the parser that you found metadata
-                  }
+
+=head2 close
+    Description: Placeholder for user-defined filehandling function.
+                 Function must close all open input streams.
+    Returntype : True/False on success/failure
 =cut
 
-sub set_metadata_function {
-    my $self = shift;
-    my $new_function = shift;
-    assert_ref($new_function,'CODE','metadata function');
-    $self->{'metadata_function'} = $new_function;
-    return;
-}
-
-sub metadata_function {
-    my $self = shift;
-    return $self->{'metadata_function'};
-}
-
-sub default_meta {
-    my $line = shift;
-    if ($line =~ /^track/ || $line =~ /^\s*#/) {
-        return 1;
-    }
-    return;
-}
-
-sub data_function {
-    my $self = shift;
-    return $self->{'data_function'};
-}
-
-=head2 set_data_function
-    Arg [1]     : Coderef for a subroutine that handles the data passing by
-    Description : Used to supply a custom handler for the data in the file.
-                  Any provided function *must* return a value if all has gone
-                  to plan and a record has been read.
-=cut
-
-sub set_data_function {
-    my $self = shift;
-    my $new_function = shift;
-    assert_ref($new_function,'CODE','data function');
-    $self->{'data_function'} = $new_function;
-    return;
-}
-
-sub process_record {
-    my $self = shift;
-    my $record = shift;
-    my $function = $self->data_function;
-    # ERM... not sure whether this is a good idea or not.
-    return $function->($record);
-}
-
-
-sub read_line {
-    my $self = shift;
-    
-    my $fh = $self->{'filehandle'};
-    my $new_line;
-    if (!eof($fh)) {
-        $new_line = <$fh> || throw ("Error reading file handle: $!");   
-    }    
-    $self->{'current_line'} = $self->{'next_line'};
-    unless (defined ($self->{'current_line'})) { return; }
-    chomp ($new_line) if defined $new_line;
-    $self->{'next_line'} = $new_line;
-    return 1;
-}
-
-sub this_line {
-    my $self = shift;
-    return $self->{'current_line'};
-}
-
-sub next_line {
-    my $self = shift;
-    return $self->{'next_line'};
+sub close {
+    throw("Method not implemented. This is really important");
 }
 
 1;

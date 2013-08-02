@@ -22,45 +22,37 @@ package Bio::EnsEMBL::IO::ColumnBasedParser;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::Parser/;
+use base qw/Bio::EnsEMBL::IO::TextParser/;
 
-sub new {
-    my $caller = shift;
+=head2 open
+    Constructor
+    Argument [1] : Filepath
+    Argument [2] : delimiters
+    Argument [2+]: Hash of parameters for configuration, e.g. buffer sizes or 
+                   specific functions for handling headers or data
+    Returntype   : Bio::EnsEMBL::IO::ColumnBasedParser
+=cut
+
+sub open {
+    my ($caller, $filepath, $delimiter, @other_args) = @_;
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::new(@_);
+    my $self = $class->SUPER::open($filepath, @other_args);
     
-    $self->{'delimiter'} ||= '\t|\s\s+';
+    $self->{'delimiter'} = $delimiter;
     return $self;
 }
+
+=head2 read_record
+    Description: Splits the current block along predefined delimiters
+    Returntype : Void 
+=cut
 
 
 sub read_record {
     my $self = shift;
-    
-    while ($self->read_line) {
-        my $line = $self->this_line;
-        if ($self->spot_metadata($line) || length($line) <= 1) {  
-            next;
-        } elsif (ref($self->data_function) eq "CODE") {
-            return $self->process_record($line);
-        } else {
-            return split($self->{'delimiter'},$line);
-        }
-        
-    }
-    return;
+    chomp $self->{'current_block'};
+    $self->{'record'} = [ split($self->{'delimiter'},$self->{'current_block'}) ] ;
 }
-
-sub delimiter {
-    my $self = shift;
-    my $delimiter = shift;
-    
-    if ($delimiter) {
-        $self->{'delimiter'} = $delimiter;
-    }
-    return $self->{'delimiter'};
-}
-
 
 1;
