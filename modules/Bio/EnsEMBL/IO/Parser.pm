@@ -50,7 +50,7 @@ sub new {
     return $self;
 }
 
-=head2 next_block
+=head2 shift_block
     Description: Wrapper for user defined functions 
     		 Loads the buffered data as current, then stores a new block of data
 		 into the waiting buffer.
@@ -58,10 +58,30 @@ sub new {
 
 =cut
 
-
-sub next_block {
+sub shift_block {
+    my $self = shift;
     $self->{'current_block'} = $self->{'waiting_block'};
     $self->{'waiting_block'} = $self->read_block();
+}
+
+=head2 next_block
+    Description: Wrapper for user defined functions 
+                 Goes through the file blocks, either skipping or parsing metadata blocks
+    Returntype : Void
+
+=cut
+
+sub next_block {
+    my $self = shift;
+    
+    $self->shift_block();
+
+    while( $self->is_metadata() ) {
+	if ($self->{'params'}->{'mustParseMetadata'}) {
+	    $self->read_metadata();
+	}
+        $self->shift_block();
+    }
 }
 
 =head2 next
@@ -77,14 +97,7 @@ sub next {
     my $self = shift;
 
     $self->record = undef;
-    $self->read_block();
-
-    while( $self->is_metadata() ) {
-	if ($self->{'params'}->{'mustParseMetadata'}) {
-	    $self->read_metadata();
-	}
-        $self->read_block();
-    }
+    $self->next_block();
 
     if (defined $self->{'current_block'}) {
 	    $self->read_record();
