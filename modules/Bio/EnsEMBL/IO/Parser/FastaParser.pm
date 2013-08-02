@@ -38,13 +38,13 @@ sub open {
     my $filename = shift;
     my $class = ref($caller) || $caller;
     
-    $self = $class->SUPER::new($filename, '>', undef, @_);
+    my $self = $class->SUPER::new($filename, '>', undef, @_);
     $self->sequence = undef;
     return $self;
 }
 
 sub read_record {
-    $self = shift;
+    my $self = shift;
     $self->{'sequence'} = undef;
     # If the sequence of the previous record was not scanned
     while (not $self->is_at_beginning_of_record()) {
@@ -58,7 +58,7 @@ sub read_record {
     Returntype : scalar
 =cut
 sub getRawHeader {
-    $self = shift;
+    my $self = shift;
     return $self->record[0];
 }
 
@@ -67,7 +67,7 @@ sub getRawHeader {
     Returntype : scalar
 =cut
 sub getHeader {
-    $self = shift;
+    my $self = shift;
     $line = $self->getRawHeader();
     chomp $line;
     # Tail removes initial '>' character
@@ -80,7 +80,7 @@ sub getHeader {
     Returntype : Void 
 =cut
 sub read_sequence {
-    $self = shift;
+    my $self = shift;
     while (not $self->is_at_end_of_record()) {
 	push $self->{'record'}, $self->{'current_block'};
 	$self->read_block();
@@ -92,7 +92,7 @@ sub read_sequence {
     Returntype : list of text lines
 =cut
 sub getRawSequence {
-    $self = shift;
+    my $self = shift;
     if (not defined $self->{'sequence'}) {
 	$self->read_sequence();
     }
@@ -105,8 +105,9 @@ sub getRawSequence {
     Returntype : scalar
 =cut
 sub getSequence {
-    chomp @$self->getRawSequence();
-    return "".join($self->getRawSequence());
+    my $lines = $self->getRawSequence();
+    chomp @$lines;
+    return "".join($lines);
 }
 
 1;
