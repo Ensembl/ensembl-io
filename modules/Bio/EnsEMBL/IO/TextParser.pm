@@ -67,16 +67,13 @@ sub close {
 
 sub read_block {
     my $self = shift;
-
     my $fh = $self->{'filehandle'};
-    my $new_line;
-    if (!eof($fh)) {
-        $new_line = <$fh> || throw ("Error reading file handle: $!");   
+
+    if (eof($fh)) {
+	$self->{'waiting_block'} = undef;
+    else {
+        $self->{'waiting_block'} = <$fh> || throw ("Error reading file handle: $!");   
     }    
-    if defined $new_line {
-	chomp $new_line;
-        $self->{'next_line'} = $new_line;
-    }
 }
 
 1;
