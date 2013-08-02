@@ -64,7 +64,7 @@ sub is_at_end_of_record {
 =cut
 sub is_at_beginning_of_record {
     my $self = shift;
-    return not defined $self->{'start_tag'} || $self->{'waiting_block'} =~ /$self->{'start_tag'}/;
+    return not defined $self->{'start_tag'} || $self->{'current_block'} =~ /$self->{'start_tag'}/;
 }
 
 1;
