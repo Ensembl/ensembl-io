@@ -59,7 +59,6 @@ sub close {
 }
 
 =head2 read_block
-    Arg [1]     : IO::TextParser object
     Description : Reads a line of text, stores it into next_block, 
     		  moving next_block to current_block.
     Returntype   : True/False on existence of a defined current_block after running.
