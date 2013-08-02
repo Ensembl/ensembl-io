@@ -53,7 +53,7 @@ sub open {
 
 sub read_record {
     my $self = shift;
-    $self->{'record'} = split($self->{'delimiter'},$line);
+    $self->{'record'} = split($self->{'delimiter'},$self->{'current_block'});
 }
 
 1;
