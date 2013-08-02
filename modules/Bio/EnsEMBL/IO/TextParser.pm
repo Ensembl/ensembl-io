@@ -65,7 +65,7 @@ sub close {
     Returntype   : True/False on existence of a defined current_block after running.
 =cut
 
-sub read_line {
+sub read_block {
     my $self = shift;
 
     my $fh = $self->{'filehandle'};

@@ -63,6 +63,7 @@ sub read_metadata {
     } elsif ($line =~ /^\s*##Type/) {
 	chomp $line;
 	($head, @tail) = split(/\s+/, $line);
+	# DZ: I do not have the foggiest idea what Type means
         $self->{'metadata'}->{'Type'} = \@tail;
     }
 };
