@@ -46,7 +46,7 @@ sub open {
 sub read_record {
     $self = shift;
     $self->{'sequence'} = undef;
-    # If the sequence of the previous record were not 
+    # If the sequence of the previous record was not scanned
     while (not $self->is_at_beginning_of_record()) {
 	    $self->next_block();
     }
