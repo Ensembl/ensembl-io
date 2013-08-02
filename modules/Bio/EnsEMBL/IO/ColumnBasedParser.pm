@@ -22,7 +22,7 @@ package Bio::EnsEMBL::IO::ColumnBasedParser;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::Parser/;
+use base qw/Bio::EnsEMBL::IO::TextParser/;
 
 =head2 open
     Constructor
