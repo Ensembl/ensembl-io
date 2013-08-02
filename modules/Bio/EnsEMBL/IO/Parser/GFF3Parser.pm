@@ -23,20 +23,147 @@ use warnings;
 
 use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
-my %strand_conversion = ( '+' => '1', '?' => '0', '-' => '-1');
-
-
-sub default_meta {
-    my $self = shift;
-    my $line = shift;
+sub open {
+    my $caller = shift;
+    my $class = ref($caller) || $caller;
     
-    if ($line =~ /^track/ || $line =~ /^\s*##/) {
-        if ($line =~ /^\s*##FASTA/) {
-            return 2;
-        }
-        return 1;
+    my $self = $class->SUPER::new('\t', @_);
+
+    # Metadata defaults
+    if ($self->{'params'}->{'mustReadMetadata'}) {
+       $self->{'gff-version'}->{'Type'} = '2';
+       $self->{'metadata'}->{'Type'} = 'DNA';
+    }
+    
+    return $self;
+}
+
+sub is_metadata {
+    my $self = shift;
+    return $self->{'current_block'} =~ /^#/;
+}
+
+sub read_metadata {
+    my $self = shift;
+    my $line = $self->{'current_block'};
+    
+    # DZ: Question: are track lines valid in a GFF file? I don;'t see this anywhere...?
+    if ($line =~ /^track/) {
+	;
+    } elsif ($line =~ /^\s*##gff-version/) {
+	chomp $line;
+        $self->{'metadata'}->{'gff-version'} = split(/\s+/, $line)[1];
+    } elsif ($line =~ /^\s*##date/) {
+	chomp $line;
+        $self->{'metadata'}->{'date'} = split(/\s+/, $line)[1];
+    } elsif ($line =~ /^\s*##source-version/) {
+	chomp $line;
+	($head, @tail) = split(/\s+/, $line);
+        $self->{'metadata'}->{'source-version'} = \@tail;
+    } elsif ($line =~ /^\s*##Type/) {
+	chomp $line;
+	($head, @tail) = split(/\s+/, $line);
+        $self->{'metadata'}->{'Type'} = \@tail;
     }
 };
+
+sub getRawSeqName {
+    my $self = shift;
+    return $self->{'record'}[0]
+}
+
+sub getSeqName {
+    my $self = shift;
+    return $self->getRawSeqName();
+}
+
+sub getRawSource {
+    my $self = shift;
+    return $self->{'record'}[1]
+}
+
+sub getSource {
+    my $self = shift;
+    return $self->getRawSource();
+}
+
+sub getRawStart {
+    my $self = shift;
+    return $self->{'record'}[2]
+}
+
+sub getStart {
+    my $self = shift;
+    return $self->getRawStart();
+}
+
+sub getRawEnd {
+    my $self = shift;
+    return $self->{'record'}[3]
+}
+
+sub getEnd {
+    my $self = shift;
+    return $self->getRawEnd();
+}
+
+sub getRawScore {
+    my $self = shift;
+    return $self->{'record'}[4]
+}
+
+sub getScore {
+    my $self = shift;
+    my $val = $self->getRawScore();
+    if ($val =~ /\./) {
+	    return undef;
+    } else {
+	    return $val;
+    }
+}
+
+sub getRawStrand {
+    my $self = shift;
+    return $self->{'record'}[5]
+}
+
+my %strand_conversion = ( '+' => '1', '.' => '0', '-' => '-1');
+
+sub getStrand {
+    my $self = shift;
+    my $val = $self->getRawStrand();
+    if ($val =~ /\./) {
+	    return undef;
+    } else {
+	    return $strand_conversion{$val};
+    }
+}
+
+sub getRawFrame {
+    my $self = shift;
+    return $self->{'record'}[6]
+}
+
+sub getFrame {
+    my $self = shift;
+    my $val = $self->getRawFrame();
+    if ($val =~ /\./) {
+	    return undef;
+    } else {
+	    return $val;
+    }
+}
+
+sub getRawAttribute {
+    my $self = shift;
+    return $self->{'record'}[7]
+}
+
+sub getAttribute {
+    my $self = shift;
+    my $val = $self->getRawAttribute();
+
+}
 
 # NOT FULLY IMPLEMENTED
 =head2 fasta_record
