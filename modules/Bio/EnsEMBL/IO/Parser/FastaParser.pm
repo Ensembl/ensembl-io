@@ -38,8 +38,13 @@ sub open {
     my $filename = shift;
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::new($filename, '>', undef, @_);
-    $self->sequence = undef;
+    my $self = $class->SUPER::open($filename, '>', undef, @_);
+    bless $self, $class;
+    $self->{'sequence'} = undef;
+
+    # pre-load peek buffer
+    $self->next_block();
+    
     return $self;
 }
 
@@ -47,10 +52,15 @@ sub read_record {
     my $self = shift;
     $self->{'sequence'} = undef;
     # If the sequence of the previous record was not scanned
-    while (not $self->is_at_beginning_of_record()) {
-	    $self->next_block();
+    while (defined $self->{'current_block'} && not $self->is_at_beginning_of_record()) {
+        $self->next_block();
     }
-    $self->{'record'} = [ $self->{'current_block'} ];
+    if (defined $self->{'current_block'} ) {
+        $self->{'record'} = [ $self->{'current_block'} ];
+        $self->next_block();
+    } else {
+        $self->{'record'} = undef;
+    }
 }
 
 =head2 getRawHeader 
@@ -59,7 +69,7 @@ sub read_record {
 =cut
 sub getRawHeader {
     my $self = shift;
-    return $self->record[0];
+    return $self->{'record'}[0];
 }
 
 =head2 getHeader 
@@ -68,11 +78,10 @@ sub getRawHeader {
 =cut
 sub getHeader {
     my $self = shift;
-    $line = $self->getRawHeader();
+    my $line = $self->getRawHeader();
     chomp $line;
-    # Tail removes initial '>' character
-    ($head, @tail) = $line;
-    return \@tail;
+    # Remove initial '>' character
+    return substr($line, 1);
 }
 
 =head2 read_sequence 
@@ -82,9 +91,10 @@ sub getHeader {
 sub read_sequence {
     my $self = shift;
     while (not $self->is_at_end_of_record()) {
-	push $self->{'record'}, $self->{'current_block'};
-	$self->read_block();
+        push $self->{'record'}, $self->{'current_block'};
+        $self->next_block();
     }
+    push $self->{'record'}, $self->{'current_block'};
 }
 
 =head2 getRawSequence
@@ -94,10 +104,9 @@ sub read_sequence {
 sub getRawSequence {
     my $self = shift;
     if (not defined $self->{'sequence'}) {
-	$self->read_sequence();
+        $self->read_sequence();
     }
-    ($head, @tail) = $self->{'record'};
-    return \@tail;
+    return [@{$self->{'record'}}[1 .. scalar(@{$self->{'record'}})-1]];
 }
 
 =head2 getSequence
@@ -105,9 +114,24 @@ sub getRawSequence {
     Returntype : scalar
 =cut
 sub getSequence {
+    my $self = shift;
     my $lines = $self->getRawSequence();
     chomp @$lines;
-    return "".join($lines);
+    return join("", @$lines);
 }
+
+=head2 is_metadata
+    Description: default 0;
+    Returntype : scalar
+=cut
+
+sub is_metadata { return 0; }
+
+=head2 is_metadata
+    Description: empty shell
+    Returntype : Void
+=cut
+
+sub read_metadata {}
 
 1;

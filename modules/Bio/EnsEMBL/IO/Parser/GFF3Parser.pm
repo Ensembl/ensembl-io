@@ -25,9 +25,10 @@ use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
 sub open {
     my $caller = shift;
+    my $filename = shift;
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::new('\t', @_);
+    my $self = $class->SUPER::open($fiename, '\t', @_);
 
     # Metadata defaults
     if ($self->{'params'}->{'mustReadMetadata'}) {
@@ -49,21 +50,23 @@ sub read_metadata {
     
     # DZ: Question: are track lines valid in a GFF file? I don;'t see this anywhere...?
     if ($line =~ /^track/) {
-	;
+	    # TODO
     } elsif ($line =~ /^\s*##gff-version/) {
-	chomp $line;
-        $self->{'metadata'}->{'gff-version'} = split(/\s+/, $line)[1];
+        chomp $line;
+	my @words = split(/\s+/, $line);
+        $self->{'metadata'}->{'gff-version'} = $words[1];
     } elsif ($line =~ /^\s*##date/) {
-	chomp $line;
-        $self->{'metadata'}->{'date'} = split(/\s+/, $line)[1];
+        chomp $line;
+	my @words = split(/\s+/, $line);
+        $self->{'metadata'}->{'date'} = $words[1];
     } elsif ($line =~ /^\s*##source-version/) {
-	chomp $line;
-	($head, @tail) = split(/\s+/, $line);
+        chomp $line;
+        (my $head, my @tail) = split(/\s+/, $line);
         $self->{'metadata'}->{'source-version'} = \@tail;
     } elsif ($line =~ /^\s*##Type/) {
-	chomp $line;
-	($head, @tail) = split(/\s+/, $line);
-	# DZ: I do not have the foggiest idea what Type means
+        chomp $line;
+        (my $head, my @tail) = split(/\s+/, $line);
+        # DZ: I do not have the foggiest idea what Type means
         $self->{'metadata'}->{'Type'} = \@tail;
     }
 };
@@ -117,9 +120,9 @@ sub getScore {
     my $self = shift;
     my $val = $self->getRawScore();
     if ($val =~ /\./) {
-	    return undef;
+            return undef;
     } else {
-	    return $val;
+            return $val;
     }
 }
 
@@ -134,9 +137,9 @@ sub getStrand {
     my $self = shift;
     my $val = $self->getRawStrand();
     if ($val =~ /\./) {
-	    return undef;
+            return undef;
     } else {
-	    return $strand_conversion{$val};
+            return $strand_conversion{$val};
     }
 }
 
@@ -149,9 +152,9 @@ sub getFrame {
     my $self = shift;
     my $val = $self->getRawFrame();
     if ($val =~ /\./) {
-	    return undef;
+            return undef;
     } else {
-	    return $val;
+            return $val;
     }
 }
 

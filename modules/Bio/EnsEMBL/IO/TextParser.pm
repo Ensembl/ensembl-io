@@ -40,11 +40,12 @@ sub open {
     my $caller = shift;
     my $filename = shift;
     my $class = ref($caller) || $caller;
-    
+
     my $self = $class->SUPER::new(@_);
+    bless $self, $class;
     $self->{'filename'} = $filename;
-    open $self->{'filehandle'} $filename || throw("Could not open " . $filename);
-    
+    open($self->{'filehandle'}, $filename) || throw("Could not open " . $filename);
+
     return $self;
 }
 
@@ -60,7 +61,7 @@ sub close {
 
 =head2 read_block
     Description : Reads a line of text, stores it into next_block, 
-    		  moving next_block to current_block.
+                  moving next_block to current_block.
     Returntype   : True/False on existence of a defined current_block after running.
 =cut
 
@@ -69,8 +70,8 @@ sub read_block {
     my $fh = $self->{'filehandle'};
 
     if (eof($fh)) {
-	$self->{'waiting_block'} = undef;
-    else {
+        $self->{'waiting_block'} = undef;
+    } else {
         $self->{'waiting_block'} = <$fh> || throw ("Error reading file handle: $!");   
     }    
 }

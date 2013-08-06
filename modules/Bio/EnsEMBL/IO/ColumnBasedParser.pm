@@ -39,7 +39,7 @@ sub open {
     my $delimiter = shift; 
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::new($filepath, @_);
+    my $self = $class->SUPER::open($filepath, @_[2 .. $#_ - 1]);
     
     $self->{'delimiter'} = $delimiter;
     return $self;

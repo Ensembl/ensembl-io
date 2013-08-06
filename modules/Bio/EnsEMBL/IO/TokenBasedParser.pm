@@ -35,12 +35,13 @@ sub open {
     my $end_tag = shift;
 
     if (not defined $start_tag && not defined $end_tag) {
-	throw("C'mon, gimme something to work with, you cannot define a TokenBasedParser without tokens!");
+        throw("C'mon, gimme something to work with, you cannot define a TokenBasedParser without tokens!");
     }
 
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::new($filename, @_);
+    my $self = $class->SUPER::open($filename, @_);
+    bless $self, $class;
     $self->{'start_tag'} = $start_tag;
     $self->{'end_tag'} = $end_tag;
     
@@ -55,7 +56,8 @@ sub open {
 sub is_at_end_of_record {
     my $self = shift;
     return (defined $self->{'end_tag'} && $self->{'current_block'} =~ /$self->{'end_tag'}/) 
-	    || (defined $self->{'start_tag'} && $self->{'waiting_block'} =~ /$self->{'start_tag'}/);
+           || !defined $self->{'waiting_block'}
+           || (defined $self->{'start_tag'} && $self->{'waiting_block'} =~ /$self->{'start_tag'}/);
 }
 
 =head2 is_end_of_record
@@ -64,7 +66,8 @@ sub is_at_end_of_record {
 =cut
 sub is_at_beginning_of_record {
     my $self = shift;
-    return not defined $self->{'start_tag'} || $self->{'current_block'} =~ /$self->{'start_tag'}/;
+    return !defined $self->{'start_tag'} || $self->{'current_block'} =~ /$self->{'start_tag'}/
+           || !defined $self->{'waiting_block'};
 }
 
 1;
