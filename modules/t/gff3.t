@@ -16,6 +16,8 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 ok ($parser->next());
 @test_row = (qw(mmscl   supported_mRNA  exon    61468   61729   .   +   .   Parent=mmMAP_17));
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
+ok ($parser->close());
 
 
-done_testing;
+
+done_testing();

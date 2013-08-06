@@ -28,13 +28,17 @@ sub open {
     my $filename = shift;
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::open($fiename, '\t', @_);
+    my $self = $class->SUPER::open($filename, '\t', @_);
+    bless $self, $class;
 
     # Metadata defaults
     if ($self->{'params'}->{'mustReadMetadata'}) {
        $self->{'gff-version'}->{'Type'} = '2';
        $self->{'metadata'}->{'Type'} = 'DNA';
     }
+
+    # pre-load peek buffer
+    $self->next_block();
     
     return $self;
 }

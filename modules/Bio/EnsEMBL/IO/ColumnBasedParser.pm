@@ -40,6 +40,7 @@ sub open {
     my $class = ref($caller) || $caller;
     
     my $self = $class->SUPER::open($filepath, @_[2 .. $#_ - 1]);
+    bless $self, $class;
     
     $self->{'delimiter'} = $delimiter;
     return $self;
@@ -53,7 +54,8 @@ sub open {
 
 sub read_record {
     my $self = shift;
-    $self->{'record'} = split($self->{'delimiter'},$self->{'current_block'});
+    chomp $self->{'current_block'};
+    $self->{'record'} = [ split($self->{'delimiter'},$self->{'current_block'}) ] ;
 }
 
 1;
