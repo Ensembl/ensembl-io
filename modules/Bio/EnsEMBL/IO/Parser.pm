@@ -43,6 +43,7 @@ sub new {
 	    record => undef,
 	    metadata => {},
 	    params => \%param_hash,
+    	    metadata_changed => 0;
     };
     bless $self, $class;
     
@@ -74,10 +75,12 @@ sub next_block {
     my $self = shift;
     
     $self->shift_block();
+    $self->metadata_changed = 0;
 
     while( defined $self->{'current_block'} && $self->is_metadata() ) {
         if ($self->{'params'}->{'mustParseMetadata'}) {
             $self->read_metadata();
+	    $self->metadata_changed = 1;
         }
         $self->shift_block();
     }
@@ -104,6 +107,16 @@ sub next {
     } else {
             return 0;
     }
+}
+
+=head2 metadataChanged 
+    Description: whether metadata was changed since the previous record
+    Returntype : Boolean 
+=cut
+
+sub metadataChanged {
+    my $self = shift;
+    return $self->{'metadata_changed'};
 }
 
 =head2 seek

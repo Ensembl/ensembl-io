@@ -38,7 +38,7 @@ sub open {
     my $filename = shift;
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::open($filename, '>', undef, @_);
+    my $self = $class->SUPER::open($filename, '^>', undef, @_);
     bless $self, $class;
     $self->{'sequence'} = undef;
 
