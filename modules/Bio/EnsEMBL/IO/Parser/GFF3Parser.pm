@@ -24,12 +24,10 @@ use warnings;
 use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
 sub open {
-    my $caller = shift;
-    my $filename = shift;
+    my ($caller, $filename, @other_args) = @_;
     my $class = ref($caller) || $caller;
     
     my $self = $class->SUPER::open($filename, '\t', @_);
-    bless $self, $class;
 
     # Metadata defaults
     if ($self->{'params'}->{'mustReadMetadata'}) {

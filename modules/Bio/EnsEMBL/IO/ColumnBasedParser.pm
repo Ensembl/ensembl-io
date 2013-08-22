@@ -34,13 +34,10 @@ use base qw/Bio::EnsEMBL::IO::TextParser/;
 =cut
 
 sub open {
-    my $caller = shift;
-    my $filepath = shift;
-    my $delimiter = shift; 
+    my ($caller, $filepath, $delimiter, @other_args) = @_;
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::open($filepath, @_[2 .. $#_ - 1]);
-    bless $self, $class;
+    my $self = $class->SUPER::open($filepath, @other_args);
     
     $self->{'delimiter'} = $delimiter;
     return $self;

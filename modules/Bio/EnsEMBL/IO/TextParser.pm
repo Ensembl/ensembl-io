@@ -37,12 +37,10 @@ use base qw/Bio::EnsEMBL::IO::Parser/;
 =cut
 
 sub open {
-    my $caller = shift;
-    my $filename = shift;
+    my ($caller, $filename, @other_args) = @_;
     my $class = ref($caller) || $caller;
 
-    my $self = $class->SUPER::new(@_);
-    bless $self, $class;
+    my $self = $class->SUPER::new(@other_args);
     $self->{'filename'} = $filename;
     open($self->{'filehandle'}, $filename) || throw("Could not open " . $filename);
 

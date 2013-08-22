@@ -34,12 +34,10 @@ use base qw/Bio::EnsEMBL::IO::TokenBasedParser/;
     Returntype : Ensembl::IO::Parser::FastaParser object
 =cut
 sub open {
-    my $caller = shift;
-    my $filename = shift;
+    my ($caller, $filename, @other_args) = @_;
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::open($filename, '^>', undef, @_);
-    bless $self, $class;
+    my $self = $class->SUPER::open($filename, '^>', undef, @other_args);
     $self->{'sequence'} = undef;
 
     # pre-load peek buffer
@@ -85,28 +83,32 @@ sub getHeader {
 }
 
 =head2 read_sequence 
-    Description: store a list of lines
-    Returntype : Void 
+    Description: Read sequence lines of Fasta record
+    Returntype : Array ref
 =cut
 sub read_sequence {
     my $self = shift;
+    my $arrayRef = [];
+
     while (not $self->is_at_end_of_record()) {
-        push $self->{'record'}, $self->{'current_block'};
+        push $arrayRef, $self->{'current_block'};
         $self->next_block();
     }
-    push $self->{'record'}, $self->{'current_block'};
+    push $arrayRef, $self->{'current_block'};
+
+    return $arrayRef;
 }
 
 =head2 getRawSequence
     Description: return raw sequence data
-    Returntype : list of text lines
+    Returntype : Array ref of text lines
 =cut
 sub getRawSequence {
     my $self = shift;
     if (not defined $self->{'sequence'}) {
-        $self->read_sequence();
+        $self->{'sequence'} = $self->read_sequence();
     }
-    return [@{$self->{'record'}}[1 .. scalar(@{$self->{'record'}})-1]];
+    return $self->{'sequence'}; 
 }
 
 =head2 getSequence

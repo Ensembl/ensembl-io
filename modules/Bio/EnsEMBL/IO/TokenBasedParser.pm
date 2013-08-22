@@ -29,10 +29,7 @@ use Bio::EnsEMBL::Utils::Scalar qw/assert_ref/;
 use base qw/Bio::EnsEMBL::IO::TextParser/;
 
 sub open {
-    my $caller = shift;
-    my $filename = shift;
-    my $start_tag = shift;
-    my $end_tag = shift;
+    my ($caller, $filename, $start_tag, $end_tag, @other_args) = @_;
 
     if (not defined $start_tag && not defined $end_tag) {
         throw("C'mon, gimme something to work with, you cannot define a TokenBasedParser without tokens!");
@@ -40,8 +37,7 @@ sub open {
 
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::open($filename, @_);
-    bless $self, $class;
+    my $self = $class->SUPER::open($filename, @other_args);
     $self->{'start_tag'} = $start_tag;
     $self->{'end_tag'} = $end_tag;
     

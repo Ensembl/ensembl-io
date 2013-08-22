@@ -43,7 +43,7 @@ sub new {
 	    record => undef,
 	    metadata => {},
 	    params => \%param_hash,
-    	    metadata_changed => 0;
+    	    metadata_changed => 0,
     };
     bless $self, $class;
     
@@ -75,12 +75,12 @@ sub next_block {
     my $self = shift;
     
     $self->shift_block();
-    $self->metadata_changed = 0;
+    $self->{'metadata_changed'} = 0;
 
     while( defined $self->{'current_block'} && $self->is_metadata() ) {
         if ($self->{'params'}->{'mustParseMetadata'}) {
             $self->read_metadata();
-	    $self->metadata_changed = 1;
+	    $self->{'metadata_changed'} = 1;
         }
         $self->shift_block();
     }
