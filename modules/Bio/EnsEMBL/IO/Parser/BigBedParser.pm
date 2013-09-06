@@ -1,9 +1,6 @@
 package Bio::EnsEMBL::IO::Parser::BigBedParser;
 use strict;
 
-use List::Util qw(max);
-
-use Data::Dumper;
 use Bio::DB::BigBed;
 
 sub open {
@@ -80,7 +77,6 @@ sub getChrom {
   return $self->getRawChrom;
 }
 
-
 sub getRawStart {
   my $self = shift;
   return $self->{current}->start;
@@ -91,7 +87,6 @@ sub getStart {
   return $self->getRawStart;
 }
 
-
 sub getRawEnd {
   my $self = shift;
   return $self->{current}->end;
@@ -101,7 +96,6 @@ sub getEnd {
   my $self = shift;
   return $self->getRawEnd;
 }
-
 
 sub getRawScore {
   my $self = shift;
@@ -175,7 +169,7 @@ sub munge_chr_id {
   }
 }
 
-sub fetch_extended_summary_array  {
+sub fetch_extended_summary_array {
   my ($self, $chr_id, $start, $end, $bins) = @_;
 
   #  Maybe need to add 'chr' 

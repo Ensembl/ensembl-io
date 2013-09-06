@@ -4,12 +4,10 @@ use warnings;
 use Test::More;
 use Bio::EnsEMBL::IO::Parser::BigBedParser;
 
-my $test_file = "data.bb";
-
 ######################################################
 ## Test 1
 ######################################################
-my $parser = Bio::EnsEMBL::IO::Parser::BigBedParser->open($test_file);
+my $parser = Bio::EnsEMBL::IO::Parser::BigBedParser->open('data.bb');
 
 ok($parser->next());
 ok($parser->getChrom eq 'chr1');
@@ -38,6 +36,5 @@ ok($parser->getScore == 1000);
 ok(!$parser->next);
 
 $parser->close();
-
 
 done_testing;
