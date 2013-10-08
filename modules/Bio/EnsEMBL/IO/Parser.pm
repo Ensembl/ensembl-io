@@ -73,10 +73,8 @@ sub shift_block {
 
 sub next_block {
     my $self = shift;
-    
     $self->shift_block();
     $self->{'metadata_changed'} = 0;
-
     while( defined $self->{'current_block'} && $self->is_metadata() ) {
         if ($self->{'params'}->{'mustParseMetadata'}) {
             $self->read_metadata();
