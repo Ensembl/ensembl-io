@@ -43,7 +43,6 @@ sub open {
   my $class = ref($caller) || $caller;
 
   my $self = $class->SUPER::open($filename, undef, '^//', mustParseMetadata=>1, @other_args);
-
   $self->next_block();
 
   return $self;
@@ -84,13 +83,23 @@ sub read_record {
       $self->add_seq($line);
       next;
     }
-    print STDERR "FIRST NOT SEQ LINE: $line\n";
-    last;
+    if ($line =~ /^TREE/) {
+      $self->add_tree($line);
+      next;
+    }
+    if ($line =~ /^SCORE/) {
+      $self->add_score_type($line);
+      next;
+    }
+    if ($line =~ /^DATA/) {
+      ## The rest are the actual sequences
+      next
+    }
+
+    $self->parse_seq($line);
+#    exit;
   }
 
-  # if ($rec =~ /^SEQ\s*(.*)/) {
-  #   $self->add_seq($1);
-  # }
   return [1];
 }
 
@@ -102,28 +111,36 @@ sub is_metadata {
 
 #####################################
 
-sub format {
-  my ($self, $format) = @_;
-  if (defined $format) {
-    $self->{_format} = $format;
-  }
-  return $self->{_format};
+sub parse_seq {
+  my ($self, $line) = @_;
+
+  my @flds = grep {$_ ne ' '} split('',$line); ## grep because of optional spaces
+  my @nts = (@flds[0..scalar@{$self->sequences}-1]);
+  my @scores = (@flds[scalar@{$self->sequences}..scalar@{$self->sequences}+scalar@{$self->score_types}-1]);
+
+  my $rec = { 'sequence' => [@nts],
+	      'scores'   => [@scores],
+	    };
+
+  push @{$self->{_columns}}, $rec;
+
 }
 
-sub date {
-  my ($self, $date) = @_;
-  if (defined $date) {
-    $self->{_date} = $date;
-  }
-  return $self->{_date};
+
+sub add_score_type {
+  my ($self, $line) = @_;
+  $line =~ /^SCORE\s+(.*)/;
+  my $score_type = $1;
+  push @{$self->{_score_types}}, $score_type;
+  return
 }
 
-sub releases {
-  my ($self, $releases) = @_;
-  if ((defined $releases) && (ref $releases eq 'ARRAY') && (scalar @$releases)) {
-    $self->{_releases} = $releases;
-  }
-  return $self->{_releases};
+sub add_tree {
+  my ($self, $line) = @_;
+  $line =~ /TREE\s+(.*)/;
+  my $tree = $1;
+  $self->tree($tree);
+  return;
 }
 
 sub add_seq {
@@ -142,8 +159,8 @@ sub parse_seq_line {
   shift @fields; # SEQ token
   $rec->{'organism'} = shift @fields;
   if ($self->format eq 'resequencing') {
-    $self->{individual} = shift @fields;
-    $self->{source}     = shift @fields;
+    $rec->{source} = pop @fields;
+    $rec->{individual} = join (" ", @fields);
   } else {
     if ($self->format eq 'gene_alignment') {
       $rec->{'translation_stable_id'} = shift @fields;
@@ -196,11 +213,53 @@ sub parse_first_seq_line {
 
 }
 
-########## RECORD BASED API ##########
+########## EXTERNAL API ##########
 
 sub sequences {
   my ($self) = @_;
   return $self->{_seqs}
+}
+
+sub score_types {
+  my ($self) = @_;
+  return $self->{_score_types};
+}
+
+sub tree {
+  my ($self, $tree) = @_;
+  if (defined $tree) {
+    $self->{_tree} = $tree;
+  }
+  return $self->{_tree};
+}
+
+sub format {
+  my ($self, $format) = @_;
+  if (defined $format) {
+    $self->{_format} = $format;
+  }
+  return $self->{_format};
+}
+
+sub date {
+  my ($self, $date) = @_;
+  if (defined $date) {
+    $self->{_date} = $date;
+  }
+  return $self->{_date};
+}
+
+sub releases {
+  my ($self, $releases) = @_;
+  if ((defined $releases) && (ref $releases eq 'ARRAY') && (scalar @$releases)) {
+    $self->{_releases} = $releases;
+  }
+  return $self->{_releases};
+}
+
+sub get_next_column {
+  my ($self) = @_;
+  return shift @{$self->{_columns}};
 }
 
 1;
