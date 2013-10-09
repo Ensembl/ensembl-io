@@ -116,7 +116,10 @@ sub parse_seq {
 
   my @flds = grep {$_ ne ' '} split('',$line); ## grep because of optional spaces
   my @nts = (@flds[0..scalar@{$self->sequences}-1]);
-  my @scores = (@flds[scalar@{$self->sequences}..scalar@{$self->sequences}+scalar@{$self->score_types}-1]);
+  my @scores = ();
+  if (defined $self->score_types && scalar @{$self->score_types}) {
+    @scores = (@flds[scalar@{$self->sequences}..scalar@{$self->sequences}+scalar@{$self->score_types}-1]);
+  }
 
   my $rec = { 'sequence' => [@nts],
 	      'scores'   => [@scores],
@@ -222,11 +225,15 @@ sub sequences {
 
 sub score_types {
   my ($self) = @_;
-  return $self->{_score_types};
+  return $self->{_score_types} || [];
 }
 
 sub tree {
   my ($self, $tree) = @_;
+  if ($self->format eq "resequencing") {
+    warn "No TREE is allowed in 'resequencing' EMF format\n";
+    return;
+  }
   if (defined $tree) {
     $self->{_tree} = $tree;
   }
