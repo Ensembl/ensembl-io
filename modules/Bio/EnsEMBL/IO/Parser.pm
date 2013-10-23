@@ -45,6 +45,12 @@ sub new {
 	    params => $param_hash_ref,
     	    metadata_changed => 0,
     };
+
+    # By default metadata is read and parsed
+    if (not exists $self->{'params'}->{'mustParseMetadata'}) {
+	    $self->{'params'}->{'mustParseMetadata'} = 1;
+    }
+
     bless $self, $class;
     
     return $self;
