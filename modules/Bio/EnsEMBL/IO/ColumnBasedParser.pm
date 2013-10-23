@@ -25,12 +25,14 @@ use warnings;
 use base qw/Bio::EnsEMBL::IO::TextParser/;
 
 =head2 open
+
     Constructor
     Argument [1] : Filepath
     Argument [2] : delimiters
     Argument [2+]: Hash of parameters for configuration, e.g. buffer sizes or 
                    specific functions for handling headers or data
     Returntype   : Bio::EnsEMBL::IO::ColumnBasedParser
+
 =cut
 
 sub open {
@@ -44,8 +46,10 @@ sub open {
 }
 
 =head2 read_record
+
     Description: Splits the current block along predefined delimiters
     Returntype : Void 
+
 =cut
 
 
