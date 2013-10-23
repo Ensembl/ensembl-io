@@ -51,6 +51,7 @@ sub new {
 }
 
 =head2 shift_block
+
     Description: Wrapper for user defined functions 
                  Loads the buffered data as current, then stores a new block of data
                  into the waiting buffer.
@@ -65,6 +66,7 @@ sub shift_block {
 }
 
 =head2 next_block
+
     Description: Wrapper for user defined functions 
                  Goes through the file blocks, either skipping or parsing metadata blocks
     Returntype : Void
@@ -87,6 +89,7 @@ sub next_block {
 }
 
 =head2 next
+
     Description: Business logic of the iterator
                  Reads blocks of data from the file, determines whether they contain 
                  metadata or an actual record, optionally processes the metadata, and
@@ -110,8 +113,10 @@ sub next {
 }
 
 =head2 metadataChanged 
+
     Description: whether metadata was changed since the previous record
     Returntype : Boolean 
+
 =cut
 
 sub metadataChanged {
@@ -120,10 +125,12 @@ sub metadataChanged {
 }
 
 =head2 seek
+
     Description: Placeholder for user-defined seek function.
                  Function must allow the user to request that all the subsequent 
                  records be part of a given genomic region.
     Returntype : Void
+
 =cut
 
 sub seek {
@@ -131,10 +138,12 @@ sub seek {
 }
 
 =head2 read_block
+
     Description: Placeholder for user-defined IO function.
                  Function must obtain and store the next block (e.g. line) of data from
                  the file.
     Returntype : Void 
+
 =cut
 
 sub read_block {
@@ -142,10 +151,12 @@ sub read_block {
 }
 
 =head2 is_metadata
+
     Description: Placeholder for user-defined metadata function.
                  Function must determine whether $self->{'current_block'}
                  contains metadata or not.
     Returntype : Boolean
+
 =cut
 
 sub is_metadata {
@@ -153,11 +164,13 @@ sub is_metadata {
 }
 
 =head2 read_metadata
+
     Description: Placeholder for user-defined metadata function.
                  Function must go through $self-{'current_block'},
                  extract relevant metadata, and store it in 
                  $self->{'metadata'}
     Returntype : Boolean
+
 =cut
 
 sub read_metadata {
@@ -165,10 +178,12 @@ sub read_metadata {
 }
 
 =head2 read_record
+
     Description: Placeholder for user-defined record lexing function.
                  Function must pre-process the data in $self->current block so that it is
                  readily available to accessor methods.
     Returntype : Void 
+
 =cut
 
 sub read_record {
@@ -176,9 +191,11 @@ sub read_record {
 }
 
 =head2 open
+
     Description: Placeholder for user-defined filehandling function.
                  Function must prepare input streams.
     Returntype : True/False on success/failure
+
 =cut
 
 sub open {
@@ -187,9 +204,11 @@ sub open {
 
 
 =head2 close
+
     Description: Placeholder for user-defined filehandling function.
                  Function must close all open input streams.
     Returntype : True/False on success/failure
+
 =cut
 
 sub close {

@@ -172,6 +172,7 @@ sub getAttribute {
 }
 
 # NOT FULLY IMPLEMENTED
+
 =head2 fasta_record
 
   Arg [1]    : listref taking the form [$meta_line,$sequence]
@@ -185,6 +186,7 @@ sub getAttribute {
                    ....
                }
   Returntype : Listref of Strings, consisting of header and sequence
+
 =cut
 
 sub fasta_record {
