@@ -35,14 +35,14 @@ use Bio::EnsEMBL::Utils::Scalar qw/assert_ref/;
 
 sub new {
     my $class = shift;
-    my %param_hash = @_;
+    my $param_hash_ref = shift;
     
     my $self = {
 	    current_block => undef,
 	    waiting_block => undef,
 	    record => undef,
 	    metadata => {},
-	    params => \%param_hash,
+	    params => $param_hash_ref,
     	    metadata_changed => 0,
     };
     bless $self, $class;
