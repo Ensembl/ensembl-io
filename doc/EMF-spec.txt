@@ -91,7 +91,7 @@ COLUMN DESCRIPTORS:
 These lines start with "SEQ" or "SCORE" and they explain, in order, the columns of data in the next data block.
 Total number of SEQ and SCORE lines must correspond with the number and order of columns in the data block lines.
 An extra type of lines starting with "COMP" are allowed in the compara subformat (cEMF). These lines are needed to explain composite SEQ lines (i.e. SEQ lines that don't refer to a single contiguous sequence region in a -usually- fragmented genome). In these cases, multiple COMP lines explain a single SEQ line (see examples below).
-An optional TREE line is allowed for compara and gene_alignment subformat (cEMF and gEMF). If present, this line must contain the phylogenetic tree of the species described in newick or nhx format.
+An optional TREE line is allowed for compara and gene_alignment subformat (cEMF and gEMF). If present, this line must contain the phylogenetic tree of the species described in newick (nwk) or nhx format. The format should appear as the second column of the line and the actual tree in the third column. More than one TREE lines are allowed.
 
 The format of these lines is:
 
