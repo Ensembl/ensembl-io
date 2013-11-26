@@ -52,14 +52,14 @@ sub read_metadata {
     
     # DZ: Question: are track lines valid in a GFF file? I don;'t see this anywhere...?
     if ($line =~ /^track/) {
-	    # TODO
+    # TODO
     } elsif ($line =~ /^\s*##gff-version/) {
         chomp $line;
-	my @words = split(/\s+/, $line);
+        my @words = split(/\s+/, $line);
         $self->{'metadata'}->{'gff-version'} = $words[1];
     } elsif ($line =~ /^\s*##date/) {
         chomp $line;
-	my @words = split(/\s+/, $line);
+        my @words = split(/\s+/, $line);
         $self->{'metadata'}->{'date'} = $words[1];
     } elsif ($line =~ /^\s*##source-version/) {
         chomp $line;
