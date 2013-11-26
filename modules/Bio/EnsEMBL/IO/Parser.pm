@@ -38,17 +38,17 @@ sub new {
     my $param_hash_ref = shift;
     
     my $self = {
-	    current_block => undef,
-	    waiting_block => undef,
-	    record => undef,
-	    metadata => {},
-	    params => $param_hash_ref,
+        current_block => undef,
+        waiting_block => undef,
+        record => undef,
+        metadata => {},
+        params => $param_hash_ref,
     	    metadata_changed => 0,
     };
 
     # By default metadata is read and parsed
     if (not exists $self->{'params'}->{'mustParseMetadata'}) {
-	    $self->{'params'}->{'mustParseMetadata'} = 1;
+        $self->{'params'}->{'mustParseMetadata'} = 1;
     }
 
     bless $self, $class;
@@ -88,7 +88,7 @@ sub next_block {
     while( defined $self->{'current_block'} && $self->is_metadata() ) {
         if ($self->{'params'}->{'mustParseMetadata'}) {
             $self->read_metadata();
-	    $self->{'metadata_changed'} = 1;
+            $self->{'metadata_changed'} = 1;
         }
         $self->shift_block();
     }
