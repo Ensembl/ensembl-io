@@ -34,7 +34,6 @@ sub open {
     my $self = $class->SUPER::open($filename, 'LOCUS', '//', @_);
     
     $self->next_block();
-    throw("Not a valid Genbank file!!") unless ($self->is_at_beginning_of_record);
     return $self;
 }
 
