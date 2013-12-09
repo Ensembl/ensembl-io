@@ -34,6 +34,7 @@ sub open {
     my $self = $class->SUPER::open($filename, 'LOCUS', '//', @_);
     
     $self->next_block();
+    throw("Not a valid Genbank file!!") unless ($self->is_at_beginning_of_record);
     return $self;
 }
 
@@ -54,17 +55,10 @@ sub next_block {
     my $self = shift;
     my $fh = $self->{'filehandle'};
 
-    if (eof($fh)) {
-        $self->{'waiting_block'} = undef;
-        return 0;
-    }
     $self->{'current_block'} = $self->{'waiting_block'};
-    while() {
-        if (eof($fh)) {
-            $self->{'waiting_block'} = undef;
-            return 0;
-        }
-        elsif (my $line = <$fh>) {
+    while(!eof($fh)) {
+        my $line = <$fh>;
+        if (defined $line) {
             if ($line =~ /^\S/) {
                 $self->{'waiting_block'} = $line;   
                 return 1;
@@ -74,6 +68,8 @@ sub next_block {
             }
         }
     }
+    $self->{'waiting_block'} = undef;
+    return 0;
 }
 
 =head2 read_record
@@ -89,60 +85,60 @@ sub read_record {
     my $self = shift;
     
     while (!$self->is_at_end_of_record) {
-    if ($self->{'current_block'} =~ /^LOCUS\s+(\S+)\s+(\d+)\s+bp\s+(\w+)\s+(\w+)\s+(\w+)\s+(\S+)/i) {
-        $self->{'record'}->{'_locus_id'}          = $1;
-        $self->{'record'}->{'_length'}            = $2;
-        $self->{'record'}->{'_molecule'}          = $3;
-        $self->{'record'}->{'_tax'}               = $5;
-        $self->{'record'}->{'_modification_date'} = $6;
-        if ($4 eq 'circular') {
-            $self->{'record'}->{'_is_circular'} = 1;
+        if ($self->{'current_block'} =~ /^LOCUS\s+(\S+)\s+(\d+)\s+bp\s+(\w+)\s+(\w+)\s+(\w+)\s+(\S+)/i) {
+            $self->{'record'}->{'_locus_id'}          = $1;
+            $self->{'record'}->{'_length'}            = $2;
+            $self->{'record'}->{'_molecule'}          = $3;
+            $self->{'record'}->{'_tax'}               = $5;
+            $self->{'record'}->{'_modification_date'} = $6;
+            if ($4 eq 'circular') {
+                $self->{'record'}->{'_is_circular'} = 1;
+            }
+            else {
+                $self->{'record'}->{'_is_circular'} = 0;
+            }
+        }
+        elsif ($self->{'current_block'} =~ s/^DEFINITION\s*//) {
+            $self->{'record'}->{'_definition'} = $self->{'current_block'};
+            $self->{'record'}->{'_definition'} =~ s/\s*\n\s*/ /g;
+        }
+        elsif ($self->{'current_block'} =~ /^ACCESSION\s+(\S+)/i) {
+            $self->{'record'}->{'_accession'} = $1;
+        }
+        elsif ($self->{'current_block'} =~ /^VERSION\s+\S+\.(\d+)\s+GI:(\d+)/i) {
+            $self->{'record'}->{'_version'} = $1;
+            $self->{'record'}->{'_secondary_id'} = $2;
+        }
+        elsif ($self->{'current_block'} =~ /^DBLINK\s+(\S+.*\S)\s*$/i) {
+            $self->{'record'}->{_dblink} = $1;
+        }
+        elsif ($self->{'current_block'} =~ /^DBSOURCE\s+(\S+.*\S)\s*$/i) {
+            $self->{'record'}->{_dbsource} = $1;
+        }
+        elsif ($self->{'current_block'} =~ /^KEYWORDS/) {
+            $self->{'record'}->{_raw_keywords} = $self->{'current_block'};
+        }
+        elsif ($self->{'current_block'} =~ /^SOURCE/) {
+            $self->{'record'}->{_raw_source} = $self->{'current_block'};
+        }
+        elsif ($self->{'current_block'} =~ /^COMMENT/) {
+            $self->{'record'}->{_raw_comments} = $self->{'current_block'};
+        }
+        elsif ($self->{'current_block'} =~ /^REFERENCE/) {
+            push(@{$self->{'record'}->{_raw_references}}, $self->{'current_block'});
+        }
+        elsif ($self->{'current_block'} =~ /^FEATURES/) {
+            $self->{'record'}->{_raw_features} = $self->{'current_block'};
+        }
+        elsif ($self->{'current_block'} =~ /^ORIGIN/) {
+            $self->{'current_block'} =~ s/[\d\s]+//g;
+            $self->{'record'}->{'_seq'} = $self->{'current_block'};
+            $self->{'record'}->{'_seq'} =~ s/ORIGIN\s*//;
         }
         else {
-            $self->{'record'}->{'_is_circular'} = 0;
+            push(@{$self->{'record'}->{'_unknown'}}, $self->{'current_block'});
         }
-    }
-    elsif ($self->{'current_block'} =~ s/^DEFINITION\s*//) {
-        $self->{'record'}->{'_definition'} = $self->{'current_block'};
-        $self->{'record'}->{'_definition'} =~ s/\s*\n\s*/ /g;
-    }
-    elsif ($self->{'current_block'} =~ /^ACCESSION\s+(\S+)/i) {
-       $self->{'record'}->{'_accession'} = $1;
-    }
-    elsif ($self->{'current_block'} =~ /^VERSION\s+\S+\.(\d+)\s+GI:(\d+)/i) {
-        $self->{'record'}->{'_version'} = $1;
-        $self->{'record'}->{'_secondary_id'} = $2;
-    }
-    elsif ($self->{'current_block'} =~ /^DBLINK\s+(\S+.*\S)\s*$/i) {
-        $self->{'record'}->{_dblink} = $1;
-    }
-    elsif ($self->{'current_block'} =~ /^DBSOURCE\s+(\S+.*\S)\s*$/i) {
-        $self->{'record'}->{_dbsource} = $1;
-    }
-    elsif ($self->{'current_block'} =~ /^KEYWORDS/) {
-        $self->{'record'}->{_raw_keywords} = $self->{'current_block'};
-    }
-    elsif ($self->{'current_block'} =~ /^SOURCE/) {
-        $self->{'record'}->{_raw_source} = $self->{'current_block'};
-    }
-    elsif ($self->{'current_block'} =~ /^COMMENT/) {
-        $self->{'record'}->{_raw_comments} = $self->{'current_block'};
-    }
-    elsif ($self->{'current_block'} =~ /^REFERENCE/) {
-        push(@{$self->{'record'}->{_raw_references}}, $self->{'current_block'});
-    }
-    elsif ($self->{'current_block'} =~ /^FEATURES/) {
-        $self->{'record'}->{_raw_features} = $self->{'current_block'};
-    }
-    elsif ($self->{'current_block'} =~ /^ORIGIN/) {
-        $self->{'current_block'} =~ s/[\d\s]+//g;
-        $self->{'record'}->{'_seq'} = $self->{'current_block'};
-        $self->{'record'}->{'_seq'} =~ s/ORIGIN\s*//;
-    }
-    else {
-        push(@{$self->{'record'}->{'_unknown'}}, $self->{'current_block'});
-    }
-    $self->next_block;
+        $self->next_block;
     }
 }
 
@@ -283,7 +279,7 @@ sub is_circular {
 
 =cut
 
-sub getOrganism {
+sub getRawOrganism {
     my $self = shift;
 
     if (!exists $self->{'record'}->{'_organism'}) {
