@@ -12,7 +12,7 @@
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::GFF3Parser - A line-based parser devoted to GFF3
+Bio::EnsEMBL::IO::Parser::GVFParser - A line-based parser devoted to GVF format version 1.06
 
 =cut
 
@@ -31,12 +31,6 @@ sub open {
     my $class = ref($caller) || $caller;
     
     my $self = $class->SUPER::open($filename, "\t", @_);
-
-    # Metadata defaults
-    #if ($self->{'params'}->{'mustReadMetadata'}) {
-    #  $self->{'gvf-version'}->{'Type'} = '2';
-    #  $self->{'metadata'}->{'Type'} = 'DNA';
-    #}
 
     # pre-load peek buffer
     $self->next_block();
@@ -62,7 +56,7 @@ sub read_metadata {
         push(@{$self->{'metadata'}->{$m_type}}, $m_data);
       }
       else {
-        $self->{'metadata'}->{$m_type} = [$m_data]
+        $self->{'metadata'}->{$m_type} = [$m_data];
       }
     }
     else {
