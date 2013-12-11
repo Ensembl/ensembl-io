@@ -42,35 +42,6 @@ sub is_metadata {
     return $self->{'current_block'} =~ /^#/;
 }
 
-=head2 read_block
-
-    Description : Reads a line of text, stores it into next_block, 
-                  moving next_block to current_block.
-    Returntype   : True/False on existence of a defined current_block after running.
-
-=cut
-
-sub next_block {
-    my $self = shift;
-    my $fh = $self->{'filehandle'};
-
-    $self->{'current_block'} = $self->{'waiting_block'};
-    while(!eof($fh)) {
-        my $line = <$fh>;
-        if (defined $line) {
-            if ($line =~ /^\S/) {
-                $self->{'waiting_block'} = $line;   
-                return 1;
-            }
-            else {
-                $self->{'current_block'} .= $line;   
-            }
-        }
-    }
-    $self->{'waiting_block'} = undef;
-    return 0;
-}
-
 =head2 read_record
 
     Description: Placeholder for user-defined record lexing function.
@@ -84,7 +55,10 @@ sub read_record {
     my $self = shift;
     
     while (!$self->is_at_end_of_record) {
-        if ($self->{'current_block'} =~ /^LOCUS\s+(\S+)\s+(\d+)\s+bp\s+(\w+)\s+(\w+)\s+(\w+)\s+(\S+)/i) {
+        my ($field_type, $field) = $self->{'current_block'} =~ /^(\w+)\s+(.*)/;
+        chomp $field;
+        if ($field_type =~ /^LOCUS/) {
+            $field =~ /(\S+)\s+(\d+)\s+bp\s+(\w+)\s+(\w+)\s+(\w+)\s+(\S+)/;
             $self->{'record'}->{'_locus_id'}          = $1;
             $self->{'record'}->{'_length'}            = $2;
             $self->{'record'}->{'_molecule'}          = $3;
@@ -97,48 +71,66 @@ sub read_record {
                 $self->{'record'}->{'_is_circular'} = 0;
             }
         }
-        elsif ($self->{'current_block'} =~ s/^DEFINITION\s*//) {
-            $self->{'record'}->{'_definition'} = $self->{'current_block'};
-            $self->{'record'}->{'_definition'} =~ s/\s*\n\s*/ /g;
+        elsif ($field_type eq 'DEFINITION') {
+            $self->{'record'}->{'_definition'} = $field.$self->_get_multiline;
         }
-        elsif ($self->{'current_block'} =~ /^ACCESSION\s+(\S+)/i) {
-            $self->{'record'}->{'_accession'} = $1;
+        elsif ($field_type eq 'ACCESSION') {
+            $field =~ s/\s*$//;
+            $self->{'record'}->{'_accession'} = $field;
         }
-        elsif ($self->{'current_block'} =~ /^VERSION\s+\S+\.(\d+)\s+GI:(\d+)/i) {
-            $self->{'record'}->{'_version'} = $1;
-            $self->{'record'}->{'_secondary_id'} = $2;
+        elsif ($field_type eq 'VERSION') {
+            if ($field =~ /\S+\.(\d+)\s+GI:(\d+)/) {
+                $self->{'record'}->{'_version'} = $1;
+                $self->{'record'}->{'_genebank_id'} = $2;
+            }
+            else {
+                $self->{'record'}->{'_version'} = $field;
+            }
         }
-        elsif ($self->{'current_block'} =~ /^DBLINK\s+(\S+.*\S)\s*$/i) {
-            $self->{'record'}->{_dblink} = $1;
+        elsif ($field_type eq 'DBLINK') {
+            $self->{'record'}->{_dblink} = $field.$self->_get_multiline;
         }
-        elsif ($self->{'current_block'} =~ /^DBSOURCE\s+(\S+.*\S)\s*$/i) {
-            $self->{'record'}->{_dbsource} = $1;
+        elsif ($field_type eq 'DBSOURCE') {
+            $self->{'record'}->{_dbsource} = $field.$self->_get_multiline;
         }
-        elsif ($self->{'current_block'} =~ /^KEYWORDS/) {
-            $self->{'record'}->{_raw_keywords} = $self->{'current_block'};
+        elsif ($field_type eq 'KEYWORDS') {
+            $self->{'record'}->{_raw_keywords} = $field.$self->_get_multiline;
         }
-        elsif ($self->{'current_block'} =~ /^SOURCE/) {
-            $self->{'record'}->{_raw_source} = $self->{'current_block'};
+        elsif ($field_type eq 'SOURCE') {
+            $self->{'record'}->{_raw_source} = $field.$self->_get_multiline;
         }
-        elsif ($self->{'current_block'} =~ /^COMMENT/) {
-            $self->{'record'}->{_raw_comments} = $self->{'current_block'};
+        elsif ($field_type eq 'COMMENT') {
+            push(@{$self->{'record'}->{_raw_comments}},  $field.$self->_get_multiline);
         }
-        elsif ($self->{'current_block'} =~ /^REFERENCE/) {
-            push(@{$self->{'record'}->{_raw_references}}, $self->{'current_block'});
+        elsif ($field_type eq 'REFERENCE') {
+            push(@{$self->{'record'}->{_raw_references}}, $field.$self->_get_multiline);
         }
-        elsif ($self->{'current_block'} =~ /^FEATURES/) {
-            $self->{'record'}->{_raw_features} = $self->{'current_block'};
+        elsif ($field_type eq 'FEATURES') {
+            $self->{'record'}->{_raw_features} = $field.$self->_get_multiline;
         }
-        elsif ($self->{'current_block'} =~ /^ORIGIN/) {
-            $self->{'current_block'} =~ s/[\d\s]+//g;
-            $self->{'record'}->{'_seq'} = $self->{'current_block'};
-            $self->{'record'}->{'_seq'} =~ s/ORIGIN\s*//;
+        elsif ($field_type eq 'ORIGIN') {
+            $field .= $self->_get_multiline;
+            $field =~ s/[\d\s]+//g;
+            $self->{'record'}->{'_seq'} = $field;
         }
         else {
-            push(@{$self->{'record'}->{'_unknown'}}, $self->{'current_block'});
+            print STDERR 'UNKNOWN: ', $self->{'current_block'}, "\n";
+            push(@{$self->{'record'}->{'_unknown'}}, $field);
         }
         $self->next_block;
     }
+}
+
+sub _get_multiline {
+    my $self = shift;
+    my $field = '';
+    while (defined $self->{'waiting_block'} and $self->{'waiting_block'} !~ /^\w|^$self->{'end_tag'}/) {
+        $self->next_block;
+        $field .= $self->{'current_block'};
+        $field =~ s/\s\s+/ /g;
+        chomp $field;
+    }
+    return $field;
 }
 
 =head2 getDescription
@@ -180,17 +172,17 @@ sub getSeqName {
     return $self->{'record'}->{'_accession'}.'.'.$self->{'record'}->{'_version'};
 }
 
-=head2 getGi
+=head2 getGenbankId
 
     Description: Return the GenBank Id of the sequence
     Returntype : String
 
 =cut
 
-sub getGi {
+sub getGenbankId {
     my $self = shift;
 
-    return $self->{'record'}->{'_secondary_id'};
+    return $self->{'record'}->{'_genebank_id'};
 }
 
 =head2 getVersion
@@ -391,6 +383,32 @@ sub _calculate_coordinates {
     else {
         $self->{'record'}->{'_features'}->[$index]->{'__positions'} = $positions;
     }
+}
+
+sub next {
+    my $self = shift;
+
+    $self->{'record'} = undef;
+    $self->next_block();
+
+    if (defined $self->{'current_block'} and $self->is_at_beginning_of_record) {
+            $self->read_record();
+            return 1;
+    } else {
+            return 0;
+    }
+}
+
+=head2 is_at_beginning_of_record
+
+    Description : Determines whether the current line is the first line of a record
+    Returntype  : Boolean
+
+=cut
+
+sub is_at_beginning_of_record {
+    my $self = shift;
+    return !defined $self->{'start_tag'} || $self->{'current_block'} =~ /$self->{'start_tag'}/;
 }
 
 1;
