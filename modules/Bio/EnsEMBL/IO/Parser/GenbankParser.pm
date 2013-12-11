@@ -133,6 +133,11 @@ sub _get_multiline {
     return $field;
 }
 
+sub read_metadata {
+    my $self = shift;
+
+#    print STDERR 'DEBUG: Met metadata!! :', $self->{'current_block'}, ":\n";
+}
 =head2 getDescription
 
     Description: Return the definition field from the GenBank file
