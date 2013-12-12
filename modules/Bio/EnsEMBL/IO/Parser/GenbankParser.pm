@@ -113,6 +113,9 @@ sub read_record {
             $field =~ s/[\d\s]+//g;
             $self->{'record'}->{'_seq'} = $field;
         }
+        elsif (defined $field_type) {
+            $self->{'record'}->{'_raw_'.$field_type} = $field.$self->_get_multiline;
+        }
         else {
             print STDERR 'UNKNOWN: ', $self->{'current_block'}, "\n";
             push(@{$self->{'record'}->{'_unknown'}}, $field);
