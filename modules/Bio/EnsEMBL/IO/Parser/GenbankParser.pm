@@ -127,15 +127,16 @@ sub _get_multiline {
     while (defined $self->{'waiting_block'} and $self->{'waiting_block'} !~ /^\w|^$self->{'end_tag'}/) {
         $self->next_block;
         $field .= $self->{'current_block'};
-        $field =~ s/\s\s+/ /g;
         chomp $field;
     }
+    $field =~ s/\s\s+/ /g;
     return $field;
 }
 
 sub read_metadata {
     my $self = shift;
 
+# We do nothing
 #    print STDERR 'DEBUG: Met metadata!! :', $self->{'current_block'}, ":\n";
 }
 =head2 getDescription
