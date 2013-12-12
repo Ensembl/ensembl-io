@@ -27,10 +27,10 @@ my %strand_conversion = ( '+' => '1', '.' => undef, '?' => undef, '-' => '-1');
 my %attributes;
 
 sub open {
-    my ($caller, $filename, @other_args) = @_;
+    my ($caller, $filename, $other_args) = @_;
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::open($filename, "\t", @_);
+    my $self = $class->SUPER::open($filename, "\t", $other_args);
 
     # pre-load peek buffer
     $self->next_block();

@@ -34,10 +34,10 @@ use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 my $version = 4.2;
 
 sub open {
-    my ($caller, $filename, @other_args) = @_;
+    my ($caller, $filename, $other_args) = @_;
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::open($filename, "\t", @_);
+    my $self = $class->SUPER::open($filename, "\t", $other_args);
 
     #############
     ## OPTIONS ##
