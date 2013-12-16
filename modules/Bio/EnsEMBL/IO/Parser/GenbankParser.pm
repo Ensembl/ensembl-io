@@ -148,7 +148,7 @@ sub getRawDescription {
 sub getDescription {
     my $self = shift;
 
-    return $self->{'record'}->{'_definition'};
+    return $self->getRawDescription;
 }
 
 =head2 getSequence
