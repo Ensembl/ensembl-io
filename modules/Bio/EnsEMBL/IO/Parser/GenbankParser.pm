@@ -83,12 +83,7 @@ sub read_record {
                 $self->{'record'}->{'_version'} = $field;
             }
         }
-        elsif ($field_type eq 'COMMENT') {
-            # COMMENT and REFERENCE are not used by the genebuild team so it can be "removed"
-            # Not sure that lc is a good idea but it looks better...
-            push(@{$self->{'record'}->{'_raw_'.lc($field_type)}},  $field.$self->_get_multiline);
-        }
-        elsif ($field_type eq 'REFERENCE') {
+        elsif ($field_type eq 'COMMENT' || $field_type eq 'REFERENCE') {
             # COMMENT and REFERENCE are not used by the genebuild team so it can be "removed"
             # Not sure that lc is a good idea but it looks better...
             push(@{$self->{'record'}->{'_raw_'.lc($field_type)}},  $field.$self->_get_multiline);
