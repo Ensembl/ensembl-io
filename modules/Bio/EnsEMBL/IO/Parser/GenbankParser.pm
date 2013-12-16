@@ -291,10 +291,22 @@ sub is_circular {
 sub getRawOrganism {
     my $self = shift;
 
-    if (!exists $self->{'record'}->{'_organism'}) {
-        ($self->{'record'}->{'_organism'}) = $self->{'record'}->{'_raw_source'} =~ /ORGANISM\s*(\S+.+)\s*$/m;
-    }
-    return $self->{'record'}->{'_organism'};
+    return $self->{'record'}->{'_raw_source'};
+}
+
+=head2 getRawOrganism
+
+    Description: Return the organism name 
+    Returntype : String
+
+=cut
+
+sub getSource {
+    my $self = shift;
+
+    $self->{'record'}->{'_raw_source'} =~ /^(.+)\s+ORGANISM/;
+    # A bit ugly I agree
+    return $1;
 }
 
 =head2 getOrganism
@@ -308,7 +320,7 @@ sub getOrganism {
     my $self = shift;
 
     if (!exists $self->{'record'}->{'_organism'}) {
-        ($self->{'record'}->{'_organism'}) = $self->{'record'}->{'_raw_source'} =~ /ORGANISM\s*(\S+.+)\s*$/m;
+        ($self->{'record'}->{'_organism'}) = $self->{'record'}->{'_raw_source'} =~ /ORGANISM\s*(\S+.+)\s*/;
     }
     return $self->{'record'}->{'_organism'};
 }
