@@ -57,7 +57,7 @@ sub read_record {
     while (!$self->is_at_end_of_record) {
         my ($field_type, $field) = $self->{'current_block'} =~ /^(\w+)\s+(.*)/;
         chomp $field;
-        if ($field_type =~ /^LOCUS/) {
+        if ($field_type eq 'LOCUS') {
             $field =~ /(\S+)\s+(\d+)\s+bp\s+(\w+)\s+(\w+)\s+(\w+)\s+(\S+)/;
             $self->{'record'}->{'_locus_id'}          = $1;
             $self->{'record'}->{'_length'}            = $2;
@@ -71,11 +71,7 @@ sub read_record {
                 $self->{'record'}->{'_is_circular'} = 0;
             }
         }
-        elsif ($field_type eq 'DEFINITION') {
-            $self->{'record'}->{'_definition'} = $field.$self->_get_multiline;
-        }
         elsif ($field_type eq 'ACCESSION') {
-            $field =~ s/\s*$//;
             $self->{'record'}->{'_accession'} = $field;
         }
         elsif ($field_type eq 'VERSION') {
@@ -87,26 +83,15 @@ sub read_record {
                 $self->{'record'}->{'_version'} = $field;
             }
         }
-        elsif ($field_type eq 'DBLINK') {
-            $self->{'record'}->{_dblink} = $field.$self->_get_multiline;
-        }
-        elsif ($field_type eq 'DBSOURCE') {
-            $self->{'record'}->{_dbsource} = $field.$self->_get_multiline;
-        }
-        elsif ($field_type eq 'KEYWORDS') {
-            $self->{'record'}->{_raw_keywords} = $field.$self->_get_multiline;
-        }
-        elsif ($field_type eq 'SOURCE') {
-            $self->{'record'}->{_raw_source} = $field.$self->_get_multiline;
-        }
         elsif ($field_type eq 'COMMENT') {
-            push(@{$self->{'record'}->{_raw_comments}},  $field.$self->_get_multiline);
+            # COMMENT and REFERENCE are not used by the genebuild team so it can be "removed"
+            # Not sure that lc is a good idea but it looks better...
+            push(@{$self->{'record'}->{'_raw_'.lc($field_type)}},  $field.$self->_get_multiline);
         }
         elsif ($field_type eq 'REFERENCE') {
-            push(@{$self->{'record'}->{_raw_references}}, $field.$self->_get_multiline);
-        }
-        elsif ($field_type eq 'FEATURES') {
-            $self->{'record'}->{_raw_features} = $field.$self->_get_multiline;
+            # COMMENT and REFERENCE are not used by the genebuild team so it can be "removed"
+            # Not sure that lc is a good idea but it looks better...
+            push(@{$self->{'record'}->{'_raw_'.lc($field_type)}},  $field.$self->_get_multiline);
         }
         elsif ($field_type eq 'ORIGIN') {
             $field .= $self->_get_multiline;
@@ -114,7 +99,8 @@ sub read_record {
             $self->{'record'}->{'_seq'} = $field;
         }
         elsif (defined $field_type) {
-            $self->{'record'}->{'_raw_'.$field_type} = $field.$self->_get_multiline;
+            # Not sure that lc is a good idea but it looks better...
+            $self->{'record'}->{'_raw_'.lc($field_type)} = $field.$self->_get_multiline;
         }
         else {
             print STDERR 'UNKNOWN: ', $self->{'current_block'}, "\n";
@@ -127,11 +113,13 @@ sub read_record {
 sub _get_multiline {
     my $self = shift;
     my $field = '';
-    while (defined $self->{'waiting_block'} and $self->{'waiting_block'} !~ /^\w|^$self->{'end_tag'}/) {
+#    while (defined $self->{'waiting_block'} && $self->{'waiting_block'} !~ /^\w|^$self->{'end_tag'}/) {
+    while (defined $self->{'waiting_block'} && $self->{'waiting_block'} !~ /^\S/) {
         $self->next_block;
         $field .= $self->{'current_block'};
         chomp $field;
     }
+    # We replace multiple spaces/tabulation to be 1 space
     $field =~ s/\s\s+/ /g;
     return $field;
 }
