@@ -164,6 +164,19 @@ sub getSequence {
     return $self->{'record'}->{'_seq'};
 }
 
+=head2 getAccession
+
+    Description: Return the accession of the sequence
+    Returntype : String
+
+=cut
+
+sub getAccession {
+    my $self = shift;
+
+    return $self->{'record'}->{'_accession'};
+}
+
 =head2 getSeqName
 
     Description: Return the accession withe the sequence version of the sequence
