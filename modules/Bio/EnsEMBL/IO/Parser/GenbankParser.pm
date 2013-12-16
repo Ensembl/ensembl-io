@@ -125,6 +125,19 @@ sub read_metadata {
 # We do nothing
 #    print STDERR 'DEBUG: Met metadata!! :', $self->{'current_block'}, ":\n";
 }
+=head2 getRawDescription
+
+    Description: Return the raw definition field from the GenBank file
+    Returntype : String
+
+=cut
+
+sub getRawDescription {
+    my $self = shift;
+
+    return $self->{'record'}->{'_raw_definition'};
+}
+
 =head2 getDescription
 
     Description: Return the definition field from the GenBank file
