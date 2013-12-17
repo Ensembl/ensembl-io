@@ -415,30 +415,4 @@ sub _calculate_coordinates {
     }
 }
 
-sub next {
-    my $self = shift;
-
-    $self->{'record'} = undef;
-    $self->next_block();
-
-    if (defined $self->{'current_block'} and $self->is_at_beginning_of_record) {
-            $self->read_record();
-            return 1;
-    } else {
-            return 0;
-    }
-}
-
-=head2 is_at_beginning_of_record
-
-    Description : Determines whether the current line is the first line of a record
-    Returntype  : Boolean
-
-=cut
-
-sub is_at_beginning_of_record {
-    my $self = shift;
-    return !defined $self->{'start_tag'} || $self->{'current_block'} =~ /$self->{'start_tag'}/;
-}
-
 1;
