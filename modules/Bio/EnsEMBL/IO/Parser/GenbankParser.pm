@@ -358,8 +358,7 @@ sub getFeatures {
     my $self = shift;
 
     if (!exists $self->{'record'}->{'_features'}) {
-        my $tmp = join('',split("\n", $self->{'record'}->{'_raw_features'}));
-        $tmp =~ s/FEATURES\s+\S+\s*//;
+        my $tmp = substr($self->{'record'}->{'_raw_features'}, 20);
         $tmp =~ s/"\s+(\w)/"\/$1/g;
         my $index = -1;
         my @features = split('/', $tmp);
