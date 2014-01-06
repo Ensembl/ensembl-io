@@ -342,6 +342,16 @@ sub getTaxonId {
     return $self->{'record'}->{'_taxon_id'};
 }
 
+sub getRawDBLinks {
+    my $self = shift;
+    
+    if (!exists $self->{'record'}->{'_dblink'}) {
+        return
+    }
+    return $self->{'record'}->{'_dblink'};
+}
+
+
 =head2 getFeatures
 
     Description: Return an array of hashes representing the features of the GenBank file
