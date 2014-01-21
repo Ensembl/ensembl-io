@@ -1,0 +1,40 @@
+##gff-version 3
+##gvf-version 1.06
+##file-date 2013-08-29
+##genome-build ensembl GRCh37
+##species http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=9606
+##feature-ontology http://song.cvs.sourceforge.net/viewvc/song/ontology/so.obo?revision=1.283
+##data-source Source=ensembl;version=73;url=http://e73.ensembl.org/Homo_sapiens
+##file-version 73
+##sequence-region Y 1 59373566
+##sequence-region 2 1 243199373
+##sequence-region 17 1 81195210
+##sequence-region 11 1 135006516
+##sequence-region 21 1 48129895
+##sequence-region 7 1 159138663
+##sequence-region 13 1 115169878
+##sequence-region 16 1 90354753
+##sequence-region 6 1 171115067
+##sequence-region 22 1 51304566
+##sequence-region 1 1 249250621
+##sequence-region 18 1 78077248
+##sequence-region 15 1 102531392
+##sequence-region 20 1 63025520
+##sequence-region 8 1 146364022
+##sequence-region 4 1 191154276
+##sequence-region 9 1 141213431
+##sequence-region 12 1 133851895
+##sequence-region 14 1 107349540
+##sequence-region X 1 155270560
+##sequence-region 3 1 198022430
+##sequence-region 10 1 135534747
+##sequence-region 19 1 59128983
+##sequence-region 5 1 180915260
+##sequence-region MT 1 16569
+Y	dbSNP	SNV	10015	10015	.	+	.	ID=1;Variant_seq=C;Dbxref=dbSNP_137:rs113469508;evidence_values=Frequency;Reference_seq=A
+Y	dbSNP	insertion	10035	10036	.	+	.	ID=2;Variant_seq=CC;Dbxref=dbSNP_137:rs201278642;Reference_seq=-;global_minor_allele_frequency=0|0.0535714|117
+Y	dbSNP	SNV	10052	10052	.	+	.	ID=3;Variant_seq=A;Dbxref=dbSNP_137:rs186434315;Reference_seq=T;global_minor_allele_frequency=1|0.344322|752
+Y	dbSNP	SNV	10060	10060	.	+	.	ID=4;Variant_seq=C;Dbxref=dbSNP_137:rs148832940;evidence_values=1000Genomes;Reference_seq=G;global_minor_allele_frequency=1|0.0389194|85
+Y	dbSNP	SNV	10069	10069	.	+	.	ID=5;Variant_seq=A;Dbxref=dbSNP_137:rs113016742;evidence_values=Multiple_observations,Frequency;Reference_seq=T;global_minor_allele_frequency=1|0.34478|753
+Y	dbSNP	SNV	10070	10070	.	+	.	ID=6;Variant_seq=T;Dbxref=dbSNP_137:rs181732953;Reference_seq=G;global_minor_allele_frequency=1|0.000915751|2
+Y	dbSNP	SNV	10072	10072	.	+	.	ID=7;Variant_seq=T,C;Dbxref=dbSNP_137:rs116895855;Reference_seq=G;global_minor_allele_frequency=1|0.0650183|142

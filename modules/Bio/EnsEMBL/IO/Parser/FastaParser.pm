@@ -29,10 +29,13 @@ use warnings;
 use base qw/Bio::EnsEMBL::IO::TokenBasedParser/;
 
 =head2 open
+
     Description: Open Fasta file
     Argument [1]: Path to file 
     Returntype : Ensembl::IO::Parser::FastaParser object
+
 =cut
+
 sub open {
     my ($caller, $filename, @other_args) = @_;
     my $class = ref($caller) || $caller;
@@ -62,18 +65,24 @@ sub read_record {
 }
 
 =head2 getRawHeader 
+
     Description: Return header line
     Returntype : scalar
+
 =cut
+
 sub getRawHeader {
     my $self = shift;
     return $self->{'record'}[0];
 }
 
 =head2 getHeader 
+
     Description: Return header of the sequence
     Returntype : scalar
+
 =cut
+
 sub getHeader {
     my $self = shift;
     my $line = $self->getRawHeader();
@@ -83,9 +92,12 @@ sub getHeader {
 }
 
 =head2 read_sequence 
+
     Description: Read sequence lines of Fasta record
     Returntype : Array ref
+
 =cut
+
 sub read_sequence {
     my $self = shift;
     my $arrayRef = [];
@@ -100,9 +112,12 @@ sub read_sequence {
 }
 
 =head2 getRawSequence
+
     Description: return raw sequence data
     Returntype : Array ref of text lines
+
 =cut
+
 sub getRawSequence {
     my $self = shift;
     if (not defined $self->{'sequence'}) {
@@ -112,9 +127,12 @@ sub getRawSequence {
 }
 
 =head2 getSequence
+
     Description: return sequence attached to record 
     Returntype : scalar
+
 =cut
+
 sub getSequence {
     my $self = shift;
     my $lines = $self->getRawSequence();
@@ -123,15 +141,19 @@ sub getSequence {
 }
 
 =head2 is_metadata
+
     Description: default 0;
     Returntype : scalar
+
 =cut
 
 sub is_metadata { return 0; }
 
 =head2 is_metadata
+
     Description: empty shell
     Returntype : Void
+
 =cut
 
 sub read_metadata {}
