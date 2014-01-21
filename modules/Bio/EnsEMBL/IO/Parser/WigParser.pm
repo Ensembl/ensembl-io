@@ -27,7 +27,7 @@ sub open {
     my ($caller, $filename, @other_args) = @_;
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::open($filename, '\t|\s+', @_);
+    my $self = $class->SUPER::open($filename, '\t|\s+', @other_args);
 
     # pre-load peek buffer
     $self->next_block();
@@ -40,7 +40,7 @@ sub open {
 sub is_metadata {
     my $self = shift;
     return ($self->{'current_block'} =~ /^track/ || $self->{'current_block'} =~ /^browser/
-        || $self->{'current_block'} =~ /^#/ || $self->{'current_block'} =~ /^[fixed|variable]Step/);
+        || $self->{'current_block'} =~ /^#/ || $self->{'current_block'} =~ /^(fixed|variable)Step/);
 }
 
 sub read_metadata {
@@ -65,8 +65,8 @@ sub read_metadata {
         }
       }
     }  
-    elsif ($line =~ /^[fixed|variable]Step/) {
-      $line =~ s/^([fixed|variable]Step) //;
+    elsif ($line =~ /^(fixed|variable)Step/) {
+      $line =~ s/^((fixed|variable)Step) //;
       $self->{'metadata'}{'format'} = $1;
       while ($line =~ s/(\w+)\s*=\s*(\S+)//) {
         $self->{'metadata'}->{$1} = $2;
@@ -206,21 +206,23 @@ sub getRawScore {
     }
     elsif ($self->{'metadata'}{'format'} eq 'variableStep') {
       return $self->{'record'}[1];
-    }
-    else {
+    } 
+    elsif ($self->{'metadata'}{'format'} eq 'bedGraph') {
       return $self->{'record'}[3];
+    } 
+    else {
+      die "Unkown data format\n";
     }
 }
 
 sub getScore {
     my $self = shift;
     my $val = $self->getRawScore();
-    if ($val =~ /\./) {
+    if ($val =~ /^\.$/) {
             return undef;
     } else {
             return $val;
     }
 }
-
 
 1;

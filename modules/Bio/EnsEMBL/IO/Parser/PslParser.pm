@@ -27,7 +27,7 @@ sub open {
     my ($caller, $filename, @other_args) = @_;
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::open($filename, '\t|\s+', @_);
+    my $self = $class->SUPER::open($filename, '\t|\s+', @other_args);
 
     # pre-load peek buffer
     $self->next_block();
