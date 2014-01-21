@@ -3,7 +3,7 @@ browser position chr19:59302001-59311000
 # limits will dynamically change to always show full range of data
 # in viewing window, priority = 20 positions this as the second graph
 # Note, zero-relative, half-open coordinate system in use for bed format
-track type=wiggle_0 name="Bed Format" description="BED format" visibility=full color=200,100,0 altColor=0,100,200 priority=20
+track type=bedGraph name="Bed Format" description="BED format" visibility=full color=200,100,0 altColor=0,100,200 priority=20
 chr19 58302000 58302300 -1.0
 chr19 58302300 58302600 -0.75
 chr19 58302600 58302900 -0.50
