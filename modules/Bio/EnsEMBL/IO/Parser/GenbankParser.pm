@@ -344,11 +344,10 @@ sub getTaxonId {
 
 sub getRawDBLinks {
     my $self = shift;
-    
-    if (!exists $self->{'record'}->{'_dblink'}) {
+    if (!exists $self->{'record'}->{'_raw_dblink'}) {
         return
     }
-    return $self->{'record'}->{'_dblink'};
+    return $self->{'record'}->{'_raw_dblink'};
 }
 
 
