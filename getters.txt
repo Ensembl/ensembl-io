@@ -1,0 +1,21 @@
+EMBL parser (Kieron):
+
+getSequence
+getAccessions
+getDescription
+getKeywords
+getSpecies
+getClassification
+getRawID
+getRawAccessions
+getRawDescription
+getRawKeywords
+getRawDate
+getRawSpecies
+getRawClassification
+getRawReferences
+getRawFeatures
+getRawComments
+getRawAssemblyHeader
+getRawAssembly
+getRawContig
