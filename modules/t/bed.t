@@ -10,11 +10,21 @@ my $test_file = "data.bed";
 
 my $parser = Bio::EnsEMBL::IO::Parser::BedParser->open($test_file);
 ok ($parser->next(), "Loading first record");
-my @test_row = ('chr19', '6603909', '6764455', 'RP11-635J19', '1000',  '-', '6603909', '6764455', '0', '2', '407,441,',  '0,160105,');
-is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
+ok ($parser->getSeqName() eq 19);
+ok ($parser->getStart() == 6603910);
+ok ($parser->getEnd() == 6764455);
+ok ($parser->getName() eq 'RP11-635J19');
+ok ($parser->getScore() eq 1000);
+ok ($parser->getStrand() == -1);
+ok ($parser->getThickStart() == 6603909);
+ok ($parser->getThickEnd() == 6764455);
+ok ($parser->getItemRGB() == 0);
+ok ($parser->getBlockCount() == 2);
+my @test_starts = (407, 441);
+is_deeply($parser->getBlockSizes(), \@test_starts, "Testing block sizes");
+my @test_lengths = (0, 160105);
+is_deeply($parser->getBlockStarts(), \@test_lengths, "Testing block starts");
 ok ($parser->next(), "Loading second record");
-@test_row = ('chr19', '6625260', '6722355', 'CTD-2240J22', '1000',  '+', '6625260', '6722355', '0', '2', '289,234,',  '0,96861,');
-is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 ok ($parser->close(), "Closing file");
 
 done_testing();

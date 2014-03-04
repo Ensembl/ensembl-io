@@ -130,7 +130,7 @@ sub getRawItemRGB {
 
 sub getItemRGB {
     my $self = shift;
-    return $self->getItemRGB();
+    return $self->getRawItemRGB();
 }
 
 sub getRawBlockCount {
@@ -150,7 +150,8 @@ sub getRawBlockSizes {
 
 sub getBlockSizes {
     my $self = shift;
-    return $self->getRawBlockSizes();
+    my @res = split ",", $self->getRawBlockSizes();
+    return \@res;
 }
 
 sub getRawBlockStarts {
@@ -160,8 +161,8 @@ sub getRawBlockStarts {
 
 sub getBlockStarts {
     my $self = shift;
-    return $self->getRawBlockStarts();
+    my @res = split ",", $self->getRawBlockStarts();
+    return \@res;
 }
-
 
 1;
