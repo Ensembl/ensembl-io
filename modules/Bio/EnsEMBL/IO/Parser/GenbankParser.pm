@@ -85,7 +85,6 @@ sub read_record {
         }
         elsif ($field_type eq 'COMMENT' || $field_type eq 'REFERENCE') {
             # COMMENT and REFERENCE are not used by the genebuild team so it can be "removed"
-            # Not sure that lc is a good idea but it looks better...
             push(@{$self->{'record'}->{'_raw_'.lc($field_type)}},  $field.$self->_get_multiline);
         }
         elsif ($field_type eq 'ORIGIN') {
@@ -94,11 +93,9 @@ sub read_record {
             $self->{'record'}->{'_seq'} = $field;
         }
         elsif (defined $field_type) {
-            # Not sure that lc is a good idea but it looks better...
             $self->{'record'}->{'_raw_'.lc($field_type)} = $field.$self->_get_multiline;
         }
         else {
-            print STDERR 'UNKNOWN: ', $self->{'current_block'}, "\n";
             push(@{$self->{'record'}->{'_unknown'}}, $field);
         }
         $self->next_block;
@@ -295,9 +292,9 @@ sub getRawOrganism {
     return $self->{'record'}->{'_raw_source'};
 }
 
-=head2 getRawOrganism
+=head2 getSource
 
-    Description: Return the organism name 
+    Description: Return the organism name in the ORGANISM field
     Returntype : String
 
 =cut
