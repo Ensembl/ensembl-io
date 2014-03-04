@@ -130,3 +130,20 @@ getEnd
 getRawScore
 getScore
 
+BigBed Parser (Daniel)
+
+getChrom
+getStart
+getEnd
+getScore
+getParts
+getName
+getRGB
+getBedFeature
+
+BigWig Parser (Daniel)
+
+getRawChrom
+getStart
+getEnd
+getScore
