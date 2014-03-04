@@ -137,7 +137,7 @@ sub getName {
   return $self->getRawName;
 }
 
-sub getRawRest {
+sub getRawRGB {
   my $self = shift;
   return $self->{current}->attributes('RGB');
 }
