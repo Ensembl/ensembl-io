@@ -45,8 +45,10 @@ sub open {
 }
 
 =head2 is_at_end_of_record
+
     Description : Determines whether the next line belongs in record
     Returntype  : Boolean
+
 =cut
 
 sub is_at_end_of_record {
@@ -57,9 +59,12 @@ sub is_at_end_of_record {
 }
 
 =head2 is_end_of_record
+
     Description : Determines whether the current line is the first line of a record
     Returntype  : Boolean
+
 =cut
+
 sub is_at_beginning_of_record {
     my $self = shift;
     return !defined $self->{'start_tag'} || $self->{'current_block'} =~ /$self->{'start_tag'}/
