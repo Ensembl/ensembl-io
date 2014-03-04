@@ -21,21 +21,9 @@ package Bio::EnsEMBL::IO::Parser::WigParser;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
+use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
-sub open {
-    my ($caller, $filename, @other_args) = @_;
-    my $class = ref($caller) || $caller;
-    
-    my $self = $class->SUPER::open($filename, '\t|\s+', @other_args);
-
-    # pre-load peek buffer
-    $self->next_block();
-    
-    return $self;
-}
-
-## --------- METADATA & TRACK LINES -----------
+## --------- FORMAT-SPECIFIC METADATA -----------
 
 sub is_metadata {
     my $self = shift;
@@ -43,65 +31,9 @@ sub is_metadata {
         || $self->{'current_block'} =~ /^#/ || $self->{'current_block'} =~ /^(fixed|variable)Step/);
 }
 
-sub read_metadata {
-    my $self = shift;
-    my $line = $self->{'current_block'};
-    return unless $line;
-    
-    if ($line =~ /^browser\s+(\w+)\s+(.*)/i ) {
-	    $self->{'metadata'}->{'browser_switches'}{$1} = $2;
-    } 
-    elsif ($line =~ /^track/) {
-      ## Grab any params wrapped in double quotes (to enclose whitespace)
-      while ($line =~ s/(\w+)\s*=\s*"(([\\"]|[^"])+?)"//) {
-        my $key = $1;
-        (my $value = $2) =~ s/\\//g;
-        $self->{'metadata'}->{$key} = $value;
-      }
-      ## Deal with any remaining whitespace-free content
-      if ($line) {
-        while ($line =~ s/(\w+)\s*=\s*(\S+)//) {
-          $self->{'metadata'}->{$1} = $2;
-        }
-      }
-    }  
-    elsif ($line =~ /^(fixed|variable)Step/) {
-      $line =~ s/^((fixed|variable)Step) //;
-      $self->{'metadata'}{'format'} = $1;
-      while ($line =~ s/(\w+)\s*=\s*(\S+)//) {
-        $self->{'metadata'}->{$1} = $2;
-      }
-    }
-}
-
-sub getBrowserSwitches {
-    my $self = shift;
-    return $self->{'metadata'}{'browser_switches'} || {};
-}
-
-sub getTrackName {
-    my $self = shift;
-    return $self->{'metadata'}{'name'};
-}
-
-sub getTrackType {
-    my $self = shift;
-    return $self->{'metadata'}{'type'};
-}
-
 sub getGraphType {
     my $self = shift;
     return $self->{'metadata'}{'graphType'};
-}
-
-sub getTrackDescription {
-    my $self = shift;
-    return $self->{'metadata'}{'description'};
-}
-
-sub getTrackPriority {
-    my $self = shift;
-    return $self->{'metadata'}{'priority'};
 }
 
 sub getAutoScale {
@@ -112,11 +44,6 @@ sub getAutoScale {
 sub getViewLimits {
     my $self = shift;
     return $self->{'metadata'}{'viewLimits'};
-}
-
-sub getVisibility {
-    my $self = shift;
-    return $self->{'metadata'}{'visibility'};
 }
 
 sub getStep {
