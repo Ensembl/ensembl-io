@@ -115,25 +115,46 @@ sub getAccessions {
 
 sub getDescription {
     my $self = shift;
-    my $list = $self->{record}->{DE};
-    chomp @$list;
-    return join ' ',@$list;
+    return $self->smushText('DE');
 }
+
+=head2 getKeywords
+    Description: Get a list of EMBL keywords. An empty string implies no keywords.
+    Returntype : ListRef of strings
+=cut
 
 sub getKeywords {
     my $self = shift;
-    return $self->getStuff('KW');
+    my $keys = $self->getStuff('KW');
+    return [] unless $keys;
+    return $keys;
 }
 
 sub getSpecies {
     my $self = shift;
-    return $self->getRawSpecies;
+    return $self->smushText('OS');
 }
 
 sub getClassification {
     my $self = shift;
     return $self->getStuff('OC');
 }
+
+sub smushText {
+    my $self = shift;
+    my $key = shift;
+    my $list = $self->{record}->{$key};
+    if (!defined $list) {return}
+    chomp @$list;
+    map { $_ =~ s/^\w\w\s+//} @$list;
+    return join '',@$list;
+}
+
+=head2 getStuff
+    Description: Convenience method for the extraction of arbitrary keys from their
+                 multi-line eccentric EMBL format
+    Returntype : listref
+=cut
 
 sub getStuff {
     my $self = shift;
@@ -142,7 +163,7 @@ sub getStuff {
     if (!defined $list) {return}
     chomp @$list;
     $list->[-1] =~ s/\.//; # last entry has a full stop on the end
-    my @things = map {$_ =~ s/^\w\w\s+//} @$list; # trim EMBL gunk off the line
+    map { $_ =~ s/^\w\w\s+//} @$list;
     my @trimmed_things = split(';\s*',join(' ',@$list));
     return \@trimmed_things;
 }
