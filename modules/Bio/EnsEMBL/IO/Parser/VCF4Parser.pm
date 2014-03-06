@@ -36,14 +36,32 @@ my $version = 4.2;
 sub open {
     my ($caller, $filename, $other_args) = @_;
     my $class = ref($caller) || $caller;
-    
-    my $self = $class->SUPER::open($filename, "\t", $other_args);
+      
+    my $self;
 
     #############
     ## OPTIONS ##
     #############
-    # TO BE IMPLEMENTED
     # 1) Use tabix (i.e. given a coordinate like 2:10000-20000)
+    if ($other_args->{'region'}) {
+      die "ERROR: tabix does not seem to be in your path - required when you use the parameter 'region'\n" unless `which tabix 2>&1` =~ /tabix$/;
+      die "ERROR: Input file is not bgzipped, cannot fork\n" unless $filename =~ /\.gz$/;
+	    die "ERROR: Tabix index file $filename.tbi not found, cannot fork\n" unless -e $filename.'.tbi';
+	    
+	    $filename =~ /(.+)\.vcf\.gz/;
+	    my $tmp_filename = $1."_tmp.vcf";
+	    my $region = $other_args->{'region'};
+	    
+	    `touch $tmp_filename`;
+	    die "Can't create a temporary file in the directory of '$filename'" unless (-e $tmp_filename);
+	    `zcat $filename | head -n 100 | grep '#' > $tmp_filename`; # Copy the metadata
+	    `tabix $filename $region >> $tmp_filename`;                          # Copy the data in a temporary file
+	    
+	    $self = $class->SUPER::open($tmp_filename, "\t", $other_args);
+    }
+    else {
+      $self = $class->SUPER::open($filename, "\t", $other_args);
+    }
     # 2) Use GP coordinates (INFO column)
     
     
@@ -420,8 +438,9 @@ sub getRawAlternatives {
 
 sub getAlternatives {
     my $self = shift;
-    my @alts = split(',',$self->getRawAlternatives());
-    return \@alts;
+    my $alt_allele = $self->getRawAlternatives();
+
+    return ($alt_allele) ? [split(',',$alt_allele)] : [];
 }
 
 
