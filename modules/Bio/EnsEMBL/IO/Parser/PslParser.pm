@@ -25,216 +25,216 @@ use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
 ## ----------- Mandatory fields (21) -------------
 
-sub getRawMatches {
-    my $self = shift;
-    return $self->{'record'}[0];
+sub get_raw_matches {
+  my $self = shift;
+  return $self->{'record'}[0];
 }
 
-sub getMatches {
-    my $self = shift;
-    return $self->getRawMatches; 
+sub get_matches {
+  my $self = shift;
+  return $self->get_raw_matches; 
 }
 
-sub getRawMisMatches {
-    my $self = shift;
-    return $self->{'record'}[1];
+sub get_raw_misMatches {
+  my $self = shift;
+  return $self->{'record'}[1];
 }
 
-sub getMisMatches {
-    my $self = shift;
-    return $self->getRawMisMatches; 
+sub get_misMatches {
+  my $self = shift;
+  return $self->get_raw_misMatches; 
 }
 
-sub getRawRepMatches {
-    my $self = shift;
-    return $self->{'record'}[2];
+sub get_raw_repMatches {
+  my $self = shift;
+  return $self->{'record'}[2];
 }
 
-sub getRepMatches {
-    my $self = shift;
-    return $self->getRawRepMatches; 
+sub get_repMatches {
+  my $self = shift;
+  return $self->get_raw_repMatches; 
 }
 
-sub getRawNCount {
-    my $self = shift;
-    return $self->{'record'}[3];
+sub get_raw_nCount {
+  my $self = shift;
+  return $self->{'record'}[3];
 }
 
-sub getNCount {
-    my $self = shift;
-    return $self->getRawNCount; 
+sub get_nCount {
+  my $self = shift;
+  return $self->get_raw_nCount; 
 }
 
-sub getRawQNumInsert {
-    my $self = shift;
-    return $self->{'record'}[4];
+sub get_raw_qNumInsert {
+  my $self = shift;
+  return $self->{'record'}[4];
 }
 
-sub getQNumInsert {
-    my $self = shift;
-    return $self->getRawQNumInsert; 
+sub get_qNumInsert {
+  my $self = shift;
+  return $self->get_raw_qNumInsert; 
 }
 
-sub getRawQBaseInsert {
-    my $self = shift;
-    return $self->{'record'}[5];
+sub get_raw_qBaseInsert {
+  my $self = shift;
+  return $self->{'record'}[5];
 }
 
-sub getQBaseInsert {
-    my $self = shift;
-    return $self->getRawQBaseInsert; 
+sub get_qBaseInsert {
+  my $self = shift;
+  return $self->get_raw_qBaseInsert; 
 }
 
-sub getRawTNumInsert {
-    my $self = shift;
-    return $self->{'record'}[6];
+sub get_raw_tNumInsert {
+  my $self = shift;
+  return $self->{'record'}[6];
 }
 
-sub getTNumInsert {
-    my $self = shift;
-    return $self->getRawTNumInsert; 
+sub get_tNumInsert {
+  my $self = shift;
+  return $self->get_raw_tNumInsert; 
 }
 
-sub getRawTBaseInsert {
-    my $self = shift;
-    return $self->{'record'}[7];
+sub get_raw_tBaseInsert {
+  my $self = shift;
+  return $self->{'record'}[7];
 }
 
-sub getTBaseInsert {
-    my $self = shift;
-    return $self->getRawTBaseInsert; 
+sub get_tBaseInsert {
+  my $self = shift;
+  return $self->get_raw_tBaseInsert; 
 }
 
-sub getRawStrand {
-    my $self = shift;
-    return $self->{'record'}[8];
+sub get_raw_strand {
+  my $self = shift;
+  return $self->{'record'}[8];
 }
 
-sub getStrand {
-    my $self = shift;
-    ## Translated alignments list both query strand and genomic strand - we want the latter
-    return substr($self->getRawStrand, -1);
+sub get_strand {
+  my $self = shift;
+  ## Translated alignments list both query strand and genomic strand - we want the latter
+  return substr($self->get_raw_strand, -1);
 }
 
-sub getRawQName {
-    my $self = shift;
-    return $self->{'record'}[9];
+sub get_raw_qName {
+  my $self = shift;
+  return $self->{'record'}[9];
 }
 
-sub getQName {
-    my $self = shift;
-    return $self->getRawQName; 
+sub get_qName {
+  my $self = shift;
+  return $self->get_raw_qName; 
 }
 
-sub getRawQSize {
-    my $self = shift;
-    return $self->{'record'}[10];
+sub get_raw_qSize {
+  my $self = shift;
+  return $self->{'record'}[10];
 }
 
-sub getQSize {
-    my $self = shift;
-    return $self->getRawQSize; 
+sub get_qSize {
+  my $self = shift;
+  return $self->get_raw_qSize; 
 }
 
-sub getRawQStart {
-    my $self = shift;
-    return $self->{'record'}[11];
+sub get_raw_qStart {
+  my $self = shift;
+  return $self->{'record'}[11];
 }
 
-sub getQStart {
-    my $self = shift;
-    return $self->getRawQStart; 
+sub get_qStart {
+  my $self = shift;
+  return $self->get_raw_qStart; 
 }
 
-sub getRawQEnd {
-    my $self = shift;
-    return $self->{'record'}[12];
+sub get_raw_qEnd {
+  my $self = shift;
+  return $self->{'record'}[12];
 }
 
-sub getQEnd {
-    my $self = shift;
-    return $self->getRawQEnd; 
+sub get_qEnd {
+  my $self = shift;
+  return $self->get_raw_qEnd; 
 }
 
-sub getRawTName {
-    my $self = shift;
-    return $self->{'record'}[13];
+sub get_raw_tName {
+  my $self = shift;
+  return $self->{'record'}[13];
 }
 
-sub getTName {
-    my $self = shift;
-    (my $chr = $self->getRawTName()) =~ s/^chr//;
-    return $chr;
+sub get_tName {
+  my $self = shift;
+  (my $chr = $self->get_raw_tName()) =~ s/^chr//;
+  return $chr;
 }
 
-sub getRawTSize {
-    my $self = shift;
-    return $self->{'record'}[14];
+sub get_raw_tSize {
+  my $self = shift;
+  return $self->{'record'}[14];
 }
 
-sub getTSize {
-    my $self = shift;
-    return $self->getRawTSize; 
+sub get_tSize {
+  my $self = shift;
+  return $self->get_raw_tSize; 
 }
 
-sub getRawTStart {
-    my $self = shift;
-    return $self->{'record'}[15];
+sub get_raw_tStart {
+  my $self = shift;
+  return $self->{'record'}[15];
 }
 
-sub getTStart {
-    my $self = shift;
-    return $self->getRawTStart+1; 
+sub get_tStart {
+  my $self = shift;
+  return $self->get_raw_tStart+1; 
 }
 
-sub getRawTEnd {
-    my $self = shift;
-    return $self->{'record'}[16];
+sub get_raw_tEnd {
+  my $self = shift;
+  return $self->{'record'}[16];
 }
 
-sub getTEnd {
-    my $self = shift;
-    return $self->getRawTEnd; 
+sub get_tEnd {
+  my $self = shift;
+  return $self->get_raw_tEnd; 
 }
 
-sub getRawBlockCount {
-    my $self = shift;
-    return $self->{'record'}[17];
+sub get_raw_blockCount {
+  my $self = shift;
+  return $self->{'record'}[17];
 }
 
-sub getBlockCount {
-    my $self = shift;
-    return $self->getRawBlockCount; 
+sub get_blockCount {
+  my $self = shift;
+  return $self->get_raw_blockCount; 
 }
 
-sub getRawBlockSizes {
-    my $self = shift;
-    return $self->{'record'}[18];
+sub get_raw_blockSizes {
+  my $self = shift;
+  return $self->{'record'}[18];
 }
 
-sub getBlockSizes {
-    my $self = shift;
-    return split(',', $self->getRawBlockSizes); 
+sub get_blockSizes {
+  my $self = shift;
+  return split(',', $self->get_raw_blockSizes); 
 }
 
-sub getRawQStarts {
-    my $self = shift;
-    return $self->{'record'}[19];
+sub get_raw_qStarts {
+  my $self = shift;
+  return $self->{'record'}[19];
 }
 
-sub getQStarts {
-    my $self = shift;
-    return split(',', $self->getRawQStarts); 
+sub get_qStarts {
+  my $self = shift;
+  return split(',', $self->get_raw_qStarts); 
 }
 
-sub getRawTStarts {
-    my $self = shift;
-    return $self->{'record'}[20];
+sub get_raw_tStarts {
+  my $self = shift;
+  return $self->{'record'}[20];
 }
 
-sub getTStarts {
-    my $self = shift;
-    return split(',', $self->getRawTStarts); 
+sub get_tStarts {
+  my $self = shift;
+  return split(',', $self->get_raw_tStarts); 
 }
 
 

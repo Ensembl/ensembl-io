@@ -67,7 +67,7 @@ sub read_metadata {
     }  
     elsif ($line =~ /^(fixed|variable)Step/) {
       ## WIG-specific - but saves a lot of redundant code!
-      $self->{'metadata'}{'steptype'} = $1.'Step';
+      $self->{'metadata'}{'step_type'} = $1.'Step';
       $line =~ s/^[fixed|variable]Step//;
       if ($line) {
         while ($line =~ s/(\w+)\s*=\s*(\S+)//) {
@@ -77,47 +77,47 @@ sub read_metadata {
     }
 }
 
-sub getBrowserSwitches {
+sub get_browser_switches {
     my $self = shift;
     return $self->{'metadata'}{'browser_switches'} || {};
 }
 
-sub getTrackName {
+sub get_track_name {
     my $self = shift;
     return $self->{'metadata'}{'name'};
 }
 
-sub getTrackType {
+sub get_track_type {
     my $self = shift;
     return $self->{'metadata'}{'type'} || '';
 }
 
-sub getTrackDescription {
+sub get_track_description {
     my $self = shift;
     return $self->{'metadata'}{'description'};
 }
 
-sub getTrackPriority {
+sub get_track_priority {
     my $self = shift;
     return $self->{'metadata'}{'priority'};
 }
 
-sub getTrackHeight {
+sub get_track_height {
     my $self = shift;
     return $self->{'metadata'}{'height'};
 }
 
-sub getUseScore {
+sub get_useScore {
     my $self = shift;
     return $self->{'metadata'}{'useScore'};
 }
 
-sub getVisibility {
+sub get_visibility {
     my $self = shift;
     return $self->{'metadata'}{'visibility'};
 }
 
-sub getURL {
+sub get_url {
     my $self = shift;
     return $self->{'metadata'}{'url'};
 }
