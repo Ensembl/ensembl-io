@@ -65,6 +65,16 @@ sub read_metadata {
         }
       }
     }  
+    elsif ($line =~ /^(fixed|variable)Step/) {
+      ## WIG-specific - but saves a lot of redundant code!
+      $self->{'metadata'}{'steptype'} = $1.'Step';
+      $line =~ s/^[fixed|variable]Step//;
+      if ($line) {
+        while ($line =~ s/(\w+)\s*=\s*(\S+)//) {
+          $self->{'metadata'}->{$1} = $2;
+        }
+      }
+    }
 }
 
 sub getBrowserSwitches {
@@ -79,7 +89,7 @@ sub getTrackName {
 
 sub getTrackType {
     my $self = shift;
-    return $self->{'metadata'}{'type'};
+    return $self->{'metadata'}{'type'} || '';
 }
 
 sub getTrackDescription {
