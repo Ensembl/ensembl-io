@@ -354,7 +354,7 @@ sub _get_interval_coordinates {
     
     my $pos = $info->{$key};
     my $type = ($outer_inner eq 'outer') ? ($key =~ /cipos/i ? 0 : 1) : ($key =~ /ciend/i ? 0 : 1);
- print "$key POS: $pos =>".(split(',',$pos))[$type]." => $type\n";
+    
     return(split(',',$pos))[$type];
 }
 
