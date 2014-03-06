@@ -420,8 +420,8 @@ sub getRawAlternatives {
 
 sub getAlternatives {
     my $self = shift;
-    my @alts = split(',',$self->getRawAlternatives());
-    return \@alts;
+    my $alt_allele = $self->getRawAlternatives();
+    return ($alt_allele) ? [split(',',$alt_allele)] : [];
 }
 
 
