@@ -27,7 +27,7 @@ sub bigbed_open {
 
   Bio::DB::BigFile->set_udc_defaults;
   $self->{_cache}->{_bigbed_handle} ||= Bio::DB::BigBed->new(-bigbed => $self->{_url});
-  warn "Failed to open BigWig file " . $self->{_url} unless $self->{_cache}->{_bigbed_handle};
+  warn "Failed to open BigBed file " . $self->{_url} unless $self->{_cache}->{_bigbed_handle};
   $self->{chromList} = $self->{_cache}->{_bigbed_handle}->bf->chromList;
   $self->{nextChrom} = $self->{chromList}->head;
   return $self->{_cache}->{_bigbed_handle};
@@ -164,7 +164,7 @@ sub munge_chr_id {
   } elsif ($self->{_cache}->{_bigbed_handle}->chromSize("chr$chr_id")) {
       return "chr$chr_id";
   } else {
-      warn " *** could not find region $chr_id in BigWig file\n";
+      warn " *** could not find region $chr_id in BigBed file\n";
       return undef;
   }
 }
