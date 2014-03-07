@@ -26,10 +26,10 @@ subtest 'EMF Resequencing format', sub {
 	my $date = $parser->date;
 	is($date, 'Thu Oct  4 19:08:14 2012', "date");
 
-	my $sequences = $parser->sequences;
+	my $sequences = $parser->get_sequences;
 	is(scalar @$sequences, 15, "number of seqs");
 
-	my $score_types = $parser->score_types;
+	my $score_types = $parser->get_score_types;
 	is(scalar @$score_types, 14, "number of scores"); 
 
 	my $next_column = $parser->get_next_column();
@@ -54,15 +54,14 @@ subtest 'Compara format', sub {
 	my $date = $parser->date;
 	is($date, 'Wed Dec 12 10:32:29 2012', "date");
 
-	my $sequences = $parser->sequences;
+	my $sequences = $parser->get_sequences;
 	is(scalar @$sequences, 5, "number of seqs");
 
-	my $score_types = $parser->score_types;
+	my $score_types = $parser->get_score_types;
 	isa_ok($score_types, "ARRAY", "score_types is an array");
 	is(scalar @$score_types, 0, "score_types is empty");
 
 	my $next_column = $parser->get_next_column();
-#	print STDERR Dumper $next_c
 	is(scalar @{$next_column->{'sequence'}}, scalar @$sequences, "correct number of nts in column");
 	is(scalar @{$next_column->{'scores'}}, scalar @$score_types, "correct number of scores in column");
 };

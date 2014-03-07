@@ -31,7 +31,6 @@ package Bio::EnsEMBL::IO::Parser::EMFParser;
 
 use strict;
 use warnings;
-use Data::Dumper;
 
 use base qw/Bio::EnsEMBL::IO::TokenBasedParser/;
 
@@ -103,7 +102,6 @@ sub read_record {
     }
 
     $self->parse_seq($line);
-#    exit;
   }
 
   return [1];
@@ -123,8 +121,8 @@ sub parse_seq {
   my @flds = grep {$_ ne ' '} split('',$line); ## grep because of optional spaces
   my @nts = (@flds[0..scalar@{$self->sequences}-1]);
   my @scores = ();
-  if (defined $self->score_types && scalar @{$self->score_types}) {
-    @scores = (@flds[scalar@{$self->sequences}..scalar@{$self->sequences}+scalar@{$self->score_types}-1]);
+  if (defined $self->get_score_types && scalar @{$self->get_score_types}) {
+    @scores = (@flds[scalar@{$self->sequences}..scalar@{$self->get_sequences}+scalar@{$self->get_score_types}-1]);
   }
 
   my $rec = { 'sequence' => [@nts],
@@ -222,17 +220,54 @@ sub parse_first_seq_line {
 
 }
 
-########## EXTERNAL API ##########
+########## Getters ##########
 
-sub sequences {
+=head2 get_sequences
+
+  Description : Getter for the sequences in the EMF entry
+                (ie. entries starting with 'SEQ' in the EMF file
+                The order of the sequences correspond with the columns of data in the data block
+  Returntype  : Arrayref with the raw sequences
+  Example     : my $sequences = $parser->get_sequences();
+  Caller      : General
+
+=cut
+
+sub get_sequences {
   my ($self) = @_;
   return $self->{_seqs}
 }
 
-sub score_types {
+=head2 get_score_types
+
+  Description : Getter for the scores entries in the EMF entry.
+                Scores are absent in the gene alignemnt subformat
+                (i.e. if ($parser->format eq 'gene_alignment')
+                The order of the scores correspons with the columns of data in the data block
+  Returntype  : Arrayref with the scores
+  Example     : my $scores = $parser->get_score_types();
+  Caller      : General
+
+=cut
+
+sub get_score_types {
   my ($self) = @_;
   return $self->{_score_types} || [];
 }
+
+=head2 tree
+
+  Description : Getter/Setter for the tree the EMF entry referes to
+                A tree entry is optional in the EMF format and can only be present in
+                the compara and gene_alignment subformats
+                (i.e. if (($parser->format eq 'gene_alignment') || ($parser->format eq 'compara')))
+                The order of the scores correspons with the columns of data in the data block
+  Returntype  : String
+  Example     : my $tree = $parser->tree();
+  Caller      : General
+  Exceptions  : A warning is raised if called on a 'resequencing' EMF file
+
+=cut
 
 sub tree {
   my ($self, $tree) = @_;
@@ -246,6 +281,17 @@ sub tree {
   return $self->{_tree};
 }
 
+=head2 tree
+
+  Description : Getter/Setter for the (sub)format of the EMF file
+                Allowed values are 'compara', 'gene_alignment' or 'resequencing'
+                See the EMF spec file for details on each of these subformats
+  Returntype  : String
+  Example     : my $format = $parser->format();
+  Caller      : General
+
+=cut
+
 sub format {
   my ($self, $format) = @_;
   if (defined $format) {
@@ -253,6 +299,17 @@ sub format {
   }
   return $self->{_format};
 }
+
+=head2 date
+
+  Description : Getter/Setter for the date the EMF file has been created
+                The date is not parsed in any way, the same string provided by the EMF file
+                is returned (for example: 'Thu Oct  4 19:08:14 2012')
+  Returntype  : String
+  Example     : my $date = $parser->date();
+  Caller      : General
+
+=cut
 
 sub date {
   my ($self, $date) = @_;
@@ -262,6 +319,16 @@ sub date {
   return $self->{_date};
 }
 
+=head2 releases
+
+  Description : Getter/Setter for the releases the EMF file refers to
+                This field is mandatory in all EMF files subformats
+  Returntype  : Arrayref with releases as plain numbers
+  Example     : my $releases = $parser->releases();
+  Caller      : General
+
+=cut
+
 sub releases {
   my ($self, $releases) = @_;
   if ((defined $releases) && (ref $releases eq 'ARRAY') && (scalar @$releases)) {
@@ -269,6 +336,16 @@ sub releases {
   }
   return $self->{_releases};
 }
+
+=head2 get_next_column
+
+  Description : Getter for the next column of data in the EMF file
+                The number of fields in the returned array ref must match the number of sequences and score_types
+  Returntype  : arrayref with the next data column
+  Example     : my $next_column = $parser->get_next_column();
+  Caller      : General
+
+=cut
 
 sub get_next_column {
   my ($self) = @_;
