@@ -26,6 +26,13 @@ use Bio::EnsEMBL::Utils::Scalar qw/assert_ref/;
 
 use base qw/Bio::EnsEMBL::IO::TokenBasedParser/;
 
+=head2 open
+
+    Description: Open the file given in parameters, the file has to be a valid Genbank file
+    Returntype : Filehandle to the GenBank file
+
+=cut
+
 sub open {
     my $caller = shift;
     my $class = ref($caller) || $caller;
@@ -36,6 +43,13 @@ sub open {
     $self->next_block();
     return $self;
 }
+
+=head2 is_metadata
+
+    Description: Define what a meta data is for the GenBank file
+    Returntype : Boolean, 1 if the line contains metadata
+
+=cut
 
 sub is_metadata {
     my $self = shift;
@@ -84,7 +98,7 @@ sub read_record {
             }
         }
         elsif ($field_type eq 'COMMENT' || $field_type eq 'REFERENCE') {
-            # COMMENT and REFERENCE are not used by the genebuild team so it can be "removed"
+            # REFERENCE is not used by the genebuild team so it can be "removed"
             push(@{$self->{'record'}->{'_raw_'.lc($field_type)}},  $field.$self->_get_multiline);
         }
         elsif ($field_type eq 'ORIGIN') {
@@ -102,6 +116,14 @@ sub read_record {
     }
 }
 
+=head2 _get_multiline
+
+    Description: Some field can be on multiple lines, this method makes sure that we have all
+                 the field information on one line
+    Returntype : String
+
+=cut
+
 sub _get_multiline {
     my $self = shift;
     my $field = '';
@@ -115,6 +137,14 @@ sub _get_multiline {
     $field =~ s/\s\s+/ /g;
     return $field;
 }
+
+=head2 read_metadata
+
+    Description: Read the metadata field of the line
+                 As far as I know, there is no metadata in the GenBank file so we return nothing
+    Returntype : Void
+
+=cut
 
 sub read_metadata {
     my $self = shift;
@@ -204,7 +234,7 @@ sub getGenbankId {
     return $self->{'record'}->{'_genebank_id'};
 }
 
-=head2 getVersion
+=head2 getSeqVersion
 
     Description: Return the sequence version of the sequence
     Returntype : String
@@ -345,6 +375,13 @@ sub getTaxonId {
     return $self->{'record'}->{'_taxon_id'};
 }
 
+=head2 getRawDBLinks
+
+    Description: Return the DBLINK fields from the GenBank file
+    Returntype : String
+
+=cut
+
 sub getRawDBLinks {
     my $self = shift;
     if (!exists $self->{'record'}->{'_raw_dblink'}) {
@@ -352,6 +389,13 @@ sub getRawDBLinks {
     }
     return $self->{'record'}->{'_raw_dblink'};
 }
+
+=head2 getRawComment
+
+    Description: Return the COMMENT fields from the GenBank file
+    Returntype : String
+
+=cut
 
 sub getRawComment {
     my $self = shift;
@@ -415,6 +459,9 @@ sub _calculate_coordinates {
     my ($self, $index, $positions) = @_;
 
     $self->{'record'}->{'_features'}->[$index]->{'__fragment'} = 0;
+    # Simple forward coordinates:
+    # gene            577..647
+    # < and > indicates that the feature is incomplete on the 5' or/and 3' end respetively
     if ($positions =~ /^<?(\d+)\.\.>?(\d+)/) {
         $self->{'record'}->{'_features'}->[$index]->{'__start'} = $1;
         $self->{'record'}->{'_features'}->[$index]->{'__end'} = $2;
@@ -422,6 +469,8 @@ sub _calculate_coordinates {
         $self->{'record'}->{'_features'}->[$index]->{'__fragment'} += 1 if ($positions =~ /</);
         $self->{'record'}->{'_features'}->[$index]->{'__fragment'} += 2 if ($positions =~ />/);
     }
+    # Simple reverse coordinates
+    # gene            complement(4329..4400)
     elsif ($positions =~ /^complement\(<?(\d+)\.\.>?(\d+)/) {
         $self->{'record'}->{'_features'}->[$index]->{'__start'} = $1;
         $self->{'record'}->{'_features'}->[$index]->{'__end'} = $2;
