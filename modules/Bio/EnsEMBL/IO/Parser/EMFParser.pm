@@ -281,7 +281,7 @@ sub tree {
   return $self->{_tree};
 }
 
-=head2 tree
+=head2 format
 
   Description : Getter/Setter for the (sub)format of the EMF file
                 Allowed values are 'compara', 'gene_alignment' or 'resequencing'
