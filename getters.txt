@@ -198,3 +198,13 @@ getRawIndividualsInfo
 getIndividualsInfo
 getIndividualsGenotypes
 
+---------------------------------
+
+EMF parser (Miguel)
+
+get_sequences
+get_score_types
+tree
+format
+date
+get_next_column
