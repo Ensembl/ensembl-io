@@ -72,7 +72,7 @@ sub read_record {
             }
         }
         elsif ($field_type eq 'ACCESSION') {
-            $self->{'record'}->{'_accession'} = $field;
+            $self->{'record'}->{'_raw_accession'} = $field;
         }
         elsif ($field_type eq 'VERSION') {
             if ($field =~ /\S+\.(\d+)\s+GI:(\d+)/) {
@@ -172,6 +172,9 @@ sub getSequence {
 sub getAccession {
     my $self = shift;
 
+    if (!exists $self->{'record'}->{'_accession'}) {
+        ($self->{'record'}->{'_accession'}) = $self->{'record'}->{'_raw_accession'} =~ /^(\w+)/;
+    }
     return $self->{'record'}->{'_accession'};
 }
 
@@ -318,7 +321,10 @@ sub getOrganism {
     my $self = shift;
 
     if (!exists $self->{'record'}->{'_organism'}) {
-        ($self->{'record'}->{'_organism'}) = $self->{'record'}->{'_raw_source'} =~ /ORGANISM\s*(\S+.+)\s*/;
+        # Instead of trying an impossible regex, I first get the line until ';', then I remove the last word
+        # as it will be the root of the taxonomy
+        ($self->{'record'}->{'_organism'}) = $self->{'record'}->{'_raw_source'} =~ /ORGANISM\s*([^;]+)/;
+        $self->{'record'}->{'_organism'} =~ s/\s+\w+$//;
     }
     return $self->{'record'}->{'_organism'};
 }
@@ -375,7 +381,7 @@ sub getFeatures {
         my $tmp = substr($self->{'record'}->{'_raw_features'}, 20);
         $tmp =~ s/"\s+(\w)/"\/$1/g;
         my $index = -1;
-        my @features = split('/', $tmp);
+        my @features = split(' /', $tmp);
         for (my $i = 0; $i < @features; $i++) {
             if ($features[$i] =~ /^\s*([^= ]+)\s+(\S.*)\s*/) {
                 $index++; 
