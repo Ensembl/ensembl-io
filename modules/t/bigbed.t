@@ -7,7 +7,7 @@ use Bio::EnsEMBL::IO::Parser::BigBedParser;
 ######################################################
 ## Test 1
 ######################################################
-my $parser = Bio::EnsEMBL::IO::Parser::BigBedParser->open('data.bb');
+my $parser = Bio::EnsEMBL::IO::Parser::BigBedParser->open('modules/t/data.bb');
 
 ok($parser->next());
 ok($parser->getChrom eq 'chr1');

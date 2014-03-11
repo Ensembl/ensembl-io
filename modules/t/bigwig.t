@@ -7,7 +7,7 @@ use Bio::EnsEMBL::IO::Parser::BigWigParser;
 ######################################################
 ## Test 1
 ######################################################
-my $parser = Bio::EnsEMBL::IO::Parser::BigWigParser->open("data-variableStep.bw");
+my $parser = Bio::EnsEMBL::IO::Parser::BigWigParser->open("modules/t/data-variableStep.bw");
 
 ok($parser->next);
 ok($parser->getChrom eq 'chr1');
@@ -30,7 +30,7 @@ $parser->close();
 ######################################################
 ## Test 2
 ######################################################
-$parser = Bio::EnsEMBL::IO::Parser::BigWigParser->open('data-fixedStep.bw');
+$parser = Bio::EnsEMBL::IO::Parser::BigWigParser->open('modules/t/data-fixedStep.bw');
 
 for (my $i = 0; $i < 10; $i ++) {
   ok($parser->next);
