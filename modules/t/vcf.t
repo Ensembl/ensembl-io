@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Bio::EnsEMBL::IO::Parser::VCF4Parser;
 
-my $test_file = "data.vcf";
+my $test_file = "modules/t/data.vcf";
 
 my ($test_info, $ind_info); 
 

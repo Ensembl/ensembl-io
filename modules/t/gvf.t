@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Bio::EnsEMBL::IO::Parser::GVFParser;
 
-my $test_file = "data.gvf";
+my $test_file = "modules/t/data.gvf";
 
 my $parser = Bio::EnsEMBL::IO::Parser::GVFParser->open($test_file);
 
