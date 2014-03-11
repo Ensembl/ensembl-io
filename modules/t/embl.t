@@ -6,7 +6,7 @@ use Test::Deep;
 
 use Bio::EnsEMBL::IO::Parser::EMBLParser;
 
-my $test_file = "data.embl";
+my $test_file = "modules/t/data.embl";
 my $parser = Bio::EnsEMBL::IO::Parser::EMBLParser->open($test_file);
 
 $parser->next;
