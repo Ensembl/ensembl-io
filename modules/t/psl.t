@@ -5,7 +5,7 @@ use Test::More;
 
 use Bio::EnsEMBL::IO::Parser::PslParser;
 
-my $test_file = "data.psl";
+my $test_file = "modules/t/data.psl";
 
 my $parser = Bio::EnsEMBL::IO::Parser::PslParser->open($test_file);
 ok ($parser->next(), "Loading first record");
