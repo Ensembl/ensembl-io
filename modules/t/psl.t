@@ -10,7 +10,7 @@ my $test_file = "modules/t/data.psl";
 my $parser = Bio::EnsEMBL::IO::Parser::PslParser->open($test_file);
 ok ($parser->next(), "Loading first record");
 my $test_desc = 'Fish BLAT';
-is_deeply($parser->get_track_description, $test_desc, "Test track description");
+is_deeply($parser->get_metadata_value('description'), $test_desc, "Test track description");
 ok ($parser->get_matches() eq 59, "Matches");
 ok ($parser->get_misMatches() eq 9, 'MisMatches');
 ok ($parser->get_repMatches() eq 0, 'RepMatches');

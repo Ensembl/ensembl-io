@@ -61,7 +61,7 @@ sub get_end {
 
 sub get_raw_name {
   my $self = shift;
-  my $column = $self->get_track_type eq 'bedGraph' ? undef : $self->{'record'}[3];
+  my $column = $self->get_metadata_value('type') eq 'bedGraph' ? undef : $self->{'record'}[3];
   return $column;
 }
 
@@ -72,7 +72,7 @@ sub get_name {
 
 sub get_raw_score {
   my $self = shift;
-  my $column = $self->get_track_type eq 'bedGraph' ? 3 : 4;
+  my $column = $self->get_metadata_value('type') eq 'bedGraph' ? 3 : 4;
   return $self->{'record'}[$column];
 }
 

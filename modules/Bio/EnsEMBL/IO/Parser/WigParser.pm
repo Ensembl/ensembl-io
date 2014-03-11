@@ -61,42 +61,7 @@ sub get_feature_count {
 
 sub get_wiggle_type {
   my $self = shift;
-  return $self->{'metadata'}{'step_type'} || $self->get_track_type;
-}
-
-sub get_graphType {
-  my $self = shift;
-  return $self->{'metadata'}{'graphType'};
-}
-
-sub get_autoScale {
-  my $self = shift;
-  return $self->{'metadata'}{'autoScale'};
-}
-
-sub get_viewLimits {
-  my $self = shift;
-  return $self->{'metadata'}{'viewLimits'};
-}
-
-sub get_step {
-  my $self = shift;
-  return $self->{'metadata'}{'step'};
-}
-
-sub get_span {
-  my $self = shift;
-  return $self->{'metadata'}{'span'};
-}
-
-sub get_color {
-  my $self = shift;
-  return $self->{'metadata'}{'color'};
-}
-
-sub get_maxHeightPixels {
-  my $self = shift;
-  return $self->{'metadata'}{'maxHeightPixels'};
+  return $self->{'metadata'}{'step_type'} || $self->{'metadata'}{'type'};
 }
 
 ## -------------- RECORDS -------------------
@@ -138,7 +103,7 @@ sub get_start {
     return $self->get_raw_start();
   }
   elsif ($self->get_wiggle_type eq 'fixedStep') {
-    return $self->get_raw_start() + $self->get_step() * ($self->get_feature_count() - 1);
+    return $self->get_raw_start() + $self->get_metadata_value('step') * ($self->get_feature_count() - 1);
   }
   else {
   ## BED-type format with half-open coordinates
@@ -154,7 +119,7 @@ sub get_raw_end {
 sub get_end {
   my $self = shift;
   if ($self->get_wiggle_type =~ /Step/) {
-    my $end = $self->get_start + $self->get_span - 1;
+    my $end = $self->get_start + $self->get_metadata_value('span') - 1;
     return $end;
   }
   else {

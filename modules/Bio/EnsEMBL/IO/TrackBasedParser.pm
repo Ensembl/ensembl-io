@@ -23,6 +23,16 @@ use warnings;
 
 use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
+=head2 open
+
+    Constructor
+    Argument [1] : Filepath
+    Argument [2+]: Hash of parameters for configuration, e.g. buffer sizes or 
+                   specific functions for handling headers or data
+    Returntype   : Bio::EnsEMBL::IO::TrackBasedParser
+
+=cut
+
 sub open {
     my ($caller, $filename, @other_args) = @_;
     my $class = ref($caller) || $caller;
@@ -37,12 +47,29 @@ sub open {
 
 ## --------- METADATA & TRACK LINES -----------
 
+=head2 is_metadata
+
+    Description: Identifies track lines and other metadata 
+    Returntype : String 
+
+=cut
+
 sub is_metadata {
     my $self = shift;
-    if ($self->{'current_block'} =~ /^track/ || $self->{'current_block'} =~ /^browser/) {
+    if ($self->{'current_block'} =~ /^track/ 
+        || $self->{'current_block'} =~ /^browser/
+        || $self->{'current_block'} =~ /^(fixed|variable)Step/
+      ) {
       return $self->{'current_block'};
     }
 }
+
+=head2 read_metadata
+
+    Description: Splits the current block along predefined delimiters
+    Returntype : Void 
+
+=cut
 
 sub read_metadata {
     my $self = shift;
@@ -77,49 +104,29 @@ sub read_metadata {
     }
 }
 
+=head2 get_browser_switches
+
+    Description: Getter for browser switch metadata
+    Returntype : Hashref 
+
+=cut
+
 sub get_browser_switches {
     my $self = shift;
     return $self->{'metadata'}{'browser_switches'} || {};
 }
 
-sub get_track_name {
-    my $self = shift;
-    return $self->{'metadata'}{'name'};
-}
+=head2 get_metadata_value
 
-sub get_track_type {
-    my $self = shift;
-    return $self->{'metadata'}{'type'} || '';
-}
+    Argument [1] : Parameter name
+    Description: Getter for arbitrary parameter in track line 
+    Returntype : String
 
-sub get_track_description {
-    my $self = shift;
-    return $self->{'metadata'}{'description'};
-}
+=cut
 
-sub get_track_priority {
-    my $self = shift;
-    return $self->{'metadata'}{'priority'};
-}
-
-sub get_track_height {
-    my $self = shift;
-    return $self->{'metadata'}{'height'};
-}
-
-sub get_useScore {
-    my $self = shift;
-    return $self->{'metadata'}{'useScore'};
-}
-
-sub get_visibility {
-    my $self = shift;
-    return $self->{'metadata'}{'visibility'};
-}
-
-sub get_url {
-    my $self = shift;
-    return $self->{'metadata'}{'url'};
+sub get_metadata_value {
+  my ($self, $key) = @_;
+  return $self->{'metadata'}{$key} || '';
 }
 
 1;
