@@ -119,10 +119,10 @@ sub parse_seq {
   my ($self, $line) = @_;
 
   my @flds = grep {$_ ne ' '} split('',$line); ## grep because of optional spaces
-  my @nts = (@flds[0..scalar@{$self->sequences}-1]);
+  my @nts = (@flds[0..scalar@{$self->get_sequences}-1]);
   my @scores = ();
   if (defined $self->get_score_types && scalar @{$self->get_score_types}) {
-    @scores = (@flds[scalar@{$self->sequences}..scalar@{$self->get_sequences}+scalar@{$self->get_score_types}-1]);
+    @scores = (@flds[scalar@{$self->get_sequences}..scalar@{$self->get_sequences}+scalar@{$self->get_score_types}-1]);
   }
 
   my $rec = { 'sequence' => [@nts],
