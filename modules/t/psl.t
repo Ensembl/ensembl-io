@@ -3,11 +3,11 @@ use warnings;
 
 use Test::More;
 
-use Bio::EnsEMBL::IO::Parser::PslParser;
+use Bio::EnsEMBL::IO::Parser::Psl;
 
 my $test_file = "modules/t/data.psl";
 
-my $parser = Bio::EnsEMBL::IO::Parser::PslParser->open($test_file);
+my $parser = Bio::EnsEMBL::IO::Parser::Psl->open($test_file);
 ok ($parser->next(), "Loading first record");
 my $test_desc = 'Fish BLAT';
 is_deeply($parser->get_metadata_value('description'), $test_desc, "Test track description");

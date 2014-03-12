@@ -4,11 +4,11 @@ use warnings;
 use Test::More;
 
 use Bio::EnsEMBL::Utils::IO qw( work_with_file );
-use Bio::EnsEMBL::IO::Parser::BedParser;
+use Bio::EnsEMBL::IO::Parser::Bed;
 
 my $test_file = "modules/t/data.bed";
 
-my $parser = Bio::EnsEMBL::IO::Parser::BedParser->open($test_file);
+my $parser = Bio::EnsEMBL::IO::Parser::Bed->open($test_file);
 ok ($parser->next(), "Loading first record");
 ok ($parser->get_seqname() eq 19);
 ok ($parser->get_start() == 6603910);

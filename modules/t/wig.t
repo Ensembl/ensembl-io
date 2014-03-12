@@ -7,7 +7,7 @@ use Bio::EnsEMBL::IO::Parser::WigParser;
 
 my $test_file = "modules/t/data.wig";
 
-my $parser = Bio::EnsEMBL::IO::Parser::WigParser->open($test_file);
+my $parser = Bio::EnsEMBL::IO::Parser::Wig->open($test_file);
 ok ($parser->next(), "Loading first record");
 
 ## NB: WIG files can contain BED format rows - that's what we're testing here!
