@@ -58,7 +58,7 @@ sub is_metadata {
     my $self = shift;
     if ($self->{'current_block'} =~ /^track/ 
         || $self->{'current_block'} =~ /^browser/
-        || $self->{'current_block'} =~ /^(fixed|variable)Step/
+        || $self->{'current_block'} =~ /^#/
       ) {
       return $self->{'current_block'};
     }

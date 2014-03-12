@@ -41,6 +41,14 @@ sub read_record {
 
 ## --------- FORMAT-SPECIFIC METADATA -----------
 
+=head2 is_metadata
+
+    Description: Identifies track lines and other metadata 
+                 Extended from parent, to (re)set feature_count parameter
+    Returntype : String 
+
+=cut
+
 sub is_metadata {
   my $self = shift;
   if ($self->{'current_block'} =~ /^track/ 
