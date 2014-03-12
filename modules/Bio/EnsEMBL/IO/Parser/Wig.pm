@@ -16,7 +16,7 @@ Bio::EnsEMBL::IO::Parser::WigParser - A line-based parser devoted to WIG
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::WigParser;
+package Bio::EnsEMBL::IO::Parser::Wig;
 
 use strict;
 use warnings;

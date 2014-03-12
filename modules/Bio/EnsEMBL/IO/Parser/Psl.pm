@@ -16,7 +16,7 @@ Bio::EnsEMBL::IO::Parser::BedParser - A line-based parser devoted to BED
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::PslParser;
+package Bio::EnsEMBL::IO::Parser::Psl;
 
 use strict;
 use warnings;
