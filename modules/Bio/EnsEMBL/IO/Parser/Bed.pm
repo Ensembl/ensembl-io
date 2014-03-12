@@ -12,7 +12,7 @@
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::BedParser - A line-based parser devoted to BED
+Bio::EnsEMBL::IO::Parser::Bed - A line-based parser devoted to BED format
 
 =cut
 

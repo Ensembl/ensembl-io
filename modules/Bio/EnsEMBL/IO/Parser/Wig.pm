@@ -12,7 +12,7 @@
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::WigParser - A line-based parser devoted to WIG
+Bio::EnsEMBL::IO::Parser::Wig - A line-based parser devoted to WIG format
 
 =cut
 
