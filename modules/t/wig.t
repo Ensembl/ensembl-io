@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-use Bio::EnsEMBL::IO::Parser::WigParser;
+use Bio::EnsEMBL::IO::Parser::Wig;
 
 my $test_file = "modules/t/data.wig";
 
