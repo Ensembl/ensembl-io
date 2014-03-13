@@ -195,3 +195,23 @@ tree
 format
 date
 get_next_column
+
+---------------------------------
+
+BigBed Parser (Daniel)
+
+getChrom
+getStart
+getEnd
+getScore
+getParts
+getName
+getRGB
+getBedFeature
+
+BigWig Parser (Daniel)
+
+getRawChrom
+getStart
+getEnd
+getScore
