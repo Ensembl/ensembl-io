@@ -38,6 +38,7 @@ sub open {
     my $class = ref($caller) || $caller;
     
     my $self = $class->SUPER::open($filename, '\t|\s+', @other_args);
+    $self->{'strand_conversion'} = {'+' => '1', '.' => '0', '-' => '-1'};
 
     # pre-load peek buffer
     $self->next_block();

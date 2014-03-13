@@ -44,7 +44,8 @@ sub read_record {
 =head2 is_metadata
 
     Description: Identifies track lines and other metadata 
-                 Extended from parent, to (re)set feature_count parameter
+                  Extends parent, to (re)set feature_count parameter
+                  to zero upon encountering a new track
     Returntype : String 
 
 =cut
@@ -60,12 +61,26 @@ sub is_metadata {
   }
 }
 
+=head2 get_feature_count
+
+    Description: Getter for internally-generated feature count 
+    Returntype : Integer
+
+=cut
+
 sub get_feature_count {
   ## Not strictly part of metadata, but we need to keep track of this
   ## in fixed-step tracks to get the start coordinates right
   my $self = shift;
   return $self->{'metadata'}{'feature_count'} || 0;
 }
+
+=head2 get_wiggle_type
+
+    Description: Getter - works out track type based on metadata 
+    Returntype : String
+
+=cut
 
 sub get_wiggle_type {
   my $self = shift;
@@ -75,6 +90,13 @@ sub get_wiggle_type {
 ## -------------- RECORDS -------------------
 
 ## ----------- Mandatory fields -------------
+
+=head2 get_raw_chrom
+
+    Description: Getter for chrom field
+    Returntype : String 
+
+=cut
 
 sub get_raw_chrom {
   my $self = shift;
@@ -86,12 +108,26 @@ sub get_raw_chrom {
   }
 }
 
+=head2 get_seqname
+
+    Description: Getter - wrapper around raw method 
+                  (uses standard method name, not format-specific)
+    Returntype : String 
+
+=cut
+
 sub get_seqname {
   my $self = shift;
   (my $chr = $self->get_raw_chrom()) =~ s/^chr//;
   return $chr;
 }
 
+=head2 get_raw_start
+
+    Description: Getter for start field
+    Returntype : Integer 
+
+=cut
 sub get_raw_start {
   my $self = shift;
   if ($self->get_wiggle_type eq 'fixedStep') {
@@ -104,6 +140,14 @@ sub get_raw_start {
     return $self->{'record'}[1];
   }
 }
+
+=head2 get_start
+
+    Description: Getter - wrapper around raw_start method, converting
+                  semi-open coordinates to standard Ensembl ones where necessary
+    Returntype : Integer 
+
+=cut
 
 sub get_start {
   my $self = shift;
@@ -119,10 +163,24 @@ sub get_start {
   }
 }
 
+=head2 get_raw_end
+
+    Description: Getter for end field
+    Returntype : Integer
+
+=cut
+
 sub get_raw_end {
   my $self = shift;
   return $self->{'record'}[2];
 }
+
+=head2 get_end
+
+    Description: Getter - wrapper around get_raw_chromEnd 
+    Returntype : String 
+
+=cut
 
 sub get_end {
   my $self = shift;
@@ -134,6 +192,13 @@ sub get_end {
     return $self->get_raw_end();
   }
 }
+
+=head2 get_raw_score
+
+    Description: Getter for score field
+    Returntype : Number (usually floating point) or String (period = no data)
+
+=cut
 
 sub get_raw_score {
   my $self = shift;
@@ -147,6 +212,13 @@ sub get_raw_score {
     return $self->{'record'}[3];
   } 
 }
+
+=head2 get_score
+
+    Description: Getter - wrapper around get_raw_score
+    Returntype : Number (usually floating point) or undef
+
+=cut
 
 sub get_score {
   my $self = shift;
