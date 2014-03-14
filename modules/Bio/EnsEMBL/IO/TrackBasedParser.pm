@@ -36,12 +36,15 @@ use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 sub open {
     my ($caller, $filename, @other_args) = @_;
     my $class = ref($caller) || $caller;
-    
-    my $self = $class->SUPER::open($filename, '\t|\s+', @other_args);
+    my $self;
+
+    $self = $class->SUPER::open($filename, '\t|\s+', @other_args);
     $self->{'strand_conversion'} = {'+' => '1', '.' => '0', '-' => '-1'};
 
-    # pre-load peek buffer
-    $self->next_block();
+    if ($filename) {
+      # pre-load peek buffer
+      $self->next_block();
+    }
     
     return $self;
 }
@@ -129,5 +132,39 @@ sub get_metadata_value {
   my ($self, $key) = @_;
   return $self->{'metadata'}{$key} || '';
 }
+
+#---------- OUTPUT METHODS --------------
+
+sub create_metadata {
+  my ($self, $metadata) = @_;
+  if (!$metadata || ref($metadata) ne 'HASH' || scalar keys %$metadata < 1) {
+    throw('Metadata not in correct format (hashref)');
+  }
+
+  my $track_line = 'track'; 
+  my $browser_switches = 'browser';
+  my ($metadata_content, $has_track, $has_switches);
+  while (my($k,$v) = each(%$metadata)) {
+    if ($k eq 'browser_switches') {
+      $has_switches = 1;
+      while (my($a, $b) = each ($browser_switches)) {
+        $browser_switches .= " $a $b";
+      }
+    }
+    else {
+      $has_track = 1;
+      if ($v =~ /\s+/) {
+        $track_line .= qq/ $k="$v"/;
+      }
+      else {
+        $track_line .= qq/ $k=$v/;
+      }
+    }
+  }
+  $metadata_content .= "$track_line\n" if $has_track;
+  $metadata_content .= "$browser_switches\n" if $has_switches;
+  return $metadata_content;
+}
+
 
 1;

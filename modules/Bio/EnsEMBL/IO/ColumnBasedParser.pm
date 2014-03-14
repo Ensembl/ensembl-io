@@ -24,6 +24,12 @@ use warnings;
 
 use base qw/Bio::EnsEMBL::IO::TextParser/;
 
+our %sub_strings = (
+    '\n' => "\n",
+    '\t' => "\t",
+    #'\s' => "\s",
+);
+
 =head2 open
 
     Constructor
@@ -38,12 +44,39 @@ use base qw/Bio::EnsEMBL::IO::TextParser/;
 sub open {
     my ($caller, $filepath, $delimiter, @other_args) = @_;
     my $class = ref($caller) || $caller;
-    
-    my $self = $class->SUPER::open($filepath, @other_args);
-    
+    my $self;
+
+    $self = $class->SUPER::open($filepath, @other_args);
+    $self->{'fields'}    = $self->set_fields;
     $self->{'delimiter'} = $delimiter;
+    my @delimiters       = split('\|', $delimiter);
+    $self->{'default_delimiter'} = $delimiters[0];
     return $self;
 }
+
+=head2 fields
+
+    Description: Getter 
+    Returntype : Arrayref
+
+=cut
+
+sub get_fields {
+    my $self = shift;
+    return $self->{'fields'} || [];
+}
+
+=head2 set_fields
+
+    Description: Placeholder for user-defined list of fields
+    Returntype : Void 
+
+=cut
+
+sub set_fields {
+    throw("Method not implemented. This is really important");
+}
+
 
 =head2 read_record
 
@@ -57,6 +90,31 @@ sub read_record {
     my $self = shift;
     chomp $self->{'current_block'};
     $self->{'record'} = [ split($self->{'delimiter'},$self->{'current_block'}) ] ;
+}
+
+#---------- OUTPUT METHODS --------------
+
+sub create_record {
+  my ($self, $translator, $object) = @_;
+  my @values;
+
+  foreach my $field (@{$self->get_fields}) {
+    my $getter = 'get_'.$field;
+    my $munger = 'munge_'.$field;
+    my $value;
+    if ($self->can($munger)) {
+      $value = $self->$munger($translator->$getter($object)) || '.'; ## Column can't be undef
+    }
+    else {
+      $value = $translator->$getter($object) || '.'; ## Column can't be undef
+    }
+    push @values, $value;
+  }
+  my $delimiter = $self->{'default_delimiter'};
+  my $record = join("$delimiter", @values) if scalar @values;
+  ## Fix interpolation of whitespace characters
+  $record =~ s/(\\n|\\t|\\s)/$sub_strings{$1}/gs;
+  return "$record\n";
 }
 
 1;

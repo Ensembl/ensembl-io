@@ -41,9 +41,10 @@ sub open {
     my $class = ref($caller) || $caller;
 
     my $self = $class->SUPER::new(@other_args);
-    $self->{'filename'} = $filename;
-    open($self->{'filehandle'}, $filename) || throw("Could not open " . $filename);
-
+    if ($filename) {
+      $self->{'filename'} = $filename;
+      open($self->{'filehandle'}, $filename) || throw("Could not open " . $filename);
+    }
     return $self;
 }
 

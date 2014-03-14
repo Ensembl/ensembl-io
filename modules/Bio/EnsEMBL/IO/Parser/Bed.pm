@@ -23,6 +23,19 @@ use warnings;
 
 use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
+=head2 set_fields
+
+    Description: Setter for list of fields used in this format - uses the
+                  "public" (i.e. non-raw) names of getter methods
+    Returntype : Void
+
+=cut
+
+sub set_fields {
+  my $self = shift;
+  $self->{'fields'} = [qw(seqname start end)];
+}
+
 ## ----------- Mandatory fields -------------
 
 =head2 get_raw_chrom
@@ -51,6 +64,19 @@ sub get_seqname {
   return $chr;
 }
 
+=head2 munge_seqname
+
+    Description: Converts Ensembl seq region name to standard BED format  
+    Returntype : String 
+
+=cut
+
+sub munge_seqname {
+  my ($self, $value) = @_;
+  $value = "chr$value" unless $value =~ /^chr/;
+  return $value;
+}
+
 =head2 get_raw_chromStart
 
     Description: Getter for chromStart field
@@ -75,6 +101,18 @@ sub get_raw_chromStart {
 sub get_start {
   my $self = shift;
   return $self->get_raw_chromStart()+1;
+}
+
+=head2 munge_start
+
+    Description: Converts Ensembl start coordinate to semi-open  
+    Returntype : Integer 
+
+=cut
+
+sub munge_start {
+  my ($self, $value) = @_;
+  return $value - 1;
 }
 
 =head2 get_raw_chromEnd
