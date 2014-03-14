@@ -28,13 +28,14 @@ use Bio::EnsEMBL::Utils::Exception qw/throw/;
     Constructor
     Argument [1] : Format of output file
     Argument [2] : Filename of output file 
+    Argument [3] : Web colourmap (optional)
     Returntype   : Bio::EnsEMBL::IO::Writer
 
 =cut
 
 
 sub new {
-  my ($class, $format, $filename) = @_;
+  my ($class, $format, $filename, $colourmap) = @_;
   $format ||= 'Bed';
 
   my $parser_class = 'Bio::EnsEMBL::IO::Parser::'.$format;
@@ -48,6 +49,7 @@ sub new {
     my $self = {
       'filename'    => $filename,
       'parser'      => $parser,
+      'colourmap'   => $colourmap,
       'translator'  => {},
     };
   
@@ -68,6 +70,18 @@ sub new {
 sub parser {
   my $self = shift;
   return $self->{'parser'};
+}
+
+=head2 colourmap
+
+    Description: Accessor for the colourmap object (for adding colours to tracks/records)
+    Returntype : EnsEmBL::Draw::ColourMap
+
+=cut
+
+sub colourmap {
+  my $self = shift;
+  return $self->{'colourmap'};
 }
 
 =head2 get_translator_by_type

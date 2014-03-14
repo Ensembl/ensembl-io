@@ -33,7 +33,7 @@ use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
 sub set_fields {
   my $self = shift;
-  $self->{'fields'} = [qw(seqname start end)];
+  $self->{'fields'} = [qw(seqname start end name score strand thickStart thickEnd itemRgb)];
 }
 
 ## ----------- Mandatory fields -------------
@@ -221,6 +221,20 @@ sub get_strand {
   my $self = shift;
   return $self->{'strand_conversion'}{$self->get_raw_strand};
 }
+
+=head2 munge_strand
+
+    Description: Converts Ensembl-style strand into BED version  
+    Returntype : String
+
+=cut
+
+sub munge_strand {
+  my ($self, $value) = @_;
+  my %lookup = reverse %{$self->{'strand_conversion'}};
+  return $lookup{$value};
+}
+
 
 =head2 get_raw_thickStart
 

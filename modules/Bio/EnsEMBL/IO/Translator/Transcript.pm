@@ -12,11 +12,11 @@
 
 =head1 NAME
 
-Translator::Gene - Translates accessor methods between gene objects and parsers
+Translator::Gene - Translates accessor methods between transcript objects and parsers
 
 =cut
 
-package Bio::EnsEMBL::IO::Translator::Gene;
+package Bio::EnsEMBL::IO::Translator::Transcript;
 
 use strict;
 use warnings;
@@ -33,8 +33,8 @@ use base qw/Bio::EnsEMBL::IO::Translator/;
 =cut
 
 sub get_seqname {
-  my ($self, $gene) = @_;
-  return $gene->slice->seq_region_name;
+  my ($self, $transcript) = @_;
+  return $transcript->slice->seq_region_name;
 }
 
 =head2 get_start
@@ -45,8 +45,8 @@ sub get_seqname {
 =cut
 
 sub get_start {
-  my ($self, $gene) = @_;
-  return $gene->start;
+  my ($self, $transcript) = @_;
+  return $transcript->start;
 }
 
 =head2 get_end
@@ -57,8 +57,8 @@ sub get_start {
 =cut
 
 sub get_end {
-  my ($self, $gene) = @_;
-  return $gene->end;
+  my ($self, $transcript) = @_;
+  return $transcript->end;
 }
 
 =head2 get_name
@@ -69,8 +69,8 @@ sub get_end {
 =cut
 
 sub get_name {
-  my ($self, $gene) = @_;
-  return $gene->stable_id;
+  my ($self, $transcript) = @_;
+  return $transcript->stable_id;
 }
 
 =head2 get_score
@@ -81,7 +81,7 @@ sub get_name {
 =cut
 
 sub get_score {
-  my ($self, $gene) = @_;
+  my ($self, $transcript) = @_;
   return '.';
 }
 
@@ -93,8 +93,8 @@ sub get_score {
 =cut
 
 sub get_strand {
-  my ($self, $gene) = @_;
-  return $gene->strand;
+  my ($self, $transcript) = @_;
+  return $transcript->strand;
 }
 
 =head2 get_thickStart
@@ -105,7 +105,7 @@ sub get_strand {
 =cut
 
 sub get_thickStart {
-  my ($self, $gene) = @_;
+  my ($self, $transcript) = @_;
   return '0'
 }
 
@@ -117,7 +117,7 @@ sub get_thickStart {
 =cut
 
 sub get_thickEnd {
-  my ($self, $gene) = @_;
+  my ($self, $transcript) = @_;
   return '0'
 }
 
@@ -129,7 +129,7 @@ sub get_thickEnd {
 =cut
 
 sub get_itemRgb {
-  my ($self, $gene) = @_;
+  my ($self, $transcript) = @_;
   return '';
 }
 

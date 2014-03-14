@@ -6,6 +6,8 @@ use Test::More;
 use Bio::EnsEMBL::Utils::IO qw( work_with_file );
 use Bio::EnsEMBL::IO::Writer;
 use Bio::EnsEMBL::Registry;
+#use EnsEMBL::Web::SpeciesDefs;
+#use EnsEMBL::Draw::ColourMap;
 
 ## Get some data from the db
 my $registry = 'Bio::EnsEMBL::Registry';
@@ -36,7 +38,9 @@ my $datasets = [{
               }];
 
 ## Create writer and write data to file
-my $writer = Bio::EnsEMBL::IO::Writer->new('Bed', 'output.bed');
+#my $sd = new EnsEMBL::Web::SpeciesDefs;
+my $colour_map; # = EnsEMBL::Draw::ColourMap->new($sd);
+my $writer = Bio::EnsEMBL::IO::Writer->new('Bed', 'output_colour.bed', $colour_map);
 $writer->output_file($datasets);
 
 done_testing();
