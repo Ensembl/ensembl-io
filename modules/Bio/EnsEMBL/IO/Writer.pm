@@ -159,7 +159,6 @@ sub close {
 
 sub write {
   my ($self, $content) = @_;
-  warn ">>> CONTENT $content";
   print OUTPUT $content;
 }
 
