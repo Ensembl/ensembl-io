@@ -35,7 +35,7 @@ use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
 
 sub new {
-  my ($class, $format, $filename) = @_;
+  my ($class, $format, $filename, $sd) = @_;
   $format ||= 'Bed';
 
   my $parser_class = 'Bio::EnsEMBL::IO::Parser::'.$format;
@@ -48,10 +48,11 @@ sub new {
     my $parser = $parser_class->open();
 
     ## Optional track colour configuration (requires ensembl-webcode)
-    my $sd;
-    eval "require EnsEMBL::Web::SpeciesDefs";
-    if (!$@) {
-      $sd = new EnsEMBL::Web::SpeciesDefs;
+    unless ($sd) {
+      eval "require EnsEMBL::Web::SpeciesDefs";
+      if (!$@) {
+        $sd = new EnsEMBL::Web::SpeciesDefs;
+      }
     }
 
     my $self = {
