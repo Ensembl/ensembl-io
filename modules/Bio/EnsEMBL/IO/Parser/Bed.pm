@@ -382,4 +382,31 @@ sub get_blockStarts {
   return \@res;
 }
 
+
+=head2 create_record
+
+    Description: Creates a single line of a BED file from an API object 
+    Returntype : String
+
+=cut
+
+sub create_record {
+  my ($self, $translator, $object) = @_;
+  my @values;
+
+  ## Add the fields in order
+  push @values, $self->munge_seqname($translator->get_seqname($object) || '.'; 
+  push @values, $self->munge_start($translator->get_start($object) || '.'; 
+  push @values, $translator->get_end($object) || '.'; 
+  push @values, $translator->get_name($object) || '.'; 
+  push @values, '.'; 
+  push @values, $self->munge_strand($translator->get_strand($object) || '.'; 
+  push @values, '.'; 
+  push @values, '.'; 
+  push @values, $translator->get_itemRgb($object) || '.'; 
+
+  return $self->concatenate_fields(@values);
+}
+
+
 1;

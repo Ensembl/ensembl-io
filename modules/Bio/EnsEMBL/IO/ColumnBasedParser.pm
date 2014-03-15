@@ -94,6 +94,14 @@ sub read_record {
 
 #---------- OUTPUT METHODS --------------
 
+=head2 create_record
+
+    Description: Generic method to create a single record from an object
+                  Can be overridden in children for efficiency 
+    Returntype : String 
+
+=cut
+
 sub create_record {
   my ($self, $translator, $object) = @_;
   my @values;
@@ -113,8 +121,15 @@ sub create_record {
     }
     push @values, $value;
   }
+  return $self->concatenate_fields(@values);
+}
+
+sub concatenate_fields {
+  my ($self, @fields) = @_;
+  return unless @fields;
+
   my $delimiter = $self->{'default_delimiter'};
-  my $record = join("$delimiter", @values) if scalar @values;
+  my $record = join("$delimiter", @fields);
   ## Fix interpolation of whitespace characters
   $record =~ s/(\\n|\\t|\\s)/$sub_strings{$1}/gs;
   return "$record\n";
