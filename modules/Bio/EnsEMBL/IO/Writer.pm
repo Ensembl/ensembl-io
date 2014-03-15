@@ -28,14 +28,14 @@ use Bio::EnsEMBL::Utils::Exception qw/throw/;
     Constructor
     Argument [1] : Format of output file
     Argument [2] : Filename of output file 
-    Argument [3] : Web colourmap (optional)
+    Argument [3] : SpeciesDefs object (optional) 
     Returntype   : Bio::EnsEMBL::IO::Writer
 
 =cut
 
 
 sub new {
-  my ($class, $format, $filename, $colourmap) = @_;
+  my ($class, $format, $filename) = @_;
   $format ||= 'Bed';
 
   my $parser_class = 'Bio::EnsEMBL::IO::Parser::'.$format;
@@ -46,11 +46,19 @@ sub new {
   }
   else {
     my $parser = $parser_class->open();
+
+    ## Optional track colour configuration (requires ensembl-webcode)
+    my $sd;
+    eval "require EnsEMBL::Web::SpeciesDefs";
+    if (!$@) {
+      $sd = new EnsEMBL::Web::SpeciesDefs;
+    }
+
     my $self = {
-      'filename'    => $filename,
-      'parser'      => $parser,
-      'colourmap'   => $colourmap,
-      'translator'  => {},
+      'filename'      => $filename,
+      'parser'        => $parser,
+      'species_defs'  => $sd,
+      'translator'    => {},
     };
   
     bless $self, $class;
@@ -72,16 +80,16 @@ sub parser {
   return $self->{'parser'};
 }
 
-=head2 colourmap
+=head2 species_defs
 
-    Description: Accessor for the colourmap object (for adding colours to tracks/records)
-    Returntype : EnsEmBL::Draw::ColourMap
+    Description: Accessor for the SpeciesDefs object (for e.g. adding colours to tracks/records)
+    Returntype : EnsEmBL::Web::SpeciesDefs
 
 =cut
 
-sub colourmap {
+sub species_defs {
   my $self = shift;
-  return $self->{'colourmap'};
+  return $self->{'species_defs'};
 }
 
 =head2 get_translator_by_type
@@ -105,7 +113,7 @@ sub get_translator_by_type {
       throw ("Cannot use $trans_class - data type unknown");
     }
     else {
-      $self->{'translator'}{$type} = new $trans_class;
+      $self->{'translator'}{$type} = $trans_class->new($self->species_defs);
       return $self->{'translator'}{$type};
     }
   }
@@ -114,6 +122,8 @@ sub get_translator_by_type {
 sub output_file {
   my ($self, $datasets) = @_;
   return unless $datasets && scalar(@{$datasets||[]});
+
+  my $sd = $self->species_defs;
 
   ## open output file
   $self->open;
@@ -127,10 +137,10 @@ sub output_file {
     }
     my @data = @{$set->{'data'}||[]};
     foreach my $feature (@data) {
-      my @namespace = split('::', ref($feature));
-      my $ftype = $namespace[-1];
-      my $translator = $self->get_translator_by_type($ftype);
-      my $record = $self->parser->create_record($translator, $feature); 
+      my @namespace   = split('::', ref($feature));
+      my $ftype       = $namespace[-1];
+      my $translator  = $self->get_translator_by_type($ftype);
+      my $record      = $self->parser->create_record($translator, $feature); 
       $self->write($record);
     }
   }

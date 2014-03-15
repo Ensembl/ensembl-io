@@ -97,30 +97,6 @@ sub get_strand {
   return $gene->strand;
 }
 
-=head2 get_thickStart
-
-    Description: Placeholder - needed so that column counts are correct 
-    Returntype : Zero
-
-=cut
-
-sub get_thickStart {
-  my ($self, $gene) = @_;
-  return '0'
-}
-
-=head2 get_thickEnd
-
-    Description: Placeholder - needed so that column counts are correct 
-    Returntype : Zero
-
-=cut
-
-sub get_thickEnd {
-  my ($self, $gene) = @_;
-  return '0'
-}
-
 =head2 get_itemRgb
 
     Description:
@@ -130,7 +106,9 @@ sub get_thickEnd {
 
 sub get_itemRgb {
   my ($self, $gene) = @_;
-  return '';
+  my $colours = $self->species_defs->colour('gene');
+  my $colour = $colours->{$gene->biotype}{'default'};
+  return $colour ? '('.join(',',$self->rgb_by_name($colour)).')' : undef;
 }
 
 1;

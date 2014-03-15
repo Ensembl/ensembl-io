@@ -102,11 +102,14 @@ sub create_record {
     my $getter = 'get_'.$field;
     my $munger = 'munge_'.$field;
     my $value;
-    if ($self->can($munger)) {
+    if ($self->can($munger) && $translator->can($getter)) {
       $value = $self->$munger($translator->$getter($object)) || '.'; ## Column can't be undef
     }
-    else {
+    elsif ($translator->can($getter)) {
       $value = $translator->$getter($object) || '.'; ## Column can't be undef
+    }
+    else {
+      $value = '.';
     }
     push @values, $value;
   }

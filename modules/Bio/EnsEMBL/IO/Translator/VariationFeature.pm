@@ -12,11 +12,11 @@
 
 =head1 NAME
 
-Translator::Gene - Translates accessor methods between transcript objects and parsers
+Translator::VarationFeature - Translates accessor methods between variation feature objects and parsers
 
 =cut
 
-package Bio::EnsEMBL::IO::Translator::Transcript;
+package Bio::EnsEMBL::IO::Translator::VariationFeature;
 
 use strict;
 use warnings;
@@ -33,8 +33,8 @@ use base qw/Bio::EnsEMBL::IO::Translator/;
 =cut
 
 sub get_seqname {
-  my ($self, $transcript) = @_;
-  return $transcript->slice->seq_region_name;
+  my ($self, $vf) = @_;
+  return $vf->slice->seq_region_name;
 }
 
 =head2 get_start
@@ -45,8 +45,8 @@ sub get_seqname {
 =cut
 
 sub get_start {
-  my ($self, $transcript) = @_;
-  return $transcript->start;
+  my ($self, $vf) = @_;
+  return $vf->start;
 }
 
 =head2 get_end
@@ -57,8 +57,8 @@ sub get_start {
 =cut
 
 sub get_end {
-  my ($self, $transcript) = @_;
-  return $transcript->end;
+  my ($self, $vf) = @_;
+  return $vf->end;
 }
 
 =head2 get_name
@@ -69,8 +69,8 @@ sub get_end {
 =cut
 
 sub get_name {
-  my ($self, $transcript) = @_;
-  return $transcript->stable_id;
+  my ($self, $vf) = @_;
+  return $vf->display_id;
 }
 
 =head2 get_score
@@ -81,7 +81,7 @@ sub get_name {
 =cut
 
 sub get_score {
-  my ($self, $transcript) = @_;
+  my ($self, $vf) = @_;
   return '.';
 }
 
@@ -93,8 +93,32 @@ sub get_score {
 =cut
 
 sub get_strand {
-  my ($self, $transcript) = @_;
-  return $transcript->strand;
+  my ($self, $vf) = @_;
+  return $vf->strand;
+}
+
+=head2 get_thickStart
+
+    Description: Placeholder - needed so that column counts are correct 
+    Returntype : Zero
+
+=cut
+
+sub get_thickStart {
+  my ($self, $vf) = @_;
+  return '0'
+}
+
+=head2 get_thickEnd
+
+    Description: Placeholder - needed so that column counts are correct 
+    Returntype : Zero
+
+=cut
+
+sub get_thickEnd {
+  my ($self, $vf) = @_;
+  return '0'
 }
 
 =head2 get_itemRgb
@@ -105,10 +129,8 @@ sub get_strand {
 =cut
 
 sub get_itemRgb {
-  my ($self, $transcript) = @_;
-  my $colours = $self->species_defs->colour('transcript');
-  my $colour = $colours->{$transcript->biotype}{'default'};
-  return $colour ? '('.join(',',$self->rgb_by_name($colour)).')' : undef;
+  my ($self, $vf) = @_;
+  return '';
 }
 
 1;

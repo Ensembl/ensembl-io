@@ -31,11 +31,38 @@ use Bio::EnsEMBL::Utils::Exception qw/throw/;
 =cut
 
 sub new {
-  my $class = shift;
+  my ($class, $sd) = @_;
 
-  my $self = {};
+  ## Optional track colour configuration (requires ensembl-webcode)
+  my $colourmap;
+  if ($sd) {
+    eval "require EnsEMBL::Draw::ColourMap";
+    if (!$@) {
+      $colourmap = EnsEMBL::Draw::ColourMap->new($sd);
+    }
+  }
+  my $self = {
+              'species_defs' => $sd,
+              'colourmap' => $colourmap
+             };
   bless $self, $class;
   return $self;
+}
+
+
+sub species_defs {
+  my $self = shift;
+  return $self->{'species_defs'};
+}
+
+sub colourmap {
+  my $self = shift;
+  return $self->{'colourmap'};
+}
+
+sub rgb_by_name {
+  my ($self, $name) = @_;
+  return $self->colourmap ? $self->colourmap->rgb_by_name($name) : undef;
 }
 
 1;
