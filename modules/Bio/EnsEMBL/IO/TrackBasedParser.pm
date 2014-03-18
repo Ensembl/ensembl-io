@@ -141,6 +141,9 @@ sub create_metadata {
     throw('Metadata not in correct format (hashref)');
   }
 
+  ## Save raw metadata to object, as records need it
+  $self->{'metadata'} = $metadata;
+
   my $track_line = 'track'; 
   my $browser_switches = 'browser';
   my ($metadata_content, $has_track, $has_switches);

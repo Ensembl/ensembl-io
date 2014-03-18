@@ -398,13 +398,17 @@ sub create_record {
   push @values, $self->munge_seqname($translator->get_seqname($object) || '.'; 
   push @values, $self->munge_start($translator->get_start($object) || '.'; 
   push @values, $translator->get_end($object) || '.'; 
-  push @values, $translator->get_name($object) || '.'; 
-  push @values, '.'; 
-  push @values, $self->munge_strand($translator->get_strand($object) || '.'; 
-  push @values, '.'; 
-  push @values, '.'; 
-  push @values, $translator->get_itemRgb($object) || '.'; 
-
+  if ($self->get_metadata_value('type') =~ /bedgraph/i) {
+    push @values, '.'; 
+  }
+  else {
+    push @values, $translator->get_name($object) || '.'; 
+    push @values, '.'; 
+    push @values, $self->munge_strand($translator->get_strand($object) || '.'; 
+    push @values, '.'; 
+    push @values, '.'; 
+    push @values, $translator->get_itemRgb($object) || '.'; 
+  }
   return $self->concatenate_fields(@values);
 }
 

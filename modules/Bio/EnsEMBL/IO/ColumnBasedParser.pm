@@ -97,7 +97,7 @@ sub read_record {
 =head2 create_record
 
     Description: Generic method to create a single record from an object
-                  Can be overridden in children for efficiency 
+                  May be overridden in children if format is very flexible! 
     Returntype : String 
 
 =cut
