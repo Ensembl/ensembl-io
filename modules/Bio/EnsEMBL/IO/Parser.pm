@@ -38,12 +38,13 @@ sub new {
     my $param_hash_ref = shift;
     
     my $self = {
-	    current_block => undef,
-	    waiting_block => undef,
-	    record => undef,
-	    metadata => {},
-	    params => $param_hash_ref,
-    	    metadata_changed => 0,
+	    current_block     => undef,
+	    waiting_block     => undef,
+	    record            => undef,
+	    metadata          => {},
+	    params            => $param_hash_ref,
+    	metadata_changed  => 0,
+      strand_conversion => {'+' => '1', '.' => '0', '-' => '-1'},
     };
 
     # By default metadata is read and parsed
