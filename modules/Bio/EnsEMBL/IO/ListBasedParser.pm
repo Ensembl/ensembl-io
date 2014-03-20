@@ -12,11 +12,11 @@
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::SimpleList - A line-based parser for simple lists of e.g. feature IDs
+Bio::EnsEMBL::IO::ListBasedParser - A line-based parser for simple lists of e.g. feature IDs
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::SimpleList;
+package Bio::EnsEMBL::IO::ListBasedParser;
 
 use strict;
 use warnings;
