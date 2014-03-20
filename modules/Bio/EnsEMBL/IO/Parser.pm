@@ -85,11 +85,11 @@ sub next_block {
     $self->shift_block();
     $self->{'metadata_changed'} = 0;
     while( defined $self->{'current_block'} && $self->is_metadata() ) {
-        if ($self->{'params'}->{'mustParseMetadata'}) {
-            $self->read_metadata();
-	    $self->{'metadata_changed'} = 1;
-        }
-        $self->shift_block();
+      if ($self->{'params'}->{'mustParseMetadata'}) {
+        $self->read_metadata();
+	      $self->{'metadata_changed'} = 1;
+      }
+      $self->shift_block();
     }
 }
 
@@ -110,10 +110,10 @@ sub next {
     $self->next_block();
 
     if (defined $self->{'current_block'}) {
-            $self->read_record();
-            return 1;
+        $self->read_record();
+        return 1;
     } else {
-            return 0;
+        return 0;
     }
 }
 
