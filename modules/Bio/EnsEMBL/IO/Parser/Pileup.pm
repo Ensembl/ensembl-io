@@ -16,6 +16,9 @@ Bio::EnsEMBL::IO::Parser::Pileup - A line-based parser for pileup (variant) form
 
 =cut
 
+### IMPORTANT - this is a work-in-progress and needs extending to fully parse
+### the content (possibly using VEP code)
+
 package Bio::EnsEMBL::IO::Parser::Pileup;
 
 use strict;

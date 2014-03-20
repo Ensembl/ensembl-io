@@ -12,9 +12,12 @@
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::HGVS
+Bio::EnsEMBL::IO::Parser::HGVS - a list-based parser for HGVS identifiers
 
 =cut
+
+### IMPORTANT - this is a work-in-progress and needs extending to fully parse
+### the content (possibly using VEP code)
 
 package Bio::EnsEMBL::IO::ListBasedParser::HGVS;
 
