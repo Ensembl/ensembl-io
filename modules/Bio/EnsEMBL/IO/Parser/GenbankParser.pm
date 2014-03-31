@@ -350,6 +350,13 @@ sub getRawDBLinks {
     return $self->{'record'}->{'_raw_dblink'};
 }
 
+sub getRawComment {
+    my $self = shift;
+    if (! exists $self->{'record'}->{'_raw_comment'}) {
+        return;
+    }
+    return $self->{'record'}->{'_raw_comment'};
+}
 
 =head2 getFeatures
 
