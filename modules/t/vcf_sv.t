@@ -17,7 +17,7 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 $test_info = "NA00001:$test_row[9]";
-$ind_info  = $parser->getRawIndividualsInfo;
+$ind_info  = $parser->get_raw_individuals_info;
 ok($test_info eq $ind_info->[0], 'Individual data');
 
 
@@ -28,7 +28,7 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 $test_info = "NA00001:$test_row[9]";
-$ind_info  = $parser->getRawIndividualsInfo;
+$ind_info  = $parser->get_raw_individuals_info;
 ok($test_info eq $ind_info->[0], 'Individual data');
 
 
@@ -39,7 +39,7 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 $test_info = "NA00001:$test_row[9]";
-$ind_info  = $parser->getRawIndividualsInfo;
+$ind_info  = $parser->get_raw_individuals_info;
 ok($test_info eq $ind_info->[0], 'Individual data');
 
 
@@ -50,7 +50,7 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 $test_info = "NA00001:$test_row[9]";
-$ind_info  = $parser->getRawIndividualsInfo;
+$ind_info  = $parser->get_raw_individuals_info;
 ok($test_info eq $ind_info->[0], 'Individual data');
 
 
@@ -61,7 +61,7 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 $test_info = "NA00001:$test_row[9]";
-$ind_info  = $parser->getRawIndividualsInfo;
+$ind_info  = $parser->get_raw_individuals_info;
 ok($test_info eq $ind_info->[0], 'Individual data');
 
 print "\n\n# Record 6\n";
@@ -71,17 +71,17 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 $test_info = "NA00001:$test_row[9]";
-$ind_info  = $parser->getRawIndividualsInfo;
+$ind_info  = $parser->get_raw_individuals_info;
 ok($test_info eq $ind_info->[0], 'Individual data');
 
 print "\n> Testing the SV specific getters (only for the last record):\n";
-ok($parser->getAlternativeDescription('DUP:TANDEM') eq 'Tandem Duplication', 'getAlternativeDescription');
-ok($parser->getOuterStart == 18665119, 'getOuterStart');
-ok($parser->getStart == 18665129, 'getStart');
-ok($parser->getInnerStart == 18665139, 'getInnerStart');
-ok($parser->getInnerEnd == 18665194, 'getInnerEnd');
-ok($parser->getEnd == 18665204, 'getEnd');
-ok($parser->getOuterEnd == 18665214, 'getOuterEnd');
+ok($parser->get_alternative_description('DUP:TANDEM') eq 'Tandem Duplication', 'get_alternative_description');
+ok($parser->get_outer_start == 18665119, 'get_outer_start');
+ok($parser->get_start == 18665129, 'get_start');
+ok($parser->get_inner_start == 18665139, 'get_inner_start');
+ok($parser->get_inner_end == 18665194, 'get_inner_end');
+ok($parser->get_end == 18665204, 'get_end');
+ok($parser->get_outer_end == 18665214, 'get_outer_end');
 
 print "\n";
 
@@ -93,13 +93,13 @@ done_testing();
 sub do_the_tests {
   my $test = shift;
 
-  ok($test->[0] eq $parser->getRawSeqName,       'Chromosome');
-  ok($test->[1] eq $parser->getRawStart,         'Start');
-  ok($test->[2] eq $parser->getRawIDs,           'Variant ID');
-  ok($test->[3] eq $parser->getRawReference,     'Reference');
-  ok($test->[4] eq $parser->getRawAlternatives,  'Alternative(s)');
-  ok($test->[5] eq $parser->getRawScore,         'Score');
-  ok($test->[6] eq $parser->getRawFilterResults, 'Filter');
-  ok($test->[7] eq $parser->getRawInfo,          'Info');
-  ok($test->[8] eq $parser->getRawFormats,       'Formats');
+  ok($test->[0] eq $parser->get_raw_seqname,        'Chromosome');
+  ok($test->[1] eq $parser->get_raw_start,          'Start');
+  ok($test->[2] eq $parser->get_raw_IDs,            'Variant ID');
+  ok($test->[3] eq $parser->get_raw_reference,      'Reference');
+  ok($test->[4] eq $parser->get_raw_alternatives,   'Alternative(s)');
+  ok($test->[5] eq $parser->get_raw_score,          'Score');
+  ok($test->[6] eq $parser->get_raw_filter_results, 'Filter');
+  ok($test->[7] eq $parser->get_raw_info,           'Info');
+  ok($test->[8] eq $parser->get_raw_formats,        'Formats');
 }

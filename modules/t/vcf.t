@@ -17,7 +17,7 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 $test_info = "NA00001:$test_row[9]";
-$ind_info  = $parser->getRawIndividualsInfo;
+$ind_info  = $parser->get_raw_individuals_info;
 ok($test_info eq $ind_info->[0], 'Individual data');
 
 
@@ -28,7 +28,7 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 $test_info = "NA00002:$test_row[10]";
-$ind_info  = $parser->getRawIndividualsInfo;
+$ind_info  = $parser->get_raw_individuals_info;
 ok($test_info eq $ind_info->[1], 'Individual data');
 
 
@@ -39,7 +39,7 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 $test_info = "NA00003:$test_row[11]";
-$ind_info  = $parser->getRawIndividualsInfo;
+$ind_info  = $parser->get_raw_individuals_info;
 ok($test_info eq $ind_info->[2], 'Individual data');
 
 
@@ -50,7 +50,7 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 $test_info = "NA00001:$test_row[9]";
-$ind_info  = $parser->getRawIndividualsInfo;
+$ind_info  = $parser->get_raw_individuals_info;
 ok($test_info eq $ind_info->[0], 'Individual data');
 
 
@@ -61,30 +61,30 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 $test_info = "NA00001:$test_row[9]";
-$ind_info  = $parser->getRawIndividualsInfo;
+$ind_info  = $parser->get_raw_individuals_info;
 ok($test_info eq $ind_info->[0], 'Individual data');
 
 print "\n> Testing the getters (only for the last record):\n";
-ok($parser->getSeqName eq '20', 'getSeqName');
-ok($parser->getStart == 1234568, 'getStart');
-ok($parser->getEnd == 1234570, 'getEnd');
-ok($parser->getIDs->[0] eq 'microsat1', 'getIDs');
-ok($parser->getReference eq 'GTC', 'getReference');
-ok($parser->getAlternatives->[0] eq 'G', 'getAlternatives');
-ok($parser->getScore == 50, 'getScore');
-ok($parser->getFilterResults->[0] eq 'PASS' , 'getFilterResults');
-ok($parser->getInfo->{'NS'} eq '3' , 'getInfo');
-ok($parser->getInformationDescription('NS') eq 'Number of Samples With Data' , 'getInformationDescription');
-ok($parser->getFormats->[0] eq 'GT', 'getFormats');
-ok($parser->getFormatDescription('GT') eq 'Genotype' , 'getFormatDescription');
-ok($parser->getIndividualsInfo->{'NA00001'}{'GT'} eq '0/1', 'getIndividualsInfo');
-ok($parser->getIndividualsGenotypes->{'NA00001'} eq 'GTC|G', 'getIndividualsGenotypes');
+ok($parser->get_seqname eq '20', 'get_seqname');
+ok($parser->get_start == 1234568, 'get_start');
+ok($parser->get_end == 1234570, 'get_end');
+ok($parser->get_IDs->[0] eq 'microsat1', 'get_IDs');
+ok($parser->get_reference eq 'GTC', 'get_reference');
+ok($parser->get_alternatives->[0] eq 'G', 'get_alternatives');
+ok($parser->get_score == 50, 'get_score');
+ok($parser->get_filter_results->[0] eq 'PASS' , 'get_filter_results');
+ok($parser->get_info->{'NS'} eq '3' , 'get_info');
+ok($parser->get_info_description('NS') eq 'Number of Samples With Data' , 'get_information_description');
+ok($parser->get_formats->[0] eq 'GT', 'get_formats');
+ok($parser->get_format_description('GT') eq 'Genotype' , 'get_format_description');
+ok($parser->get_individuals_info->{'NA00001'}{'GT'} eq '0/1', 'get_Iindividuals_info');
+ok($parser->get_individuals_genotypes->{'NA00001'} eq 'GTC|G', 'get_individuals_genotypes');
 
 print "\n> Testing the metadata getters:\n";
-ok($parser->getMetadataKeyList eq 'FILTER, FORMAT, INFO, contig, fileDate, fileformat, header, phasing, reference, source', 'getMetadataKeyList');
-ok($parser->getMetadataByPragma('fileDate') eq '20090805', 'getMetadataByPragma');
-ok($parser->getVCFversion eq 'VCFv4.2', 'getVCFversion');
-ok($parser->getMetaDescription('INFO', 'AA') eq 'Ancestral Allele', 'getMetaDescription'); 
+ok($parser->get_metadata_key_list eq 'FILTER, FORMAT, INFO, contig, fileDate, fileformat, header, phasing, reference, source', 'getMetadataKeyList');
+ok($parser->get_metadata_by_pragma('fileDate') eq '20090805', 'getMetadataByPragma');
+ok($parser->get_vcf_version eq 'VCFv4.2', 'getVCFversion');
+ok($parser->get_metadata_description('INFO', 'AA') eq 'Ancestral Allele', 'getMetaDescription'); 
 
 print "\n";
 
@@ -96,13 +96,13 @@ done_testing();
 sub do_the_tests {
   my $test = shift;
   
-  ok($test->[0] eq $parser->getRawSeqName,       'Chromosome');
-  ok($test->[1] eq $parser->getRawStart,         'Start');
-  ok($test->[2] eq $parser->getRawIDs,           'Variant ID');
-  ok($test->[3] eq $parser->getRawReference,     'Reference');
-  ok($test->[4] eq $parser->getRawAlternatives,  'Alternative(s)');
-  ok($test->[5] eq $parser->getRawScore,         'Score');
-  ok($test->[6] eq $parser->getRawFilterResults, 'Filter');
-  ok($test->[7] eq $parser->getRawInfo,          'Info');
-  ok($test->[8] eq $parser->getRawFormats,       'Formats');
+  ok($test->[0] eq $parser->get_raw_seqname,        'Chromosome');
+  ok($test->[1] eq $parser->get_raw_start,          'Start');
+  ok($test->[2] eq $parser->get_raw_IDs,            'Variant ID');
+  ok($test->[3] eq $parser->get_raw_reference,      'Reference');
+  ok($test->[4] eq $parser->get_raw_alternatives,   'Alternative(s)');
+  ok($test->[5] eq $parser->get_raw_score,          'Score');
+  ok($test->[6] eq $parser->get_raw_filter_results, 'Filter');
+  ok($test->[7] eq $parser->get_raw_info,           'Info');
+  ok($test->[8] eq $parser->get_raw_formats,        'Formats');
 }

@@ -90,236 +90,256 @@ sub read_metadata {
   }
 }
 
-sub getMetadataKeyList {
+
+=head2 get_metadata_key_list
+    Description : Retrieve the list of metadata keys available as a 
+                  string with each term separated by a comma.
+    Returntype  : String
+=cut
+
+sub get_metadata_key_list {
   my $self = shift;
   return join(", ",sort(keys(%{$self->{'metadata'}})));
 }
 
 
-=head2 getGVFversion
+=head2 get_gvf_version
     Description : Retrieve the GVF format version
     Returntype  : String
 =cut
 
-sub getGVFversion {
+sub get_gvf_version {
   my $self = shift;
   return $self->{'metadata'}->{'gvf-version'};
 }
 
 
-=head2 getGenomeBuild
+=head2 get_genome_build
     Description : Retrieve the assembly
     Returntype  : String
 =cut
 
-sub getGenomeBuild {
+sub get_genome_build {
   my $self = shift;
   return $self->{'metadata'}->{'genome-build'};
 }
 
-sub getSequenceRegionList {
+
+=head2 get_sequence_region_list
+    Description : Retrieve the list of metadata with the key (pragma) "sequence-region".
+    Returntype  : Reference to an array
+=cut
+
+sub get_sequence_region_list {
   my $self = shift;
   return (defined($self->{'metadata'}->{'sequence-region'})) ? $self->{'metadata'}->{'sequence-region'} : [];
 }
 
-sub getMetadataByPragma {
+
+=head2 get_metadata_by_pragma
+    Description : Retrieve the metadata associated with the given key (pragma).
+    Returntype  : String or reference to an array (depending on the type of metadata)
+=cut
+
+sub get_metadata_by_pragma {
   my $self = shift;
   my $pragma = shift;
   return (defined($self->{'metadata'}->{$pragma})) ? $self->{'metadata'}->{$pragma} : undef;
 }
 
 
+
 # Sequence name
 
-=head2 getRawSeqName
+=head2 get_raw_seqname
     Description : Return the name of the sequence
     Returntype  : String
 =cut
 
-sub getRawSeqName {
+sub get_raw_seqname {
     my $self = shift;
     return $self->{'record'}[0];
 }
 
 
-=head2 getSeqName
+=head2 get_seqname
     Description : Return the name of the sequence
     Returntype  : String
 =cut
 
-sub getSeqName {
+sub get_seqname {
     my $self = shift;
-    return $self->getRawSeqName();
+    return $self->get_raw_seqname();
 }
 
 
 # Source name
 
-=head2 getRawSource
+=head2 get_raw_source
     Description : Return the name of the source of the data
     Returntype  : String
 =cut
 
-sub getRawSource {
+sub get_raw_source {
     my $self = shift;
     return $self->{'record'}[1];
 }
 
 
-=head2 getSource
+=head2 get_source
     Description : Return the name of the source of the data
     Returntype  : String
 =cut
 
-sub getSource {
+sub get_source {
     my $self = shift;
-    return $self->getRawSource();
+    return $self->get_raw_source();
 }
 
 
 # Sequence type
 
-=head2 getRawType
+=head2 get_raw_type
     Description : Return the class/type of the feature
     Returntype  : String
 =cut
 
-sub getRawType {
+sub get_raw_type {
   my $self = shift;
   return $self->{'record'}[2];
 }
 
 
-=head2 getType
+=head2 get_type
     Description : Return the class/type of the feature
     Returntype  : String
 =cut
 
-sub getType {
+sub get_type {
     my $self = shift;
-    return $self->getRawType();
+    return $self->get_raw_type();
 }
 
 
 # Sequence start
 
-=head2 getRawStart
+=head2 get_raw_start
     Description : Return the start position of the feature
     Returntype  : Integer
 =cut
 
-sub getRawStart {
+sub get_raw_start {
     my $self = shift;
     return $self->{'record'}[3];
 }
 
 
-=head2 getStart
+=head2 get_start
     Description : Return the start position of the feature
     Returntype  : Integer
 =cut
 
-sub getStart {
+sub get_start {
     my $self = shift;
-    return $self->getRawStart();
+    return $self->get_raw_start();
 }
 
 
 # Sequence end
 
-=head2 getRawEnd
+=head2 get_raw_end
     Description : Return the end position of the feature
     Returntype  : Integer
 =cut
 
-sub getRawEnd {
+sub get_raw_end {
     my $self = shift;
     return $self->{'record'}[4];
 }
 
 
-=head2 getEnd
+=head2 get_end
     Description : Return the end position of the feature
     Returntype  : Integer
 =cut
 
-sub getEnd {
+sub get_end {
     my $self = shift;
-    return $self->getRawEnd();
+    return $self->get_raw_end();
 }
 
 
 # Phred scaled probability that the sequence_alteration call is incorrect (real number)
 
-=head2 getRawScore
+=head2 get_raw_score
     Description : Return the Phred scaled probability that the sequence_alteration call is incorrect (real number)
     Returntype  : Integer
 =cut
 
-sub getRawScore {
+sub get_raw_score {
     my $self = shift;
     return $self->{'record'}[5];
 }
 
 
-=head2 getScore
+=head2 get_score
     Description : Return the Phred scaled probability that the sequence_alteration call is incorrect (real number)
     Returntype  : Integer
 =cut
 
-sub getScore {
+sub get_score {
     my $self = shift;
-    my $val = $self->getRawScore();
+    my $val = $self->get_raw_score();
     return ($val =~ /\./) ? undef : $val;
 }
 
 
 # Sequence strand
 
-=head2 getRawStrand
+=head2 get_raw_strand
     Description : Return the strand of the feature
     Returntype  : String
 =cut
 
-sub getRawStrand {
+sub get_raw_strand {
     my $self = shift;
     return $self->{'record'}[6];
 }
 
 
-=head2 getStrand
+=head2 get_strand
     Description : Return the strand of the feature (1 for the forward strand and -1 for the reverse strand)
     Returntype  : Integer
 =cut
 
-sub getStrand {
+sub get_strand {
     my $self = shift;
-    my $val = $self->getRawStrand();
+    my $val = $self->get_raw_strand();
     return $strand_conversion{$val};
 }
 
 
 # Phase/Frame
 
-=head2 getRawPhase
+=head2 get_raw_phase
     Description : Return the phase/frame of the feature
     Returntype  : String
 =cut
 
-sub getRawPhase {
+sub get_raw_phase {
   my $self = shift;
   return $self->{'record'}[7];
 }
 
 
-=head2 getPhase
+=head2 get_phase
     Description : Return the phase/frame of the feature
     Returntype  : String
 =cut
 
-sub getPhase {
+sub get_phase {
     my $self = shift;
-    my $val = $self->getRawPhase();
+    my $val = $self->get_raw_phase();
     return ($val =~ /\./) ? undef : $val;
 }
 
@@ -327,26 +347,26 @@ sub getPhase {
 # Attributes
 # The methods listed below concern the 9th column data
 
-=head2 getRawAttributes
+=head2 get_raw_attributes
     Description : Return the content of the 9th column of the line
     Returntype  : String
 =cut
 
-sub getRawAttributes {
+sub get_raw_attributes {
   my $self = shift;
   return $self->{'record'}[8];
 }
 
 
-=head2 getAttributes
+=head2 get_attributes
     Description : Return the content of the 9th column of the line in a hash: "attribute => value"
     Returntype  : Reference to a hash
 =cut
 
-sub getAttributes {
+sub get_attributes {
   my $self = shift;
   return \%attributes if (%attributes);
-  foreach my $attr (split(';',$self->getRawAttributes)) {
+  foreach my $attr (split(';',$self->get_raw_attributes)) {
     my ($key,$value) = split('=',$attr);
     $attributes{$key} = $value;
   }
@@ -354,37 +374,37 @@ sub getAttributes {
 }
 
 
-=head2 getID
+=head2 get_ID
     Description : Return the identifier of the feature (extracted from the 9th column)
     Returntype  : String
 =cut
 
-sub getID {
+sub get_ID {
   my $self = shift;
-  my $attr = $self->getAttributes;
+  my $attr = $self->get_attributes;
   return $attr->{'ID'};
 }
 
 
-=head2 getVariantSeq
+=head2 get_variant_seq
     Description : Return the variant sequence of the feature (extracted from the 9th column)
     Returntype  : String
 =cut
 
-sub getVariantSeq {
+sub get_variant_seq {
   my $self = shift;
-  my $attr = $self->getAttributes;
+  my $attr = $self->get_attributes;
   return $attr->{'Variant_seq'};
 }
 
-=head2 getReferenceSeq
+=head2 get_reference_seq
     Description : Return the reference sequence of the feature (extracted from the 9th column)
     Returntype  : String
 =cut
 
-sub getReferenceSeq {
+sub get_reference_seq {
   my $self = shift;
-  my $attr = $self->getAttributes;
+  my $attr = $self->get_attributes;
   return $attr->{'Reference_seq'};
 }
 

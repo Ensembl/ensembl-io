@@ -14,18 +14,18 @@ my @test_row = (qw(Y	dbSNP	SNV	10015	10015	.	+	.	ID=1;Variant_seq=C;Dbxref=dbSNP
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 
 print "\n# Test the getters (only for the first row):\n";
-ok($parser->getSeqName eq 'Y', 'getSeqName');
-ok($parser->getStart == 10015, 'getStart');
-ok($parser->getEnd == 10015, 'getEnd');
-ok($parser->getStrand == 1, 'getStrand');
-ok($parser->getSource eq 'dbSNP', 'getSource');
-ok($parser->getType eq 'SNV', 'getType');
-ok(!defined($parser->getScore), 'getScore');
-ok(!defined($parser->getPhase), 'getPhase');
-ok(join(',',sort(keys(%{$parser->getAttributes}))) eq 'Dbxref,ID,Reference_seq,Variant_seq,evidence_values', 'getAttributes');
-ok($parser->getID eq '1', 'getID');
-ok($parser->getVariantSeq eq 'C', 'getVariantSeq');
-ok($parser->getReferenceSeq eq 'A', 'getReferenceSeq');
+ok($parser->get_seqname eq 'Y', 'get_seqname');
+ok($parser->get_start == 10015, 'get_start');
+ok($parser->get_end == 10015, 'get_end');
+ok($parser->get_strand == 1, 'get_strand');
+ok($parser->get_source eq 'dbSNP', 'get_source');
+ok($parser->get_type eq 'SNV', 'get_type');
+ok(!defined($parser->get_score), 'get_score');
+ok(!defined($parser->get_phase), 'get_phase');
+ok(join(',',sort(keys(%{$parser->get_attributes}))) eq 'Dbxref,ID,Reference_seq,Variant_seq,evidence_values', 'get_attributes');
+ok($parser->get_ID eq '1', 'get_ID');
+ok($parser->get_variant_seq eq 'C', 'get_variant_seq');
+ok($parser->get_reference_seq eq 'A', 'get_reference_seq');
 
 print "\n# Second record:\n";
 ok ($parser->next(), "Loading second record");
@@ -33,11 +33,11 @@ ok ($parser->next(), "Loading second record");
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 
 print "\n# Methods to retrieve metadata:\n";
-ok($parser->getMetadataKeyList eq 'data-source, feature-ontology, file-date, file-version, genome-build, gff-version, gvf-version, sequence-region, species', 'getMetadataKeyList');
-ok($parser->getGVFversion eq '1.06', 'getGVFversion');
-ok($parser->getGenomeBuild eq 'ensembl GRCh37', 'getGenomeBuild');
-ok($parser->getSequenceRegionList->[0] eq 'Y 1 59373566', 'getSequenceRegionList');
-ok($parser->getMetadataByPragma('file-version') eq '73', 'getMetadataByPragma');
+ok($parser->get_metadata_key_list eq 'data-source, feature-ontology, file-date, file-version, genome-build, gff-version, gvf-version, sequence-region, species', 'get_metadata_key_list');
+ok($parser->get_gvf_version eq '1.06', 'get_gvf_version');
+ok($parser->get_genome_build eq 'ensembl GRCh37', 'get_genome_build');
+ok($parser->get_sequence_region_list->[0] eq 'Y 1 59373566', 'get_sequence_region_list');
+ok($parser->get_metadata_by_pragma('file-version') eq '73', 'get_metadata_by_pragma');
 
 print "\n";
 
