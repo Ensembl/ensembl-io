@@ -2,13 +2,22 @@
 
 =head1 LICENSE
 
-  Copyright (c) 1999-2013 The European Bioinformatics Institute and
-  Genome Research Limited.  All rights reserved.
+  Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
-  This software is distributed under a modified Apache license.
-  For license details, please see
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-  http://www.ensembl.org/info/about/code_licence.html
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut
+
 
 =head1 NAME
 
@@ -38,6 +47,7 @@ sub open {
     my $class = ref($caller) || $caller;
       
     my $self;
+    my $delimiter = "\t";
 
     #############
     ## OPTIONS ##
@@ -45,8 +55,8 @@ sub open {
     # 1) Use tabix (i.e. given a coordinate like 2:10000-20000)
     if ($other_args->{'region'}) {
       die "ERROR: tabix does not seem to be in your path - required when you use the parameter 'region'\n" unless `which tabix 2>&1` =~ /tabix$/;
-      die "ERROR: Input file is not bgzipped, cannot fork\n" unless $filename =~ /\.gz$/;
-	    die "ERROR: Tabix index file $filename.tbi not found, cannot fork\n" unless -e $filename.'.tbi';
+      die "ERROR: Input file is not bgzipped, cannot use tabix\n" unless $filename =~ /\.gz$/;
+	    die "ERROR: Tabix index file $filename.tbi not found, cannot use tabix\n" unless -e $filename.'.tbi';
 	    
 	    $filename =~ /(.+)\.vcf\.gz/;
 	    my $tmp_filename = $1."_tmp.vcf";
@@ -54,14 +64,15 @@ sub open {
 	    
 	    `touch $tmp_filename`;
 	    die "Can't create a temporary file in the directory of '$filename'" unless (-e $tmp_filename);
-	    `zcat $filename | head -n 100 | grep '#' > $tmp_filename`; # Copy the metadata
-	    `tabix $filename $region >> $tmp_filename`;                          # Copy the data in a temporary file
+	    `tabix -h $filename $region >> $tmp_filename`; # Copy the data in a temporary file
 	    
-	    $self = $class->SUPER::open($tmp_filename, "\t", $other_args);
+	    $self = $class->SUPER::open($tmp_filename, $delimiter, $other_args);
+	    $self->{'tmp_filename'} = $tmp_filename;
     }
     else {
-      $self = $class->SUPER::open($filename, "\t", $other_args);
+      $self = $class->SUPER::open($filename, $delimiter, $other_args);
     }
+    
     # 2) Use GP coordinates (INFO column)
     
     
@@ -69,6 +80,12 @@ sub open {
     $self->next_block();
     
     return $self;
+}
+
+
+sub close {
+  my $self = shift;
+  `rm -f $self->{'tmp_filename'}` if ($self->{'tmp_filename'});
 }
 
 sub is_metadata {
@@ -137,23 +154,37 @@ sub read_metadata {
   }
 }
 
-sub getMetadataKeyList {
+
+=head2 get_metadata_key_list
+    Description : Retrieve the list of metadata keys available as a 
+                  string with each term separated by a comma.
+    Returntype  : String
+=cut
+
+sub get_metadata_key_list {
   my $self = shift;
   return join(", ",sort(keys(%{$self->{'metadata'}})));
 }
 
-sub getMetadataByPragma {
+
+=head2 get_metadata_by_pragma
+    Description : Retrieve the metadata associated with the given key (pragma).
+    Returntype  : String or reference to an array (depending on the type of metadata)
+=cut
+
+sub get_metadata_by_pragma {
   my $self = shift;
   my $pragma = shift;
   return (defined($self->{'metadata'}->{$pragma})) ? $self->{'metadata'}->{$pragma} : undef;
 }
 
-=head2 getVCFversion
+
+=head2 get_vcf_version
     Description : Retrieve the VCF format version
     Returntype  : String
 =cut
 
-sub getVCFversion {
+sub get_vcf_version {
   my $self = shift;
   return $self->{'metadata'}->{'fileformat'};
 }
@@ -161,57 +192,57 @@ sub getVCFversion {
 
 # Sequence name
 
-=head2 getRawSeqName
+=head2 get_raw_seqname
     Description : Return the name of the sequence
     Returntype  : String
 =cut
 
-sub getRawSeqName {
+sub get_raw_seqname {
     my $self = shift;
     return $self->{'record'}[0];
 }
 
 
-=head2 getSeqName
+=head2 get_seqname
     Description : Return the name of the sequence
     Returntype  : String
 =cut
 
-sub getSeqName {
+sub get_seqname {
     my $self = shift;
-    return $self->getRawSeqName();
+    return $self->get_raw_seqname();
 }
 
 
 # Sequence start
 
-=head2 getRawStart
+=head2 get_raw_start
     Description : Return the start position of the feature
     Returntype  : Integer
 =cut
 
-sub getRawStart {
+sub get_raw_start {
     my $self = shift;
     return $self->{'record'}[1];
 }
 
 
-=head2 getStart
+=head2 get_start
     Description : Return the adjusted start position of the feature 
     Returntype  : Integer
 =cut
 
-sub getStart {
+sub get_start {
     my $self = shift;
-    my $start = $self->getRawStart();
+    my $start = $self->get_raw_start();
     # Like indels, SVs have the base before included for reference
-    if ($self->getRawInfo =~ /SVTYPE/ || $self->getAlternatives =~ /\<|\[|\]|\>/ ) {
+    if ($self->get_raw_info =~ /SVTYPE/ || $self->get_alternatives =~ /\<|\[|\]|\>/ ) {
       $start ++;
     }
     else {
       # For InDels, the reference String must include the base before the event (which must be reflected in the POS field).
-      my $ref = $self->getRawReference;
-      foreach my $alt (split(',',$self->getAlternatives)) {
+      my $ref = $self->get_raw_reference;
+      foreach my $alt (split(',',$self->get_alternatives)) {
         if (length($alt) != length($ref)) {
           $start ++;
           last;
@@ -224,64 +255,64 @@ sub getStart {
 
 # Sequence end
 
-=head2 getRawEnd
+=head2 get_raw_end
     Description : Return the end position of the feature
     Returntype  : Integer
 =cut
 
-sub getRawEnd {
+sub get_raw_end {
     my $self = shift;
-    my $info = $self->getInfo;
+    my $info = $self->get_info;
     my $end;
     if (defined($info->{END})) {
       $end = $info->{END};
     }
     elsif(defined($info->{SVLEN})) {
       my $svlen = (split(',',$info->{SVLEN}))[0];
-      $end = $self->getRawStart + abs($svlen);
+      $end = $self->get_raw_start + abs($svlen);
     }
     else {
-      $end = $self->getRawStart + length($self->getRawReference) - 1;
+      $end = $self->get_raw_start + length($self->get_raw_reference) - 1;
     }
     return $end;
 }
 
 
-=head2 getEnd
+=head2 get_end
     Description : Return the adjusted end position of the feature 
     Returntype  : Integer
 =cut
 
-sub getEnd {
+sub get_end {
     my $self = shift;
-    my $info = $self->getInfo;
+    my $info = $self->get_info;
     my $end;
     if (defined($info->{END})) {
       $end = $info->{END};
     }
     elsif(defined($info->{SVLEN})) {
       my $svlen = (split(',',$info->{SVLEN}))[0];
-      $end = $self->getStart + abs($svlen)-1;
+      $end = $self->get_start + abs($svlen)-1;
     }
     else {
-      $end = $self->getStart + length($self->getRawReference) - 1;
+      $end = $self->get_start + length($self->get_raw_reference) - 1;
     }
     return $end;
 }
 
 
-=head2 getOuterStart
+=head2 get_outer_start
     Description : Return the outer start position of the feature if the start 
                   position is imprecise (only for structural variant)
     Returntype  : Integer
 =cut
 
-sub getOuterStart {
+sub get_outer_start {
     my $self = shift;
-    my $start = $self->getStart();
+    my $start = $self->get_start();
     my $key = 'CIPOS';
  
-    return $start if ($self->getRawInfo !~ /$key/);
+    return $start if ($self->get_raw_info !~ /$key/);
     
     $start += $self->_get_interval_coordinates($key,'outer');
     
@@ -289,18 +320,18 @@ sub getOuterStart {
 }
 
 
-=head2 getInnerStart
+=head2 get_inner_start
     Description : Return the inner start position of the feature if the start 
                   position is imprecise (only for structural variant)
     Returntype  : Integer
 =cut
 
-sub getInnerStart {
+sub get_inner_start {
     my $self = shift;
-    my $start = $self->getStart();
+    my $start = $self->get_start();
     my $key = 'CIPOS';
  
-    return $start if ($self->getRawInfo !~ /$key/);
+    return $start if ($self->get_raw_info !~ /$key/);
     
     $start += $self->_get_interval_coordinates($key,'inner');
     
@@ -308,18 +339,18 @@ sub getInnerStart {
 }
 
 
-=head2 getInnerEnd
+=head2 get_inner_end
     Description : Return the inner end position of the feature if the end 
                   position is imprecise (only for structural variant)
     Returntype  : Integer
 =cut
 
-sub getInnerEnd {
+sub get_inner_end {
     my $self = shift;
-    my $end = $self->getEnd();
+    my $end = $self->get_end();
     my $key = 'CIEND';
  
-    return $end if ($self->getRawInfo !~ /$key/);
+    return $end if ($self->get_raw_info !~ /$key/);
     
     $end += $self->_get_interval_coordinates($key,'inner');
     
@@ -327,18 +358,18 @@ sub getInnerEnd {
 }
 
 
-=head2 getOuterEnd
+=head2 get_outer_end
     Description : Return the outer end position of the feature if the end 
                   position is imprecise (only for structural variant)
     Returntype  : Integer
 =cut
 
-sub getOuterEnd {
+sub get_outer_end {
     my $self = shift;
-    my $end = $self->getEnd();
+    my $end = $self->get_end();
     my $key = 'CIEND';
  
-    return $end if ($self->getRawInfo !~ /$key/);
+    return $end if ($self->get_raw_info !~ /$key/);
     
     $end += $self->_get_interval_coordinates($key,'outer');
     
@@ -359,178 +390,177 @@ sub _get_interval_coordinates {
     my $key  = shift;
     my $outer_inner = shift;
     
-    my $info = $self->getInfo;
+    my $info = $self->get_info;
     
     my $pos = $info->{$key};
     my $type = ($outer_inner eq 'outer') ? ($key =~ /cipos/i ? 0 : 1) : ($key =~ /ciend/i ? 0 : 1);
- print "$key POS: $pos =>".(split(',',$pos))[$type]." => $type\n";
+    
     return(split(',',$pos))[$type];
 }
 
 
 # ID(s)
 
-=head2 getRawIDs
+=head2 get_raw_IDs
     Description : Return the identifier of the feature
     Returntype  : String
 =cut
 
-sub getRawIDs {
+sub get_raw_IDs {
     my $self = shift;
     return $self->{'record'}[2];
 }
 
 
-=head2 getIDs
+=head2 get_IDs
     Description : Return the identifier(s) of the feature
     Returntype  : reference to list
 =cut
 
-sub getIDs {
+sub get_IDs {
     my $self = shift;
-    my @ids = split(';',$self->getRawIDs());
+    my @ids = split(';',$self->get_raw_IDs());
     return \@ids;
 }
 
 
 # Sequence reference
 
-=head2 getRawReference
+=head2 get_raw_reference
     Description : Return the reference sequence of the feature
     Returntype  : String
 =cut
 
-sub getRawReference {
+sub get_raw_reference {
     my $self = shift;
     return $self->{'record'}[3];
 }
 
 
-=head2 getReference
+=head2 get_reference
     Description : Return the reference sequence of the feature
     Returntype  : String
 =cut
 
-sub getReference {
+sub get_reference {
     my $self = shift;
-    return $self->getRawReference();
+    return $self->get_raw_reference();
 }
 
 
 # Sequence alternative
 
-=head2 getRawAlternatives
+=head2 get_raw_alternatives
     Description : Return the alternative(s) sequence(s) of the feature
                   in a string separated by comma(s)
     Returntype  : String
 =cut
 
-sub getRawAlternatives {
+sub get_raw_alternatives {
     my $self = shift;
     return $self->{'record'}[4];
 }
 
 
-=head2 getAlternatives
+=head2 get_alternatives
     Description : Return the alternative(s) sequence(s) of the feature
     Returntype  : reference to list
 =cut
 
-sub getAlternatives {
+sub get_alternatives {
     my $self = shift;
-    my $alt_allele = $self->getRawAlternatives();
-
+    my $alt_allele = $self->get_raw_alternatives();
     return ($alt_allele) ? [split(',',$alt_allele)] : [];
 }
 
 
-=head2 getAlternativeDescription
+=head2 get_alternative_description
     Arg [1]     : String $alt (alternative sequence) 
     Description : Return the description of the given alternative sequence of the feature
     Returntype  : String
 =cut
 
-sub getAlternativeDescription {
+sub get_alternative_description {
   my $self = shift;
   my $alt = shift;
-  return $self->getMetaDescription('ALT', $alt);
+  return $self->get_metadata_description('ALT', $alt);
 }
 
 
 # Sequence quality score
 
-=head2 getRawScore
+=head2 get_raw_score
     Description : Return the quality score of the feature
     Returntype  : String
 =cut
 
-sub getRawScore {
+sub get_raw_score {
     my $self = shift;
     return $self->{'record'}[5];
 }
 
 
-=head2 getScore
+=head2 get_score
     Description : Return the quality score of the feature
     Returntype  : String
 =cut
 
-sub getScore {
+sub get_score {
     my $self = shift;
-    return $self->getRawScore();
+    return $self->get_raw_score();
 }
 
 
 # Data filter
 
-=head2 getRawFilterResults
+=head2 get_raw_filter_results
     Description : Return the filter status in a string separated by comma(s)
     Returntype  : String
 =cut
 
-sub getRawFilterResults {
+sub get_raw_filter_results {
     my $self = shift;
     return $self->{'record'}[6];
 }
 
 
-=head2 getFilterResults
+=head2 get_filter_results
     Description : Return the filter status
     Returntype  : reference to list
 =cut
 
-sub getFilterResults {
+sub get_filter_results {
     my $self = shift;
-    my @filters = split(';',$self->getRawFilterResults());
+    my @filters = split(';',$self->get_raw_filter_results());
     return \@filters;
 }
 
 
 # Additional information
 
-=head2 getRawInfo
+=head2 get_raw_info
     Description : Return additional information associated with the feature.
                   INFO fields are encoded as a semicolon-separated series of short
                   keys with optional values in the format: <key>=<data>[,data]
     Returntype  : String
 =cut
 
-sub getRawInfo {
+sub get_raw_info {
   my $self = shift;
   return $self->{'record'}[7];
 }
 
 
-=head2 getInfo
+=head2 get_info
     Description : Return additional information associated with the feature in a hash,
                   in the format "key => data"
     Returntype  : reference to hash
 =cut
 
-sub getInfo {
+sub get_info {
   my $self = shift;
   my %info_data;
-  foreach my $info (split(';',$self->getRawInfo)) {
+  foreach my $info (split(';',$self->get_raw_info)) {
     my ($key,$value) = split('=',$info);
     $info_data{$key} = $value;
   }
@@ -538,72 +568,72 @@ sub getInfo {
 }
 
 
-=head2 getInformationDescription
+=head2 get_info_description
     Arg [1]     : String $info (INFO key, e.g. 'AA') 
-    Example     : $info_desc = $vcf->getInformationDescription('AA');
+    Example     : $info_desc = $vcf->get_info_description('AA');
                   The result is "Ancestral Allele"
     Description : Return the description of the given INFO key.
     Returntype  : String
 =cut
 
-sub getInformationDescription {
+sub get_info_description {
   my $self = shift;
   my $info = shift;
-  return $self->getMetaDescription('INFO', $info);
+  return $self->get_metadata_description('INFO', $info);
 }
 
 
 # Format information
 
-=head2 getRawFormats
+=head2 get_raw_formats
     Description : Return the data types used for each individual, e.g. "GT:GQ:DP:HQ"
     Returntype  : String
 =cut
 
-sub getRawFormats {
+sub get_raw_formats {
   my $self = shift;
-  return undef if (!$self->getMetadataByPragma('header')->[8] || $self->getMetadataByPragma('header')->[8] ne 'FORMAT');
+  return undef if (!$self->get_metadata_by_pragma('header')->[8] || $self->get_metadata_by_pragma('header')->[8] ne 'FORMAT');
   return $self->{'record'}[8];
 }
 
 
-=head2 getFormats
+=head2 get_formats
     Description : Return the list of data types used for each individual, e.g. "[GT,GQ,DP,HQ]"
     Returntype  : reference to list
 =cut
 
 
-sub getFormats {
+sub get_formats {
   my $self = shift;
-  my $raw_formats = $self->getRawFormats;
+  my $raw_formats = $self->get_raw_formats;
   my @formats = ($raw_formats) ? split(':',$raw_formats) : ();
   return \@formats;
 }
 
 
-=head2 getFormatDescription
+=head2 get_format_description
     Arg [1]     : String $format (FORMAT key, e.g. 'GT') 
-    Example     : $format_desc = $vcf->getFormatDescription('GT');
+    Example     : $format_desc = $vcf->get_format_description('GT');
                   The result is "Genotype"
     Description : Return the description of the given FORMAT key.
     Returntype  : String
 =cut
 
-sub getFormatDescription {
+sub get_format_description {
   my $self   = shift;
   my $format = shift;
-  return $self->getMetaDescription('FORMAT', $format);
+  return $self->get_metadata_description('FORMAT', $format);
 }
 
 
-=head2 getMetaDescription
+=head2 get_metadata_description
     Argument [1]: Metadata type, e.g. 'INFO'
     Argument [2]: Metadata ID, e.g. 'AA'
     Description : Retrieve the description of the given metadata type and metadata ID
     Returntype  : String
 =cut
 
-sub getMetaDescription {
+sub get_metadata_description {
   my $self = shift;
   my $type = shift;
   my $id   = shift;
@@ -613,7 +643,7 @@ sub getMetaDescription {
     return undef;
   }
   
-  my $meta = $self->getMetadataByPragma($type);
+  my $meta = $self->get_metadata_by_pragma($type);
   foreach my $meta_entry (@$meta) {
     return $meta_entry->{'Description'} if ($meta_entry->{'ID'} eq $id);
   }
@@ -623,13 +653,13 @@ sub getMetaDescription {
 
 # Individual information
 
-=head2 getRawIndividualsInfo
+=head2 get_raw_individuals_info
     Description: Returns the list of individual name concatenated with the content of individual genotype data
                  e.g. 'NA10000:0|1:44:23'
     Returntype : List reference of strings
 =cut
 
-sub getRawIndividualsInfo {
+sub get_raw_individuals_info {
   my $self = shift;
   # Uses an array to keep the individuals order.
   # Not sure if the order is really important. If not, an hash would be better to store the data.
@@ -640,17 +670,17 @@ sub getRawIndividualsInfo {
   return \@ind_list;
 }
 
-=head2 getIndividualsInfo
+=head2 get_individuals_info
     Description: Returns the list of individual names, formats and the corresponding data
                  e.g. 'NA10000' => ( 'GT' => '0|1' )
     Returntype : Hash with the format 'individual_name' => ( 'format' => 'data' )
 =cut
 
-sub getIndividualsInfo {
+sub get_individuals_info {
   my $self = shift;
   my %ind_info;
-  my $formats = $self->getFormats;
-  foreach my $ind (@{$self->getRawIndividualsInfo}) {
+  my $formats = $self->get_formats;
+  foreach my $ind (@{$self->get_raw_individuals_info}) {
     my @ind_data = split(':',$ind);
     my $ind_name = shift @ind_data;
     for (my $i = 0; $i < scalar(@ind_data); $i++) {
@@ -660,17 +690,17 @@ sub getIndividualsInfo {
   return \%ind_info;
 }
 
-=head2 getIndividualsGenotypes
+=head2 get_individuals_genotypes
     Description: Returns the list of individual names with their genotypes (with alleles)
                  e.g. 'NA10000' => 'A|G'
     Returntype : Hash with the format 'individual_name' => 'allele1|allele2'
 =cut
 
-sub getIndividualsGenotypes {
+sub get_individuals_genotypes {
   my $self = shift;
   my %ind_gen;
-  my $ind_info = $self->getIndividualsInfo;
-  my @alleles = (($self->getReference),@{$self->getAlternatives});
+  my $ind_info = $self->get_individuals_info;
+  my @alleles = (($self->get_reference),@{$self->get_alternatives});
   foreach my $ind (keys(%$ind_info)) {
     my $al_separator = ($ind_info->{$ind}{'GT'} =~ /\|/) ? '\|' : '/'; 
     my ($al1,$al2) = split($al_separator,$ind_info->{$ind}{'GT'});
