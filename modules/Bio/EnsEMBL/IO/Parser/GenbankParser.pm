@@ -153,53 +153,53 @@ sub read_metadata {
     # print STDERR 'DEBUG: Met metadata!! :', $self->{'current_block'}, ":\n";
 }
 
-=head2 getRawDescription
+=head2 get_raw_description
 
     Description: Return the raw definition field from the GenBank file
     Returntype : String
 
 =cut
 
-sub getRawDescription {
+sub get_raw_description {
     my $self = shift;
 
     return $self->{'record'}->{'_raw_definition'};
 }
 
-=head2 getDescription
+=head2 get_description
 
     Description: Return the definition field from the GenBank file
     Returntype : String
 
 =cut
 
-sub getDescription {
+sub get_description {
     my $self = shift;
 
-    return $self->getRawDescription;
+    return $self->get_raw_description;
 }
 
-=head2 getSequence
+=head2 get_sequence
 
     Description: Return the sequence from the GenBank file
     Returntype : String
 
 =cut
 
-sub getSequence {
+sub get_sequence {
     my $self = shift;
 
     return $self->{'record'}->{'_seq'};
 }
 
-=head2 getAccession
+=head2 get_accession
 
     Description: Return the accession of the sequence
     Returntype : String
 
 =cut
 
-sub getAccession {
+sub get_accession {
     my $self = shift;
 
     if (!exists $self->{'record'}->{'_accession'}) {
@@ -208,92 +208,92 @@ sub getAccession {
     return $self->{'record'}->{'_accession'};
 }
 
-=head2 getSeqName
+=head2 get_sequence_name
 
     Description: Return the accession withe the sequence version of the sequence
     Returntype : String
 
 =cut
 
-sub getSeqName {
+sub get_sequence_name {
     my $self = shift;
 
     return $self->{'record'}->{'_accession'}.'.'.$self->{'record'}->{'_version'};
 }
 
-=head2 getGenbankId
+=head2 get_genbank_id
 
     Description: Return the GenBank Id of the sequence
     Returntype : String
 
 =cut
 
-sub getGenbankId {
+sub get_genbank_id {
     my $self = shift;
 
     return $self->{'record'}->{'_genebank_id'};
 }
 
-=head2 getSeqVersion
+=head2 get_sequence_version
 
     Description: Return the sequence version of the sequence
     Returntype : String
 
 =cut
 
-sub getSeqVersion {
+sub get_sequence_version {
     my $self = shift;
 
     return $self->{'record'}->{'_version'};
 }
 
-=head2 getLength
+=head2 get_length
 
     Description: Return the length of the sequence
     Returntype : String
 
 =cut
 
-sub getLength {
+sub get_length {
     my $self = shift;
 
     return $self->{'record'}->{'_length'};
 }
 
-=head2 getLocusId
+=head2 get_locus_id
 
     Description: Return the locus id of the sequence. It can be the gene name if it exists
     Returntype : String
 
 =cut
 
-sub getLocusId {
+sub get_locus_id {
     my $self = shift;
 
     return $self->{'record'}->{'_locus_id'};
 }
 
-=head2 getType
+=head2 get_sequence_type
 
     Description: Return the type of the sequence: mRNA, DNA, RNA
     Returntype : String
 
 =cut
 
-sub getType {
+sub get_sequence_type {
     my $self = shift;
 
     return $self->{'record'}->{'_molecule'};
 }
 
-=head2 getModificationDate
+=head2 get_modification_date
 
     Description: Return the last modification date in the GenBank format
     Returntype : String
 
 =cut
 
-sub getModificationDate {
+sub get_modification_date {
     my $self = shift;
 
     return $self->{'record'}->{'_modification_date'};
@@ -312,27 +312,27 @@ sub is_circular {
     return $self->{'record'}->{'_is_circular'};
 }
 
-=head2 getRawOrganism
+=head2 get_raw_organism
 
     Description: Return the organism name 
     Returntype : String
 
 =cut
 
-sub getRawOrganism {
+sub get_raw_organism {
     my $self = shift;
 
     return $self->{'record'}->{'_raw_source'};
 }
 
-=head2 getSource
+=head2 get_source
 
     Description: Return the organism name in the ORGANISM field
     Returntype : String
 
 =cut
 
-sub getSource {
+sub get_source {
     my $self = shift;
 
     $self->{'record'}->{'_raw_source'} =~ /^(.+)\s+ORGANISM/;
@@ -340,14 +340,14 @@ sub getSource {
     return $1;
 }
 
-=head2 getOrganism
+=head2 get_organism
 
     Description: Return the organism name 
     Returntype : String
 
 =cut
 
-sub getOrganism {
+sub get_organism {
     my $self = shift;
 
     if (!exists $self->{'record'}->{'_organism'}) {
@@ -359,14 +359,14 @@ sub getOrganism {
     return $self->{'record'}->{'_organism'};
 }
 
-=head2 getTaxonId
+=head2 get_taxon_id
 
     Description: Return the NCBI taxonomy id of the organism
     Returntype : Integer
 
 =cut
 
-sub getTaxonId {
+sub get_taxon_id {
     my $self = shift;
 
     if (!exists $self->{'record'}->{'_taxon_id'}) {
@@ -375,14 +375,14 @@ sub getTaxonId {
     return $self->{'record'}->{'_taxon_id'};
 }
 
-=head2 getRawDBLinks
+=head2 get_raw_dblinks
 
     Description: Return the DBLINK fields from the GenBank file
     Returntype : String
 
 =cut
 
-sub getRawDBLinks {
+sub get_raw_dblinks {
     my $self = shift;
     if (!exists $self->{'record'}->{'_raw_dblink'}) {
         return
@@ -390,14 +390,15 @@ sub getRawDBLinks {
     return $self->{'record'}->{'_raw_dblink'};
 }
 
-=head2 getRawComment
+=head2 get_raw_comment
 
     Description: Return the COMMENT fields from the GenBank file
     Returntype : String
 
 =cut
 
-sub getRawComment {
+sub get_raw_comment
+{
     my $self = shift;
     if (! exists $self->{'record'}->{'_raw_comment'}) {
         return;
@@ -405,7 +406,7 @@ sub getRawComment {
     return $self->{'record'}->{'_raw_comment'};
 }
 
-=head2 getFeatures
+=head2 get_features
 
     Description: Return an array of hashes representing the features of the GenBank file
                  Each subfeature has its own key except db_xref which is an array
@@ -418,7 +419,7 @@ sub getRawComment {
 
 =cut
 
-sub getFeatures {
+sub get_features {
     my $self = shift;
 
     if (!exists $self->{'record'}->{'_features'}) {
