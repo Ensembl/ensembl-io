@@ -21,6 +21,7 @@ package Bio::EnsEMBL::IO::Writer;
 use strict;
 use warnings;
 
+use Bio::EnsEMBL::Utils::IO qw/work_with_file/;
 use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
 =head2 new
@@ -135,7 +136,7 @@ sub output_dataset {
   my $sd = $self->species_defs;
 
   ## open output file
-  $self->open;
+  #$self->open;
 
   ## process input
   foreach my $set (@$datasets) {
@@ -150,7 +151,7 @@ sub output_dataset {
   }
 
   ## close output file
-  $self->close;
+  #$self->close;
 }
 
 =head2 output_metadata
@@ -219,7 +220,11 @@ sub close {
 
 sub write {
   my ($self, $content) = @_;
-  print OUTPUT $content or die("Couldn't write to file!");
+  work_with_file($self->{'filename'}), 'w', sub{
+    my ($fh) = @_; 
+    print $fh $content; 
+    return;
+  });
 }
 
 1;
