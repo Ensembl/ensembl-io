@@ -120,7 +120,15 @@ sub get_translator_by_type {
   }
 }
 
-sub output_file {
+=head2 output_dataset
+
+    Description: Outputs a dataset to file
+    Args[1]    : Hashref of metadata and array of features
+    Returntype : None 
+
+=cut
+
+sub output_dataset {
   my ($self, $datasets) = @_;
   return unless $datasets && scalar(@{$datasets||[]});
 
@@ -133,21 +141,48 @@ sub output_file {
   foreach my $set (@$datasets) {
     my $metadata = $set->{'metadata'};
     if ($metadata) {
-      my $metadata_content = $self->parser->create_metadata($metadata);
-      $self->write($metadata_content);
+      $self->output_metadata($metadata);
     }
     my @data = @{$set->{'data'}||[]};
     foreach my $feature (@data) {
-      my @namespace   = split('::', ref($feature));
-      my $ftype       = $namespace[-1];
-      my $translator  = $self->get_translator_by_type($ftype);
-      my $record      = $self->parser->create_record($translator, $feature); 
-      $self->write($record);
+      $self->output_feature($feature);
     }
   }
 
   ## close output file
   $self->close;
+}
+
+=head2 output_metadata
+
+    Description: Converts metadata into the required format and writes it to file 
+    Args[1]    : Hashref
+    Returntype : None 
+
+=cut
+
+sub output_metadata {
+  my ($self, $metadata) = @_;
+  my $metadata_content = $self->parser->create_metadata($metadata);
+  $self->write($metadata_content);
+}
+
+=head2 output_feature
+
+    Description: Converts a single feature into a record and writes it to file
+    Args[1]    : Feature object
+    Returntype : None 
+
+=cut
+
+sub output_feature {
+  my ($self, $feature) = @_;
+
+  my @namespace   = split('::', ref($feature));
+  my $ftype       = $namespace[-1];
+  my $translator  = $self->get_translator_by_type($ftype);
+  my $record      = $self->parser->create_record($translator, $feature); 
+  $self->write($record);
 }
 
 =head2 open
