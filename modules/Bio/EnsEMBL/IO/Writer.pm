@@ -184,7 +184,7 @@ sub close {
 
 sub write {
   my ($self, $content) = @_;
-  print OUTPUT $content;
+  print OUTPUT $content or die("Couldn't write to file!");
 }
 
 1;
