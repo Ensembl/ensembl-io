@@ -395,8 +395,8 @@ sub create_record {
   my @values;
 
   ## Add the fields in order
-  push @values, $self->munge_seqname($translator->get_seqname($object) || '.'; 
-  push @values, $self->munge_start($translator->get_start($object) || '.'; 
+  push @values, $self->munge_seqname($translator->get_seqname($object)) || '.'; 
+  push @values, $self->munge_start($translator->get_start($object)) || '.'; 
   push @values, $translator->get_end($object) || '.'; 
   if ($self->get_metadata_value('type') =~ /bedgraph/i) {
     push @values, '.'; 
@@ -404,7 +404,7 @@ sub create_record {
   else {
     push @values, $translator->get_name($object) || '.'; 
     push @values, '.'; 
-    push @values, $self->munge_strand($translator->get_strand($object) || '.'; 
+    push @values, $self->munge_strand($translator->get_strand($object)) || '.'; 
     push @values, '.'; 
     push @values, '.'; 
     push @values, $translator->get_itemRgb($object) || '.'; 

@@ -186,31 +186,6 @@ sub output_feature {
   $self->write($record);
 }
 
-=head2 open
-
-    Description  : Opens the filehandler
-    Returntype   : Void
-
-=cut
-
-sub open {
-  my $self = shift;
-  open(OUTPUT, '>', $self->{'filename'}) || throw("Could not open " . $self->{'filename'});
-}
-
-=head2 close
-
-    Description  : Closes the filehandler
-    Returntype   : True/False on success/failure
-
-=cut
-
-sub close {
-  my $self = shift;
-  return close OUTPUT;
-}
-
-
 =head2 write 
 
     Description  : Outputs one or more lines to the file 
@@ -220,7 +195,7 @@ sub close {
 
 sub write {
   my ($self, $content) = @_;
-  work_with_file($self->{'filename'}), 'w', sub{
+  work_with_file($self->{'filename'}, '>>', sub{
     my ($fh) = @_; 
     print $fh $content; 
     return;

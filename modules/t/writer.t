@@ -3,40 +3,51 @@ use warnings;
 
 use Test::More;
 
-use Bio::EnsEMBL::Utils::IO qw( work_with_file );
 use Bio::EnsEMBL::IO::Writer;
-use Bio::EnsEMBL::Registry;
+use Bio::EnsEMBL::CoordSystem;
+use Bio::EnsEMBL::Slice;
+use Bio::EnsEMBL::Gene;
+use Bio::EnsEMBL::Transcript;
 
-## Get some data from the db
-my $registry = 'Bio::EnsEMBL::Registry';
-$registry->load_registry_from_db(
-                      -host => 'ensembldb.ensembl.org',
-                      -user => 'anonymous',
-                      );
-my $slice_adaptor = $registry->get_adaptor('Human', 'Core', 'Slice');
-my $gene_adaptor  = $registry->get_adaptor('Human', 'Core', 'Gene');
-my $slice = $slice_adaptor->fetch_by_region('chromosome', '6', 133e6, 134e6);
-my $genes = $gene_adaptor->fetch_all_by_Slice($slice);
+## Create some sample objects (we don't want unit tests to depend on a db connection
+my $cs = Bio::EnsEMBL::CoordSystem->new(-NAME    => 'chromosome',
+                                        -VERSION => 'GRCh37',
+                                        -RANK    => 1,
+                                        ); 
+my $slice =  Bio::EnsEMBL::Slice->new(-coord_system     => $cs,
+                                      -seq_region_name  => '6',
+                                      -start            => 133041408,
+                                      -end              => 133091407,
+                                      -strand           => 1,
+                                      );
 
-ok(scalar(@$genes) > 0);
+my @gene_data = (
+                  ['ENSG00000093134', 133043926, 133055904, -1],
+                  ['ENSG00000234484', 133073814, 133075090,  1],
+                  ['ENSG00000112303', 133065009, 133084598, -1],
+                );
 
-my @data;
-foreach my $gene (@$genes) {
-  push @data, $gene;
-  my $transcripts = $gene->get_all_Transcripts;
-  foreach (@$transcripts) {
-    push @data, $_;
-  }  
+my @features = ();
+foreach (@gene_data) {
+  push @features, Bio::EnsEMBL::Gene->new(
+    -STABLE_ID  => $_->[0],
+    -START      => $_->[1],
+    -END        => $_->[2],
+    -STRAND     => $_->[3],
+    -SLICE      => $slice,
+  );
 }
+
+ok(scalar(@features) > 0);
 
 ## Create dataset to pass to writer
 my $datasets = [{
                 'metadata' => {'name' => 'Test 1', 'description' => 'Test of writing genes and their transcripts to a BED file'},
-                'data'     => \@data, 
+                'data'     => \@features, 
               }];
 
 ## Create writer and write data to file
 my $writer = Bio::EnsEMBL::IO::Writer->new('Bed', 'output.bed');
-$writer->output_file($datasets);
+$writer->output_dataset($datasets);
 
 done_testing();

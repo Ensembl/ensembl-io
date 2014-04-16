@@ -34,6 +34,7 @@ use base qw/Bio::EnsEMBL::IO::Translator::Feature/;
 
 sub get_itemRgb {
   my ($self, $gene) = @_;
+  return '.' unless $self->species_defs;
   my $colours = $self->species_defs->colour('gene');
   my $colour = $colours->{$gene->biotype}{'default'};
   return $colour ? '('.join(',',$self->rgb_by_name($colour)).')' : undef;
