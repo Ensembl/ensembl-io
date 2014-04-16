@@ -12,7 +12,7 @@
 
 =head1 NAME
 
-Translator::Gene - Translates accessor methods between transcript objects and parsers
+Translator::Transcript - Translates accessor methods between transcript objects and parsers
 
 =cut
 
@@ -23,79 +23,7 @@ use warnings;
 
 use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
-use base qw/Bio::EnsEMBL::IO::Translator/;
-
-=head2 get_seqname
-
-    Description: Wrapper around API call to seq region name
-    Returntype : String
-
-=cut
-
-sub get_seqname {
-  my ($self, $transcript) = @_;
-  return $transcript->slice->seq_region_name;
-}
-
-=head2 get_start
-
-    Description: Wrapper around API call to feature start
-    Returntype : Integer
-
-=cut
-
-sub get_start {
-  my ($self, $transcript) = @_;
-  return $transcript->start;
-}
-
-=head2 get_end
-
-    Description: Wrapper around API call to feature end
-    Returntype : Integer
-
-=cut
-
-sub get_end {
-  my ($self, $transcript) = @_;
-  return $transcript->end;
-}
-
-=head2 get_name
-
-    Description: Wrapper around API call to feature name
-    Returntype : String
-
-=cut
-
-sub get_name {
-  my ($self, $transcript) = @_;
-  return $transcript->stable_id;
-}
-
-=head2 get_score
-
-    Description: Wrapper around API call to feature name
-    Returntype : String
-
-=cut
-
-sub get_score {
-  my ($self, $transcript) = @_;
-  return '.';
-}
-
-=head2 get_strand
-
-    Description: Wrapper around API call to feature strand
-    Returntype : String
-
-=cut
-
-sub get_strand {
-  my ($self, $transcript) = @_;
-  return $transcript->strand;
-}
+use base qw/Bio::EnsEMBL::IO::Translator::Feature/;
 
 =head2 get_itemRgb
 
