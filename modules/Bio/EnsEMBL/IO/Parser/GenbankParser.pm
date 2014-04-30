@@ -72,13 +72,16 @@ sub read_record {
         my ($field_type, $field) = $self->{'current_block'} =~ /^(\w+)\s+(.*)/;
         chomp $field;
         if ($field_type eq 'LOCUS') {
-            $field =~ /(\S+)\s+(\d+)\s+bp\s+(\w+)\s+(\w+)\s+(\w+)\s+(\S+)/;
-            $self->{'record'}->{'_locus_id'}          = $1;
-            $self->{'record'}->{'_length'}            = $2;
-            $self->{'record'}->{'_molecule'}          = $3;
-            $self->{'record'}->{'_tax'}               = $5;
-            $self->{'record'}->{'_modification_date'} = $6;
-            if ($4 eq 'circular') {
+            $field =~ /(\S+)\s+(\d+)\s[bpa]{2}/;
+            $self->{'record'}->{'_locus_id'} = $1;
+            $self->{'record'}->{'_length'}   = $2;
+            my $molecule = substr($field, 31, 12);
+            if ($molecule =~ /(\w+)/) {
+                $self->{'record'}->{'_molecule'} = $1;
+            }
+            $self->{'record'}->{'_tax'}               = substr($field, 52, 3);
+            $self->{'record'}->{'_modification_date'} = substr($field, 56, 11);
+            if (substr($field, 43, 8) eq 'circular') {
                 $self->{'record'}->{'_is_circular'} = 1;
             }
             else {
