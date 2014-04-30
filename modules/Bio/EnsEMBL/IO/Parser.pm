@@ -231,4 +231,34 @@ sub close {
     throw("Method not implemented. This is really important");
 }
 
+=head2 close
+
+    Description: Wrapper function to demand format as a parameter
+    Returntype : Parser object
+
+=cut
+
+sub open_as {
+    my ($format, @other_args) = @_;
+    if ($format eq 'bed') {
+        return Bio::EnsEMBL::IO::Parser::Bed(@other_args);
+    } elsif ($format eq 'bigBed') {
+        return Bio::EnsEMBL::IO::Parser::BigBedParser(@other_args);
+    } elsif ($format eq 'bigWig') {
+        return Bio::EnsEMBL::IO::Parser::BigWigParser(@other_args);
+    } elsif ($format eq 'EMF') {
+        return Bio::EnsEMBL::IO::Parser::EMFParser(@other_args);
+    } elsif ($format eq 'fasta') {
+        return Bio::EnsEMBL::IO::Parser::FastaParser(@other_args);
+    } elsif ($format eq 'gff3') {
+        return Bio::EnsEMBL::IO::Parser::GFF3Parser(@other_args);
+    } elsif ($format eq 'gvf') {
+        return Bio::EnsEMBL::IO::Parser::GVFParser(@other_args);
+    } elsif ($format eq 'psl') {
+        return Bio::EnsEMBL::IO::Parser::PSLParser(@other_args);
+    } elsif ($format eq 'wig') {
+        return Bio::EnsEMBL::IO::Parser::WigParser(@other_args);
+    }
+}
+
 1;
