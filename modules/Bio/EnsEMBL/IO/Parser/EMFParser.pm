@@ -47,7 +47,7 @@ sub open {
   my ($caller, $filename, @other_args) = @_;
   my $class = ref($caller) || $caller;
 
-  my $self = $class->SUPER::open($filename, undef, '^//', mustParseMetadata=>1, @other_args);
+  my $self = $class->SUPER::open($filename, undef, '^//', @other_args);
   $self->next_block();
 
   return $self;

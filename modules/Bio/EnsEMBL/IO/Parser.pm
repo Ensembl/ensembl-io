@@ -47,8 +47,8 @@ sub new {
     };
 
     # By default metadata is read and parsed
-    if (not exists $self->{'params'}->{'mustParseMetadata'}) {
-	    $self->{'params'}->{'mustParseMetadata'} = 1;
+    if (not exists $self->{'params'}->{'must_parse_metadata'}) {
+	    $self->{'params'}->{'must_parse_metadata'} = 1;
     }
 
     bless $self, $class;
@@ -84,7 +84,7 @@ sub next_block {
     $self->shift_block();
     $self->{'metadata_changed'} = 0;
     while( defined $self->{'current_block'} && $self->is_metadata() ) {
-        if ($self->{'params'}->{'mustParseMetadata'}) {
+        if ($self->{'params'}->{'must_parse_metadata'}) {
             $self->read_metadata();
 	    $self->{'metadata_changed'} = 1;
         }
