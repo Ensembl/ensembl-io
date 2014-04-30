@@ -14,6 +14,15 @@
 
 Bio::EnsEMBL::IO::TrackBasedParser - a parent module for formats that use track/browser lines 
 
+An extension of the ColmnBasedParser class that implements is_metadata and read_metadata.
+
+If you are extending this class you need to implement:
+- read_record: reads $self->{current_block}, possibly invoking $self->next_block(), stores list in $self->{record}
+- a bunch of getters.
+
+Optionally, you may want to implement:
+- seek: seeks coordinate in sorted/indexed file
+
 =cut
 
 package Bio::EnsEMBL::IO::TrackBasedParser;

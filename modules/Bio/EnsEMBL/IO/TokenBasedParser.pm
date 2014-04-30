@@ -16,6 +16,17 @@ Bio::EnsEMBL::IO::Parser::TokenBasedParser - An abstract parser class
 specialised for files with keyed fields or data that comprise a multi-
 lined record.
 
+An extension of the TextParser class that provides is_at_end_of_record and is_at_beginning of record functions:
+
+If you are extending this class you need to implement:
+- is_metadata: determines whether $self->{current_block} is metadata
+- read_metadata: reads $self->{current_block}, stores relevant data in $self->{metadata} hash ref
+- read_record: reads $self->{current_block}, possibly invoking $self->next_block(), stores list in $self->{record}
+- a bunch of getters.
+
+Optionally, you may want to implement:
+- seek: seeks coordinate in sorted/indexed file
+
 =cut
 
 package Bio::EnsEMBL::IO::TokenBasedParser;

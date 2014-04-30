@@ -33,6 +33,16 @@ use base qw/Bio::EnsEMBL::IO::TextParser/;
                    specific functions for handling headers or data
     Returntype   : Bio::EnsEMBL::IO::ColumnBasedParser
 
+    Extension of the TextBasedParser that implements read_record.
+
+    If you are extending this class you need to implement:
+    - is_metadata: determines whether $self->{current_block} is metadata
+    - read_metadata: reads $self->{current_block}, stores relevant data in $self->{metadata} hash ref
+    - a bunch of getters.
+    
+    Optionally, you may want to implement:
+    - seek: seeks coordinate in sorted/indexed file
+
 =cut
 
 sub open {
