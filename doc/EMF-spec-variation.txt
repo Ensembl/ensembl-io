@@ -1,0 +1,105 @@
+
+#### README ####
+
+IMPORTANT: For data queries you can use Ensembl's data mining tool,
+Biomart http://www.ensembl.org/biomart/martview/.
+
+Please send comments or questions to helpdesk@ensembl.org
+
+-----------------------------------------
+Ensembl Multi Format (EMF) FLATFILE DUMPS
+-----------------------------------------
+This directory contains EMF flatfile dumps for resequencing data.
+To ease download there is an EMF file for each chromosome.
+All files are then compacted with GNU Zip for storage efficiency.
+
+In Ensembl, there are EMF files for different types of data:
+
+1.  Whole-genome multiple alignments created by the Ensembl
+Comparative Genomics team (compara).
+
+2.  Gene-based multiple alignments created by the Ensembl Comparative
+Genomics team (gene_alignment).
+
+3.  Alignments of resequencing data from individuals or strains
+ to the reference genome assembly. (These are created
+ by the Ensembl variation team).
+
+The file format is very similar for all data types.
+This README represents verion 1.0 of the EMF specification for
+resequencing data.
+
+----------
+FILE NAMES
+----------
+The files are consistently named following this pattern:
+<species>.<assembly>.<release>.<data type>.<region>.emf.gz
+
+EXAMPLE EMF resequencing data file names:
+Mus_musculus.NCBIM36.43.resequencing.chromosome.Y.emf.gz
+Homo_sapiens.NCBI36.43.resequencing.chromosome.X.emf.gz
+Rattus_norvegicus.RGSC3.4.43.resequencing.chromosome.7.emf.gz
+
+-----------
+FILE FORMAT
+-----------
+
+-- Example --
+##FORMAT (resequencing)
+##DATE Fri Nov  6 11:38:11 2009
+##RELEASE 57 58
+
+SEQ mouse reference 17 780000 790000 1
+SEQ mouse 129S1/SvJ WGS
+SEQ mouse DBA WGS
+SCORE aligned 129S1/SvJ reads
+SCORE aligned DBA reads
+
+DATA
+A A A 2 1
+T A T 2 1
+C C C 2 1
+G G ~ 1 0
+C C ~ 1 0
+//
+
+
+
+-- Explanation --
+
+There are three sections to the file:
+- the file header lines, starting with ##
+- the column header lines
+- the data block
+Comment character is "#" and must be the first character in the line.
+
+
+-- The header lines:
+##FORMAT (resequencing)
+##DATE dump_date
+##RELEASE ensembl_release_number (may contain multiple release numbers)
+
+
+-- The column header lines:
+These lines start with "SEQ" and "SCORE". Each line in this section
+explains, in order, the columns of data in the data block. The number of lines
+in this section match the number of columns of data so there may be
+multiple SEQ and SCORE lines.
+The information is as follows:
+SEQ organism individual chr sequence_start sequence_stop strand
+(chr_length=sequence_length)
+SEQ organism individual sequence_source (WGS, etc.)
+SCORE score_type (may also be confidence score)
+
+
+-- The data block:
+This section starts with the line only containing the word "DATA".
+The number of columns here corresponds to the number of lines in the
+column header section.
+Spaces between the columns are optional.
+The data block ends with //.
+An insertion or deletion is represented by "-".
+Positions in the genome which have no resequencing coverage are denoted by "~".
+Lowercase characters are used for masked sequence.
+Ambiguity codes are used at heterozygous base pairs.
+All coordinates are inclusive coordinates.

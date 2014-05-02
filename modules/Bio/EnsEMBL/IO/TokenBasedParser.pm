@@ -31,7 +31,7 @@ use base qw/Bio::EnsEMBL::IO::TextParser/;
 sub open {
     my ($caller, $filename, $start_tag, $end_tag, @other_args) = @_;
 
-    if (not defined $start_tag && not defined $end_tag) {
+    if (! defined $start_tag && ! defined $end_tag) {
         throw("C'mon, gimme something to work with, you cannot define a TokenBasedParser without tokens!");
     }
 

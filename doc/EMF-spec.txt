@@ -1,0 +1,175 @@
+--------------------------
+Ensembl Multi Format (EMF)
+--------------------------
+
+The current document describes and explains the EMF (Ensembl Multi Format) file format.
+
+--------
+VERSION:
+--------
+1.0
+
+---------------
+EMF SUBFORMATS:
+---------------
+In Ensembl, there are EMF files for different types of data:
+
+1. Whole-genome multiple alignments created by the Ensembl Comparative Genomics team (compara subformat -- cEMF)
+
+2. Gene-based multiple alignments created by the Ensembl Comparative Genomics team (gene_alignment subformat -- gEMF)
+
+3. Alignments of resequencing data from individuals (or strains) to a reference genome assembly created by the Ensembl Variation team (resequencing subformat -- rEMF).
+
+The file format is very similar for all the types and the differences are explained below.
+
+-----------
+FILE NAMES:
+-----------
+The EMF files are consistently named following this convention:
+
++ Resequencing subformat (rEMF):
+<species>.<assembly>.<release>.resequencing.<region>.emf.gz
+Examples:
+Mus_musculus.NCBIM36.43.resequencing.chromosome.Y.emf.gz
+Homo_sapiens.NCBI36.43.resequencing.chromosome.X.emf.gz
+Rattus_norvegicus.RGSC3.4.43.resequencing.chromosome.7.emf.gz
+
++ Compara subformat (cEMF):
+Compara.<release>.<method>.<region>.emf.gz
+Examples:
+Compara.pecan_7_way.chr13_1.emf.gz
+Compara.pecan_gerp_10_way.chr3_5.emf.gz
+Compara.pecan_gerp_10_way.others_1.emf.gz
+
++ Gene_alignment subformat (gEMF):
+Compara.<release>.<gene type>.<tree format>.emf.gz
+Examples:
+Compara.73.protein.nhx.emf.gz
+Compara.73.ncrna.nh.emf.gz
+
+------------
+FILE FORMAT:
+------------
+
+HEADERS:
+--------
+File headers start with '##' and be in capital letters
+Three file headers are mandatory: FORMAT, DATE AND RELEASE.
+
++ The FORMAT header has the following format:
+##FORMAT (<subformat>)
+Where <subformat> is one of [resequencing|compara|gene_alignment]
+Brackets around the <subformat> are mandatory
+Extra spaces between '##FORMAT' and the opening brackets are allowed.
+Example:
+##FORMAT (resequencing)
+
++ The DATE header has the following format:
+##DATE <date>
+Where <date> is a string representing the date when the file has been created.
+Different date formats are allowed.
+Extra spaces after '##DATE ' are allowed.
+Example:
+##DATE Fri Nov  6 11:38:11 2009
+
++ The RELEASE header has the following format:
+##RELEASE <rel>[,<rel>]...
+Where <rel> is the Ensembl release to which the EMF file applies to.
+Multiple releases are allowed and should be separated by one or more spaces.
+Extra spaces after '##RELEASE ' are allowed.
+Examples:
+##RELEASE 73
+##RELEASE 69 70 71 72 73
+
+COMMENT AND EMPTY LINES:
+------------------------
+Comment lines start with a single '#'
+Empty lines are ignored.
+
+COLUMN DESCRIPTORS:
+-------------------
+These lines start with "SEQ" or "SCORE" and they explain, in order, the columns of data in the next data block.
+Total number of SEQ and SCORE lines must correspond with the number and order of columns in the data block lines.
+An extra type of lines starting with "COMP" are allowed in the compara subformat (cEMF). These lines are needed to explain composite SEQ lines (i.e. SEQ lines that don't refer to a single contiguous sequence region in a -usually- fragmented genome). In these cases, multiple COMP lines explain a single SEQ line (see examples below).
+An optional TREE line is allowed for compara and gene_alignment subformat (cEMF and gEMF). If present, this line must contain the phylogenetic tree of the species described in newick (nwk) or nhx format. The format should appear as the second column of the line and the actual tree in the third column. More than one TREE lines are allowed.
+
+The format of these lines is:
+
++ Resequencing subformat (rEMF):
+-First SEQ line:
+SEQ <organism> <individual> <chr> <sequence start> <sequence end> <strand>
+-Others SEQ line:
+SEQ <organism> <individual> <sequence source>
+Where sequence_source refers to WGS, etc... and can't include white spaces.
+-SCORE lines:
+SCORE <score_type>
+In the SCORE lines the score_type is the description of the score and may contain space separated words. It may also be a confidence score
+Example:
+SEQ mouse reference 17 780000 790000 1
+SEQ mouse 129S1/SvJ WGS
+SEQ mouse DBA WGS
+SCORE aligned 129S1/SvJ reads
+SCORE aligned DBA reads
+
+
++ Compara subformat (cEMF):
+-SEQ lines:
+SEQ <species> <chr> <sequence start> <sequence end> <strand>
+When the SEQ lines are composites:
+COMP <composite ID> <seq region type> <assembly name> <seq region name> <sequence start> <sequence end> <strand>
+SEQ <species> <composite ID>
+The full description of the composites (i.e. all the COMP lines corresponding to a SEQ line) have to appear before its corresponding SEQ line.
+-SCORE lines:
+SCORE <score type>
+In the SCORE lines the score_type is the description of the score and may contain space separated words.
+The SCORE lines must appear after all the SEQ lines have been defined.
+-TREE lines:
+TREE <tree>
+Where the tree is a string in nwk or nhx format.
+Example:
+SEQ homo_sapiens 10 135003108 135020400 1
+SEQ gorilla_gorilla 10 147197751 147217931 1
+COMP GL397379.1_6220001985947 supercontig Nleu1.0 GL397379.1 5101692 5103075 1
+COMP GL397379.1_6220001985947 supercontig Nleu1.0 GL397379.1 5104016 5105049 1
+COMP GL397379.1_6220001985947 supercontig Nleu1.0 GL397379.1 5105883 5107578 1
+SEQ nomascus_leucogenys GL397379.1_6220001985947
+SCORE Gerp Conservation Scores (36 eutherian mammals)
+
++ Gene alignment subformat (gEMF):
+-SEQ lines:
+SEQ <species> <transc/peptide stable ID> <chr> <sequence start> <sequence end> <strand> <gene stable ID> <gene name>
+-TREE lines:
+TREE <tree>
+Where the tree is a string in nwk or nhx format representing the gene tree.
+Example:
+SEQ dipodomys_ordii ENSDORT00000022298 scaffold_81096   -1 ENSDORG00000022310 SNORA73
+SEQ tetraodon_nigroviridis ENSTNIT00000023848 14   -1 ENSTNIG00000020332 SNORA73
+SEQ ictidomys_tridecemlineatus ENSSTOT00000017359 JH393292.1   1 ENSSTOG00000017356 SNORA73
+SEQ procavia_capensis ENSPCAT00000019496 GeneScaffold_7389   1 ENSPCAG00000020086 SNORA73
+
+
+DATA BLOCKS:
+------------
+This section starts with a line containing the "DATA" word. Nothing more is expected in this line. The data block ends with a line only containing the two characters "//".
+The lines between the start and the end of the data block contain as many columns as SEQ + SCORE lines have been defined. Each column correspond with one SEQ or SCORE line in the same order they appeared in the COLUMN DESCRIPTOR section. Spaces between the columns are optional.
+
+In seq positions:
+"-" represents a gap in the alignment
+"~" represents no alignment in that position (in resequencing this usually means no resequencing coverage at that position).
+Lowercase characters are used for masked sequence
+Ambiguity codes are used at heterozygous base pairs
+All coordinates are inclusive coordinates.
+
+Examples:
+AAA -5
+TTA +1
+CGA +1
+GG- +4
+CG- +4
+
+A A A 2 1
+T A T 2 1
+C C C 2 1
+G G ~ 1 0
+C C ~ 1 0
+
