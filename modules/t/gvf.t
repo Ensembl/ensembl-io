@@ -2,11 +2,11 @@ use strict;
 use warnings;
 
 use Test::More;
-use Bio::EnsEMBL::IO::Parser::GVFParser;
+use Bio::EnsEMBL::IO::Parser::GVF;
 
 my $test_file = "modules/t/data.gvf";
 
-my $parser = Bio::EnsEMBL::IO::Parser::GVFParser->open($test_file);
+my $parser = Bio::EnsEMBL::IO::Parser::GVF->open($test_file);
 
 print "\n# First record:\n";
 ok ($parser->next(), "Loading first record");

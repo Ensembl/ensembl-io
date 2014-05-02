@@ -2,13 +2,13 @@ use strict;
 use warnings;
 
 use Test::More;
-use Bio::EnsEMBL::IO::Parser::VCF4Parser;
+use Bio::EnsEMBL::IO::Parser::VCF4;
 
 my $test_file = "modules/t/data.vcf";
 
 my ($test_info, $ind_info); 
 
-my $parser = Bio::EnsEMBL::IO::Parser::VCF4Parser->open($test_file);
+my $parser = Bio::EnsEMBL::IO::Parser::VCF4->open($test_file);
 
 print "# Record 1\n";
 ok ($parser->next(), "Loading first record");
