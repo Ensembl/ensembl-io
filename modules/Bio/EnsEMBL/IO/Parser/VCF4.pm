@@ -21,7 +21,7 @@ limitations under the License.
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::VCF4Parser - A line-based parser devoted to VCF format version 4.2
+Bio::EnsEMBL::IO::Parser::VCF4 - A line-based parser devoted to VCF format version 4.2
 
 =cut
 
@@ -32,13 +32,13 @@ http://samtools.github.io/hts-specs/VCFv4.2.pdf
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::VCF4Parser;
+package Bio::EnsEMBL::IO::Parser::VCF4;
 
 use strict;
 use warnings;
 use Bio::EnsEMBL::Utils::Exception qw(warning);
 
-use base qw/Bio::EnsEMBL::IO::Parser::BaseVCF4Parser/;
+use base qw/Bio::EnsEMBL::IO::Parser::BaseVCF4/;
 
 
 sub open {

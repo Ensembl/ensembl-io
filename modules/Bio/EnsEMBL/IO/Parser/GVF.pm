@@ -21,7 +21,7 @@ limitations under the License.
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::GVFParser - A line-based parser devoted to GVF format version 1.06
+Bio::EnsEMBL::IO::Parser::GVF - A line-based parser devoted to GVF format version 1.06
 
 =cut
 
@@ -32,7 +32,7 @@ http://www.sequenceontology.org/resources/gvf.html
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::GVFParser;
+package Bio::EnsEMBL::IO::Parser::GVF;
 
 use strict;
 use warnings;

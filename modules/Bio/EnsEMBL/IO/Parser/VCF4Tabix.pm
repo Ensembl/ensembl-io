@@ -21,7 +21,7 @@ limitations under the License.
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::VCF4TabixParser - A line-based parser devoted to VCF format version 4.2, using the tabix index tool
+Bio::EnsEMBL::IO::Parser::VCF4Tabix - A line-based parser devoted to VCF format version 4.2, using the tabix index tool
 
 =cut
 
@@ -34,15 +34,15 @@ https://github.com/samtools/tabix
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::VCF4TabixParser;
+package Bio::EnsEMBL::IO::Parser::VCF4Tabix;
 
 use strict;
 use warnings;
 use Bio::EnsEMBL::Utils::Exception qw(warning);
 use Bio::EnsEMBL::IO::TabixParser;
-use Bio::EnsEMBL::IO::Parser::BaseVCF4Parser;
+use Bio::EnsEMBL::IO::Parser::BaseVCF4;
 
-use base qw/Bio::EnsEMBL::IO::TabixParser Bio::EnsEMBL::IO::Parser::BaseVCF4Parser/;
+use base qw/Bio::EnsEMBL::IO::TabixParser Bio::EnsEMBL::IO::Parser::BaseVCF4/;
 
 sub open {
   my ($caller, $filename, $other_args) = @_;
@@ -53,7 +53,7 @@ sub open {
   
   my $tabix_data = `tabix -H $filename`;
   foreach my $line (split("\n",$tabix_data)) {
-    $self->Bio::EnsEMBL::IO::Parser::BaseVCF4Parser::read_metadata($line);
+    $self->Bio::EnsEMBL::IO::Parser::BaseVCF4::read_metadata($line);
   }
   
   $self->{'delimiter'} = $delimiter;
@@ -68,7 +68,7 @@ sub open {
 
 sub read_record {
     my $self = shift;
-    $self->Bio::EnsEMBL::IO::Parser::BaseVCF4Parser::read_record(@_);
+    $self->Bio::EnsEMBL::IO::Parser::BaseVCF4::read_record(@_);
 }
 
 1;
