@@ -38,7 +38,7 @@ sub open {
     my $class = ref($caller) || $caller;
     my $filename = shift;
     
-    my $self = $class->SUPER::open($filename, 'LOCUS', '//', @_);
+    my $self = $class->SUPER::open($filename, 'LOCUS', '^//', @_);
     
     $self->next_block();
     return $self;
@@ -70,6 +70,7 @@ sub read_record {
     
     while (!$self->is_at_end_of_record) {
         my ($field_type, $field) = $self->{'current_block'} =~ /^(\w+)\s+(.*)/;
+        unless (defined($field_type)) { throw ("Genbank record parsing going badly.\n".$self->{current_block}."\n".$self->{filename}) };
         chomp $field;
         if ($field_type eq 'LOCUS') {
             $field =~ /(\S+)\s+(\d+)\s[bpa]{2}/;
