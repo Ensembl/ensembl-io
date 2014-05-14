@@ -1,0 +1,21 @@
+EnsEMBL::IO meeting - Tue 20 May 14:00 Copper Room
+--------------------------------------------------
+
+- Talked to Anne about possible work.
+- Pointed me to Miguel, Compara might need some parsers.
+- Miguel suggested BLAST parser, developed independently by different groups,
+  pointed to Harpreet for web parser, told me what/where Compara and
+  genebuilder use.
+- Talked to Harpreet, checked out private sanger_plugins repository for
+  NCBI BLAST parser used by web team.
+- Created feature/blast_parser branch.
+- Explored scope and contexts of existing BLAST parsers.
+
+Web
+---
+
+Compara
+-------
+
+Genebuilders
+------------
