@@ -243,21 +243,21 @@ sub open_as {
     if ($format eq 'bed') {
         return Bio::EnsEMBL::IO::Parser::Bed(@other_args);
     } elsif ($format eq 'bigBed') {
-        return Bio::EnsEMBL::IO::Parser::BigBedParser(@other_args);
+        return Bio::EnsEMBL::IO::Parser::BigBed(@other_args);
     } elsif ($format eq 'bigWig') {
-        return Bio::EnsEMBL::IO::Parser::BigWigParser(@other_args);
+        return Bio::EnsEMBL::IO::Parser::BigWig(@other_args);
     } elsif ($format eq 'EMF') {
-        return Bio::EnsEMBL::IO::Parser::EMFParser(@other_args);
+        return Bio::EnsEMBL::IO::Parser::EMF(@other_args);
     } elsif ($format eq 'fasta') {
-        return Bio::EnsEMBL::IO::Parser::FastaParser(@other_args);
+        return Bio::EnsEMBL::IO::Parser::Fasta(@other_args);
     } elsif ($format eq 'gff3') {
-        return Bio::EnsEMBL::IO::Parser::GFF3Parser(@other_args);
+        return Bio::EnsEMBL::IO::Parser::GFF3(@other_args);
     } elsif ($format eq 'gvf') {
-        return Bio::EnsEMBL::IO::Parser::GVFParser(@other_args);
+        return Bio::EnsEMBL::IO::Parser::GVF(@other_args);
     } elsif ($format eq 'psl') {
-        return Bio::EnsEMBL::IO::Parser::PSLParser(@other_args);
+        return Bio::EnsEMBL::IO::Parser::PSL(@other_args);
     } elsif ($format eq 'wig') {
-        return Bio::EnsEMBL::IO::Parser::WigParser(@other_args);
+        return Bio::EnsEMBL::IO::Parser::Wig(@other_args);
     }
 }
 

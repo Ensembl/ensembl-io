@@ -5,7 +5,7 @@ use Data::Dumper;
 use Test::More;
 use Test::Warn;
 
-use Bio::EnsEMBL::IO::Parser::EMFParser;
+use Bio::EnsEMBL::IO::Parser::EMF;
 
 
 ########
@@ -14,8 +14,8 @@ use Bio::EnsEMBL::IO::Parser::EMFParser;
 ## Resequencing
 subtest 'EMF Resequencing format', sub {
 	my $test_file = 'modules/t/Homo_sapiens.GRCh37.73.resequencing.chromosome.21.emf';
-	my $parser = Bio::EnsEMBL::IO::Parser::EMFParser->open($test_file);
-	isa_ok($parser, 'Bio::EnsEMBL::IO::Parser::EMFParser', "correct class");
+	my $parser = Bio::EnsEMBL::IO::Parser::EMF->open($test_file);
+	isa_ok($parser, 'Bio::EnsEMBL::IO::Parser::EMF', "correct class");
 	my $next_record = $parser->next;
 	ok($next_record, "can next");
 	is($parser->format, "resequencing", "correct format");
@@ -40,8 +40,8 @@ subtest 'EMF Resequencing format', sub {
 ## Compara
 subtest 'Compara format', sub {
 	my $test_file = 'modules/t/Compara.13_eutherian_mammals_EPO.chr1_26.emf';
-	my $parser = Bio::EnsEMBL::IO::Parser::EMFParser->open($test_file);	
-	isa_ok($parser, 'Bio::EnsEMBL::IO::Parser::EMFParser', "correct class");
+	my $parser = Bio::EnsEMBL::IO::Parser::EMF->open($test_file);	
+	isa_ok($parser, 'Bio::EnsEMBL::IO::Parser::EMF', "correct class");
 	my $next_record = $parser->next;
 	ok($next_record, "can next");
 	is($parser->format, "compara", "correct format");

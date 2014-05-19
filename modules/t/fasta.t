@@ -3,14 +3,14 @@ use warnings;
 
 use Test::More;
 
-use Bio::EnsEMBL::IO::Parser::FastaParser;
+use Bio::EnsEMBL::IO::Parser::Fasta;
 
 my $test_file = "data.fasta";
 
 ######################################################
 ## Test 1
 ######################################################
-my $parser = Bio::EnsEMBL::IO::Parser::FastaParser->open($test_file);
+my $parser = Bio::EnsEMBL::IO::Parser::Fasta->open($test_file);
 ok($parser->next());
 ok(length($parser->getHeader()) == 44, "Check length of header");
 ok(scalar(@{$parser->getRawSequence()}) == 17,"Check size of first FASTA block");

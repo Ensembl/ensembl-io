@@ -12,11 +12,11 @@
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::BigBedParser - A line-based parser devoted to BigBed
+Bio::EnsEMBL::IO::Parser::BigBed - A line-based parser devoted to BigBed
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::BigBedParser;
+package Bio::EnsEMBL::IO::Parser::BigBed;
 use strict;
 
 use Bio::DB::BigBed;
