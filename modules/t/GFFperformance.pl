@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Bio::EnsEMBL::Utils::IO qw( work_with_file );
-use Bio::EnsEMBL::IO::Parser::GFF3Parser;
+use Bio::EnsEMBL::IO::Parser::GFF3;
 use Bio::EnsEMBL::Variation::Variation;
 use Bio::EnsEMBL::Variation::VariationFeature;
 
@@ -32,7 +32,7 @@ cmpthese($r);
 sub gff {
     work_with_file( $test_file, "r", sub {
         my $fh = shift;
-        my $parser = Bio::EnsEMBL::IO::Parser::GFF3Parser->new($fh);
+        my $parser = Bio::EnsEMBL::IO::Parser::GFF3->new($fh);
         while($parser->read_record) {next;};    
         return;
     } );
@@ -66,7 +66,7 @@ sub gff_with_happy_stuff {
     };
     work_with_file( $test_file, "r", sub {
         my $fh = shift;
-        my $parser = Bio::EnsEMBL::IO::Parser::GFF3Parser->new($fh);
+        my $parser = Bio::EnsEMBL::IO::Parser::GFF3->new($fh);
         $parser->set_data_function($happy_stuff);
         while($parser->read_record) {next;};
         return;
@@ -119,7 +119,7 @@ sub gff_to_objects {
     
     work_with_file( $test_file, "r", sub {
         my $fh = shift;
-        my $parser = Bio::EnsEMBL::IO::Parser::GFF3Parser->new($fh);
+        my $parser = Bio::EnsEMBL::IO::Parser::GFF3->new($fh);
         $parser->set_data_function($function);
         while($parser->read_record) {next;};
         return;
@@ -168,7 +168,7 @@ sub gff_to_fast_objects {
     
     work_with_file( $test_file, "r", sub {
         my $fh = shift;
-        my $parser = Bio::EnsEMBL::IO::Parser::GFF3Parser->new($fh);
+        my $parser = Bio::EnsEMBL::IO::Parser::GFF3->new($fh);
         $parser->set_data_function($function);
         while($parser->read_record) {next;};
         return;

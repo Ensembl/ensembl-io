@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 use Test::More;
-use Bio::EnsEMBL::IO::Parser::BigBedParser;
+use Bio::EnsEMBL::IO::Parser::BigBed;
 
 ######################################################
 ## Test 1
 ######################################################
-my $parser = Bio::EnsEMBL::IO::Parser::BigBedParser->open('modules/t/data.bb');
+my $parser = Bio::EnsEMBL::IO::Parser::BigBed->open('modules/t/data.bb');
 
 ok($parser->next());
 ok($parser->getChrom eq 'chr1');

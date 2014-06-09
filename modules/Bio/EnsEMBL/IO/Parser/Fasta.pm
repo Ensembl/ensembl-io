@@ -32,7 +32,7 @@ use base qw/Bio::EnsEMBL::IO::TokenBasedParser/;
 
     Description: Open Fasta file
     Argument [1]: Path to file 
-    Returntype : Ensembl::IO::Parser::FastaParser object
+    Returntype : Ensembl::IO::Parser::Fasta object
 
 =cut
 
