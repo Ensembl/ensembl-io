@@ -12,11 +12,11 @@
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::BigWigParser - A line-based parser devoted to BigWigs
+Bio::EnsEMBL::IO::Parser::BigWig - A line-based parser devoted to BigWigs
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::BigWigParser;
+package Bio::EnsEMBL::IO::Parser::BigWig;
 use strict;
 
 use Bio::DB::BigWig;

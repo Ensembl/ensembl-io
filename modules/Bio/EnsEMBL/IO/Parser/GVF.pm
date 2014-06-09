@@ -12,11 +12,11 @@
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::GFF3Parser - A line-based parser devoted to GFF3
+Bio::EnsEMBL::IO::Parser::GVF - A line-based parser devoted to GFF3
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::GVFParser;
+package Bio::EnsEMBL::IO::Parser::GVF;
 
 use strict;
 use warnings;
