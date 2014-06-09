@@ -47,15 +47,16 @@ use Bio::EnsEMBL::Utils::Scalar qw/assert_ref/;
 
 sub new {
     my $class = shift;
-    my $param_hash_ref = shift;
+    my %param_hash = @_;
     
     my $self = {
-	    current_block => undef,
-	    waiting_block => undef,
-	    record => undef,
-	    metadata => {},
-	    params => $param_hash_ref,
-    	    metadata_changed => 0,
+	    current_block     => undef,
+	    waiting_block     => undef,
+	    record            => undef,
+	    metadata          => {},
+	    params            => \%param_hash,
+    	metadata_changed  => 0,
+      strand_conversion => {'+' => '1', '.' => '0', '-' => '-1'},
     };
 
     # By default metadata is read and parsed
@@ -96,11 +97,11 @@ sub next_block {
     $self->shift_block();
     $self->{'metadata_changed'} = 0;
     while( defined $self->{'current_block'} && $self->is_metadata() ) {
-        if ($self->{'params'}->{'must_parse_metadata'}) {
-            $self->read_metadata();
-	    $self->{'metadata_changed'} = 1;
-        }
-        $self->shift_block();
+      if ($self->{'params'}->{'mustParseMetadata'}) {
+        $self->read_metadata();
+	      $self->{'metadata_changed'} = 1;
+      }
+      $self->shift_block();
     }
 }
 
@@ -121,10 +122,10 @@ sub next {
     $self->next_block();
 
     if (defined $self->{'current_block'}) {
-            $self->read_record();
-            return 1;
+        $self->read_record();
+        return 1;
     } else {
-            return 0;
+        return 0;
     }
 }
 
