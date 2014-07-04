@@ -12,11 +12,11 @@
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::BigBedParser - A line-based parser devoted to BigBed
+Bio::EnsEMBL::IO::Parser::BigBed - A line-based parser devoted to BigBed
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::BigBedParser;
+package Bio::EnsEMBL::IO::Parser::BigBed;
 use strict;
 
 use Bio::DB::BigBed;
@@ -85,87 +85,87 @@ sub next {
   }
 }
 
-sub getRawChrom {
+sub get_raw_chrom {
   my $self = shift;
   return $self->{current}->seq_id;
 }
 
-sub getChrom {
+sub get_chrom {
   my $self = shift;
-  return $self->getRawChrom;
+  return $self->get_raw_chrom;
 }
 
-sub getRawStart {
+sub get_raw_start {
   my $self = shift;
   return $self->{current}->start;
 }
 
-sub getStart {
+sub get_start {
   my $self = shift;
-  return $self->getRawStart;
+  return $self->get_raw_start;
 }
 
-sub getRawEnd {
+sub get_raw_end {
   my $self = shift;
   return $self->{current}->end;
 }
 
-sub getEnd {
+sub get_end {
   my $self = shift;
-  return $self->getRawEnd;
+  return $self->get_raw_end;
 }
 
-sub getRawScore {
+sub get_raw_score {
   my $self = shift;
   return $self->{current}->score;
 }
 
-sub getScore {
+sub get_score {
   my $self = shift;
-  return $self->getRawScore;
+  return $self->get_raw_score;
 }
 
-sub getRawStrand {
+sub get_raw_strand {
   my $self = shift;
   return $self->{current}->strand;
 }
 
-sub getStrand {
+sub get_strand {
   my $self = shift;
-  return $self->getRawStrand;
+  return $self->get_raw_strand;
 }
 
-sub getRawParts {
+sub get_raw_parts {
   my $self = shift;
   return $self->{current}->get_SeqFeatures;
 }
 
-sub getParts {
+sub get_parts {
   my $self = shift;
-  return $self->getRawParts;
+  return $self->get_raw_parts;
 }
 
-sub getRawName {
+sub get_raw_name {
   my $self = shift;
   return $self->{current}->name;
 }
 
-sub getName {
+sub get_name {
   my $self = shift;
-  return $self->getRawName;
+  return $self->get_raw_name;
 }
 
-sub getRawRGB {
+sub get_raw_rgb {
   my $self = shift;
   return $self->{current}->attributes('RGB');
 }
 
-sub getRGB {
+sub get_rgb {
   my $self = shift;
-  return $self->getRawRGB;
+  return $self->get_raw_rgb;
 }
 
-sub getBEDFeature {
+sub get_bed_feature {
   my $self = shift;
   return $self->{current};
 }
@@ -176,7 +176,7 @@ sub getBEDFeature {
 sub munge_chr_id {
   my ($self, $chr_id) = @_;
 
-  # Check we get values back for seq region. Maybe need to add 'chr' 
+  # Check we get_ values back for seq region. Maybe need to add 'chr' 
   if ($self->{_cache}->{_bigbed_handle}->chromSize($chr_id)) {
       return $chr_id;
   } elsif ($self->{_cache}->{_bigbed_handle}->chromSize("chr$chr_id")) {
@@ -207,7 +207,7 @@ sub fetch_features  {
 
   my @features;
   while ($self->next) {
-    push @features,$self->getBEDFeature;
+    push @features,$self->get_bed_feature;
   }
   return \@features;
 }

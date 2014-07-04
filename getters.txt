@@ -200,18 +200,18 @@ get_next_column
 
 BigBed Parser (Daniel)
 
-getChrom
-getStart
-getEnd
-getScore
-getParts
-getName
-getRGB
-getBedFeature
+get_chrom
+get_start
+get_end
+get_score
+get_parts
+get_name
+get_rgb
+get_bedFeature
 
 BigWig Parser (Daniel)
 
-getRawChrom
-getStart
-getEnd
-getScore
+get_chrom
+get_start
+get_end
+get_score

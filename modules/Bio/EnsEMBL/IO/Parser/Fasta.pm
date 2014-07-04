@@ -12,7 +12,7 @@
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::FastaParser - A record-based parser devoted to FASTA format
+Bio::EnsEMBL::IO::Parser::Fasta - A record-based parser devoted to FASTA format
 
 =head1 DESCRIPTION
 
@@ -21,7 +21,7 @@ Bio::EnsEMBL::IO::Parser::FastaParser - A record-based parser devoted to FASTA f
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::FastaParser;
+package Bio::EnsEMBL::IO::Parser::Fasta;
 
 use strict;
 use warnings;
@@ -32,7 +32,7 @@ use base qw/Bio::EnsEMBL::IO::TokenBasedParser/;
 
     Description: Open Fasta file
     Argument [1]: Path to file 
-    Returntype : Ensembl::IO::Parser::FastaParser object
+    Returntype : Ensembl::IO::Parser::Fasta object
 
 =cut
 

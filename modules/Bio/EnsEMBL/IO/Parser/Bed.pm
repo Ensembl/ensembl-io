@@ -23,6 +23,19 @@ use warnings;
 
 use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
+=head2 set_fields
+
+    Description: Setter for list of fields used in this format - uses the
+                  "public" (i.e. non-raw) names of getter methods
+    Returntype : Void
+
+=cut
+
+sub set_fields {
+  my $self = shift;
+  $self->{'fields'} = [qw(seqname start end name score strand thickStart thickEnd itemRgb)];
+}
+
 ## ----------- Mandatory fields -------------
 
 =head2 get_raw_chrom
@@ -51,6 +64,19 @@ sub get_seqname {
   return $chr;
 }
 
+=head2 munge_seqname
+
+    Description: Converts Ensembl seq region name to standard BED format  
+    Returntype : String 
+
+=cut
+
+sub munge_seqname {
+  my ($self, $value) = @_;
+  $value = "chr$value" unless $value =~ /^chr/;
+  return $value;
+}
+
 =head2 get_raw_chromStart
 
     Description: Getter for chromStart field
@@ -75,6 +101,18 @@ sub get_raw_chromStart {
 sub get_start {
   my $self = shift;
   return $self->get_raw_chromStart()+1;
+}
+
+=head2 munge_start
+
+    Description: Converts Ensembl start coordinate to semi-open  
+    Returntype : Integer 
+
+=cut
+
+sub munge_start {
+  my ($self, $value) = @_;
+  return $value - 1;
 }
 
 =head2 get_raw_chromEnd
@@ -183,6 +221,20 @@ sub get_strand {
   my $self = shift;
   return $self->{'strand_conversion'}{$self->get_raw_strand};
 }
+
+=head2 munge_strand
+
+    Description: Converts Ensembl-style strand into BED version  
+    Returntype : String
+
+=cut
+
+sub munge_strand {
+  my ($self, $value) = @_;
+  my %lookup = reverse %{$self->{'strand_conversion'}};
+  return $lookup{$value};
+}
+
 
 =head2 get_raw_thickStart
 
@@ -329,5 +381,36 @@ sub get_blockStarts {
   my @res = split ",", $self->get_raw_blockStarts();
   return \@res;
 }
+
+
+=head2 create_record
+
+    Description: Creates a single line of a BED file from an API object 
+    Returntype : String
+
+=cut
+
+sub create_record {
+  my ($self, $translator, $object) = @_;
+  my @values;
+
+  ## Add the fields in order
+  push @values, $self->munge_seqname($translator->get_seqname($object)) || '.'; 
+  push @values, $self->munge_start($translator->get_start($object)) || '.'; 
+  push @values, $translator->get_end($object) || '.'; 
+  if ($self->get_metadata_value('type') =~ /bedgraph/i) {
+    push @values, '.'; 
+  }
+  else {
+    push @values, $translator->get_name($object) || '.'; 
+    push @values, '.'; 
+    push @values, $self->munge_strand($translator->get_strand($object)) || '.'; 
+    push @values, '.'; 
+    push @values, '.'; 
+    push @values, $translator->get_itemRgb($object) || '.'; 
+  }
+  return $self->concatenate_fields(@values);
+}
+
 
 1;

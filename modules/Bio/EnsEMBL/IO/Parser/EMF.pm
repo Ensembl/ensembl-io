@@ -18,7 +18,7 @@ limitations under the License.
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::FastaParser - A record-based parser devoted to FASTA format
+Bio::EnsEMBL::IO::Parser::EMF - A record-based parser devoted to EMF format
 
 =head1 DESCRIPTION
 
@@ -27,7 +27,7 @@ Bio::EnsEMBL::IO::Parser::FastaParser - A record-based parser devoted to FASTA f
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::EMFParser;
+package Bio::EnsEMBL::IO::Parser::EMF;
 
 use strict;
 use warnings;
@@ -39,7 +39,7 @@ use base qw/Bio::EnsEMBL::IO::TokenBasedParser/;
 
   Description  : Open the EMF file
   Argument [1] : Path to the EMF file
-  Returntype   : Ensembl::IO::Parser::EMFParser object
+  Returntype   : Ensembl::IO::Parser::EMF object
 
 =cut
 

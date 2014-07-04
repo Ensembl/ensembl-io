@@ -12,11 +12,11 @@
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::BigWigParser - A line-based parser devoted to BigWigs
+Bio::EnsEMBL::IO::Parser::BigWig - A line-based parser devoted to BigWigs
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::BigWigParser;
+package Bio::EnsEMBL::IO::Parser::BigWig;
 use strict;
 
 use Bio::DB::BigWig;
@@ -85,44 +85,44 @@ sub next {
   }
 }
 
-sub getRawChrom {
+sub get_raw_chrom {
   my $self = shift;
   return $self->{current} ? $self->{current}->seq_id : undef;
 }
 
-sub getChrom {
+sub get_chrom {
   my $self = shift;
-  return $self->getRawChrom;
+  return $self->get_raw_chrom;
 }
 
-sub getRawStart {
+sub get_raw_start {
   my $self = shift;
   return $self->{current}->start;
 }
 
-sub getStart {
+sub get_start {
   my $self = shift;
-  return $self->getRawStart;
+  return $self->get_raw_start;
 }
 
-sub getRawEnd {
+sub get_raw_end {
   my $self = shift;
   return $self->{current}->end;
 }
 
-sub getEnd {
+sub get_end {
   my $self = shift;
-  return $self->getRawEnd;
+  return $self->get_raw_end;
 }
 
-sub getRawScore {
+sub get_raw_score {
   my $self = shift;
   return $self->{current}->score;
 }
 
-sub getScore {
+sub get_score {
   my $self = shift;
-  return $self->getRawScore;
+  return $self->get_raw_score;
 }
 
 # UCSC prepend 'chr' on human chr ids. These are in some of the BigBed
@@ -131,7 +131,7 @@ sub getScore {
 sub munge_chr_id {
   my ($self, $chr_id) = @_;
 
-  # Check we get values back for seq region. Maybe need to add 'chr' 
+  # Check we get_ values back for seq region. Maybe need to add 'chr' 
   if ($self->{_cache}->{_bigbed_handle}->chromSize($chr_id)) {
       return $chr_id;
   } elsif ($self->{_cache}->{_bigbed_handle}->chromSize("chr$chr_id")) {

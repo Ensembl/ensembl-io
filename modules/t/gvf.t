@@ -2,11 +2,11 @@ use strict;
 use warnings;
 
 use Test::More;
-use Bio::EnsEMBL::IO::Parser::GVFParser;
+use Bio::EnsEMBL::IO::Parser::GVF;
 
 my $test_file = "data.gvf";
 
-my $parser = Bio::EnsEMBL::IO::Parser::GVFParser->open($test_file);
+my $parser = Bio::EnsEMBL::IO::Parser::GVF->open($test_file);
 ok ($parser->next(), "Loading first record");
 my @test_row = (qw(Y	dbSNP	SNV	10015	10015	.	+	.	ID=1;Variant_seq=C;Dbxref=dbSNP_137:rs113469508;evidence_values=Frequency;Reference_seq=A));
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
