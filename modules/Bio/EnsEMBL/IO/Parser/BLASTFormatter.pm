@@ -23,15 +23,19 @@ use warnings;
 
 use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
+use Bio::EnsEMBL::Utils::Exception qw/throw/;
+
 sub open {
   my ($caller, $filename, $format, @other_args) = @_;
   my $class = ref($caller) || $caller;
  
-  defined $filename or 
-    throw "Must provide blast_formatter output filename";
   defined $format or 
     throw "Must provide format used to produce blast_formatter output";
-  
+
+  $format =~ /^(\d+?)/ or throw "Invalid format specifier, must begin with number";
+  $1 == 6 || $1 == 7 || $1 == 10 or 
+    throw "Invalid format specifier: must be either 6, 7 or 10";
+
   my $self = $class->SUPER::open($filename, '\t', @other_args);
 
   # metadata defaults
