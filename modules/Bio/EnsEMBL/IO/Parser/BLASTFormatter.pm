@@ -38,10 +38,15 @@ sub open {
     throw "Must provide format used to produce blast formatted output";
 
   $format =~ /^(\d+?)/ or throw "Invalid format specifier, must begin with number";
-  $1 == 6 || $1 == 7 || $1 == 10 or 
+  my $format_specifier = $1;
+  $format_specifier == 6 || $format_specifier == 7 || $format_specifier == 10 or 
     throw "Invalid format specifier: must be either 6, 7 or 10";
 
-  my $self = $class->SUPER::open($filename, '\t', @other_args);
+  my $delimiter;
+  ($format_specifier == 6 or $format_specifier == 7 and $delimiter = '\t') or # 6|7: tab-separated
+    $delimiter = ','; # 10: comma-separated
+  
+  my $self = $class->SUPER::open($filename, $delimiter, @other_args);
 
   # metadata defaults
   if ($self->{'params'}->{'mustReadMetadata'}) {
