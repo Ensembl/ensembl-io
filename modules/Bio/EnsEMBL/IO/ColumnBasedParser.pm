@@ -22,6 +22,8 @@ package Bio::EnsEMBL::IO::ColumnBasedParser;
 use strict;
 use warnings;
 
+use Bio::EnsEMBL::Utils::Exception qw/throw/;
+
 use base qw/Bio::EnsEMBL::IO::TextParser/;
 
 our %sub_strings = (
