@@ -12,7 +12,7 @@
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::BLASTFormatter - A column-based parser of blast_formatter output
+Bio::EnsEMBL::IO::Parser::BLASTFormatter - A column-based parser of blast formatted output
 
 =cut
 
@@ -29,8 +29,13 @@ sub open {
   my ($caller, $filename, $format, @other_args) = @_;
   my $class = ref($caller) || $caller;
  
+  defined $filename or 
+    throw "Must provide name of the file to parse";
+  -e $filename and -f $filename or
+    throw "Check file $filename exists and is readable";
+
   defined $format or 
-    throw "Must provide format used to produce blast_formatter output";
+    throw "Must provide format used to produce blast formatted output";
 
   $format =~ /^(\d+?)/ or throw "Invalid format specifier, must begin with number";
   $1 == 6 || $1 == 7 || $1 == 10 or 
