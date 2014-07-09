@@ -80,7 +80,7 @@ sub set_fields {
   my $format = $self->{params}{format_specifier};
   defined $format or throw "Undefined BLAST output format";
   
-  $self->{'fields'} = [ split /\s/, $format ];
+  $self->{'fields'} = [ split /\s+/, $format ];
 }
 
 1;
