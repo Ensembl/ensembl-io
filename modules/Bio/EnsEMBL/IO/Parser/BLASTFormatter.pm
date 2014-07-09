@@ -20,6 +20,7 @@ package Bio::EnsEMBL::IO::Parser::BLASTFormatter;
 
 use strict;
 use warnings;
+use Data::Dumper;
 
 use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
@@ -37,20 +38,28 @@ sub open {
   defined $format or 
     throw "Must provide format used to produce blast formatted output";
 
-  $format =~ /^(\d+?)/ or throw "Invalid format specifier, must begin with number";
-  my $format_specifier = $1;
-  $format_specifier == 6 || $format_specifier == 7 || $format_specifier == 10 or 
-    throw "Invalid format specifier: must be either 6, 7 or 10";
+  $format =~ /^(\d+)/ or throw "Invalid output format, must begin with number";
+  my $alignment_view_option = $1;
+  $alignment_view_option == 6 || $alignment_view_option == 7 || $alignment_view_option == 10 or 
+    throw "Invalid alignment view option: must be either 6, 7 or 10";
 
-  my $delimiter;
-  ($format_specifier == 6 or $format_specifier == 7 and $delimiter = '\t') or # 6|7: tab-separated
-    $delimiter = ','; # 10: comma-separated
+  $format =~ s/^\d+?//;
+  $format =~ s/^\s+?//;
+  # no format specifier detected, set to default: 
+  # "qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore"
+  # see http://home.cc.umanitoba.ca/~psgendb/birchhomedir/doc/NCBI/blast_formatter.txt
+  $format = "qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore"
+    unless $format;
+
+  my $delimiter = ($alignment_view_option == 6 or $alignment_view_option == 7)?'\t':',';
+
+  my $self = $class->SUPER::open($filename, 
+				 $delimiter, 
+				 alignment_view => $alignment_view_option, 
+				 format_specifier => $format);
   
-  my $self = $class->SUPER::open($filename, $delimiter, @other_args);
-
   # metadata defaults
-  if ($self->{'params'}->{'mustReadMetadata'}) {
-  }
+  #  if ($self->{'params'}->{'mustReadMetadata'}) { }
 
   # pre-load peek buffer
   $self->next_block();
@@ -58,5 +67,20 @@ sub open {
   return $self;
 }
 
+=head2 set_fields
+
+    Description: Setter for list of fields used in this format - uses the
+                  "public" (i.e. non-raw) names of getter methods
+    Returntype : Void
+
+=cut
+
+sub set_fields {
+  my $self = shift;
+  my $format = $self->{params}{format_specifier};
+  defined $format or throw "Undefined BLAST output format";
+  
+  $self->{'fields'} = [ split /\s/, $format ];
+}
 
 1;
