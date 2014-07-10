@@ -55,4 +55,20 @@ is_deeply($got_fields, $default_fields, 'Default format specifiers with comma-se
 #
 ################################################################
 
+#################################################################
+# Test invalid calls to automatically generated accessor methods
+#
+$outfmt = 6; # default format specifiers
+$parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
+throws_ok { $parser->get_raw_qacc() }
+	  qr/Invalid attribute method/, 'Invalid attribute getter call caught';
+throws_ok { $parser->get_score() }
+	  qr/Invalid attribute method/, 'Invalid attribute getter call caught';
+throws_ok { $parser->get_gapopen() }
+	  qr/Cannot get attribute/, 'Invalid attribute getter call caught';
+#
+#################################################################
+
+
+
 done_testing();
