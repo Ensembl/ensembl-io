@@ -50,7 +50,7 @@ is_deeply($got_fields, $compara_fields, 'Compara format specifiers');
 $outfmt = 10;
 $parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
 is($parser->{delimiter}, ',', 'Comma-delimiter');
-my $got_fields = $parser->get_fields();
+$got_fields = $parser->get_fields();
 is_deeply($got_fields, $default_fields, 'Default format specifiers with comma-separated values');
 #
 ################################################################
