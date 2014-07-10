@@ -59,7 +59,7 @@ sub open {
     my $self;
 
     $self = $class->SUPER::open($filepath, @other_args);
-    $self->{'fields'}    = $self->set_fields;
+    $self->set_fields;
     $self->{'delimiter'} = $delimiter;
     my @delimiters       = split('\|', $delimiter);
     $self->{'default_delimiter'} = $delimiters[0];
