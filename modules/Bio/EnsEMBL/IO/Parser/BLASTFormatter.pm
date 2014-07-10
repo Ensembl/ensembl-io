@@ -150,4 +150,9 @@ sub set_fields {
   }
 }
 
+sub is_metadata {
+  my $self = shift;
+  return $self->{'current_block'} =~ /^#/;
+}
+
 1;
