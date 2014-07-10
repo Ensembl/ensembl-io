@@ -76,9 +76,10 @@ sub AUTOLOAD {
 
   return if $method !~ /^get_/;
 
-  $method =~ /get_raw_(.+?)$|get_(.+?)$/;
+  $method =~ /get_raw_(.+?)$/;
+  $method =~ /get_(.+?)$/ unless $1;
   my $attr = $1;
-
+  
   throw("Invalid attribute method: ->$method()") 
     unless exists $self->{fields_index}{$attr};
   
