@@ -82,6 +82,9 @@ sub AUTOLOAD {
   throw("Invalid attribute method: ->$method()") 
     unless exists $self->{fields_index}{$attr};
   
+  throw "Cannot get attribute $attr, record is empty"
+    unless $self->{record};
+
   return $self->{record}[$self->{fields_index}{$attr}];
 }
 
