@@ -119,7 +119,8 @@ sub open {
   my $self = $class->SUPER::open($filename, 
 				 $delimiter, 
 				 alignment_view => $alignment_view_option, 
-				 format_specifier => $format);
+				 format_specifier => $format,
+				 mustReadMetadata => 0);
  
   # metadata defaults
   #  if ($self->{'params'}->{'mustReadMetadata'}) { }
