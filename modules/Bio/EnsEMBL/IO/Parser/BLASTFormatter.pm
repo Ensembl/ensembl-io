@@ -26,6 +26,7 @@ use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
 use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
+
 sub open {
   my ($caller, $filename, $format, @other_args) = @_;
   my $class = ref($caller) || $caller;
@@ -81,6 +82,51 @@ sub set_fields {
   defined $format or throw "Undefined BLAST output format";
   
   $self->{'fields'} = [ split /\s+/, $format ];
+
+  for (my $i=0; $i<scalar @{$self->{fields}}; $i++) {
+    $self->{fields_index}{$self->{fields}[$i]} = $i;
+  }
+}
+
+
+# Supported format specifiers:
+# qseqid : Query Seq-id
+# qgi : Query GI
+# qacc : Query accesion
+# qaccver : Query accesion.version
+# qlen : Query sequence length
+# sseqid : Subject Seq-id
+# sallseqid : All subject Seq-id(s), separated by a ';'
+# sgi : Subject GI
+# sallgi : All subject GIs
+# sacc : Subject accession
+# saccver : Subject accession.version
+# sallacc : All subject accessions
+# slen : Subject sequence length
+# qstart : Start of alignment in query
+# qend : End of alignment in query
+# sstart : Start of alignment in subject
+# send : End of alignment in subject
+# qseq : Aligned part of query sequence
+# sseq : Aligned part of subject sequence
+# evalue : Expect value
+# bitscore : Bit score
+# score : Raw score
+# length : Alignment length
+# pident : Percentage of identical matches
+# nident : Number of identical matches
+# mismatch : Number of mismatches
+# positive : Number of positive-scoring matches
+# gapopen : Number of gap openings
+# gaps : Total number of gaps
+# ppos : Percentage of positive-scoring matches
+# frames : Query and subject frames separated by a '/'
+# qframe : Query frame
+# sframe : Subject frame
+# btop : Blast traceback operations (BTOP)
+
+sub get_raw_qseqid {
+  
 }
 
 1;
