@@ -45,7 +45,7 @@ is_deeply($got_fields, $default_fields, 'Default format specifiers with tab-sepa
 $outfmt = '7 qacc sacc evalue score nident pident qstart qend sstart send length positive ppos qseq sseq';
 $parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
 is($parser->{delimiter}, '\t', 'Tab delimiter');
-my $compara_fields = [ qw/qacc sacc evalue score rident pident qstart qend sstart send length positive ppos qseq sseq/ ];
+my $compara_fields = [ qw/qacc sacc evalue score nident pident qstart qend sstart send length positive ppos qseq sseq/ ];
 $got_fields = $parser->get_fields();
 is_deeply($got_fields, $compara_fields, 'Compara format specifiers');
 
