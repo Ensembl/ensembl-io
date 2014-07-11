@@ -83,6 +83,7 @@ throws_ok { $parser->get_mismatch() }
 #
 # Test parsing tabular format with default specifiers
 #
+diag("Test tabular format with default specifiers");
 $outfmt = 6; # default format specifiers
 $test_file = "blast_test.6.default.tab";
 $parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
@@ -196,6 +197,45 @@ ok($parser->get_sframe == 1, 'Subject frame');
 ok(!$parser->next(), 'No more records');
 #
 #########################################################################################
+
+########################################################
+# Test parsing comma-separated format, no comment lines
+#
+diag("Test comma-separated format with default specifiers");
+$outfmt = '10';
+$test_file = "blast_test.10.default.csv";
+$parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
+ok($parser->next(), 'Loading first record');
+is($parser->get_qseqid, 'gnl|MYDB|1', 'Query seq-id');
+is($parser->get_sseqid, 'gi|405832|gb|U00001.1|HSCDC27', 'Subject seq-id');
+ok($parser->get_pident == 100, 'Percentage identity');
+ok($parser->get_length == 720, 'Alignment length');
+ok($parser->get_mismatch == 0, 'Mismatch');
+ok($parser->get_gapopen == 0, 'Gap open');
+is($parser->get_qstart, 1, 'Query start');
+is($parser->get_qend, 720, 'Query end');
+is($parser->get_sstart, 1, 'Subject start');
+is($parser->get_send, 720, 'Subject end');
+ok($parser->get_evalue == 0, 'Alignment length');
+is($parser->get_bitscore, 1330, 'Bit score');
+
+diag("Parse last record");
+map { $parser->next() } (1 .. 250);
+is($parser->get_qseqid, 'gnl|MYDB|1', 'Query seq-id');
+is($parser->get_sseqid, 'gi|564374743|ref|XM_006247536.1|', 'Subject seq-id');
+ok($parser->get_pident == 92.79, 'Percentage identity');
+ok($parser->get_length == 638, 'Alignment length');
+ok($parser->get_mismatch == 46, 'Mismatch');
+ok($parser->get_gapopen == 0, 'Gap open');
+is($parser->get_qstart, 83, 'Query start');
+is($parser->get_qend, 720, 'Query end');
+is($parser->get_sstart, 79, 'Subject start');
+is($parser->get_send, 716, 'Subject end');
+ok($parser->get_evalue == 0, 'Alignment length');
+is($parser->get_bitscore, 924, 'Bit score');
+ok(!$parser->next(), 'No more records');
+#
+########################################################
 
 # my $default_fields = [ qw/qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore/ ];
 done_testing();
