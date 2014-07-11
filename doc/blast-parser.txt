@@ -32,6 +32,10 @@ Output: a sequence of lines, each line/record composed of at least 13 fields:
 11: qframe
 12: tframe (sframe)
 
+Note: aln option doesn't seem to be a valid format specifier for blat-formatter of BLAST2.2.25.
+Ouptut format used to produce test files is:
+7 qseqid qstart qend sseqid sstart send score evalue pident length qframe sframe
+
 Compara
 -------
 

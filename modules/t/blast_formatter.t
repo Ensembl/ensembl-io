@@ -158,5 +158,44 @@ ok(!$parser->next(), 'No more records');
 #
 #####################################################################################
 
+#########################################################################################
+# Test parsing tabular format with comment lines, ensembl web-specific format specifiers 
+#
+diag("Test Ensembl Web format specifiers");
+$outfmt = '7 qseqid qstart qend sseqid sstart send score evalue pident length qframe sframe';
+$test_file = "blast_test.7.web.tab";
+$parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
+ok($parser->next(), 'Loading first record');
+is($parser->get_qseqid, 'gnl|MYDB|1', 'Query seq-id');
+is($parser->get_qstart, 1, 'Query start');
+is($parser->get_qend, 720, 'Query end');
+is($parser->get_sseqid, 'gi|405832|gb|U00001.1|HSCDC27', 'Subject id');
+is($parser->get_sstart, 1, 'Subject start');
+is($parser->get_send, 720, 'Subject end');
+ok($parser->get_score == 720, 'Score');
+ok($parser->get_evalue == 0, 'E-value');
+ok($parser->get_pident == 100, 'Percentage identity');
+is($parser->get_length, 720, 'Alignment length');
+is($parser->get_qframe, 1, 'Query frame');
+ok($parser->get_sframe == 1, 'Subject frame');
+
+diag("Parse last record");
+map { $parser->next() } (1 .. 250);
+is($parser->get_qseqid, 'gnl|MYDB|1', 'Query seq-id');
+is($parser->get_qstart, 83, 'Query start');
+is($parser->get_qend, 720, 'Query end');
+is($parser->get_sseqid, 'gi|564374743|ref|XM_006247536.1|', 'Subject id');
+is($parser->get_sstart, 79, 'Subject start');
+is($parser->get_send, 716, 'Subject end');
+ok($parser->get_score == 500, 'Score');
+ok($parser->get_evalue == 0, 'E-value');
+ok($parser->get_pident == 92.79, 'Percentage identity');
+is($parser->get_length, 638, 'Alignment length');
+is($parser->get_qframe, 1, 'Query frame');
+ok($parser->get_sframe == 1, 'Subject frame');
+ok(!$parser->next(), 'No more records');
+#
+#########################################################################################
+
 # my $default_fields = [ qw/qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore/ ];
 done_testing();
