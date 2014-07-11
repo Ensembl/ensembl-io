@@ -27,10 +27,10 @@ RID: VU5FZ4D2015
    the parser understand
 
   4.1 Tabular output with comment lines used by Compara, file: blast_test.7.compara.tab:
-      $ blast_formatter -rid VU5FZ4D2015 -out blast_test.7.compara.tab -outfmt '7 qacc sacc evalue score rident pident qstart qend sstart send length positive ppos qseq sseq'
+      $ blast_formatter -rid VU5FZ4D2015 -out blast_test.7.compara.tab -outfmt '7 qacc sacc evalue score nident pident qstart qend sstart send length positive ppos qseq sseq'
 
   4.2 Tabular output with comment lines and default format specifiers, file: blast_test.7.default.tab
-      $ blast_formatter -rid VU5FZ4D2015 -out blast_test.7.default.tab -outfmt 7
+      $ 
 
   4.3 Tabular output with default format specifiers, file: blast_test.6.default.tab
       $ blast_formatter -rid VU5FZ4D2015 -out blast_test.6.default.tab -outfmt 6

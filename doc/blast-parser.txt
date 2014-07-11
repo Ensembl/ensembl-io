@@ -18,19 +18,19 @@ Use NCBIBLAST module in private sanger-plugins repo.
 It simply parses the tab result file produced by the ncbi blast program "blast-formatter".
 
 Output: a sequence of lines, each line/record composed of at least 13 fields:
-0: ?
+0: qid (qseqid)
 1: qstart (query start)
 2: qend
-3: tid
-4: tstart (target start)
-5: tend
+3: tid (sseqid)
+4: tstart (sstart)
+5: tend (send)
 6: score
 7: evalue
 8: pident
-9: len
+9: len (length)
 10: aln
 11: qframe
-12: tframe
+12: tframe (sframe)
 
 Compara
 -------
