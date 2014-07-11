@@ -11,6 +11,7 @@ my $parser;
 my $test_file = "blast_test.6.default.tab";
 
 ###########################################
+#
 # Test invalid argument exception handling
 #
 throws_ok { $parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open() }
@@ -30,6 +31,7 @@ throws_ok { $parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file,
 ###########################################
 
 ################################################################
+#
 # Test parsing of format specifiers from output format argument
 #
 $outfmt = 6; # default format specifiers
@@ -56,6 +58,7 @@ is_deeply($got_fields, $default_fields, 'Default format specifiers with comma-se
 ################################################################
 
 #################################################################
+#
 # Test invalid calls to automatically generated accessor methods
 #
 $outfmt = 6; # default format specifiers
@@ -66,6 +69,14 @@ throws_ok { $parser->get_score() }
 	  qr/Invalid attribute method/, 'Invalid attribute getter call caught';
 throws_ok { $parser->get_gapopen() }
 	  qr/Cannot get attribute/, 'Invalid attribute getter call caught';
+
+$outfmt = '7 qacc sacc evalue score rident pident qstart qend sstart send length positive ppos qseq sseq';
+$parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
+throws_ok { $parser->get_raw_sseqid() }
+	  qr/Invalid attribute method/, 'Invalid attribute getter call caught';
+throws_ok { $parser->get_mismatch() }
+	  qr/Invalid attribute method/, 'Invalid attribute getter call caught';
+
 #
 #################################################################
 
