@@ -42,7 +42,7 @@ my $default_fields = [ qw/qseqid sseqid pident length mismatch gapopen qstart qe
 my $got_fields = $parser->get_fields();
 is_deeply($got_fields, $default_fields, 'Default format specifiers with tab-separated values');
 
-$outfmt = '7 qacc sacc evalue score rident pident qstart qend sstart send length positive ppos qseq sseq';
+$outfmt = '7 qacc sacc evalue score nident pident qstart qend sstart send length positive ppos qseq sseq';
 $parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
 is($parser->{delimiter}, '\t', 'Tab delimiter');
 my $compara_fields = [ qw/qacc sacc evalue score rident pident qstart qend sstart send length positive ppos qseq sseq/ ];
