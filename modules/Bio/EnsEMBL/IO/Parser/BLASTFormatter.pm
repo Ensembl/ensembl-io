@@ -86,10 +86,11 @@ sub AUTOLOAD {
   throw "Cannot get attribute $attr, record is empty"
     unless $self->{record};
 
-  return trim($self->{record}[$self->{fields_index}{$attr}]);
+  return $self->_trim($self->{record}[$self->{fields_index}{$attr}]);
 }
 
-sub trim {
+sub _trim {
+  my $self = shift;
   (my $s = $_[0]) =~ s/^\s+|\s+$//g;
   return $s;
 }
