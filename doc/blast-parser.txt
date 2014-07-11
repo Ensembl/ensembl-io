@@ -43,7 +43,7 @@ blastp is run with -outfmt option (custom).
 
 Output: a sequence of lines/records, each record composed of 14/16 fields
 
-7 qacc sacc evalue score rident pident qstart qend sstart send length positive ppos [qseq sseq]
+7 qacc sacc evalue score nident pident qstart qend sstart send length positive ppos [qseq sseq]
 |
 --> code meaning: "tabular with comment lines"
 
