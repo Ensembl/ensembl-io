@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use Test::More;
+use Test::More tests => 116;
 use Test::Exception;
 
 BEGIN { use_ok('Bio::EnsEMBL::IO::Parser::BLASTFormatter'); } 
@@ -237,5 +237,4 @@ ok(!$parser->next(), 'No more records');
 #
 ########################################################
 
-# my $default_fields = [ qw/qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore/ ];
-done_testing();
+# done_testing();
