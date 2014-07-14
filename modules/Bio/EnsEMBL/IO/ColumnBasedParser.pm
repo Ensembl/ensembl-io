@@ -22,6 +22,8 @@ package Bio::EnsEMBL::IO::ColumnBasedParser;
 use strict;
 use warnings;
 
+use Bio::EnsEMBL::Utils::Exception qw/throw/;
+
 use base qw/Bio::EnsEMBL::IO::TextParser/;
 
 our %sub_strings = (
@@ -57,7 +59,7 @@ sub open {
     my $self;
 
     $self = $class->SUPER::open($filepath, @other_args);
-    $self->{'fields'}    = $self->set_fields;
+    $self->set_fields;
     $self->{'delimiter'} = $delimiter;
     my @delimiters       = split('\|', $delimiter);
     $self->{'default_delimiter'} = $delimiters[0];

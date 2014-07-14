@@ -1,0 +1,70 @@
+EnsEMBL::IO meeting - Tue 20 May 14:00 Copper Room
+--------------------------------------------------
+
+- Talked to Anne about possible work.
+- Pointed me to Miguel, Compara might need some parsers.
+- Miguel suggested BLAST parser, developed independently by different groups,
+  pointed to Harpreet for web parser, told me what/where Compara and
+  genebuilder use.
+- Talked to Harpreet, checked out private sanger_plugins repository for
+  NCBI BLAST parser used by web team.
+- Created feature/blast_parser branch.
+- Explored scope and contexts of existing BLAST parsers.
+
+Web
+---
+
+Use NCBIBLAST module in private sanger-plugins repo.
+It simply parses the tab result file produced by the ncbi blast program "blast-formatter".
+
+Output: a sequence of lines, each line/record composed of at least 13 fields:
+0: qid (qseqid)
+1: qstart (query start)
+2: qend
+3: tid (sseqid)
+4: tstart (sstart)
+5: tend (send)
+6: score
+7: evalue
+8: pident
+9: len (length)
+10: aln
+11: qframe
+12: tframe (sframe)
+
+Note: aln option doesn't seem to be a valid format specifier for blat-formatter of BLAST2.2.25.
+Ouptut format used to produce test files is:
+7 qseqid qstart qend sseqid sstart send score evalue pident length qframe sframe
+
+Compara
+-------
+
+Parser is Bio::EnsEMBL::Compara::RunnableDB::BlastAndParsePAF.
+Run ncbi_blastp and store the output into PeptideAlignFeature objects which are then stored
+in the compara database.
+
+blastp is run with -outfmt option (custom).
+
+Output: a sequence of lines/records, each record composed of 14/16 fields
+
+7 qacc sacc evalue score nident pident qstart qend sstart send length positive ppos [qseq sseq]
+|
+--> code meaning: "tabular with comment lines"
+
+Genebuilders
+------------
+
+Use Bio::EnsEMBL::Analysis::Tools::BPlite, a port of bioperl 0.7 BPlite blast parser.
+The description says:
+"There are differences in the format of the various flavors of BLAST".
+BPlite parses BLASTN, BLASTP, BLASTX, TBLASTN, TBLASTX reports from both high-perf
+WU-BLAST and the more generic NCBI-BLAST.
+
+BPlite have accompanying modules in Bio::EnsEMBL::Analysis::Tools::BPlite::[HSP,Iteration,Sbjct]
+Iteration represents object for parsing a single iteration of a PSI-BLAST report.
+
+and related Bio::EnsEMBL::Analysis::Tools::FilterBPlite.
+
+BPlite inherits from Bio::Root::IO and Bio::SeqAnalysisParserI from Bioperl.
+A subject is a BLAST hit, which may have several alignments (HSP, high scoring pairs) associated
+with it.
