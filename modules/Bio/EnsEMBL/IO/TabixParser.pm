@@ -51,7 +51,7 @@ sub open {
   
   die "ERROR: tabix does not seem to be in your path - required to parse the VCF file\n" unless `which tabix 2>&1` =~ /tabix$/;
   die "ERROR: Input file is not bgzipped, cannot use tabix\n" unless $filename =~ /\.gz$/;
-	die "ERROR: Tabix index file $filename.tbi not found, cannot use tabix\n" unless -e $filename.'.tbi';
+	#die "ERROR: Tabix index file $filename.tbi not found, cannot use tabix\n" unless -e $filename.'.tbi';
   
   $self->{record}     = undef;
   $self->{filehandle} = tabix_open($filename);
