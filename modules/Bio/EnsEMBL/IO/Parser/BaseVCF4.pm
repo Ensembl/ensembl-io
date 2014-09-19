@@ -64,8 +64,16 @@ sub read_metadata {
     
     # Check the fileformat
     if ($m_type eq 'fileformat') {
-      if ($m_data =~ /(\d+\.\d+)/) {
-        die "The VCF file format version $1 is not compatible with the parser version (VCF v$version)" if ($1 != $version);
+      if ($m_data =~ /(\d+)\.(\d+)/) {
+        my ($file_version_major, $file_version_minor) = ($1, $2);
+        my $f_version = $file_version_major.'.'.$file_version_minor;
+        
+        # get version of this parser
+        $version =~ /(\d+)\.(\d+)/;
+        my ($parser_version_major, $parser_version_minor) = ($1, $2);
+        
+        die "The VCF file format version $f_version is not compatible with the parser version (VCF v$version)" if ($file_version_major != $parser_version_major) || ($file_version_major == $parser_version_major && $parser_version_major < $file_version_major);
+        #warn "VCF file version $f_version may be incompatible with parser version $version" if ($file_version_major == $parser_version_major && $parser_version_minor != $file_version_minor);
       }
       else {
         die "The script can't read the VCF file format version of '$m_type'";
@@ -78,11 +86,10 @@ sub read_metadata {
       my %metadata;
       
       # Fix when the character "," is found in the description field
-      if ($m_data =~ /(".+")/) {
-        my $desc_content = $1;
-        my $new_desc_content = $desc_content;
-        $new_desc_content =~ s/,/!#!/g;
-        $m_data =~ s/$desc_content/$new_desc_content/;
+      if($m_data =~ /(.?)(".+")(.?)/) {
+        my ($before, $content, $after) = ($1, $2, $3);
+        $content =~ s/,/!#!/g;
+        $m_data = ($before || '').$content.($after || '');
       }
       foreach my $meta (split(',',$m_data)) {
         my ($key,$value) = split('=',$meta);
@@ -606,6 +613,17 @@ sub get_metadata_description {
 
 
 # Individual information
+
+=head2 get_individuals
+    Description: Returns list of individual names
+    Returntype : Listref of strings
+=cut
+
+sub get_individuals {
+  my $self = shift;
+  my @inds = map {$self->{'metadata'}{'header'}->[$_]} ($self->{'individual_begin'}..$#{$self->{'metadata'}{'header'}});
+  return \@inds;
+}
 
 =head2 get_raw_individuals_info
     Description: Returns the list of individual name concatenated with the content of individual genotype data
