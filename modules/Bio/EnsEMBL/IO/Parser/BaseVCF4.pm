@@ -621,8 +621,32 @@ sub get_metadata_description {
 
 sub get_individuals {
   my $self = shift;
-  my @inds = map {$self->{'metadata'}{'header'}->[$_]} ($self->{'individual_begin'}..$#{$self->{'metadata'}{'header'}});
-  return \@inds;
+  
+  if(!exists($self->{individuals})) {
+    my $indices = $self->get_individual_column_indices;
+    @{$self->{individuals}} = sort {$indices->{$a} <=> $indices->{$b}} keys %$indices;
+  }
+  return $self->{individuals};
+}
+
+=head2 get_individual_column_indices
+    Description: Returns hashref of individual names with value
+                 being the column index they appear in the file
+    Returntype : Hashref of { individual => index }
+=cut
+
+sub get_individual_column_indices {
+  my $self = shift;
+  
+  if(!exists($self->{individual_column_indices})) {
+    my %indices =
+      map {$self->{metadata}{header}->[$_] => $_}
+      ($self->{individual_begin}..(scalar(@{$self->{metadata}{header}}) - 1));
+      
+    $self->{individual_column_indices} = \%indices;
+  }
+  
+  return $self->{individual_column_indices};
 }
 
 =head2 get_raw_individuals_info
@@ -633,13 +657,55 @@ sub get_individuals {
 
 sub get_raw_individuals_info {
   my $self = shift;
-  # Uses an array to keep the individuals order.
-  # Not sure if the order is really important. If not, an hash would be better to store the data.
-  my @ind_list;
-  for(my $i = $self->{'individual_begin'};$i < scalar(@{$self->{'metadata'}{'header'}});$i++) {
-    push(@ind_list, $self->{'metadata'}{'header'}->[$i].':'.$self->{'record'}[$i]);
-  } 
-  return \@ind_list;
+  my $individual_ids = shift;
+  
+  # restrict by individual list?
+  
+  my $limit = $self->_get_individual_index_list($individual_ids);
+  
+  # get a list of indices
+  # this is either a limited list based on the individuals provided
+  # or a list for all individuals in the file
+  my @index_list = scalar @$limit ? @$limit : ($self->{individual_begin}..(scalar(@{$self->{metadata}{header}}) - 1));
+  
+  return [
+    map {$self->{metadata}{header}->[$_].':'.$self->{record}[$_]}
+    @index_list    
+  ];
+}
+
+# this sub caches a list of individual column indices
+# might be unnecessary, but every millisecond counts!
+sub _get_individual_index_list {
+  my $self = shift;
+  my $individual_ids = shift;
+  
+  if(!exists($self->{_individual_limit_list}->{$individual_ids})) {
+    
+    # clear the cache
+    $self->{_individual_limit_list} = {};
+    my @limit = ();
+    
+    # check we have a valid array
+    if(defined($individual_ids) && ref($individual_ids) eq 'ARRAY' && scalar @$individual_ids) {
+      my $all_ind_cols = $self->get_individual_column_indices();
+      
+      # we have to check that each individual exists
+      # otherwise we'll get undefined warnings everywhere
+      foreach my $ind_id(@$individual_ids) {
+        next unless $all_ind_cols->{$ind_id};
+        push @limit, $all_ind_cols->{$ind_id};
+      }
+      
+      # it won't be much use if none of the individual names you gave appear in the file
+      throw("ERROR: No valid individual IDs given") unless scalar @limit;
+    }
+  
+    # key the hash on the reference of the list
+    $self->{_individual_limit_list}->{$individual_ids} = [sort {$a <=> $b} @limit];
+  }
+  
+  return $self->{_individual_limit_list}->{$individual_ids};
 }
 
 =head2 get_individuals_info
@@ -650,13 +716,34 @@ sub get_raw_individuals_info {
 
 sub get_individuals_info {
   my $self = shift;
+  my $individual_ids = shift;
+  my $key = shift;
+  
   my %ind_info;
   my $formats = $self->get_formats;
-  foreach my $ind (@{$self->get_raw_individuals_info}) {
+  
+  # restrict by key, e.g. to only fetch GT
+  my $format_index;
+  if(defined($key)) {
+    my %tmp = map {$formats->[$_] => $_} (0..$#{$formats});
+    $format_index = $tmp{$key};
+    throw("ERROR: Key '$key' not found in format string ".join("|", @$formats)) unless defined($format_index);
+  }
+  
+  foreach my $ind (@{$self->get_raw_individuals_info($individual_ids)}) {
     my @ind_data = split(':',$ind);
-    my $ind_name = shift @ind_data;
-    for (my $i = 0; $i < scalar(@ind_data); $i++) {
-      $ind_info{$ind_name}{$formats->[$i]} = $ind_data[$i];
+    
+    # limit to one key
+    if(defined($format_index)) {
+      $ind_info{$ind_data[0]}{$key} = $ind_data[$format_index + 1];
+    }
+    
+    # get all keys
+    else {
+      my $ind_name = shift @ind_data;
+      for (my $i = 0; $i < scalar(@ind_data); $i++) {
+        $ind_info{$ind_name}{$formats->[$i]} = $ind_data[$i];
+      }
     }
   } 
   return \%ind_info;
@@ -670,15 +757,17 @@ sub get_individuals_info {
 
 sub get_individuals_genotypes {
   my $self = shift;
+  my $individual_ids = shift;
+  
   my %ind_gen;
-  my $ind_info = $self->get_individuals_info;
+  my $ind_info = $self->get_individuals_info($individual_ids, 'GT');
   my @alleles = (($self->get_reference),@{$self->get_alternatives});
   foreach my $ind (keys(%$ind_info)) {
-    my $al_separator = ($ind_info->{$ind}{'GT'} =~ /\|/) ? '\|' : '/'; 
-    my ($al1,$al2) = split($al_separator,$ind_info->{$ind}{'GT'});
+    my $phased = ($ind_info->{$ind}{'GT'} =~ /\|/ ? 1 : 0); 
+    my ($al1,$al2) = split(($phased ? '\|' : '/'),$ind_info->{$ind}{'GT'});
     my $allele1 = ($al1 eq '.') ? '' : $alleles[$al1];
     my $allele2 = ($al2 eq '.') ? '' : $alleles[$al2];
-    $ind_gen{$ind} = "$allele1|$allele2";
+    $ind_gen{$ind} = join("", ($allele1, ($phased ? '|' : '/'), $allele2));
   }
   return \%ind_gen;
 }
