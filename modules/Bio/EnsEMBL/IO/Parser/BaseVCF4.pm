@@ -196,6 +196,7 @@ sub get_raw_start {
 sub get_start {
     my $self = shift;
     my $start = $self->get_raw_start();
+    
     # Like indels, SVs have the base before included for reference
     if ($self->get_raw_info =~ /SVTYPE/ || $self->get_alternatives =~ /\<|\[|\]|\>/ ) {
       $start ++;
@@ -203,7 +204,7 @@ sub get_start {
     else {
       # For InDels, the reference String must include the base before the event (which must be reflected in the POS field).
       my $ref = $self->get_raw_reference;
-      foreach my $alt (split(',',$self->get_alternatives)) {
+      foreach my $alt (@{$self->get_alternatives}) {
         if (length($alt) != length($ref)) {
           $start ++;
           last;
