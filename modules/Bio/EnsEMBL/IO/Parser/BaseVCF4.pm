@@ -765,10 +765,12 @@ sub get_individuals_genotypes {
   my @alleles = (($self->get_reference),@{$self->get_alternatives});
   foreach my $ind (keys(%$ind_info)) {
     my $phased = ($ind_info->{$ind}{'GT'} =~ /\|/ ? 1 : 0); 
-    my ($al1,$al2) = split(($phased ? '\|' : '/'),$ind_info->{$ind}{'GT'});
-    my $allele1 = ($al1 eq '.') ? '' : $alleles[$al1];
-    my $allele2 = ($al2 eq '.') ? '' : $alleles[$al2];
-    $ind_gen{$ind} = join("", ($allele1, ($phased ? '|' : '/'), $allele2));
+    $ind_gen{$ind} = join(
+      ($phased ? '|' : '/'),
+      map {$alleles[$_]}
+      grep {$_ ne '.'}
+      split(($phased ? '\|' : '/'), $ind_info->{$ind}{'GT'})
+    );
   }
   return \%ind_gen;
 }
