@@ -43,10 +43,10 @@ my %strand_conversion = ( '+' => '1', '.' => undef, '?' => undef, '-' => '-1');
 my %attributes;
 
 sub open {
-    my ($caller, $filename, $other_args) = @_;
+    my ($caller, $filename, @other_args) = @_;
     my $class = ref($caller) || $caller;
     
-    my $self = $class->SUPER::open($filename, "\t", $other_args);
+    my $self = $class->SUPER::open($filename, "\t", mustParseMetadata=>1 ,@other_args);
 
     # pre-load peek buffer
     $self->next_block();
@@ -88,6 +88,17 @@ sub read_metadata {
       $self->{'metadata'}->{'other'} = [$content];
     }
   }
+}
+
+=head2 set_fields
+    Description: Setter for list of fields used in this format - uses the
+                 "public" (i.e. non-raw) names of getter methods
+    Returntype : Void
+=cut
+
+sub set_fields {
+  my $self = shift;
+  $self->{'fields'} = [qw(seqname source type start end score strand attributes)];
 }
 
 

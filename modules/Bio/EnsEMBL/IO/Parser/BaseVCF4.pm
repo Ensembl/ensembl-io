@@ -86,12 +86,13 @@ sub read_metadata {
       my %metadata;
       
       # Fix when the character "," is found in the description field
-      if($m_data =~ /(.?)(".+")(.?)/) {
+      if($m_data =~ /(.*)(".+")(.*)/) {
         my ($before, $content, $after) = ($1, $2, $3);
         $content =~ s/,/!#!/g;
         $m_data = ($before || '').$content.($after || '');
       }
       foreach my $meta (split(',',$m_data)) {
+        
         my ($key,$value) = split('=',$meta);
         $value =~ s/"//g;
         $value =~ s/!#!/,/g; # Revert the fix for the character ","
@@ -148,6 +149,18 @@ sub get_metadata_by_pragma {
 sub get_vcf_version {
   my $self = shift;
   return $self->{'metadata'}->{'fileformat'};
+}
+
+
+=head2 set_fields
+    Description: Setter for list of fields used in this format - uses the
+                 "public" (i.e. non-raw) names of getter methods
+    Returntype : Void
+=cut
+
+sub set_fields {
+  my $self = shift;
+  $self->{'fields'} = [qw(seqname start end IDs reference alternatives score filter_results info formats)];
 }
 
 

@@ -42,11 +42,11 @@ use base qw/Bio::EnsEMBL::IO::Parser::BaseVCF4/;
 
 
 sub open {
-    my ($caller, $filename, $other_args) = @_;
+    my ($caller, $filename, @other_args) = @_;
     my $class = ref($caller) || $caller;
      
     my $delimiter = "\t";
-    my $self = $class->SUPER::open($filename, $delimiter, $other_args);
+    my $self = $class->SUPER::open($filename, $delimiter, mustParseMetadata=>1, @other_args);
     
     # pre-load peek buffer
     $self->next_block();
