@@ -10,15 +10,18 @@ my ($test_info, $ind_info);
 
 my $parser = Bio::EnsEMBL::IO::Parser::VCF4->open($test_file);
 
+my @inds = ('NA00001','NA00002','NA00003');
+
 print "# Record 1\n";
 ok ($parser->next(), "Loading first record");
 my @test_row = (qw(20	14370	rs6054257	G	A	29	PASS	NS=3;DP=14;AF=0.5;DB;H2	GT:GQ:DP:HQ),	'0|0:48:1:51,51', '1|0:48:8:51,51', '1/1:43:5:.,.');
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
-$test_info = "NA00001:$test_row[9]";
-$ind_info  = $parser->get_raw_individuals_info;
-ok($test_info eq $ind_info->[0], 'Individual data');
+my $index = 0;
+$test_info = "$inds[$index]:$test_row[9]";
+$ind_info  = $parser->get_raw_individuals_info($inds[$index]);
+ok($test_info eq $ind_info->[$index], 'Individual data');
 
 
 print "\n\n# Record 2\n";
@@ -27,9 +30,10 @@ ok ($parser->next(), "Loading second record");
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
-$test_info = "NA00002:$test_row[10]";
-$ind_info  = $parser->get_raw_individuals_info;
-ok($test_info eq $ind_info->[1], 'Individual data');
+$index = 1;
+$test_info = "$inds[$index]:$test_row[10]";
+$ind_info  = $parser->get_raw_individuals_info($inds[$index]);
+ok($test_info eq $ind_info->[$index], 'Individual data');
 
 
 print "\n\n# Record 3\n";
@@ -38,9 +42,10 @@ ok ($parser->next(), "Loading third record");
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
-$test_info = "NA00003:$test_row[11]";
-$ind_info  = $parser->get_raw_individuals_info;
-ok($test_info eq $ind_info->[2], 'Individual data');
+$index = 2;
+$test_info = "$inds[$index]:$test_row[11]";
+$ind_info  = $parser->get_raw_individuals_info($inds[$index]);
+ok($test_info eq $ind_info->[$index], 'Individual data');
 
 
 print "\n\n# Record 4\n";
@@ -49,9 +54,10 @@ ok ($parser->next(), "Loading fourth record");
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
-$test_info = "NA00001:$test_row[9]";
-$ind_info  = $parser->get_raw_individuals_info;
-ok($test_info eq $ind_info->[0], 'Individual data');
+$index = 0;
+$test_info = "$inds[$index]:$test_row[9]";
+$ind_info  = $parser->get_raw_individuals_info($inds[$index]);
+ok($test_info eq $ind_info->[$index], 'Individual data');
 
 
 print "\n\n# Record 5\n";
@@ -60,9 +66,10 @@ ok ($parser->next(), "Loading fifth record");
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
-$test_info = "NA00001:$test_row[9]";
-$ind_info  = $parser->get_raw_individuals_info;
-ok($test_info eq $ind_info->[0], 'Individual data');
+$index = 0;
+$test_info = "$inds[$index]:$test_row[9]";
+$ind_info  = $parser->get_raw_individuals_info($inds[$index]);
+ok($test_info eq $ind_info->[$index], 'Individual data');
 
 print "\n> Testing the getters (only for the last record):\n";
 ok($parser->get_seqname eq '20', 'get_seqname');
@@ -77,8 +84,9 @@ ok($parser->get_info->{'NS'} eq '3' , 'get_info');
 ok($parser->get_info_description('NS') eq 'Number of Samples With Data' , 'get_information_description');
 ok($parser->get_formats->[0] eq 'GT', 'get_formats');
 ok($parser->get_format_description('GT') eq 'Genotype' , 'get_format_description');
-ok($parser->get_individuals_info->{'NA00001'}{'GT'} eq '0/1', 'get_Iindividuals_info');
-ok($parser->get_individuals_genotypes->{'NA00001'} eq 'GTC|G', 'get_individuals_genotypes');
+$index = 0;
+ok($parser->get_individuals_info($inds[$index])->{$inds[$index]}->{'GT'} eq '0/1', 'get_individuals_info');
+ok($parser->get_individuals_genotypes($inds[$index])->{$inds[$index]} eq 'GTC/G', 'get_individuals_genotypes');
 
 print "\n> Testing the metadata getters:\n";
 ok($parser->get_metadata_key_list eq 'FILTER, FORMAT, INFO, contig, fileDate, fileformat, header, phasing, reference, source', 'getMetadataKeyList');
