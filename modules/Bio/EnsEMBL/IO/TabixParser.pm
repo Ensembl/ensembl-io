@@ -43,11 +43,11 @@ use Tabix;
 use base qw/Bio::EnsEMBL::IO::Parser/;
 
 sub open {
-  my ($caller, $filename, $other_args) = @_;
+  my ($caller, $filename, @other_args) = @_;
   my $class = ref($caller) || $caller;
   
   my $delimiter = "\t";   
-  my $self = $class->SUPER::new($other_args);
+  my $self = $class->SUPER::new(@other_args);
   
   die "ERROR: tabix does not seem to be in your path - required to parse the VCF file\n" unless `which tabix 2>&1` =~ /tabix$/;
   die "ERROR: Input file is not bgzipped, cannot use tabix\n" unless $filename =~ /\.gz$/;

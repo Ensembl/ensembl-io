@@ -45,11 +45,11 @@ use Bio::EnsEMBL::IO::Parser::BaseVCF4;
 use base qw/Bio::EnsEMBL::IO::TabixParser Bio::EnsEMBL::IO::Parser::BaseVCF4/;
 
 sub open {
-  my ($caller, $filename, $other_args) = @_;
+  my ($caller, $filename, @other_args) = @_;
   my $class = ref($caller) || $caller;
   
   my $delimiter = "\t";   
-  my $self = $class->SUPER::open($filename,$other_args);
+  my $self = $class->SUPER::open($filename, mustParseMetadata=>1, @other_args);
   
   my $tabix_data = `tabix -f -h $filename 0:0-0`;
   foreach my $line (split("\n",$tabix_data)) {
