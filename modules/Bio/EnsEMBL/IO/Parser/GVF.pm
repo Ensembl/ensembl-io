@@ -2,7 +2,7 @@
 
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,8 +38,6 @@ use strict;
 use warnings;
 
 use base qw/Bio::EnsEMBL::IO::Parser::GXF/;
-
-my %attributes;
 
 sub open {
     my ($caller, $filename, @other_args) = @_;
@@ -87,17 +85,6 @@ sub read_metadata {
       $self->{'metadata'}->{'other'} = [$content];
     }
   }
-}
-
-=head2 set_fields
-    Description: Setter for list of fields used in this format - uses the
-                 "public" (i.e. non-raw) names of getter methods
-    Returntype : Void
-=cut
-
-sub set_fields {
-  my $self = shift;
-  $self->{'fields'} = [qw(seqname source type start end score strand attributes)];
 }
 
 
@@ -155,22 +142,6 @@ sub get_metadata_by_pragma {
   my $self = shift;
   my $pragma = shift;
   return (defined($self->{'metadata'}->{$pragma})) ? $self->{'metadata'}->{$pragma} : undef;
-}
-
-
-=head2 get_attributes
-    Description : Return the content of the 9th column of the line in a hash: "attribute => value"
-    Returntype  : Reference to a hash
-=cut
-
-sub get_attributes {
-  my $self = shift;
-  return \%attributes if (%attributes);
-  foreach my $attr (split(';',$self->get_raw_attributes)) {
-    my ($key,$value) = split('=',$attr);
-    $attributes{$key} = $value;
-  }
-  return \%attributes;
 }
 
 

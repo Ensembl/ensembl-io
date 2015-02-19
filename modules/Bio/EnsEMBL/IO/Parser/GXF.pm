@@ -44,26 +44,23 @@ sub read_metadata {
     my $self = shift;
     my $line = $self->{'current_block'};
     
-    if ($line =~ /^\s*##date/) {
-        chomp $line;
-        my @words = split(/\s+/, $line);
-        $self->{'metadata'}->{'date'} = $words[1];
-    } elsif ($line =~ /^\s*##source-version/) {
-        chomp $line;
-        (my $head, my @tail) = split(/\s+/, $line);
-        $self->{'metadata'}->{'source-version'} = \@tail;
-    } elsif ($line =~ /^\s*##(\w+)-version/) {
-        chomp $line;
-        my $filetype = $1;
-        my @words = split(/\s+/, $line);
-        $self->{'metadata'}->{"$filetype-version"} = $words[1];
-    } elsif ($line =~ /^\s*##Type/) {
-        chomp $line;
-        (my $head, my @tail) = split(/\s+/, $line);
-        # DZ: I do not have the foggiest idea what Type means
-        $self->{'metadata'}->{'Type'} = \@tail;
+    if ($line =~ /^\s*##(\S+)\s+(\S+)/) {
+        $self->{'metadata'}->{$1} = $2;
     }
 }
+
+
+=head2 set_fields
+    Description: Setter for list of fields used in this format - uses the
+                 "public" (i.e. non-raw) names of getter methods
+    Returntype : Void
+=cut
+
+sub set_fields {
+  my $self = shift;
+  $self->{'fields'} = [qw(seqname source type start end score strand attributes)];
+}
+
 
 =head2 get_raw_seqname
     Description : Return the name of the sequence
@@ -271,18 +268,32 @@ sub get_raw_attributes {
   return $self->{'record'}[8];
 }
 
+=head2 get_attributes
+    Description : Return the content of the 9th column of the line in a hash: "attribute => value"
+    Returntype  : Reference to a hash
+=cut
 
-sub get_attribute_by_name {
-    my ($self, $name) = @_;
+sub get_attributes {
+  my $self = shift;
+  my %attributes;
+  foreach my $attr (split(';',$self->get_raw_attributes)) {
+    my ($key,$value) = split('=',$attr);
+    $attributes{$key} = $value;
+  }
+  return \%attributes;
+}
 
-    if (! exists $self->{attributes}) {
-        # I hope nobody will use the same attribute name twice...
-        while (my ($key, $value) = $self->getRawAttribute =~ /([^=]+)=([^;]+);?/g) {
-            $self->{attributes}{$key} = $value;
-        }
-    }
-    # I think it's better to do the decode here as we may not want all the attributes
-    return decode_entites($self->{attributes}{$name});
+
+=head2 decode_html
+    Argument[1] : $string, string containing html encoding like %3B
+    Description : Return the html decoded $string
+    Returntype  : String
+=cut
+
+sub decode_html {
+    my ($self, $string) = @_;
+
+    return decode_entities($string);
 }
 
 1;
