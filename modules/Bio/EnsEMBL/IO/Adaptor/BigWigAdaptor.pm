@@ -122,31 +122,27 @@ sub fetch_scores_by_chromosome {
     my $chr = $chrs->head;
     while ($chr) {
       if (!$chromosomes || $chr_check{$chr->name}) {
-        my @scores;
-        my $start = 0;
-        my ($end, $previous_start, $previous_end);
+        my $stats = $bw->bigWigSummaryArrayExtended($chr->name, 1, $chr->size, $bins);
+        my $scores;
 
-        for (my $i = 0; $i < $bins; $i++) {
-          last if $previous_end == $chr->size;
-          $start  = $previous_end + 1;
-          $end    = $start + $bin_size;
-          $end    = $chr->size if $end > $chr->size;
+        foreach (@$stats) {
+          my $bin_min = sprintf('%.2f', $_->{'minVal'});
+          my $bin_max = sprintf('%.2f', $_->{'maxVal'});
+          my $mean    = $_->{'validCount'} 
+                          ? sprintf('%.2f', ($_->{'sumData'} / $_->{'validCount'}))
+                          : 0;
 
-          my $summary = $bw->bigWigSingleSummary($chr->name, $start, $end, 'bbiSumMean');
-          push @scores, sprintf('%.2f', $summary);
-
-          ## Get the maximum via each bin rather than for the entire dataset, 
-          ## so we can scale nicely on single-chromosome pages
-          my $bin_max = sprintf('%.2f', $bw->bigWigSingleSummary($chr->name, $start, $end, 'bbiSumMax'));
-          $max = $bin_max if $max < $bin_max;
-
-          $previous_start = $start;
-          $previous_end   = $end;
+          push @$scores, {'mean' => $mean, 
+                          'min' => $bin_min, 
+                          'max' => $bin_max,
+                        };
+          $max    = $bin_max if $max < $bin_max;
         }
+
         ## Translate chromosome name back from its UCSC equivalent
         (my $chr_name = $chr->name) =~ s/chr//;
         $chr_name = 'MT' if $chr_name eq 'M';
-        $data{$chr_name} = \@scores;
+        $data{$chr_name} = $scores;
 
       }
       $chr = $chr->next;
