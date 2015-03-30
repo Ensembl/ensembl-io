@@ -112,7 +112,7 @@ sub read_metadata {
   }
   elsif ($line =~ /^#\s*(.+)$/) {
     $self->{'metadata'}->{'header'} = [split("\t",$1)];
-    $self->{'individual_begin'} = ($self->{'metadata'}->{'header'}->[8] eq 'FORMAT') ? 9 : 8;
+    $self->{'individual_begin'} = (scalar @{$self->{'metadata'}->{'header'}} >= 9 && $self->{'metadata'}->{'header'}->[8] eq 'FORMAT') ? 9 : 8;
   }
 }
 
@@ -675,7 +675,7 @@ sub get_raw_individuals_info {
   
   # restrict by individual list?
   
-  my $limit = $self->_get_individual_index_list($individual_ids);
+  my $limit = $individual_ids ? $self->_get_individual_index_list($individual_ids) : [];
   
   # get a list of indices
   # this is either a limited list based on the individuals provided
