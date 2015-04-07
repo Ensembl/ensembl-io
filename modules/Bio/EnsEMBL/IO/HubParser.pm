@@ -63,7 +63,7 @@ sub get_hub_info {
     $_ =~ s/\s+$//;
     my @line = split /\s/, $_, 2;
     ## Genomes file path is usually given relative to hub.txt
-    if ($line[0] eq 'genomesFile' && $line[1] !~ /^[http|ftp]/) {
+    if ($line[0] eq 'genomesFile' && $line[1] !~ /^(http|ftp)/) {
       $line[1] = $self->{'base_url'}.'/'.$line[1];
     }
     $hub_info->{$line[0]} = $line[1];
