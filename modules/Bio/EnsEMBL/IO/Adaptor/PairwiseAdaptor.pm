@@ -46,7 +46,6 @@ sub fetch_features {
     delete $self->{_cache}->{features};
 
     my $parser = $self->{_cache}->{'parser'};
-    my %pair;
 
     if (!$parser) {
       $parser = Bio::EnsEMBL::IO::Parser::PairwiseTabix->open($self->url);
@@ -59,33 +58,17 @@ sub fetch_features {
       next unless $ok_data;
      
       while ($parser->next) {
-
-        my @interacting_region = $parser->get_interacting_region;
-
-        ## Is this the other half of a feature pair?
-        if (keys %pair && $pair{'seqname'} eq $interacting_region[0]
-                        && $pair{'start_1'} eq $interacting_region[1]
-                        && $pair{'end_1'} eq $interacting_region[2]
-          ) {
-          $pair{'id_2'} = $parser->get_id; 
-          my %hash = %pair;
-          push @features, \%hash;
-          ## Now we have everything we need, so get rid of the old data
-          %pair = ();
-        }
-        else {
-          $pair{'seqname'}    = $parser->get_seqname;
-          $pair{'start_1'}    = $parser->get_start;
-          $pair{'end_1'}      = $parser->get_start;
-          $pair{'id_1'}       = $parser->get_id;
-          $pair{'score'}      = $parser->get_score;
-          $pair{'direction'}  = $parser->get_direction;
-          ($pair{'seq_2'}, $pair{'start_2'}, $pair{'end_2'}) = @interacting_region;
-          ## We're done here - go to next feature
-        }
+        my $feature;
+        $feature->{'seqname'}    = $parser->get_seqname;
+        $feature->{'start_1'}    = $parser->get_start;
+        $feature->{'end_1'}      = $parser->get_start;
+        $feature->{'id_1'}       = $parser->get_id;
+        $feature->{'score'}      = $parser->get_score;
+        $feature->{'direction'}  = $parser->get_direction;
+        ($feature->{'seqname_2'}, $feature->{'start_2'}, $feature->{'end_2'}, $feature->{'score'}) = @{$parser->get_information}; 
+        push @features, $feature;
       } 
     }
-    warn ">>> FEATURES @features";
     $self->{_cache}->{features} = \@features;
   }
   return $self->{_cache}->{features};
