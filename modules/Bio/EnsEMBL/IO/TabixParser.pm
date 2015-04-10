@@ -74,7 +74,7 @@ sub seek {
 sub next_block {
   my $self = shift;
   if (!defined $self->{iterator}) {
-    print "Must seek region before reading with TabixParser\n";
+    warn "Must seek region before reading with TabixParser\n";
     exit 1;
   }
   $self->shift_block();
