@@ -74,7 +74,9 @@ sub seek {
 sub next_block {
   my $self = shift;
   if (!defined $self->{iterator}) {
-    warn "Must seek region before reading with TabixParser\n";
+    ## Not sure if it's sensible to warn this by default, as it gets triggered in legitimate circumstances
+    ## and will thus tend to fill up the web logs
+    #warn "Must seek region before reading with TabixParser\n";
     exit 1;
   }
   $self->shift_block();
