@@ -121,4 +121,40 @@ sub get_thickEnd {
   return '0'
 }
 
+=head2 get_blockCount
+
+    Description: Placeholder - needed so that column counts are correct
+    Returntype : Zero
+
+=cut
+
+sub get_blockCount {
+  my ($self, $vf) = @_;
+  return '0'
+}
+
+=head2 get_blockSizes
+
+    Description: Placeholder - needed so that column counts are correct
+    Returntype : Zero
+
+=cut
+
+sub get_blockSizes {
+  my ($self, $vf) = @_;
+  return '0'
+}
+
+=head2 get_blockStart
+
+    Description: Placeholder - needed so that column counts are correct
+    Returntype : Zero
+
+=cut
+
+sub get_blockStart {
+  my ($self, $vf) = @_;
+  return '0'
+}
+
 1;
