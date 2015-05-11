@@ -1,0 +1,95 @@
+##FORMAT (resequencing)
+##DATE Thu Oct  4 19:08:14 2012
+##RELEASE 69 70 71 72 73
+
+SEQ human reference 21 9411181 9483887 1
+SEQ human WATSON WGS
+SEQ human VENTER WGS
+SEQ human AK1 WGS
+SEQ human Misha Angrist WGS
+SEQ human Henry Louis Gates Jr WGS
+SEQ human Henry Louis Gates Sr WGS
+SEQ human Rosalynn Gill WGS
+SEQ human Marjolein Kriek WGS
+SEQ human Anonymous Irish Male WGS
+SEQ human Stephen Quake WGS
+SEQ human Palaeo-Eskimo Saqqaq individual HC WGS
+SEQ human Palaeo-Eskimo Saqqaq individual WGS
+SEQ human SJK WGS
+SEQ human YH WGS
+SCORE aligned WATSON reads
+SCORE aligned VENTER reads
+SCORE aligned AK1 reads
+SCORE aligned Misha Angrist reads
+SCORE aligned Henry Louis Gates Jr reads
+SCORE aligned Henry Louis Gates Sr reads
+SCORE aligned Rosalynn Gill reads
+SCORE aligned Marjolein Kriek reads
+SCORE aligned Anonymous Irish Male reads
+SCORE aligned Stephen Quake reads
+SCORE aligned Palaeo-Eskimo Saqqaq individual HC reads
+SCORE aligned Palaeo-Eskimo Saqqaq individual reads
+SCORE aligned SJK reads
+SCORE aligned YH reads
+DATA
+N ~ N ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 1 0 0 0 0 0 0 0 0 0 0 0 0 
+N ~ N ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 1 0 0 0 0 0 0 0 0 0 0 0 0 
+N ~ N ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 1 0 0 0 0 0 0 0 0 0 0 0 0 
+N ~ N ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 1 0 0 0 0 0 0 0 0 0 0 0 0 
+N ~ N ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 1 0 0 0 0 0 0 0 0 0 0 0 0 
+N ~ N ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 1 0 0 0 0 0 0 0 0 0 0 0 0 
+N ~ N ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 1 0 0 0 0 0 0 0 0 0 0 0 0 
+N ~ N ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 1 0 0 0 0 0 0 0 0 0 0 0 0 
+N ~ N ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 1 0 0 0 0 0 0 0 0 0 0 0 0 
+N ~ N ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 1 0 0 0 0 0 0 0 0 0 0 0 0 
+N ~ N ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 1 0 0 0 0 0 0 0 0 0 0 0 0 
+N ~ N ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 1 0 0 0 0 0 0 0 0 0 0 0 0 
+N ~ N ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 1 0 0 0 0 0 0 0 0 0 0 0 0 
+G ~ G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+A ~ A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T ~ T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+C ~ C ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T ~ T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T ~ T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+C ~ C ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+C ~ C ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T ~ T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+C ~ C ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+C ~ C ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+A ~ A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+A ~ A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+A ~ A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+G ~ G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+A ~ A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+A ~ A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+A ~ A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T ~ T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T ~ T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+G ~ G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T ~ T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+A ~ A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+G ~ G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T ~ T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T ~ T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T ~ T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T ~ T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+C ~ C ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T ~ T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T ~ T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+C ~ C ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T ~ T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+G ~ G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+G ~ G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+C ~ C ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 0 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T T T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 1 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T T T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 1 2 0 0 0 0 0 0 0 0 0 0 0 0 
+A A A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 1 2 0 0 0 0 0 0 0 0 0 0 0 0 
+G G G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 1 2 0 0 0 0 0 0 0 0 0 0 0 0 
+A A A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 1 2 0 0 0 0 0 0 0 0 0 0 0 0 
+G G G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 1 2 0 0 0 0 0 0 0 0 0 0 0 0 
+G G G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 1 2 0 0 0 0 0 0 0 0 0 0 0 0 
+T T T ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 1 2 0 0 0 0 0 0 0 0 0 0 0 0 
+A A A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 1 2 0 0 0 0 0 0 0 0 0 0 0 0 
+G G G ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 1 2 0 0 0 0 0 0 0 0 0 0 0 0 
+A A A ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 1 2 0 0 0 0 0 0 0 0 0 0 0 0 
+//
