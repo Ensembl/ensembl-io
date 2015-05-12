@@ -49,7 +49,7 @@ sub open {
   my $class = ref($caller) || $caller;
   
   my $delimiter = "\t";   
-  my $self = $class->SUPER::open($filename, mustParseMetadata=>1, @other_args);
+  my $self = $class->SUPER::open($filename, @other_args);
   
   my $tabix_data = `tabix -f -h $filename 0:0-0`;
   foreach my $line (split("\n",$tabix_data)) {
