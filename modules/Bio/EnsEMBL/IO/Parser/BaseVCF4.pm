@@ -113,6 +113,7 @@ sub read_metadata {
   elsif ($line =~ /^#\s*(.+)$/) {
     $self->{'metadata'}->{'header'} = [split("\t",$1)];
     $self->{'individual_begin'} = (scalar @{$self->{'metadata'}->{'header'}} >= 9 && $self->{'metadata'}->{'header'}->[8] eq 'FORMAT') ? 9 : 8;
+    $self->{'sample_begin'} = (scalar @{$self->{'metadata'}->{'header'}} >= 9 && $self->{'metadata'}->{'header'}->[8] eq 'FORMAT') ? 9 : 8;
   }
 }
 
@@ -786,6 +787,174 @@ sub get_individuals_genotypes {
     );
   }
   return \%ind_gen;
+}
+
+# Sample information
+
+=head2 get_samples
+    Description: Returns list of sample names
+    Returntype : Listref of strings
+=cut
+
+sub get_samples {
+  my $self = shift;
+
+  if(!exists($self->{samples})) {
+    my $indices = $self->get_sample_column_indices;
+    @{$self->{samples}} = sort {$indices->{$a} <=> $indices->{$b}} keys %$indices;
+  }
+  return $self->{samples};
+}
+
+=head2 get_sample_column_indices
+    Description: Returns hashref of sample names with value
+                 being the column index they appear in the file
+    Returntype : Hashref of { sample => index }
+=cut
+
+=head2 get_sample_column_indices
+    Description: Returns hashref of sample names with value
+                 being the column index they appear in the file
+    Returntype : Hashref of { sample => index }
+=cut
+
+sub get_sample_column_indices {
+  my $self = shift;
+
+  if(!exists($self->{sample_column_indices})) {
+    my %indices =
+      map {$self->{metadata}{header}->[$_] => $_}
+      ($self->{sample_begin}..(scalar(@{$self->{metadata}{header}}) - 1));
+
+    $self->{sample_column_indices} = \%indices;
+  }
+
+  return $self->{sample_column_indices};
+}
+
+=head2 get_raw_samples_info
+    Description: Returns the list of sample name concatenated with the content of sample genotype data
+                 e.g. 'NA10000:0|1:44:23'
+    Returntype : List reference of strings
+=cut
+
+sub get_raw_samples_info {
+  my $self = shift;
+  my $sample_ids = shift;
+
+  # restrict by sample list?
+
+  my $limit = $sample_ids ? $self->_get_sample_index_list($sample_ids) : [];
+
+  # get a list of indices
+  # this is either a limited list based on the samples provided
+  # or a list for all samples in the file
+  my @index_list = scalar @$limit ? @$limit : ($self->{sample_begin}..(scalar(@{$self->{metadata}{header}}) - 1));
+
+  return [
+    map {$self->{metadata}{header}->[$_].':'.$self->{record}[$_]}
+    @index_list
+  ];
+}
+
+# this sub caches a list of sample column indices
+# might be unnecessary, but every millisecond counts!
+sub _get_sample_index_list {
+  my $self = shift;
+  my $sample_ids = shift;
+
+  if(!exists($self->{_sample_limit_list}->{$sample_ids})) {
+
+    # clear the cache
+    $self->{_sample_limit_list} = {};
+    my @limit = ();
+
+    # check we have a valid array
+    if(defined($sample_ids) && ref($sample_ids) eq 'ARRAY' && scalar @$sample_ids) {
+      my $all_sample_cols = $self->get_sample_column_indices();
+
+      # we have to check that each sample exists
+      # otherwise we'll get undefined warnings everywhere
+      foreach my $sample_id(@$sample_ids) {
+        next unless $all_sample_cols->{$sample_id};
+        push @limit, $all_sample_cols->{$sample_id};
+      }
+
+      # it won't be much use if none of the sample names you gave appear in the file
+      throw("ERROR: No valid sample IDs given") unless scalar @limit;
+    }
+
+    # key the hash on the reference of the list
+    $self->{_sample_limit_list}->{$sample_ids} = [sort {$a <=> $b} @limit];
+  }
+
+  return $self->{_sample_limit_list}->{$sample_ids};
+}
+
+=head2 get_samples_info
+    Description: Returns the list of sample names, formats and the corresponding data
+                 e.g. 'NA10000' => ( 'GT' => '0|1' )
+    Returntype : Hash with the format 'sample_name' => ( 'format' => 'data' )
+=cut
+
+sub get_samples_info {
+  my $self = shift;
+  my $sample_ids = shift;
+  my $key = shift;
+
+  my %sample_info;
+  my $formats = $self->get_formats;
+
+  # restrict by key, e.g. to only fetch GT
+  my $format_index;
+  if(defined($key)) {
+    my %tmp = map {$formats->[$_] => $_} (0..$#{$formats});
+    $format_index = $tmp{$key};
+    throw("ERROR: Key '$key' not found in format string ".join("|", @$formats)) unless defined($format_index);
+  }
+
+  foreach my $sample (@{$self->get_raw_samples_info($sample_ids)}) {
+    my @sample_data = split(':',$sample);
+
+    # limit to one key
+    if(defined($format_index)) {
+      $sample_info{$sample_data[0]}{$key} = $sample_data[$format_index + 1];
+    }
+
+    # get all keys
+    else {
+      my $sample_name = shift @sample_data;
+      for (my $i = 0; $i < scalar(@sample_data); $i++) {
+        $sample_info{$sample_name}{$formats->[$i]} = $sample_data[$i];
+      }
+    }
+  }
+  return \%sample_info;
+}
+
+=head2 get_samples_genotypes
+    Description: Returns the list of sample names with their genotypes (with alleles)
+                 e.g. 'NA10000' => 'A|G'
+    Returntype : Hash with the format 'sample_name' => 'allele1|allele2'
+=cut
+
+sub get_samples_genotypes {
+  my $self = shift;
+  my $sample_ids = shift;
+
+  my %sample_gen;
+  my $sample_info = $self->get_samples_info($sample_ids, 'GT');
+  my @alleles = (($self->get_reference),@{$self->get_alternatives});
+  foreach my $sample (keys(%$sample_info)) {
+    my $phased = ($sample_info->{$sample}{'GT'} =~ /\|/ ? 1 : 0);
+    $sample_gen{$sample} = join(
+      ($phased ? '|' : '/'),
+      map {$alleles[$_]}
+      grep {$_ ne '.'}
+      split(($phased ? '\|' : '/'), $sample_info->{$sample}{'GT'})
+    );
+  }
+  return \%sample_gen;
 }
 
 1;
