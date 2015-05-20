@@ -114,7 +114,7 @@ sub get_tracks {
   my ($self, $content, $file) = @_;
   my %tracks;
   my $url      = $file =~ s|^(.+)/.+|$1|r; # URL relative to the file (up until the last slash before the file name)
-  my @contents = split /track /, $content;
+  my @contents = split /\s*track\s+/, $content;
   shift @contents;
  
   ## Some hubs don't set the track type, so...
