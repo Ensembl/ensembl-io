@@ -112,7 +112,6 @@ sub read_metadata {
   }
   elsif ($line =~ /^#\s*(.+)$/) {
     $self->{'metadata'}->{'header'} = [split("\t",$1)];
-    $self->{'individual_begin'} = (scalar @{$self->{'metadata'}->{'header'}} >= 9 && $self->{'metadata'}->{'header'}->[8] eq 'FORMAT') ? 9 : 8;
     $self->{'sample_begin'} = (scalar @{$self->{'metadata'}->{'header'}} >= 9 && $self->{'metadata'}->{'header'}->[8] eq 'FORMAT') ? 9 : 8;
   }
 }
@@ -637,56 +636,34 @@ sub get_metadata_description {
 sub get_individuals {
   my $self = shift;
   
-  if(!exists($self->{individuals})) {
-    my $indices = $self->get_individual_column_indices;
-    @{$self->{individuals}} = sort {$indices->{$a} <=> $indices->{$b}} keys %$indices;
-  }
-  return $self->{individuals};
+  return $self->get_samples;
 }
 
 =head2 get_individual_column_indices
     Description: Returns hashref of individual names with value
                  being the column index they appear in the file
     Returntype : Hashref of { individual => index }
+    Status     : DEPRECATED
 =cut
 
 sub get_individual_column_indices {
   my $self = shift;
   
-  if(!exists($self->{individual_column_indices})) {
-    my %indices =
-      map {$self->{metadata}{header}->[$_] => $_}
-      ($self->{individual_begin}..(scalar(@{$self->{metadata}{header}}) - 1));
-      
-    $self->{individual_column_indices} = \%indices;
-  }
-  
-  return $self->{individual_column_indices};
+  return $self->get_sample_column_indices;
 }
 
 =head2 get_raw_individuals_info
     Description: Returns the list of individual name concatenated with the content of individual genotype data
                  e.g. 'NA10000:0|1:44:23'
     Returntype : List reference of strings
+    Status     : DEPRECATED
 =cut
 
 sub get_raw_individuals_info {
   my $self = shift;
   my $individual_ids = shift;
   
-  # restrict by individual list?
-  
-  my $limit = $individual_ids ? $self->_get_individual_index_list($individual_ids) : [];
-  
-  # get a list of indices
-  # this is either a limited list based on the individuals provided
-  # or a list for all individuals in the file
-  my @index_list = scalar @$limit ? @$limit : ($self->{individual_begin}..(scalar(@{$self->{metadata}{header}}) - 1));
-  
-  return [
-    map {$self->{metadata}{header}->[$_].':'.$self->{record}[$_]}
-    @index_list    
-  ];
+  return $self->get_raw_samples_info($individual_ids);
 }
 
 # this sub caches a list of individual column indices
@@ -695,98 +672,36 @@ sub _get_individual_index_list {
   my $self = shift;
   my $individual_ids = shift;
   
-  if(!exists($self->{_individual_limit_list}->{$individual_ids})) {
-    
-    # clear the cache
-    $self->{_individual_limit_list} = {};
-    my @limit = ();
-    
-    # check we have a valid array
-    if(defined($individual_ids) && ref($individual_ids) eq 'ARRAY' && scalar @$individual_ids) {
-      my $all_ind_cols = $self->get_individual_column_indices();
-      
-      # we have to check that each individual exists
-      # otherwise we'll get undefined warnings everywhere
-      foreach my $ind_id(@$individual_ids) {
-        next unless $all_ind_cols->{$ind_id};
-        push @limit, $all_ind_cols->{$ind_id};
-      }
-      
-      # it won't be much use if none of the individual names you gave appear in the file
-      throw("ERROR: No valid individual IDs given") unless scalar @limit;
-    }
-  
-    # key the hash on the reference of the list
-    $self->{_individual_limit_list}->{$individual_ids} = [sort {$a <=> $b} @limit];
-  }
-  
-  return $self->{_individual_limit_list}->{$individual_ids};
+  return $self->_get_sample_index_list($individual_ids);
 }
 
 =head2 get_individuals_info
     Description: Returns the list of individual names, formats and the corresponding data
                  e.g. 'NA10000' => ( 'GT' => '0|1' )
     Returntype : Hash with the format 'individual_name' => ( 'format' => 'data' )
+    Status     : DEPRECATED
 =cut
 
 sub get_individuals_info {
   my $self = shift;
   my $individual_ids = shift;
   my $key = shift;
-  
-  my %ind_info;
-  my $formats = $self->get_formats;
-  
-  # restrict by key, e.g. to only fetch GT
-  my $format_index;
-  if(defined($key)) {
-    my %tmp = map {$formats->[$_] => $_} (0..$#{$formats});
-    $format_index = $tmp{$key};
-    throw("ERROR: Key '$key' not found in format string ".join("|", @$formats)) unless defined($format_index);
-  }
-  
-  foreach my $ind (@{$self->get_raw_individuals_info($individual_ids)}) {
-    my @ind_data = split(':',$ind);
-    
-    # limit to one key
-    if(defined($format_index)) {
-      $ind_info{$ind_data[0]}{$key} = $ind_data[$format_index + 1];
-    }
-    
-    # get all keys
-    else {
-      my $ind_name = shift @ind_data;
-      for (my $i = 0; $i < scalar(@ind_data); $i++) {
-        $ind_info{$ind_name}{$formats->[$i]} = $ind_data[$i];
-      }
-    }
-  } 
-  return \%ind_info;
+
+  return $self->get_samples_info($individual_ids,$key);
 }
 
 =head2 get_individuals_genotypes
     Description: Returns the list of individual names with their genotypes (with alleles)
                  e.g. 'NA10000' => 'A|G'
     Returntype : Hash with the format 'individual_name' => 'allele1|allele2'
+    Status     : DEPRECATED
 =cut
 
 sub get_individuals_genotypes {
   my $self = shift;
   my $individual_ids = shift;
-  
-  my %ind_gen;
-  my $ind_info = $self->get_individuals_info($individual_ids, 'GT');
-  my @alleles = (($self->get_reference),@{$self->get_alternatives});
-  foreach my $ind (keys(%$ind_info)) {
-    my $phased = ($ind_info->{$ind}{'GT'} =~ /\|/ ? 1 : 0); 
-    $ind_gen{$ind} = join(
-      ($phased ? '|' : '/'),
-      map {$alleles[$_]}
-      grep {$_ ne '.'}
-      split(($phased ? '\|' : '/'), $ind_info->{$ind}{'GT'})
-    );
-  }
-  return \%ind_gen;
+
+  return $self->get_samples_genotypes($individual_ids);
 }
 
 # Sample information
@@ -806,11 +721,6 @@ sub get_samples {
   return $self->{samples};
 }
 
-=head2 get_sample_column_indices
-    Description: Returns hashref of sample names with value
-                 being the column index they appear in the file
-    Returntype : Hashref of { sample => index }
-=cut
 
 =head2 get_sample_column_indices
     Description: Returns hashref of sample names with value

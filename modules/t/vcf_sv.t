@@ -6,7 +6,7 @@ use Bio::EnsEMBL::IO::Parser::VCF4;
 
 my $test_file = "modules/t/data_sv.vcf";
 
-my ($test_info, $ind_info); 
+my ($test_sample, $sample_info, $ind_info); 
 
 my $parser = Bio::EnsEMBL::IO::Parser::VCF4->open($test_file);
 
@@ -19,9 +19,11 @@ my @test_row = (qw(1	2827694	rs2376870	CGTGGATGCGGGGAC	C	.	PASS	SVTYPE=DEL;END=2
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
-$test_info = "$inds[$index]:$test_row[9]";
+$test_sample = "$inds[$index]:$test_row[9]";
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
-ok($test_info eq $ind_info->[$index], 'Individual data');
+ok($test_sample eq $ind_info->[$index], 'Individual data (DEPRECATED)');
+$sample_info = $parser->get_raw_samples_info($inds[$index]);
+ok($test_sample eq $sample_info->[$index], 'Sample data');
 
 
 print "\n\n# Record 2\n";
@@ -30,9 +32,11 @@ ok ($parser->next(), "Loading second record");
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
-$test_info = "$inds[$index]:$test_row[9]";
+$test_sample = "$inds[$index]:$test_row[9]";
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
-ok($test_info eq $ind_info->[$index], 'Individual data');
+ok($test_sample eq $ind_info->[$index], 'Individual data (DEPRECATED)');
+$sample_info = $parser->get_raw_samples_info($inds[$index]);
+ok($test_sample eq $sample_info->[$index], 'Sample data');
 
 
 print "\n\n# Record 3\n";
@@ -41,9 +45,11 @@ ok ($parser->next(), "Loading third record");
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
-$test_info = "$inds[$index]:$test_row[9]";
+$test_sample = "$inds[$index]:$test_row[9]";
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
-ok($test_info eq $ind_info->[$index], 'Individual data');
+ok($test_sample eq $ind_info->[$index], 'Individual data (DEPRECATED)');
+$sample_info = $parser->get_raw_samples_info($inds[$index]);
+ok($test_sample eq $sample_info->[$index], 'Sample data');
 
 
 print "\n\n# Record 4\n";
@@ -52,9 +58,11 @@ ok ($parser->next(), "Loading fourth record");
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
-$test_info = "$inds[$index]:$test_row[9]";
+$test_sample = "$inds[$index]:$test_row[9]";
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
-ok($test_info eq $ind_info->[$index], 'Individual data');
+ok($test_sample eq $ind_info->[$index], 'Individual data (DEPRECATED)');
+$sample_info = $parser->get_raw_samples_info($inds[$index]);
+ok($test_sample eq $sample_info->[$index], 'Sample data');
 
 
 print "\n\n# Record 5\n";
@@ -63,9 +71,11 @@ ok ($parser->next(), "Loading fifth record");
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
-$test_info = "$inds[$index]:$test_row[9]";
+$test_sample = "$inds[$index]:$test_row[9]";
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
-ok($test_info eq $ind_info->[$index], 'Individual data');
+ok($test_sample eq $ind_info->[$index], 'Individual data (DEPRECATED)');
+$sample_info = $parser->get_raw_samples_info($inds[$index]);
+ok($test_sample eq $sample_info->[$index], 'Sample data');
 
 print "\n\n# Record 6\n";
 ok ($parser->next(), "Loading sixth record");
@@ -73,9 +83,11 @@ ok ($parser->next(), "Loading sixth record");
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
-$test_info = "$inds[$index]:$test_row[9]";
+$test_sample = "$inds[$index]:$test_row[9]";
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
-ok($test_info eq $ind_info->[$index], 'Individual data');
+ok($test_sample eq $ind_info->[$index], 'Individual data (DEPRECATED)');
+$sample_info = $parser->get_raw_samples_info($inds[$index]);
+ok($test_sample eq $sample_info->[$index], 'Sample data');
 
 print "\n> Testing the SV specific getters (only for the last record):\n";
 ok($parser->get_alternative_description('DUP:TANDEM') eq 'Tandem Duplication', 'get_alternative_description');

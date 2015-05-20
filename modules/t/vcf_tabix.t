@@ -6,7 +6,7 @@ use Bio::EnsEMBL::IO::Parser::VCF4Tabix;
 
 my $test_file = "modules/t/data.vcf.gz";
 
-my ($test_info, $ind_info); 
+my ($test_sample, $sample_info, $ind_info); 
 
 my $parser = Bio::EnsEMBL::IO::Parser::VCF4Tabix->open($test_file);
 
@@ -22,9 +22,11 @@ print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 my $index = 0;
 my $row_index = 9 + $index;
-$test_info = "$inds[$index]:$test_row[$row_index]";
+$test_sample = "$inds[$index]:$test_row[$row_index]";
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
-ok($test_info eq $ind_info->[$index], 'Individual data');
+ok($test_sample eq $ind_info->[$index], 'Individual data (DEPRECATED)');
+$sample_info = $parser->get_raw_samples_info($inds[$index]);
+ok($test_sample eq $sample_info->[$index], 'Sample data');
 
 
 print "\n\n# Record 2\n";
@@ -35,9 +37,11 @@ print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 $index = 1;
 $row_index = 9 + $index;
-$test_info = "$inds[$index]:$test_row[$row_index]";
+$test_sample = "$inds[$index]:$test_row[$row_index]";
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
-ok($test_info eq $ind_info->[$index], 'Individual data');
+ok($test_sample eq $ind_info->[$index], 'Individual data (DEPRECATED)');
+$sample_info = $parser->get_raw_samples_info($inds[$index]);
+ok($test_sample eq $sample_info->[$index], 'Sample data');
 
 
 print "\n\n# Record 3\n";
@@ -48,9 +52,11 @@ print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 $index = 2;
 $row_index = 9 + $index;
-$test_info = "$inds[$index]:$test_row[$row_index]";
+$test_sample = "$inds[$index]:$test_row[$row_index]";
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
-ok($test_info eq $ind_info->[$index], 'Individual data');
+ok($test_sample eq $ind_info->[$index], 'Individual data (DEPRECATED)');
+$sample_info = $parser->get_raw_samples_info($inds[$index]);
+ok($test_sample eq $sample_info->[$index], 'Sample data');
 
 
 print "\n\n# Record 4\n";
@@ -61,9 +67,11 @@ print "\n> Testing each column of the row\n";
 do_the_tests(\@test_row);
 $index = 0;
 $row_index = 9 + $index;
-$test_info = "$inds[$index]:$test_row[$row_index]";
+$test_sample = "$inds[$index]:$test_row[$row_index]";
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
-ok($test_info eq $ind_info->[$index], 'Individual data');
+ok($test_sample eq $ind_info->[$index], 'Individual data (DEPRECATED)');
+$sample_info = $parser->get_raw_samples_info($inds[$index]);
+ok($test_sample eq $sample_info->[$index], 'Sample data');
 
 
 print "\n> Testing the getters (only for the last record):\n";
@@ -79,8 +87,10 @@ ok($parser->get_info_description('BN') eq 'First dbSNP build #' , 'get_informati
 ok($parser->get_formats->[0] eq 'GT', 'get_formats');
 ok($parser->get_format_description('GT') eq 'Genotype' , 'get_format_description');
 $index = 0;
-ok($parser->get_individuals_info($inds[$index])->{$inds[$index]}->{'GT'} eq '1|1', 'get_individuals_info');
-ok($parser->get_individuals_genotypes($inds[$index])->{$inds[$index]} eq 'C|C', 'get_individuals_genotypes');
+ok($parser->get_individuals_info($inds[$index])->{$inds[$index]}->{'GT'} eq '1|1', 'get_individuals_info (DEPRECATED)');
+ok($parser->get_individuals_genotypes($inds[$index])->{$inds[$index]} eq 'C|C', 'get_individuals_genotypes (DEPRECATED)');
+ok($parser->get_samples_info($inds[$index])->{$inds[$index]}->{'GT'} eq '1|1', 'get_samples_info');
+ok($parser->get_samples_genotypes($inds[$index])->{$inds[$index]} eq 'C|C', 'get_samples_genotypes');
 
 print "\n> Testing the metadata getters:\n";
 ok($parser->get_metadata_key_list eq 'FORMAT, INFO, fileformat, header, reference', 'getMetadataKeyList');
