@@ -176,7 +176,13 @@ sub get_interacting_region {
 sub get_score {
     my $self = shift;
     my $info = $self->get_information;
-    return $info->[3];
+    if ($info->[4]) {
+      ## Comma-separated RGB
+      return join(',', $info->[3..5]);
+    }
+    else {
+      return $info->[3];
+    }
 }
 
 =head2 get_raw_id
