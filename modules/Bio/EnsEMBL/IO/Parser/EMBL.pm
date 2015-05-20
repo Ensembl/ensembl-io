@@ -12,7 +12,7 @@
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::EMBLParser - A record-based parser that reads EMBL format.
+Bio::EnsEMBL::IO::Parser::EMBL - A record-based parser that reads EMBL format.
 
 =head1 DESCRIPTION
 
@@ -21,7 +21,7 @@ ftp://ftp.ebi.ac.uk/pub/databases/embl/doc/usrman.txt
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::EMBLParser;
+package Bio::EnsEMBL::IO::Parser::EMBL;
 
 use strict;
 use warnings;
@@ -32,7 +32,7 @@ use base qw/Bio::EnsEMBL::IO::TokenBasedParser/;
 
     Description: Open Fasta file
     Argument [1]: Path to file 
-    Returntype : Ensembl::IO::Parser::EMBLParser object
+    Returntype : Ensembl::IO::Parser::EMBL object
 
 =cut
 
@@ -93,54 +93,59 @@ sub read_metadata {
     return;
 }
 
-sub getSequence {
+sub get_sequence {
     my $self = shift;
     return $self->{record}->{sequence};
 }
 
-=head2 getAccessions
+=head2 get_accessions
     Description: Get an unpunctuated list of the AC fields 
     Returntype : listref
 =cut
 
-sub getAccessions {
+sub get_accessions {
     my $self = shift;
-    return $self->getStuff('AC');
+    return $self->get_stuff('AC');
 }
 
-=head2 getDescription
+=head2 get_description
     Description: Fetch the DE field, combined into a single string
     Returntype : String
 =cut
 
-sub getDescription {
+sub get_description {
     my $self = shift;
-    return $self->smushText('DE');
+    return $self->smush_text('DE');
 }
 
-=head2 getKeywords
+=head2 get_keywords
     Description: Get a list of EMBL keywords. An empty string implies no keywords.
     Returntype : ListRef of strings
 =cut
 
-sub getKeywords {
+sub get_keywords {
     my $self = shift;
-    my $keys = $self->getStuff('KW');
+    my $keys = $self->get_stuff('KW');
     return [] unless $keys;
     return $keys;
 }
 
-sub getSpecies {
+sub get_species {
     my $self = shift;
-    return $self->smushText('OS');
+    return $self->smush_text('OS');
 }
 
-sub getClassification {
+sub get_classification {
     my $self = shift;
-    return $self->getStuff('OC');
+    return $self->get_stuff('OC');
 }
 
-sub smushText {
+sub get_date {
+    my $self = shift;
+    return $self->get_stuff('DT');
+}
+
+sub smush_text {
     my $self = shift;
     my $key = shift;
     my $list = $self->{record}->{$key};
@@ -150,13 +155,13 @@ sub smushText {
     return join '',@$list;
 }
 
-=head2 getStuff
+=head2 get_stuff
     Description: Convenience method for the extraction of arbitrary keys from their
                  multi-line eccentric EMBL format
     Returntype : listref
 =cut
 
-sub getStuff {
+sub get_stuff {
     my $self = shift;
     my $key = shift;
     my $list = $self->{record}->{$key};
@@ -168,74 +173,84 @@ sub getStuff {
     return \@trimmed_things;
 }
 
-=head2 getRawID
+=head2 get_raw_id
     Description: Get the ID field as it was found within the source file 
     Returntype : listref
 =cut
 
-sub getRawID {
+sub get_raw_id {
     my $self = shift;
     return $self->{record}->{ID};
 }
 
-sub getRawAccessions {
+sub get_raw_accessions {
     my $self = shift;
     return $self->{record}->{AC};
 }
 
-sub getRawDescription {
+sub get_raw_description {
     my $self = shift;
     return $self->{record}->{DE};
 }
 
-sub getRawKeywords {
+sub get_raw_keywords {
     my $self = shift;
     return $self->{record}->{KW};
 }
 
-sub getRawDate {
+sub get_raw_date {
     my $self = shift;
     return $self->{record}->{DT};
 }
 
-sub getRawSpecies {
+sub get_raw_species {
     my $self = shift;
     return $self->{record}->{OS};
 }
 
-sub getRawClassification {
+sub get_raw_classification {
     my $self = shift;
     return $self->{record}->{OC};
 }
 
-sub getRawReferences {
+sub get_raw_references {
     my $self = shift;
     return $self->{record}->{References};
 }
 
-sub getRawFeatures {
+sub get_raw_features {
     my $self = shift;
     return $self->{record}->{FT};
 }
 
-sub getRawComments {
+sub get_raw_comments {
     my $self = shift;
     return $self->{record}->{CC};
 }
 
-sub getRawAssemblyHeader {
+sub get_raw_assembly_header {
     my $self = shift;
     return $self->{record}->{AH};
 }
 
-sub getRawAssembly {
+sub get_raw_assembly {
     my $self = shift;
     return $self->{record}->{AS};
 }
 
-sub getRawContig {
+sub get_raw_contig {
     my $self = shift;
     return $self->{record}->{CO};
+}
+
+sub get_raw_pelevel {
+    my $self = shift;
+    return $self->{record}->{PE};
+}
+
+sub get_pelevel {
+    my $self = shift;
+    return substr($self->get_raw_pelevel->[0], 5, 1);
 }
 
 1;
