@@ -84,7 +84,7 @@ sub read_metadata {
 
 sub set_fields {
   my $self = shift;
-  $self->{'fields'} = [qw(seqname source feature start end score strand frame attribute)];
+  $self->{'fields'} = [qw(seqname source feature start end score strand phase attribute)];
 }
 
 
@@ -100,105 +100,216 @@ sub set_minimum_column_count {
     $self->{'min_col_count'} = 5;
 }
 
+######### FIELD ACCESSORS ################
 
+# Seq region name
 
-sub getRawSeqName {
+=head2 get_raw_seqname
+    Description : Return the name of the sequence
+    Returntype  : String
+=cut
+
+sub get_raw_seqname {
     my $self = shift;
-    return $self->{'record'}[0]
+    return $self->{'record'}[0];
 }
 
-sub getSeqName {
+
+=head2 get_seqname
+    Description : Return the name of the sequence
+    Returntype  : String
+=cut
+
+sub get_seqname {
     my $self = shift;
-    return $self->getRawSeqName();
+    return $self->get_raw_seqname();
 }
 
-sub getRawSource {
+# Source name
+
+=head2 get_raw_source
+    Description : Return the name of the source of the data
+    Returntype  : String
+=cut
+
+sub get_raw_source {
     my $self = shift;
-    return $self->{'record'}[1]
+    return $self->{'record'}[1];
 }
 
-sub getSource {
+
+=head2 get_source
+    Description : Return the name of the source of the data
+    Returntype  : String
+=cut
+
+sub get_source {
     my $self = shift;
-    return $self->getRawSource();
+    return $self->get_raw_source();
 }
 
-sub getRawStart {
-    my $self = shift;
-    return $self->{'record'}[2]
+# Sequence type
+
+=head2 get_raw_type
+    Description : Return the class/type of the feature
+    Returntype  : String
+=cut
+
+sub get_raw_type {
+  my $self = shift;
+  return $self->{'record'}[2];
 }
 
-sub getStart {
+
+=head2 get_type
+    Description : Return the class/type of the feature
+    Returntype  : String
+=cut
+
+sub get_type {
     my $self = shift;
-    return $self->getRawStart();
+    return $self->get_raw_type();
 }
 
-sub getRawEnd {
+
+equence start
+
+=head2 get_raw_start
+    Description : Return the start position of the feature
+    Returntype  : Integer
+=cut
+
+sub get_raw_start {
     my $self = shift;
-    return $self->{'record'}[3]
+    return $self->{'record'}[3];
 }
 
-sub getEnd {
+
+=head2 get_start
+    Description : Return the start position of the feature
+    Returntype  : Integer
+=cut
+
+sub get_start {
     my $self = shift;
-    return $self->getRawEnd();
+    return $self->get_raw_start();
 }
 
-sub getRawScore {
+
+# Sequence end
+
+=head2 get_raw_end
+    Description : Return the end position of the feature
+    Returntype  : Integer
+=cut
+
+sub get_raw_end {
     my $self = shift;
-    return $self->{'record'}[4]
+    return $self->{'record'}[4];
 }
 
-sub getScore {
+# Phred scaled probability that the sequence_alteration call is incorrect (real number)
+
+=head2 get_raw_score
+    Description : Return the Phred scaled probability that the sequence_alteration call is incorrect (real number)
+    Returntype  : Integer
+=cut
+
+sub get_raw_score {
     my $self = shift;
-    my $val = $self->getRawScore();
-    if ($val =~ /\./) {
-            return undef;
-    } else {
-            return $val;
-    }
+    return $self->{'record'}[5];
 }
 
-sub getRawStrand {
+
+=head2 get_score
+    Description : Return the Phred scaled probability that the sequence_alteration call is incorrect (real number)
+    Returntype  : Integer
+=cut
+
+sub get_score {
     my $self = shift;
-    return $self->{'record'}[5]
+    my $val = $self->get_raw_score();
+    return ($val =~ /\./) ? undef : $val;
 }
 
-my %strand_conversion = ( '+' => '1', '.' => '0', '-' => '-1');
+# Sequence strand
 
-sub getStrand {
+=head2 get_raw_strand
+    Description : Return the strand of the feature
+    Returntype  : String
+=cut
+
+sub get_raw_strand {
     my $self = shift;
-    my $val = $self->getRawStrand();
-    if ($val =~ /\./) {
-            return undef;
-    } else {
-            return $strand_conversion{$val};
-    }
+    return $self->{'record'}[6];
 }
 
-sub getRawFrame {
+
+=head2 get_strand
+    Description : Return the strand of the feature (1 for the forward strand and -1 for the reverse strand)
+    Returntype  : Integer
+=cut
+
+sub get_strand {
     my $self = shift;
-    return $self->{'record'}[6]
+    my $val = $self->get_raw_strand();
+    return $self->{'strand_conversion'}{$val} || $val;
 }
 
-sub getFrame {
-    my $self = shift;
-    my $val = $self->getRawFrame();
-    if ($val =~ /\./) {
-            return undef;
-    } else {
-            return $val;
-    }
+
+# Phase/Frame
+
+=head2 get_raw_phase
+    Description : Return the phase/frame of the feature
+    Returntype  : String
+=cut
+
+sub get_raw_phase {
+  my $self = shift;
+  return $self->{'record'}[7];
 }
 
-sub getRawAttribute {
+
+=head2 get_phase
+    Description : Return the phase/frame of the feature
+    Returntype  : String
+=cut
+
+sub get_phase {
     my $self = shift;
-    return $self->{'record'}[7]
+    my $val = $self->get_raw_phase();
+    return ($val =~ /\./) ? undef : $val;
 }
 
-sub getAttribute {
-    my $self = shift;
-    my $val = $self->getRawAttribute();
 
+# Attributes
+# The methods listed below concern the 9th column data
+
+=head2 get_raw_attributes
+    Description : Return the content of the 9th column of the line
+    Returntype  : String
+=cut
+
+sub get_raw_attributes {
+  my $self = shift;
+  return $self->{'record'}[8];
 }
+
+=head2 get_attributes
+    Description : Return the content of the 9th column of the line in a hash: "attribute => value"
+    Returntype  : Reference to a hash
+=cut
+
+sub get_attributes {
+  my $self = shift;
+  my %attributes;
+  foreach my $attr (split(';',$self->get_raw_attributes)) {
+    my ($key,$value) = split('=',$attr);
+    $attributes{$key} = $value;
+  }
+  return \%attributes;
+}
+
 
 # NOT FULLY IMPLEMENTED
 
