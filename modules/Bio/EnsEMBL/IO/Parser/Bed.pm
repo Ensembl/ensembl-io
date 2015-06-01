@@ -22,6 +22,7 @@ use strict;
 use warnings;
 
 use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
+ 
 
 =head2 set_fields
 
@@ -34,6 +35,18 @@ use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 sub set_fields {
   my $self = shift;
   $self->{'fields'} = [qw(seqname start end name score strand thickStart thickEnd itemRgb)];
+}
+
+=head2 set_minimum_column_count
+
+    Description: Sets minimum column count for a valid BED file 
+    Returntype : Void 
+
+=cut
+
+sub set_minimum_column_count {
+    my $self = shift;
+    $self->{'min_col_count'} = 3;
 }
 
 ## ----------- Mandatory fields -------------
