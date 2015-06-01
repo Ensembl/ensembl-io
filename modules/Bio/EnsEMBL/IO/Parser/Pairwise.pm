@@ -61,6 +61,31 @@ sub set_fields {
 }
 
 
+=head2 set_minimum_column_count
+
+    Description: Sets minimum column count for a valid PAIRWISE file 
+    Returntype : Void 
+
+=cut
+
+sub set_minimum_column_count {
+    my $self = shift;
+    $self->{'min_col_count'} = 5;
+}
+
+=head2 set_maximum_column_count
+
+    Description: Sets maximum column count for a valid PAIRWISE file 
+    Returntype : Void 
+
+=cut
+
+sub set_maximum_column_count {
+    my $self = shift;
+    $self->{'max_col_count'} = 6;
+}
+
+
 # Sequence name
 
 =head2 get_raw_seqname
