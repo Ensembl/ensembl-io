@@ -851,17 +851,25 @@ sub get_samples_info {
 sub get_samples_genotypes {
   my $self = shift;
   my $sample_ids = shift;
+  my $non_ref_only = shift;
 
   my %sample_gen;
   my $sample_info = $self->get_samples_info($sample_ids, 'GT');
   my @alleles = (($self->get_reference),@{$self->get_alternatives});
+  
   foreach my $sample (keys(%$sample_info)) {
-    my $phased = ($sample_info->{$sample}{'GT'} =~ /\|/ ? 1 : 0);
+    my $gt = $sample_info->{$sample}{'GT'};
+    
+    # skip reference homozygotes if $non_ref_only is true
+    # e.g. 0|0 (phased diploid), 0/0/0 (unphased triploid), 0 (monoploid e.g. male X)
+    next if $non_ref_only && $gt =~ /^(0[\\\|\/]?)+$/;
+
+    my $phased = ($gt =~ /\|/ ? 1 : 0);
     $sample_gen{$sample} = join(
       ($phased ? '|' : '/'),
       map {$alleles[$_]}
       grep {$_ ne '.'}
-      split(($phased ? '\|' : '/'), $sample_info->{$sample}{'GT'})
+      split(($phased ? '\|' : '/'), $gt)
     );
   }
   return \%sample_gen;
