@@ -23,6 +23,33 @@ use warnings;
 
 use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
+
+=head2 set_fields
+
+    Description: Setter for list of fields used in this format - uses the
+                  "public" (i.e. non-raw) names of getter methods
+    Returntype : Void
+
+=cut
+
+sub set_fields {
+  my $self = shift;
+  $self->{'fields'} = [qw(matches misMatches repMatches nCount qNumInsert qBaseInsert tNumInsert tBaseInsert strand qName qSize qStart qEnd tName tSize tStart tEnd blockCount blockSizes qStarts tStarts)];
+}
+
+
+=head2 set_minimum_column_count
+
+    Description: Sets minimum column count for a valid PSL file 
+    Returntype : Void 
+
+=cut
+
+sub set_minimum_column_count {
+    my $self = shift;
+    $self->{'min_col_count'} = 21;
+}
+
 ## ----------- Mandatory fields (21) -------------
 
 =head2 get_raw_matches
