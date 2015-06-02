@@ -669,10 +669,8 @@ sub get_raw_individuals_info {
 # this sub caches a list of individual column indices
 # might be unnecessary, but every millisecond counts!
 sub _get_individual_index_list {
-  my $self = shift;
-  my $individual_ids = shift;
-  
-  return $self->_get_sample_index_list($individual_ids);
+  my $self = shift;  
+  return $self->_get_sample_index_list(@_);
 }
 
 =head2 get_individuals_info
@@ -684,10 +682,7 @@ sub _get_individual_index_list {
 
 sub get_individuals_info {
   my $self = shift;
-  my $individual_ids = shift;
-  my $key = shift;
-
-  return $self->get_samples_info($individual_ids,$key);
+  return $self->get_samples_info(@_);
 }
 
 =head2 get_individuals_genotypes
@@ -699,9 +694,7 @@ sub get_individuals_info {
 
 sub get_individuals_genotypes {
   my $self = shift;
-  my $individual_ids = shift;
-
-  return $self->get_samples_genotypes($individual_ids);
+  return $self->get_samples_genotypes(@_);
 }
 
 # Sample information
