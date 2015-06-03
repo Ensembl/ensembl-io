@@ -420,8 +420,8 @@ sub create_record {
     push @values, $translator->get_name($object) || '.'; 
     push @values, $translator->get_score($object) eq '.' ? 0 : $translator->get_score($object);
     push @values, $self->munge_strand($translator->get_strand($object)) || '.'; 
-    push @values, $translator->get_thickStart($object) || $start;
-    push @values, $translator->get_thickEnd($object) || $end;
+    push @values, $translator->get_thickStart($object) ? $self->munge_start($translator->get_thickStart($object)) : $start;
+    push @values, $translator->get_thickEnd($object) ? $translator->get_thickEnd($object) : $end;
     push @values, $translator->get_itemRgb($object) || '.'; 
     if ($translator->get_blockCount($object)) {
         push @values, $translator->get_blockCount($object);
