@@ -36,18 +36,17 @@ my @bed_columns = (
   ['name'],
   ['score'],
   ['strand'],
-  ['thickStart'],
-  ['thickEnd'],
-  ['itemRgb'],
+  ['thickStart',6],
+  ['thickEnd',7],
+  ['itemRgb',8],
   ['blockCount',9],
   ['blockSizes',10],
-  ['chromStarts'],
+  ['chromStarts',11],
 );
 
 # colour, age used in AgeOfBase track
-# Reserved used in old Age-of-Base track: delete after e76
 my %global_name_map = (
-  item_colour => ['item_colour','colour','reserved'],
+  item_colour => ['item_colour','colour'],
   score => ['score','age'],
 );
 
@@ -152,18 +151,31 @@ sub fetch_extended_summary_array  {
 
 sub _as_mapping {
   my ($self) = @_;
-
+  use Data::Dumper;
   my $as = $self->autosql;
+  warn "!!! AUTOSQL ".Dumper($as);
   unless($as and %$as) {
     my %map;
     $map{$_} = $_ for(0..$#bed_columns);
     return [\%map,{},[],{}];
   }
   my (%name_map,%names,%real_name);
-  my $table = $as->{[keys %$as]->[0]};
-  foreach my $name (map { $_->[1] } @$table) {
-    $names{$name} = 1;
+
+  ## Check for incomplete AutoSQL
+  while (my ($k,$v) = each (%$as)) {
+    my $i = 0;
+    foreach (@$v) { 
+      my ($type, $name, $desc) = @$_;
+      if ($name =~ /^field\d+$/ || $desc eq 'Undocumented field') {
+        my $lookup = $bed_columns[$i];
+        $name = $lookup->[0];
+        $name_map{$_->[1]} = $name;
+      }
+      $names{$name} = 1;
+      $i++;
+    }
   }
+
   foreach my $k (keys %global_name_map) {
     foreach my $v (@{$global_name_map{$k}}) {
       next unless $names{$v};
@@ -172,8 +184,11 @@ sub _as_mapping {
       last;
     }
   }
+
   $real_name{$_} ||= $_ for keys %names;
+  my $table = $as->{[keys %$as]->[0]};
   my (%map,%core,@order,%pos);
+
   foreach my $idx_bed (0..$#bed_columns) {
     foreach my $try (@{$bed_columns[$idx_bed]}) {
       foreach my $idx_file (0..$#$table) {
