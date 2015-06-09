@@ -176,11 +176,20 @@ sub get_tracks {
           $tracks{$id}{$key} = $value =~ /^(ftp|https?):\/\// ? $value : "$url/$value";
         }
       } else {
-        if ($key eq 'parent' || $key =~ /^subGroup[0-9]/) {
+        if ($key eq 'parent' || $key eq 'superTrack' || $key =~ /^subGroup[0-9]/) {
+
           my @values = split /\s+/, $value;
           
-          if ($key eq 'parent') {
-            $tracks{$id}{$key} = $values[0]; # FIXME: throwing away on/off setting for now
+          if ($key eq 'parent' || $key eq 'superTrack') {
+            if ($key eq 'superTrack' && $values[0] eq 'on') {
+              $tracks{$id}{'superTrack'}  = shift @values;
+              $tracks{$id}{'visibility'}  = shift @values if scalar @values;
+            }
+            else {
+              ## Hack for incorrect hubs that use 'superTrack' in children instead of 'parent'
+              $tracks{$id}{'parent'}      = shift @values;
+              $tracks{$id}{'visibility'}  = shift @values if scalar @values;
+            }
             next;
           } else {
             $tracks{$id}{$key}{'name'}  = shift @values;
@@ -227,10 +236,6 @@ sub get_tracks {
       }
     }
     
-    # filthy hack to support superTrack setting being used as parent, because hubs are incorrect.
-    $tracks{$id}{'parent'} = delete $tracks{$id}{'superTrack'} if $tracks{$id}{'superTrack'} && $tracks{$id}{'superTrack'} !~ /^on/ && !$tracks{$id}{'parent'};
-
-
     # any track which doesn't have any of these is definitely invalid
     if ($tracks{$id}{'type'} || $tracks{$id}{'shortLabel'} || $tracks{$id}{'longLabel'}) {
       $tracks{$id}{'track'}           = $id;
@@ -251,7 +256,6 @@ sub get_tracks {
       delete $tracks{$id};
     }
   }
-
   return %tracks;
 }
 
