@@ -270,8 +270,8 @@ sub fix_tree {
     my @views      = grep $_->data->{'view'}, @{$node->child_nodes};
     my $dimensions = $data->{'dimensions'};
     
-    # If there's only one view and all the tracks are inside it, make the view's labels be the same as it's parent's label
-    # so that the config menu entry is nicer
+    ## If there's only one view and all the tracks are inside it, make the 
+    ## view's labels be the same as its parent's label so the config menu entry is nicer
     if (scalar @views == 1 && scalar @{$node->child_nodes} == 1) {
       $views[0]->data->{$_} = $data->{$_} for qw(shortLabel longLabel);
     }
