@@ -24,9 +24,6 @@ use List::Util qw(max);
 use Bio::DB::BigFile;
 use Bio::DB::BigFile::Constants;
 
-## TODO - replace this with ensembl-io BED parser
-use EnsEMBL::Web::Text::Feature::BED;
-
 # Standard BED columns and where to find them: this will need adding to
 #   when we come across various whacky field names.
 my @bed_columns = (
@@ -151,9 +148,7 @@ sub fetch_extended_summary_array  {
 
 sub _as_mapping {
   my ($self) = @_;
-  use Data::Dumper;
   my $as = $self->autosql;
-  warn "!!! AUTOSQL ".Dumper($as);
   unless($as and %$as) {
     my %map;
     $map{$_} = $_ for(0..$#bed_columns);
@@ -270,11 +265,7 @@ sub fetch_features  {
   my $names = $self->real_names;
   $self->fetch_rows($chr_id,$start,$end,sub {
     my ($row,$extra,$order) = $self->_as_transform(\@_);
-    my $bed = EnsEMBL::Web::Text::Feature::BED->new($row,$extra,$order,$names);
-    $bed->coords([$_[0],$_[1],$_[2]]);
-
-    ## Set score to undef if missing to distinguish it from a genuine present but zero score
-    $bed->score(undef) if @_ < 5;
+    my $bed = [$row,$extra,$order,$names];
 
     $self->{_cache}->{numfield} = max($self->{_cache}->{numfield}, scalar(@_)); 
 
