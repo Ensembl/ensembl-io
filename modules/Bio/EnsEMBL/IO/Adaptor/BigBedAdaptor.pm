@@ -43,14 +43,14 @@ my @bed_columns = (
 
 # colour, age used in AgeOfBase track
 my %global_name_map = (
-  item_colour => ['item_colour','colour'],
+  item_colour => ['item_colour','colour', 'reserved'],
   score => ['score','age'],
 );
 
 sub new {
   my ($class, $url) = @_;
 
-  my $self = bless {
+    my $self = bless {
     _cache => {},
     _url => $url,
   }, $class;
