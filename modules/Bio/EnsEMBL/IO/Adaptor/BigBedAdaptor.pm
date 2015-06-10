@@ -46,7 +46,7 @@ my @bed_columns = (
 
 # colour, age used in AgeOfBase track
 my %global_name_map = (
-  item_colour => ['item_colour','colour'],
+  item_colour => ['item_colour','colour', 'reserved'],
   score => ['score','age'],
 );
 
@@ -153,7 +153,7 @@ sub _as_mapping {
   my ($self) = @_;
   use Data::Dumper;
   my $as = $self->autosql;
-  warn "!!! AUTOSQL ".Dumper($as);
+  #warn "!!! AUTOSQL ".Dumper($as);
   unless($as and %$as) {
     my %map;
     $map{$_} = $_ for(0..$#bed_columns);
