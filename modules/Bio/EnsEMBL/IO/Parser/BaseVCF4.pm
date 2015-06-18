@@ -36,7 +36,7 @@ package Bio::EnsEMBL::IO::Parser::BaseVCF4;
 
 use strict;
 use warnings;
-use Bio::EnsEMBL::Utils::Exception qw(warning);
+use Bio::EnsEMBL::Utils::Exception qw(warning throw);
 
 use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
