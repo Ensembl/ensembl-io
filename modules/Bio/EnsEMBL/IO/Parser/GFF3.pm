@@ -33,7 +33,7 @@ use base qw/Bio::EnsEMBL::IO::Parser::GXF/;
 sub open {
     my ($caller, $filename, @other_args) = @_;
     my $class = ref($caller) || $caller;
-    
+
     my $self = $class->SUPER::open($filename, @other_args);
 
     # Metadata defaults
@@ -44,14 +44,14 @@ sub open {
 
     # pre-load peek buffer
     $self->next_block();
-    
+
     return $self;
 }
 
 sub read_metadata {
     my $self = shift;
     my $line = $self->{'current_block'};
-    
+
     if ($line =~ /^\s*##(\S+)\s+(\S+)/) {
         $self->{'metadata'}->{$1} = $2;
     }
@@ -59,6 +59,18 @@ sub read_metadata {
         chomp $line;
         push(@{$self->{metadata}->{comments}}, $line);
     }
+}
+
+=head2 set_minimum_column_count
+
+    Description: Sets minimum column count for a valid GFF file
+    Returntype : Void
+
+=cut
+
+sub set_minimum_column_count {
+    my $self = shift;
+    $self->{'min_col_count'} = 5;
 }
 
 =head2 get_source
