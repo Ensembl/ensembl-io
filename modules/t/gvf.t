@@ -31,6 +31,7 @@ print "\n# Second record:\n";
 ok ($parser->next(), "Loading second record");
 @test_row = (qw(Y	dbSNP	insertion	10035	10036	.	+	.	ID=2;Variant_seq=CC;Dbxref=dbSNP_137:rs201278642;Reference_seq=-;global_minor_allele_frequency=0|0.0535714|117));
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
+ok($parser->get_variant_seq eq 'CC', 'get_variant_seq');
 
 print "\n# Methods to retrieve metadata:\n";
 ok($parser->get_metadata_key_list eq 'data-source, feature-ontology, file-date, file-version, genome-build, gff-version, gvf-version, sequence-region, species', 'get_metadata_key_list');

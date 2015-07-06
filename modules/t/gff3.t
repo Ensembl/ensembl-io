@@ -3,11 +3,10 @@ use warnings;
 
 use Test::More;
 
-#use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::Utils::IO qw( work_with_file );
 use Bio::EnsEMBL::IO::Parser::GFF3;
 
-my $test_file = "data.gff3";
+my $test_file = "modules/t/data.gff3";
 
 my $parser = Bio::EnsEMBL::IO::Parser::GFF3->open($test_file);
 ok ($parser->next(), "Loading first record");
