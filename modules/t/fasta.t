@@ -5,7 +5,7 @@ use Test::More;
 
 use Bio::EnsEMBL::IO::Parser::Fasta;
 
-my $test_file = "data.fasta";
+my $test_file = "modules/t/data.fasta";
 
 ######################################################
 ## Test 1
