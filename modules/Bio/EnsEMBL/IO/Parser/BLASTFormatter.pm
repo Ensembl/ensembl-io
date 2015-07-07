@@ -158,10 +158,10 @@ sub open {
 				 $delimiter, 
 				 alignment_view => $alignment_view_option, 
 				 format_specifier => $format,
-				 mustReadMetadata => 0);
+				 must_parse_metadata => 0);
  
   # metadata defaults
-  #  if ($self->{'params'}->{'mustReadMetadata'}) { }
+  #  if ($self->{'params'}->{'must_parse_metadata'}) { }
 
   # pre-load peek buffer
   $self->next_block();

@@ -37,7 +37,7 @@ sub open {
     my $self = $class->SUPER::open($filename, @other_args);
 
     # Metadata defaults
-    if ($self->{'params'}->{'mustReadMetadata'}) {
+    if ($self->{'params'}->{'must_parse_metadata'}) {
        $self->{'metadata'}->{'gff-version'} = '3';
        $self->{'metadata'}->{'Type'} = 'DNA';
     }
