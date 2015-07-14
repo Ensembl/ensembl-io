@@ -86,6 +86,8 @@ sub get_hub {
 ### @return Hashref               
   my ($self, $args) = @_;
 
+  my $file_args = {'hub' => $self->{'hub'}, 'nice' => 1, 'headers' => $headers}; 
+
   ## First check the cache
   my $cache = $self->web_hub ? $self->web_hub->cache : undef;
   my $cache_key = 'trackhub_'.md5_hex($self->url);
@@ -93,12 +95,14 @@ sub get_hub {
 
   if ($cache) {
     $trackhub = $cache->get($cache_key);
-    return $trackhub if $trackhub;
+    if ($trackhub) {
+      my $check_ok = $self->check_tracks($trackhub, $file_args);
+      return $trackhub if $check_ok;
+    }
   }
 
   ## Prepare to parse!
   my $parser = $self->parser;
-  my $file_args = {'hub' => $self->{'hub'}, 'nice' => 1, 'headers' => $headers}; 
 
   ## First read the hub.txt file and get the hub's metadata
   my $response = read_file($parser->hub_file_path, $file_args);
@@ -131,35 +135,7 @@ sub get_hub {
     ## be thousands of the darned things!
     if ($args->{'parse_tracks'}) {
       while (my($genome, $info) = each (%$genome_info)) {
- 
-        my $tree = EnsEMBL::Web::Tree->new;
-        my $options = {'tree' => $tree};
-
-        if ($args->{'genome'} && $args->{'genome'} eq $genome) {
-          $options->{'genome'} = $args->{'genome'};
-        }
-        else {
-          my $file = $info->{'trackDb'};
-          if ($file !~ /^http|ftp/) {
-            $file = $parser->base_url.'/'.$file;
-          }
-          $options->{'file'} = $file;
-
-          $response = read_file($file, $file_args); 
-
-          if ($response->{'error'} || !$response->{'content'}) {
-            my $error = @{$response->{'error'}} || "trackDB file empty for genome $genome";
-            push @errors, "$genome ($file): $error";
-            $tree->append($tree->create_node("error_$genome", { error => $error, file => $file }));
-          }
-          else {
-            $options->{'content'} = $response->{'content'};
-          }
-        }
-
-        if ($options->{'genome'} || $options->{'content'}) {
-          $genome_info->{$genome}{'tree'} = $self->get_track_info($options);
-        }
+        push @errors, $self->_get_trackDb_content($info, $genome, $file_args, $args);
       }
     }
   }
@@ -177,6 +153,60 @@ sub get_hub {
     }
     return $trackhub;
   }
+}
+
+sub _get_trackDb_content {
+  my ($self, $info, $genome, $file_args, $args) = @_;
+  $args ||= {};
+
+  my $tree = EnsEMBL::Web::Tree->new;
+  my $options = {'tree' => $tree};
+  my @errors;
+
+  if ($args->{'genome'} && $args->{'genome'} eq $genome) {
+    $options->{'genome'} = $args->{'genome'};
+  }
+  else {
+    my $file = $info->{'trackDb'};
+    if ($file !~ /^http|ftp/) {
+      $file = $self->parser->base_url.'/'.$file;
+    }
+    $options->{'file'} = $file;
+
+    my $response = read_file($file, $file_args); 
+
+    if ($response->{'error'} || !$response->{'content'}) {
+      my $error = @{$response->{'error'}} || "trackDB file empty for genome $genome";
+      push @errors, "$genome ($file): $error";
+      $tree->append($tree->create_node("error_$genome", { error => $error, file => $file }));
+    }
+    else {
+      $options->{'content'} = $response->{'content'};
+    }
+  }
+  if ($options->{'genome'} || $options->{'content'}) {
+    $info->{'tree'} = $self->get_track_info($options);
+  }
+
+  return @errors;
+}
+
+sub check_tracks {
+### In case the hub has been cached sans track info, reparse files as needed
+  my ($self, $trackhub, $file_args) = @_;
+ 
+  my %genome_info = %{$trackhub->{'genomes'}||{}};
+  return unless keys %genome_info;
+
+  my $check_ok = 0;
+  
+  while (my ($genome, $info) = each (%genome_info)) {
+    next if $info->{'tree'} && keys %{$info->{'tree'}};
+    my @errors = $self->_get_trackDb_content($info, $genome, $file_args);
+    $check_ok = 1 unless scalar(@errors);
+  }
+
+  return $check_ok; 
 }
 
 sub get_track_info {
