@@ -232,7 +232,7 @@ sub close {
     throw("Method not implemented. This is really important");
 }
 
-=head2 close
+=head2 open_as
 
     Description: Wrapper function to demand format as a parameter
     Returntype : Parser object
@@ -241,24 +241,57 @@ sub close {
 
 sub open_as {
     my ($format, @other_args) = @_;
-    if ($format eq 'bed') {
-        return Bio::EnsEMBL::IO::Parser::Bed(@other_args);
-    } elsif ($format eq 'bigBed') {
-        return Bio::EnsEMBL::IO::Parser::BigBed(@other_args);
-    } elsif ($format eq 'bigWig') {
-        return Bio::EnsEMBL::IO::Parser::BigWig(@other_args);
-    } elsif ($format eq 'EMF') {
-        return Bio::EnsEMBL::IO::Parser::EMF(@other_args);
-    } elsif ($format eq 'fasta') {
-        return Bio::EnsEMBL::IO::Parser::Fasta(@other_args);
-    } elsif ($format eq 'gff3') {
-        return Bio::EnsEMBL::IO::Parser::GFF3(@other_args);
-    } elsif ($format eq 'gvf') {
-        return Bio::EnsEMBL::IO::Parser::GVF(@other_args);
-    } elsif ($format eq 'psl') {
-        return Bio::EnsEMBL::IO::Parser::PSL(@other_args);
-    } elsif ($format eq 'wig') {
-        return Bio::EnsEMBL::IO::Parser::Wig(@other_args);
+    return _open_as($format, 'open', @other_args);
+}
+
+=head2 open_content_as
+
+    Description: Wrapper function to demand format as a parameter
+    Returntype : Parser object
+
+=cut
+
+sub open_content_as {
+    my ($format, @other_args) = @_;
+    return _open_as($format, 'open_content', @other_args);
+}
+
+=head2 _open
+
+    Description: Wrapper function to demand format as a parameter
+    Returntype : Parser object
+
+=cut
+
+sub _open_as {
+    my ($format, $method, @other_args) = @_;
+
+    ## Map user-input file format to correct case for parser
+
+    my %format_to_class = (
+                'bed'     => 'Bed',
+                'bigbed'  => 'BigBed',
+                'bigwig'  => 'BigWig',
+                'emf'     => 'EMF',
+                'fasta'   => 'Fasta',
+                'gff'     => 'GFF3',
+                'gff3'    => 'GFF3',
+                'gvf'     => 'GVF',
+                'psl'     => 'PSL',
+                'wig'     => 'Wig',
+                );
+
+    my $subclass = $format_to_class(lc($format));
+
+    if ($class) {
+      my $class = 'Bio::EnsEMBL::IO::Parser::'.$subclass;
+      eval "require $class";
+      if ($@) {
+      }
+      else {
+        my $object = $class->$method(@other_args);
+        return $object;
+      }
     }
 }
 
