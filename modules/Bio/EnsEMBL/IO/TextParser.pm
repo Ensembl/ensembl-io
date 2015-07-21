@@ -59,6 +59,27 @@ sub open {
     return $self;
 }
 
+=head2 open_content
+
+    Constructor
+    Argument [1] : Content
+    Argument [2+]: Hash of parameters for configuration, e.g. buffer sizes or 
+                   specific functions for handling headers or data
+    Returntype   : Bio::EnsEMBL::IO::TextParser
+
+=cut
+
+sub open_content {
+    my ($caller, $content, @other_args) = @_;
+    my $class = ref($caller) || $caller;
+
+    my $self = $class->SUPER::new(@other_args);
+    if ($content) {
+      open($self->{'filehandle'}, '<', \$content) || throw("Could not open in-memory file");
+    }
+    return $self;
+}
+
 =head2 close
 
     Description  : Closes the filehandler
