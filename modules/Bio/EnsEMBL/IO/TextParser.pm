@@ -54,7 +54,7 @@ sub open {
     my $self = $class->SUPER::new(@other_args);
     if ($filename) {
       $self->{'filename'} = $filename;
-      open($self->{'filehandle'}, $filename) || throw("Could not open " . $filename);
+      CORE::open($self->{'filehandle'}, $filename) || throw("Could not open " . $filename);
     }
     return $self;
 }
@@ -75,7 +75,7 @@ sub open_content {
 
     my $self = $class->SUPER::new(@other_args);
     if ($content) {
-      open($self->{'filehandle'}, '<', \$content) || throw("Could not open in-memory file");
+      CORE::open($self->{'filehandle'}, '<', \$content) || throw("Could not open in-memory file");
     }
     return $self;
 }
