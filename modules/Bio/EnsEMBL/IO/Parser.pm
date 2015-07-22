@@ -35,6 +35,7 @@ use warnings;
 
 use Bio::EnsEMBL::Utils::Exception qw/throw/;
 use Bio::EnsEMBL::Utils::Scalar qw/assert_ref/;
+use Bio::EnsEMBL::IO::Utils;
 
 =head2 new
 
@@ -268,22 +269,11 @@ sub _open_as {
 
     ## Map user-input file format to correct case for parser
 
-    my %format_to_class = (
-                'bed'     => 'Bed',
-                'bigbed'  => 'BigBed',
-                'bigwig'  => 'BigWig',
-                'emf'     => 'EMF',
-                'fasta'   => 'Fasta',
-                'gff'     => 'GFF3',
-                'gff3'    => 'GFF3',
-                'gvf'     => 'GVF',
-                'psl'     => 'PSL',
-                'wig'     => 'Wig',
-                );
+    my %format_to_class = Bio::EnsEMBL::IO::Utils::format_to_class;
 
-    my $subclass = $format_to_class(lc($format));
+    my $subclass = $format_to_class{lc($format)};
 
-    if ($class) {
+    if ($subclass) {
       my $class = 'Bio::EnsEMBL::IO::Parser::'.$subclass;
       eval "require $class";
       if ($@) {
