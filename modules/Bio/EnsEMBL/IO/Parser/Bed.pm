@@ -263,14 +263,15 @@ sub get_raw_thickStart {
 
 =head2 get_thickStart
 
-    Description: Getter - wrapper around get_raw_thickStart
+    Description: Getter - wrapper around get_raw_thickStart,
+                  converting semi-open coordinates to standard Ensembl ones
     Returntype : Integer
 
 =cut
 
 sub get_thickStart {
   my $self = shift;
-  return $self->get_raw_thickStart();
+  return $self->get_raw_thickStart() + 1;
 }
 
 =head2 get_raw_thickEnd
