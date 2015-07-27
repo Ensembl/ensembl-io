@@ -141,6 +141,32 @@ sub get_metadata_value {
   return $self->{'metadata'}{$key} || '';
 }
 
+=head2 get_all_metadata {
+
+    Description: Getter for all metadata
+    Returntype : Hashref 
+
+=cut
+
+sub get_all_metadata {
+    my $self = shift;
+    return $self->{'metadata'} || {};
+}
+
+=head2 start_new_track 
+
+    Description: Setter for all metadata
+                 Resets metadata hash to empty (used with files
+                 that contain multiple tracks)
+    Returntype : Void 
+
+=cut
+
+sub start_new_track {
+    my $self = shift;
+    $self->{'metadata'} = {};
+}
+
 #---------- OUTPUT METHODS --------------
 
 sub create_metadata {
