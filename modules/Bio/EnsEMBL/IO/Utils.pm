@@ -27,7 +27,7 @@ sub format_to_class {
           'gff'     => 'GFF3',
           'gff3'    => 'GFF3',
           'gvf'     => 'GVF',
-          'psl'     => 'PSL',
+          'psl'     => 'Psl',
           'wig'     => 'Wig',
           );
 }
