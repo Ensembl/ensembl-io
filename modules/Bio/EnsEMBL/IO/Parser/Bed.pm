@@ -20,6 +20,7 @@ package Bio::EnsEMBL::IO::Parser::Bed;
 
 use strict;
 use warnings;
+no warnings 'uninitialized';
 
 use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
  
