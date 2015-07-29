@@ -19,16 +19,17 @@ use warnings;
 
 sub format_to_class {
   return (
-          'bed'     => 'Bed',
-          'bigbed'  => 'BigBed',
-          'bigwig'  => 'BigWig',
-          'emf'     => 'EMF',
-          'fasta'   => 'Fasta',
-          'gff'     => 'GFF3',
-          'gff3'    => 'GFF3',
-          'gvf'     => 'GVF',
-          'psl'     => 'Psl',
-          'wig'     => 'Wig',
+          'bed'       => 'Bed',
+          'bigbed'    => 'BigBed',
+          'bigwig'    => 'BigWig',
+          'emf'       => 'EMF',
+          'fasta'     => 'Fasta',
+          'gff'       => 'GFF3',
+          'gff3'      => 'GFF3',
+          'gvf'       => 'GVF',
+          'pairwise'  => 'PairwiseSimple',
+          'psl'       => 'Psl',
+          'wig'       => 'Wig',
           );
 }
 
