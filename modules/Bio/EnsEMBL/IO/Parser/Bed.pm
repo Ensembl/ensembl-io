@@ -397,6 +397,22 @@ sub get_blockStarts {
   return \@res;
 }
 
+=head2 _validate 
+
+    Description: Additional format_specific validation
+    Returntype: Boolean
+
+=cut
+
+sub _validate {
+    my ($self, $column_count) = @_;
+    my $valid = 1;
+  
+    $valid = 0 if !$self->seqname;
+
+    return $valid;
+}
+
 
 =head2 create_record
 

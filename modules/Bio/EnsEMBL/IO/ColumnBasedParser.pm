@@ -194,9 +194,8 @@ sub validate {
       }
 
       ## Additional format-specific validation
-      if ($self->_validate) {
-        $valid = 1;
-      }
+      $valid = $self->_validate($col_count) ? 1 : 0;
+
       last;
     }
 
