@@ -408,7 +408,7 @@ sub _validate {
     my ($self, $column_count) = @_;
     my $valid = 1;
   
-    $valid = 0 if !$self->seqname;
+    $valid = 0 if !$self->get_seqname;
 
     return $valid;
 }

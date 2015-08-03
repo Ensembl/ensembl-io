@@ -189,7 +189,7 @@ sub validate {
         $valid = 1;
       }
 
-      if ($self->start =~ /\d+/ && $self->start > 0 && $self->end =~ /\d+/) {
+      if ($self->get_start =~ /\d+/ && $self->get_start > 0 && $self->get_end =~ /\d+/) {
         $valid = 1;
       }
 
