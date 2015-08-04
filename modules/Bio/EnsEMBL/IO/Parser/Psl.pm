@@ -566,5 +566,45 @@ sub get_tStarts {
   return \@starts;
 }
 
+=head2 validate
+    
+    Description: Performs very basic validation on the content
+                  (override parent validation owing to non-standard column names)
+    Returntype: Boolean
+
+=cut
+
+sub validate {
+    my $self = shift;
+
+    my $valid   = 0;
+
+    while ($self->next) {
+
+      next if $self->is_metadata;
+
+      $self->read_record;
+
+      ## Check we have the minimum number of columns for this format
+      my $col_count = scalar(@{$self->{'record'}});
+
+      if ($col_count >= $self->get_minimum_column_count
+            && $col_count <= $self->get_maximum_column_count) {
+        $valid = 1;
+      }
+
+      if ($self->get_tStart =~ /\d+/ && $self->get_tStart > 0 && $self->get_tEnd =~ /\d+/) {
+        $valid = 1;
+      }
+
+      if ($self->get_tName) {
+        $valid = 1;
+      }
+
+      last;
+    }
+
+    return $valid;
+}
 
 1;
