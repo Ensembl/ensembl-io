@@ -30,6 +30,7 @@ sub format_to_class {
           'gvf'       => 'GVF',
           'pairwise'  => 'PairwiseSimple',
           'psl'       => 'Psl',
+          'vcf'       => 'VCF4',
           'wig'       => 'Wig',
           );
 }
