@@ -23,6 +23,33 @@ use warnings;
 
 use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
+=head2 set_fields
+
+    Description: Setter for list of fields used in this format - uses the
+                  "public" (i.e. non-raw) names of getter methods
+    Returntype : Void
+
+=cut
+
+sub set_fields {
+  my $self = shift;
+  $self->{'fields'} = [qw(seqname start end score)];
+}
+
+=head2 set_minimum_column_count
+
+    Description: Sets minimum column count for a valid BED file 
+    Returntype : Void 
+
+=cut
+
+sub set_minimum_column_count {
+    my $self = shift;
+    $self->{'min_col_count'} = 1;
+}
+
+
+
 =head2 read_record
 
     Description: Extends parent method, by keeping a count of records read 
@@ -36,6 +63,22 @@ sub read_record {
   chomp $self->{'current_block'};
   $self->{'record'} = [ split($self->{'delimiter'},$self->{'current_block'}) ] ;
   $self->{'metadata'}{'feature_count'}++;
+}
+
+=head2 _validate 
+
+    Description: Additional format_specific validation
+    Returntype: Boolean
+
+=cut
+
+sub _validate {
+    my ($self, $column_count) = @_;
+    my $valid = 1;
+
+    $valid = 0 if !$self->get_seqname;
+
+    return $valid;
 }
 
 
