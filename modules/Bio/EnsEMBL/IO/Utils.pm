@@ -26,6 +26,7 @@ sub format_to_class {
           'fasta'     => 'Fasta',
           'gff'       => 'GFF3',
           'gff3'      => 'GFF3',
+          'gtf'       => 'GTF',
           'gvf'       => 'GVF',
           'pairwise'  => 'PairwiseSimple',
           'psl'       => 'Psl',
