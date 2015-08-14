@@ -766,7 +766,10 @@ sub _get_sample_index_list {
   my $self = shift;
   my $sample_ids = shift;
 
-  if(!exists($self->{_sample_limit_list}->{$sample_ids})) {
+  my $cache_key = $sample_ids;
+  $cache_key = join("\n",sort @$sample_ids) if ref($sample_ids) eq 'ARRAY';
+
+  if(!exists($self->{_sample_limit_list}->{$cache_key})) {
 
     # clear the cache
     $self->{_sample_limit_list} = {};
@@ -788,10 +791,10 @@ sub _get_sample_index_list {
     }
 
     # key the hash on the reference of the list
-    $self->{_sample_limit_list}->{$sample_ids} = [sort {$a <=> $b} @limit];
+    $self->{_sample_limit_list}->{$cache_key} = [sort {$a <=> $b} @limit];
   }
 
-  return $self->{_sample_limit_list}->{$sample_ids};
+  return $self->{_sample_limit_list}->{$cache_key};
 }
 
 =head2 get_samples_info
