@@ -27,21 +27,27 @@ $registry->load_registry_from_db(
                       -host => 'ensembldb.ensembl.org',
                       -user => 'anonymous',
                       );
-my $slice_adaptor = $registry->get_adaptor('Human', 'Core', 'Slice');
-my $vf_adaptor  = $registry->get_adaptor('Human', 'Variation', 'VariationFeature');
-my $slice = $slice_adaptor->fetch_by_region('chromosome', '6', 133e6, 134e6);
-my $vfs = $vf_adaptor->fetch_all_by_Slice($slice);
+                      
+my $dba = $registry->get_DBAdaptor('human', 'core', 'no alias check');
 
-ok(scalar(@$vfs) > 0);
+SKIP: {
+  skip 'No database adaptor can be found for human. Probably not live yet.', 1 unless $dba;
+  my $slice_adaptor = $dba->get_SliceAdaptor();
+  my $vf_adaptor  = $registry->get_adaptor('Human', 'Variation', 'VariationFeature');
+  my $slice = $slice_adaptor->fetch_by_region('chromosome', '6', 133e6, 134e6);
+  my $vfs = $vf_adaptor->fetch_all_by_Slice($slice);
 
-## Create dataset to pass to writer
-my $datasets = [{
+  ok(scalar(@$vfs) > 0);
+
+  ## Create dataset to pass to writer
+  my $datasets = [{
                 'metadata' => {'name' => 'Test 3', 'description' => 'Test of writing SNPs to a BED file'},
                 'data'     => $vfs, 
               }];
 
-## Create writer and write data to file
-my $writer = Bio::EnsEMBL::IO::Writer->new('Bed', 'output.bed');
-$writer->output_file($datasets);
+  ## Create writer and write data to file
+  my $writer = Bio::EnsEMBL::IO::Writer->new('Bed', 'output.bed');
+  $writer->output_file($datasets);
+};
 
 done_testing();
