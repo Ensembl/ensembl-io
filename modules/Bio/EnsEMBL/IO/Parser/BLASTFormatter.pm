@@ -106,8 +106,7 @@ package Bio::EnsEMBL::IO::Parser::BLASTFormatter;
 
 use strict;
 use warnings;
-use Data::Dumper;
-use Bio::EnsEMBL::Utils::Exception qw/throw/;
+use Carp;
 
 use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 our ($AUTOLOAD);
@@ -132,17 +131,17 @@ sub open {
   my $class = ref($caller) || $caller;
  
   defined $filename or 
-    throw "Must provide name of the file to parse";
+    confess "Must provide name of the file to parse";
   -e $filename and -f $filename or
-    throw "Check file $filename exists and is readable";
+    confess "Check file $filename exists and is readable";
 
   defined $format or 
-    throw "Must provide format used to produce blast formatted output";
+    confess "Must provide format used to produce blast formatted output";
 
-  $format =~ /^(\d+)/ or throw "Invalid output format, must begin with number";
+  $format =~ /^(\d+)/ or confess "Invalid output format, must begin with number";
   my $alignment_view_option = $1;
   $alignment_view_option == 6 || $alignment_view_option == 7 || $alignment_view_option == 10 or 
-    throw "Invalid alignment view option: must be either 6, 7 or 10";
+    confess "Invalid alignment view option: must be either 6, 7 or 10";
 
   $format =~ s/^\d+?//;
   $format =~ s/^\s+?//;
@@ -183,7 +182,7 @@ sub open {
 sub set_fields {
   my $self = shift;
   my $format = $self->{params}{format_specifier};
-  defined $format or throw "Undefined BLAST output format";
+  defined $format or confess "Undefined BLAST output format";
   
   $self->{fields} = [ split /\s+/, $format ];
 
@@ -234,10 +233,10 @@ sub AUTOLOAD {
   $method =~ /get_(.+?)$/ unless $1;
   my $attr = $1;
   
-  throw("Invalid attribute method: ->$method()") 
+  confess("Invalid attribute method: ->$method()") 
     unless exists $self->{fields_index}{$attr};
   
-  throw "Cannot get attribute $attr, record is empty"
+  confess "Cannot get attribute $attr, record is empty"
     unless $self->{record};
 
   return $self->_trim($self->{record}[$self->{fields_index}{$attr}]);

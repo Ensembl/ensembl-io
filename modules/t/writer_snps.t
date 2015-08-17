@@ -17,7 +17,6 @@ use warnings;
 
 use Test::More;
 
-use Bio::EnsEMBL::Utils::IO qw( work_with_file );
 use Bio::EnsEMBL::IO::Writer;
 use Bio::EnsEMBL::Registry;
 

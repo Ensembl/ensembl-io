@@ -20,9 +20,7 @@ package Bio::EnsEMBL::IO::Writer;
 
 use strict;
 use warnings;
-
-use Bio::EnsEMBL::Utils::IO qw/work_with_file/;
-use Bio::EnsEMBL::Utils::Exception qw/throw/;
+use Carp;
 
 =head2 new
 
@@ -43,7 +41,7 @@ sub new {
   eval "require $parser_class";
 
   if ($@) {
-    throw ("Cannot use $parser_class - format unknown ($@)");
+    confess ("Cannot use $parser_class - format unknown ($@)");
   }
   else {
     my $parser = $parser_class->open();
@@ -112,7 +110,7 @@ sub get_translator_by_type {
     eval "require $trans_class";
 
     if ($@) {
-      throw ("Cannot use $trans_class - data type unknown");
+      confess ("Cannot use $trans_class - data type unknown");
     }
     else {
       $self->{'translator'}{$type} = $trans_class->new($self->species_defs);
@@ -195,11 +193,11 @@ sub output_feature {
 
 sub write {
   my ($self, $content) = @_;
-  work_with_file($self->{'filename'}, '>>', sub{
-    my ($fh) = @_; 
-    print $fh $content; 
-    return;
-  });
+  my $file = $self->{filename};
+  open my $fh, '>>', $file or confess "Cannot open '${file}' for appending: $!";
+  print $fh $content or confess "Cannot write content to '${file}: $!";
+  close $fh or confess "Cannot close '${file}: $!";
+  return;
 }
 
 1;

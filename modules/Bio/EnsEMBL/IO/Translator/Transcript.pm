@@ -27,7 +27,7 @@ package Bio::EnsEMBL::IO::Translator::Transcript;
 use strict;
 use warnings;
 
-use Bio::EnsEMBL::Utils::Exception qw/throw/;
+use Carp;
 
 use base qw/Bio::EnsEMBL::IO::Translator::Feature/;
 

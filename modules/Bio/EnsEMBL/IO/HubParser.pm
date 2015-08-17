@@ -19,6 +19,7 @@ limitations under the License.
 package Bio::EnsEMBL::IO::HubParser;
 
 use strict;
+use warnings;
 
 sub new {
   my ($class, %args) = @_;

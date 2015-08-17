@@ -28,7 +28,7 @@ package Bio::EnsEMBL::IO::ColumnBasedParser;
 use strict;
 use warnings;
 
-use Bio::EnsEMBL::Utils::Exception qw/throw/;
+use Carp;
 
 use base qw/Bio::EnsEMBL::IO::TextParser/;
 
@@ -94,7 +94,7 @@ sub get_fields {
 =cut
 
 sub set_fields {
-    throw("Method not implemented. This is really important");
+    confess("Method not implemented. This is really important");
 }
 
 =head2 get_minimum_column_count

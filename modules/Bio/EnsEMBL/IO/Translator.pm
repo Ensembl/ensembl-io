@@ -21,8 +21,6 @@ package Bio::EnsEMBL::IO::Translator;
 use strict;
 use warnings;
 
-use Bio::EnsEMBL::Utils::Exception qw/throw/;
-
 =head2 new
 
     Constructor

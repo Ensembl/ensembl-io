@@ -24,6 +24,7 @@ Bio::EnsEMBL::IO::Parser::BigBed - A line-based parser devoted to BigBed
 
 package Bio::EnsEMBL::IO::Parser::BigBed;
 use strict;
+use warnings;
 
 use Bio::DB::BigBed;
 

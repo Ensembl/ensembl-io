@@ -24,6 +24,7 @@ Bio::EnsEMBL::IO::Parser::BigWig - A line-based parser devoted to BigWigs
 
 package Bio::EnsEMBL::IO::Parser::BigWig;
 use strict;
+use warnings;
 
 use Bio::DB::BigWig;
 
