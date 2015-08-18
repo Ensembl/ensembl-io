@@ -39,8 +39,7 @@ package Bio::EnsEMBL::IO::Parser;
 use strict;
 use warnings;
 
-use Bio::EnsEMBL::Utils::Exception qw/throw/;
-use Bio::EnsEMBL::Utils::Scalar qw/assert_ref/;
+use Carp;
 use Bio::EnsEMBL::IO::Utils;
 
 =head2 new
@@ -158,7 +157,7 @@ sub metadataChanged {
 =cut
 
 sub seek {
-    throw("Method not implemented. Might not be applicable to your file format.");
+    confess("Method not implemented. Might not be applicable to your file format.");
 }
 
 =head2 read_block
@@ -171,7 +170,7 @@ sub seek {
 =cut
 
 sub read_block {
-    throw("Method not implemented. This is really important");
+    confess("Method not implemented. This is really important");
 }
 
 =head2 is_metadata
@@ -184,7 +183,7 @@ sub read_block {
 =cut
 
 sub is_metadata {
-    throw("Method not implemented. This is really important");
+    confess("Method not implemented. This is really important");
 }
 
 =head2 read_metadata
@@ -198,7 +197,7 @@ sub is_metadata {
 =cut
 
 sub read_metadata {
-    throw("Method not implemented. This is really important");
+    confess("Method not implemented. This is really important");
 }
 
 =head2 read_record
@@ -211,7 +210,7 @@ sub read_metadata {
 =cut
 
 sub read_record {
-    throw("Method not implemented. This is really important");
+    confess("Method not implemented. This is really important");
 }
 
 =head2 open
@@ -223,7 +222,7 @@ sub read_record {
 =cut
 
 sub open {
-    throw("Method not implemented. This is really important");
+    confess("Method not implemented. This is really important");
 }
 
 
@@ -236,7 +235,7 @@ sub open {
 =cut
 
 sub close {
-    throw("Method not implemented. This is really important");
+    confess("Method not implemented. This is really important");
 }
 
 =head2 open_as

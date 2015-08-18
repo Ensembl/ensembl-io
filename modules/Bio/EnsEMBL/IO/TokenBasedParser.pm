@@ -40,8 +40,7 @@ package Bio::EnsEMBL::IO::TokenBasedParser;
 use strict;
 use warnings;
 
-use Bio::EnsEMBL::Utils::Exception qw/throw/;
-use Bio::EnsEMBL::Utils::Scalar qw/assert_ref/;
+use Carp;
 
 use base qw/Bio::EnsEMBL::IO::TextParser/;
 
@@ -49,7 +48,7 @@ sub open {
     my ($caller, $filename, $start_tag, $end_tag, @other_args) = @_;
 
     if (! defined $start_tag && ! defined $end_tag) {
-        throw("C'mon, gimme something to work with, you cannot define a TokenBasedParser without tokens!");
+        confess("C'mon, gimme something to work with, you cannot define a TokenBasedParser without tokens!");
     }
 
     my $class = ref($caller) || $caller;

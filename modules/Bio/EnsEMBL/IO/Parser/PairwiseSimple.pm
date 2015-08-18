@@ -42,7 +42,6 @@ package Bio::EnsEMBL::IO::Parser::PairwiseSimple;
 
 use strict;
 use warnings;
-use Bio::EnsEMBL::Utils::Exception qw(warning);
 
 use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 

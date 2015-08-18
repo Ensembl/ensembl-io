@@ -36,7 +36,7 @@ package Bio::EnsEMBL::IO::Parser::BaseVCF4;
 
 use strict;
 use warnings;
-use Bio::EnsEMBL::Utils::Exception qw(warning);
+use Carp;
 
 use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
@@ -72,7 +72,7 @@ sub read_metadata {
         $version =~ /(\d+)\.(\d+)/;
         my ($parser_version_major, $parser_version_minor) = ($1, $2);
         
-        die "The VCF file format version $f_version is not compatible with the parser version (VCF v$version)" if ($file_version_major != $parser_version_major) || ($file_version_major == $parser_version_major && $parser_version_major < $file_version_major);
+        confess "The VCF file format version $f_version is not compatible with the parser version (VCF v$version)" if ($file_version_major != $parser_version_major) || ($file_version_major == $parser_version_major && $parser_version_major < $file_version_major);
         #warn "VCF file version $f_version may be incompatible with parser version $version" if ($file_version_major == $parser_version_major && $parser_version_minor != $file_version_minor);
       }
       else {
@@ -614,7 +614,7 @@ sub get_metadata_description {
   my $id   = shift;
   
   if (!defined($type) || !defined($id)) {
-    warning("You need to provide a meta type (e.g. 'INFO') and a meta entry ID (e.g. 'AA')");
+    carp("You need to provide a meta type (e.g. 'INFO') and a meta entry ID (e.g. 'AA')");
     return undef;
   }
   
@@ -787,7 +787,7 @@ sub _get_sample_index_list {
       }
 
       # it won't be much use if none of the sample names you gave appear in the file
-      throw("ERROR: No valid sample IDs given") unless scalar @limit;
+      confess("ERROR: No valid sample IDs given") unless scalar @limit;
     }
 
     # key the hash on the reference of the list
@@ -816,7 +816,7 @@ sub get_samples_info {
   if(defined($key)) {
     my %tmp = map {$formats->[$_] => $_} (0..$#{$formats});
     $format_index = $tmp{$key};
-    throw("ERROR: Key '$key' not found in format string ".join("|", @$formats)) unless defined($format_index);
+    confess("ERROR: Key '$key' not found in format string ".join("|", @$formats)) unless defined($format_index);
   }
 
   foreach my $sample (@{$self->get_raw_samples_info($sample_ids)}) {

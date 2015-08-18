@@ -38,7 +38,6 @@ package Bio::EnsEMBL::IO::Parser::VCF4Tabix;
 
 use strict;
 use warnings;
-use Bio::EnsEMBL::Utils::Exception qw(warning);
 use Bio::EnsEMBL::IO::TabixParser;
 use Bio::EnsEMBL::IO::Parser::BaseVCF4;
 

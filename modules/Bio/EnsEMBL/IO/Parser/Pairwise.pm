@@ -36,7 +36,6 @@ package Bio::EnsEMBL::IO::Parser::Pairwise;
 
 use strict;
 use warnings;
-use Bio::EnsEMBL::Utils::Exception qw(warning);
 
 use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 

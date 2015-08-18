@@ -178,7 +178,7 @@ sub start_new_track {
 sub create_metadata {
   my ($self, $metadata) = @_;
   if (!$metadata || ref($metadata) ne 'HASH' || scalar keys %$metadata < 1) {
-    throw('Metadata not in correct format (hashref)');
+    confess('Metadata not in correct format (hashref)');
   }
 
   ## Save raw metadata to object, as records need it

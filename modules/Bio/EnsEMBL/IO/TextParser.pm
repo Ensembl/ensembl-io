@@ -38,8 +38,7 @@ package Bio::EnsEMBL::IO::TextParser;
 use strict;
 use warnings;
 
-use Bio::EnsEMBL::Utils::Exception qw/throw/;
-use Bio::EnsEMBL::Utils::Scalar qw/assert_ref/;
+use Carp;
 
 use base qw/Bio::EnsEMBL::IO::Parser/;
 
@@ -60,7 +59,7 @@ sub open {
     my $self = $class->SUPER::new(@other_args);
     if ($filename) {
       $self->{'filename'} = $filename;
-      CORE::open($self->{'filehandle'}, $filename) || throw("Could not open " . $filename);
+      CORE::open($self->{'filehandle'}, $filename) || confess("Could not open " . $filename);
     }
     return $self;
 }
@@ -81,7 +80,7 @@ sub open_content {
 
     my $self = $class->SUPER::new(@other_args);
     if ($content) {
-      CORE::open($self->{'filehandle'}, '<', \$content) || throw("Could not open in-memory file");
+      CORE::open($self->{'filehandle'}, '<', \$content) || confess("Could not open in-memory file");
     }
     return $self;
 }
@@ -113,7 +112,7 @@ sub read_block {
     if (eof($fh)) {
         $self->{'waiting_block'} = undef;
     } else {
-        $self->{'waiting_block'} = <$fh> || throw ("Error reading file handle: $!");   
+        $self->{'waiting_block'} = <$fh> || confess ("Error reading file handle: $!");   
     }    
 }
 

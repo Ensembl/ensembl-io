@@ -36,7 +36,6 @@ package Bio::EnsEMBL::IO::Parser::PairwiseTabix;
 
 use strict;
 use warnings;
-use Bio::EnsEMBL::Utils::Exception qw(warning);
 use Bio::EnsEMBL::IO::TabixParser;
 use Bio::EnsEMBL::IO::Parser::Pairwise;
 
