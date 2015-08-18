@@ -50,7 +50,7 @@ sub read_metadata {
     my $self = shift;
     my $line = $self->{'current_block'};
     
-    if ($line =~ /^\s*##(\S+)\s+(\S+)/) {
+    if ($line =~ /^\s*##(\S+)\s+(.+)/) {
         $self->{'metadata'}->{$1} = $2;
     }
 }
