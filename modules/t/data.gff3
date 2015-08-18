@@ -1,7 +1,22 @@
-mmscl	supported_mRNA	CDS	40759	41225	.	+	.	Parent=mmscl
-mmscl	supported_mRNA	exon	61468	61729	.	+	.	Parent=mmMAP_17
-mmscl	supported_mRNA	exon	63653	63768	.	+	.	Parent=mmMAP_17
-mmscl	supported_mRNA	exon	65434	65537	.	+	.	Parent=mmMAP_17
-mmscl	supported_mRNA	exon	65983	66383	.	+	.	Parent=mmMAP_17
-mmscl	RepeatMasker	Repeat	55	115	378	-	.	Target=B4;Note="(230) 61";Name="SINE/B4"
-mmscl	RepeatMasker	Repeat	160	304	1153	+	.	Target=B1_MM;Note="1 147";Name="SINE/Alu"
+##gff-version 3
+#!gff-spec-version 1.20
+#!processor NCBI annotwriter
+#!genome-build GRCh38.p3
+#!genome-build-accession NCBI_Assembly:GCF_000001405.29
+##sequence-region NC_000001.11 1 248956422
+##species http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=9606
+NC_000001.11	RefSeq	region	1	248956422	.	+	.	ID=id0;Dbxref=taxon:9606;Name=1;chromosome=1;gbkey=Src;genome=chromosome;mol_type=genomic DNA
+NC_000001.11	BestRefSeq	gene	11874	14409	.	+	.	ID=gene0;Dbxref=GeneID:100287102,HGNC:HGNC:37102;Name=DDX11L1;description=DEAD/H (Asp-Glu-Ala-Asp/His) box helicase 11 like 1;gbkey=Gene;gene=DDX11L1;pseudo=true
+NC_000001.11	BestRefSeq	transcript	11874	14409	.	+	.	ID=rna0;Parent=gene0;Dbxref=GeneID:100287102,Genbank:NR_046018.2,HGNC:HGNC:37102;Name=NR_046018.2;gbkey=misc_RNA;gene=DDX11L1;product=DEAD/H (Asp-Glu-Ala-Asp/His) box helicase 11 like 1;transcript_id=NR_046018.2
+NC_000001.11	BestRefSeq	exon	11874	12227	.	+	.	ID=id1;Parent=rna0;Dbxref=GeneID:100287102,Genbank:NR_046018.2,HGNC:HGNC:37102;gbkey=misc_RNA;gene=DDX11L1;product=DEAD/H (Asp-Glu-Ala-Asp/His) box helicase 11 like 1;transcript_id=NR_046018.2
+NC_000001.11	BestRefSeq	exon	12613	12721	.	+	.	ID=id2;Parent=rna0;Dbxref=GeneID:100287102,Genbank:NR_046018.2,HGNC:HGNC:37102;gbkey=misc_RNA;gene=DDX11L1;product=DEAD/H (Asp-Glu-Ala-Asp/His) box helicase 11 like 1;transcript_id=NR_046018.2
+NC_000001.11	BestRefSeq	exon	13221	14409	.	+	.	ID=id3;Parent=rna0;Dbxref=GeneID:100287102,Genbank:NR_046018.2,HGNC:HGNC:37102;gbkey=misc_RNA;gene=DDX11L1;product=DEAD/H (Asp-Glu-Ala-Asp/His) box helicase 11 like 1;transcript_id=NR_046018.2
+NC_000001.11	BestRefSeq	gene	34611	36081	.	-	.	ID=gene4;Dbxref=GeneID:645520,HGNC:HGNC:32334;Name=FAM138A;description=family with sequence similarity 138%2C member A;gbkey=Gene;gene=FAM138A;gene_synonym=F379,FAM138F
+NC_000001.11	BestRefSeq	ncRNA	34611	36081	.	-	.	ID=rna7;Parent=gene4;Dbxref=GeneID:645520,Genbank:NR_026818.1,HGNC:HGNC:32334;Name=NR_026818.1;gbkey=ncRNA;gene=FAM138A;ncrna_class=lncRNA;product=family with sequence similarity 138%2C member A;transcript_id=NR_026818.1
+NC_000001.11	BestRefSeq	exon	35721	36081	.	-	.	ID=id20;Parent=rna7;Dbxref=GeneID:645520,Genbank:NR_026818.1,HGNC:HGNC:32334;gbkey=ncRNA;gene=FAM138A;ncrna_class=lncRNA;product=family with sequence similarity 138%2C member A;transcript_id=NR_026818.1
+NC_000001.11	BestRefSeq	exon	35277	35481	.	-	.	ID=id21;Parent=rna7;Dbxref=GeneID:645520,Genbank:NR_026818.1,HGNC:HGNC:32334;gbkey=ncRNA;gene=FAM138A;ncrna_class=lncRNA;product=family with sequence similarity 138%2C member A;transcript_id=NR_026818.1
+NC_000001.11	BestRefSeq	exon	34611	35174	.	-	.	ID=id22;Parent=rna7;Dbxref=GeneID:645520,Genbank:NR_026818.1,HGNC:HGNC:32334;gbkey=ncRNA;gene=FAM138A;ncrna_class=lncRNA;product=family with sequence similarity 138%2C member A;transcript_id=NR_026818.1
+NC_000001.11	BestRefSeq	gene	685716	686654	.	-	.	ID=gene31;Dbxref=GeneID:81399,HGNC:HGNC:15079,HPRD:14969;Name=OR4F16;description=olfactory receptor%2C family 4%2C subfamily F%2C member 16;gbkey=Gene;gene=OR4F16;gene_synonym=OR1-1,OR7-21
+NC_000001.11	BestRefSeq	mRNA	685716	686654	.	-	.	ID=rna74;Parent=gene31;Dbxref=GeneID:81399,Genbank:NM_001005277.1,HGNC:HGNC:15079,HPRD:14969;Name=NM_001005277.1;gbkey=mRNA;gene=OR4F16;product=olfactory receptor%2C family 4%2C subfamily F%2C member 16;transcript_id=NM_001005277.1
+NC_000001.11	BestRefSeq	exon	685716	686654	.	-	.	ID=id444;Parent=rna74;Dbxref=GeneID:81399,Genbank:NM_001005277.1,HGNC:HGNC:15079,HPRD:14969;gbkey=mRNA;gene=OR4F16;product=olfactory receptor%2C family 4%2C subfamily F%2C member 16;transcript_id=NM_001005277.1
+NC_000001.11	BestRefSeq	CDS	685716	686654	.	-	0	ID=cds9;Parent=rna74;Dbxref=CCDS:CCDS41221.1,GeneID:81399,Genbank:NP_001005277.1,HGNC:HGNC:15079,HPRD:14969;Name=NP_001005277.1;gbkey=CDS;gene=OR4F16;product=olfactory receptor 4F3/4F16/4F29;protein_id=NP_001005277.1

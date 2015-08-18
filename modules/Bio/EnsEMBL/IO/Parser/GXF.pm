@@ -27,7 +27,7 @@ package Bio::EnsEMBL::IO::Parser::GXF;
 use strict;
 use warnings;
 
-use HTML::Entities;
+use URI::Escape;
 use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
 my %strand_conversion = ('+' => '1', '-' => '-1', '.' => undef, '?' => undef);
@@ -50,7 +50,7 @@ sub read_metadata {
     my $self = shift;
     my $line = $self->{'current_block'};
     
-    if ($line =~ /^\s*##(\S+)\s+(\S+)/) {
+    if ($line =~ /^\s*##(\S+)\s+(.+)/) {
         $self->{'metadata'}->{$1} = $2;
     }
 }
@@ -290,16 +290,29 @@ sub get_attributes {
 }
 
 
-=head2 decode_html
-    Argument[1] : $string, string containing html encoding like %3B
-    Description : Return the html decoded $string
+=head2 decode_sting
+    Argument[1] : $string, string containing encoding like %3B
+    Description : Return the decoded string: %2C will be ,
     Returntype  : String
 =cut
 
-sub decode_html {
+sub decode_string {
     my ($self, $string) = @_;
 
-    return decode_entities($string);
+    return uri_unescape($string);
+}
+
+
+=head2 encode_string
+    Argument[1] : $string, string without encoding like %3B
+    Description : Return the uri encoded $string: , will be %2C
+    Returntype  : String
+=cut
+
+sub encode_string {
+    my ($self, $string) = @_;
+
+    return uri_escape($string);
 }
 
 1;

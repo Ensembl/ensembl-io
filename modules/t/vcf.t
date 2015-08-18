@@ -26,11 +26,11 @@ my $parser = Bio::EnsEMBL::IO::Parser::VCF4->open($test_file);
 
 my @inds = ('NA00001','NA00002','NA00003');
 
-print "# Record 1\n";
+note "Record 1";
 ok ($parser->next(), "Loading first record");
 my @test_row = (qw(20	14370	rs6054257	G	A	29	PASS	NS=3;DP=14;AF=0.5;DB;H2	GT:GQ:DP:HQ),	'0|0:48:1:51,51', '1|0:48:8:51,51', '1/1:43:5:.,.');
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
-print "\n> Testing each column of the row\n";
+note "> Testing each column of the row";
 do_the_tests(\@test_row);
 my $index = 0;
 $test_sample = "$inds[$index]:$test_row[9]";
@@ -40,11 +40,11 @@ $sample_info = $parser->get_raw_samples_info($inds[$index]);
 ok($test_sample eq $sample_info->[$index], 'Sample data');
 
 
-print "\n\n# Record 2\n";
+note "Record 2";
 ok ($parser->next(), "Loading second record");
 @test_row = (qw(20	17330	.	T	A	3	q10	NS=3;DP=11;AF=0.017	GT:GQ:DP:HQ),	'0|0:49:3:58,50', '0|1:3:5:65,3', '0/0:41:3');
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
-print "\n> Testing each column of the row\n";
+note "> Testing each column of the row";
 do_the_tests(\@test_row);
 $index = 1;
 $test_sample = "$inds[$index]:$test_row[10]";
@@ -54,11 +54,11 @@ $sample_info = $parser->get_raw_samples_info($inds[$index]);
 ok($test_sample eq $sample_info->[$index], 'Sample data');
 
 
-print "\n\n# Record 3\n";
+note "Record 3";
 ok ($parser->next(), "Loading third record");
 @test_row = (qw(20	1110696	rs6040355	A), 'G,T', 67, 'PASS', 'NS=2;DP=10;AF=0.333,0.667;AA=T;DB', 'GT:GQ:DP:HQ', '1|2:21:6:23,27', '2|1:2:0:18,2', '2/2:35:4');
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
-print "\n> Testing each column of the row\n";
+note "> Testing each column of the row";
 do_the_tests(\@test_row);
 $index = 2;
 $test_sample = "$inds[$index]:$test_row[11]";
@@ -68,11 +68,11 @@ $sample_info  = $parser->get_raw_samples_info($inds[$index]);
 ok($test_sample eq $sample_info->[$index], 'Sample data');
 
 
-print "\n\n# Record 4\n";
+note "Record 4";
 ok ($parser->next(), "Loading fourth record");
 @test_row = (qw(20	1230237	.	T	.	47	PASS	NS=3;DP=13;AA=T	GT:GQ:DP:HQ),	'0|0:54:7:56,60', '0|0:48:4:51,51', '0/0:61:2');
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
-print "\n> Testing each column of the row\n";
+note "> Testing each column of the row";
 do_the_tests(\@test_row);
 $index = 0;
 $test_sample = "$inds[$index]:$test_row[9]";
@@ -82,11 +82,11 @@ $sample_info  = $parser->get_raw_samples_info($inds[$index]);
 ok($test_sample eq $sample_info->[$index], 'Sample data');
 
 
-print "\n\n# Record 5\n";
+note "Record 5";
 ok ($parser->next(), "Loading fifth record");
 @test_row = (qw(20	1234567	microsat1	GTC), 'G,GTCT', 50, 'PASS', qw(NS=3;DP=9;AA=G	GT:GQ:DP	0/1:35:4	0/2:17:2	1/1:40:3));
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
-print "\n> Testing each column of the row\n";
+note "> Testing each column of the row";
 do_the_tests(\@test_row);
 $index = 0;
 $test_sample = "$inds[$index]:$test_row[9]";
@@ -114,13 +114,11 @@ ok($parser->get_individuals_genotypes($inds[$index])->{$inds[$index]} eq 'GTC/G'
 ok($parser->get_samples_info($inds[$index])->{$inds[$index]}->{'GT'} eq '0/1', 'get_samples_info');
 ok($parser->get_samples_genotypes($inds[$index])->{$inds[$index]} eq 'GTC/G', 'get_samples_genotypes');
 
-print "\n> Testing the metadata getters:\n";
+note "> Testing metadata getters";
 ok($parser->get_metadata_key_list eq 'FILTER, FORMAT, INFO, contig, fileDate, fileformat, header, phasing, reference, source', 'getMetadataKeyList');
 ok($parser->get_metadata_by_pragma('fileDate') eq '20090805', 'getMetadataByPragma');
 ok($parser->get_vcf_version eq 'VCFv4.2', 'getVCFversion');
 ok($parser->get_metadata_description('INFO', 'AA') eq 'Ancestral Allele', 'getMetaDescription'); 
-
-print "\n";
 
 ok ($parser->close(), "Closing file");
 

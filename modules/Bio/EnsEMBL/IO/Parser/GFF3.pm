@@ -52,7 +52,7 @@ sub read_metadata {
     my $self = shift;
     my $line = $self->{'current_block'};
 
-    if ($line =~ /^\s*##(\S+)\s+(\S+)/) {
+    if ($line =~ /^\s*##(\S+)\s+(.+)/) {
         $self->{'metadata'}->{$1} = $2;
     }
     elsif ($line =~ /^#/ and $line !~ /^#\s*$/) {
@@ -80,7 +80,7 @@ sub set_minimum_column_count {
 
 sub get_source {
     my $self = shift;
-    return $self->decode_html($self->get_raw_source());
+    return $self->decode_string($self->get_raw_source());
 }
 
 =head2 get_type
@@ -90,7 +90,7 @@ sub get_source {
 
 sub get_type {
     my $self = shift;
-    return $self->decode_html($self->get_raw_type());
+    return $self->decode_string($self->get_raw_type());
 }
 
 =head2 get_attribute_by_name
@@ -109,7 +109,7 @@ sub get_attribute_by_name {
     # This implementation is either very smart or pretty bad...
     my (undef, $value) = $self->get_raw_attributes =~ /(\A|;)$name=([^;]+)/;
     # If $value is not undef, return decoded $value
-    return $value ? $self->decode_html($value) : $value;
+    return $value ? $self->decode_string($value) : $value;
 }
 
 =head2 get_attributes

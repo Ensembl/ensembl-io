@@ -91,7 +91,7 @@ sub get_attribute_by_name {
     # This implementation is either very smart or pretty bad...
     my (undef, $value) = $self->get_raw_attributes =~ /(\A|;)$name "([^"]+)"/;
     # If $value is not undef, return decoded $value
-    return $value ? $self->decode_html($value) : $value;
+    return $value ? $self->decode_string($value) : $value;
 }
 
 1;
