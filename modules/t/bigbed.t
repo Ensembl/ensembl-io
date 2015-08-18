@@ -27,7 +27,7 @@ ok($parser->next());
 ok($parser->get_chrom eq 'chr1');
 ok($parser->get_start == 3);
 ok($parser->get_end == 6);
-ok($parser->get_strand == 0);
+is($parser->get_strand, 1, 'strand');
 ok($parser->get_name eq 'Mo');
 ok($parser->get_score == 1000);
 

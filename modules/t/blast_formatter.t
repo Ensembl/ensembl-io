@@ -16,7 +16,7 @@ use strict;
 use warnings;
 
 use FindBin;
-use Test::More tests => 116;
+use Test::More;
 use Test::Exception;
 
 BEGIN { use_ok('Bio::EnsEMBL::IO::Parser::BLASTFormatter'); } 
@@ -98,7 +98,7 @@ throws_ok { $parser->get_mismatch() }
 #
 # Test parsing tabular format with default specifiers
 #
-diag("Test tabular format with default specifiers");
+note("Test tabular format with default specifiers");
 $outfmt = 6; # default format specifiers
 $test_file = "$prefix/blast_test.6.default.tab";
 $parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
@@ -120,7 +120,7 @@ is($parser->get_qstart, 7, 'Start of alignment in query');
 is($parser->get_send, 789, 'End of alignment in query');
 
 # seek to last record
-diag("Parse last record");
+note("Parse last record");
 map { $parser->next() } (1 .. 245); 
 ok($parser->get_pident == 92.79, 'Percentage of identical matches');
 is($parser->get_mismatch, 46, 'Number of mismatches');
@@ -132,7 +132,7 @@ ok(!$parser->next(), 'No more records');
 #####################################################################################
 # Test parsing tabular format with comment lines, compara-specific format specifiers 
 #
-diag("Test Compara format specifiers");
+note("Test Compara format specifiers");
 $outfmt = '7 qacc sacc evalue score nident pident qstart qend sstart send length positive ppos qseq sseq';
 $test_file = "$prefix/blast_test.7.compara.tab";
 $parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
@@ -153,7 +153,7 @@ ok($parser->get_ppos == 100, 'Percentage positives');
 ok($parser->get_qseq eq 'GAATTCCCGCTACAGGGGGGGCCTGAGGCACTGCAGAAAGTGGGCCTGAGCCTCGAGGATGACGGTGCTGCAGGAACCCGTCCAGGCTGCTATATGGCAAGCACTAAACCACTATGCTTACCGAGATGCGGTTTTCCTCGCAGAACGCCTTTATGCAGAAGTACACTCAGAAGAAGCCTTGTTTTTACTGGCAACCTGTTATTACCGCTCAGGAAAGGCATATAAAGCATATAGACTCTTGAAAGGACACAGTTGTACTACACCGCAATGCAAATACCTGCTTGCAAAATGTTGTGTTGATCTCAGCAAGCTTGCAGAAGGGGAACAAATCTTATCTGGTGGAGTGTTTAATAAGCAGAAAAGCCATGATGATATTGTTACTGAGTTTGGTGATTCAGCTTGCTTTACTCTTTCATTGTTGGGACATGTATATTGCAAGACAGATCGGCTTGCCAAAGGATCAGAATGTTACCAAAAGAGCCTTAGTTTAAATCCTTTCCTCTGGTCTCCCTTTGAATCATTATGTGAAATAGGTGAAAAGCCAGATCCTGACCAAACATTTAAATTCACATCTTTACAGAACTTTAGCAACTGTCTGCCCAACTCTTGCACAACACAAGTACCTAATCATAGTTTATCTCACAGACAGCCTGAGACAGTTCTTACGGAAACACCCCAGGACACAATTGAATTAAACAGATTGAATTTAGAATCTTCCAA', 'Query sequence');
 ok($parser->get_sseq eq 'GAATTCCCGCTACAGGGGGGGCCTGAGGCACTGCAGAAAGTGGGCCTGAGCCTCGAGGATGACGGTGCTGCAGGAACCCGTCCAGGCTGCTATATGGCAAGCACTAAACCACTATGCTTACCGAGATGCGGTTTTCCTCGCAGAACGCCTTTATGCAGAAGTACACTCAGAAGAAGCCTTGTTTTTACTGGCAACCTGTTATTACCGCTCAGGAAAGGCATATAAAGCATATAGACTCTTGAAAGGACACAGTTGTACTACACCGCAATGCAAATACCTGCTTGCAAAATGTTGTGTTGATCTCAGCAAGCTTGCAGAAGGGGAACAAATCTTATCTGGTGGAGTGTTTAATAAGCAGAAAAGCCATGATGATATTGTTACTGAGTTTGGTGATTCAGCTTGCTTTACTCTTTCATTGTTGGGACATGTATATTGCAAGACAGATCGGCTTGCCAAAGGATCAGAATGTTACCAAAAGAGCCTTAGTTTAAATCCTTTCCTCTGGTCTCCCTTTGAATCATTATGTGAAATAGGTGAAAAGCCAGATCCTGACCAAACATTTAAATTCACATCTTTACAGAACTTTAGCAACTGTCTGCCCAACTCTTGCACAACACAAGTACCTAATCATAGTTTATCTCACAGACAGCCTGAGACAGTTCTTACGGAAACACCCCAGGACACAATTGAATTAAACAGATTGAATTTAGAATCTTCCAA', 'Subject sequence');
 
-diag("Parse last record");
+note("Parse last record");
 map { $parser->next() } (1 .. 250);
 is($parser->get_qacc, 'gnl|MYDB|1', 'Query accession');
 is($parser->get_sacc, 'XM_006247536', 'Subject accession');
@@ -177,7 +177,7 @@ ok(!$parser->next(), 'No more records');
 #########################################################################################
 # Test parsing tabular format with comment lines, ensembl web-specific format specifiers 
 #
-diag("Test Ensembl Web format specifiers");
+note("Test Ensembl Web format specifiers");
 $outfmt = '7 qseqid qstart qend sseqid sstart send score evalue pident length qframe sframe';
 $test_file = "$prefix/blast_test.7.web.tab";
 $parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
@@ -195,7 +195,7 @@ is($parser->get_length, 720, 'Alignment length');
 is($parser->get_qframe, 1, 'Query frame');
 ok($parser->get_sframe == 1, 'Subject frame');
 
-diag("Parse last record");
+note("Parse last record");
 map { $parser->next() } (1 .. 250);
 is($parser->get_qseqid, 'gnl|MYDB|1', 'Query seq-id');
 is($parser->get_qstart, 83, 'Query start');
@@ -216,7 +216,7 @@ ok(!$parser->next(), 'No more records');
 ########################################################
 # Test parsing comma-separated format, no comment lines
 #
-diag("Test comma-separated format with default specifiers");
+note("Test comma-separated format with default specifiers");
 $outfmt = '10';
 $test_file = "$prefix/blast_test.10.default.csv";
 $parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
@@ -234,7 +234,7 @@ is($parser->get_send, 720, 'Subject end');
 ok($parser->get_evalue == 0, 'Alignment length');
 is($parser->get_bitscore, 1330, 'Bit score');
 
-diag("Parse last record");
+note("Parse last record");
 map { $parser->next() } (1 .. 250);
 is($parser->get_qseqid, 'gnl|MYDB|1', 'Query seq-id');
 is($parser->get_sseqid, 'gi|564374743|ref|XM_006247536.1|', 'Subject seq-id');
@@ -252,4 +252,4 @@ ok(!$parser->next(), 'No more records');
 #
 ########################################################
 
-# done_testing();
+done_testing();
