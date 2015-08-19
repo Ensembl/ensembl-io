@@ -162,11 +162,13 @@ sub get_tracks {
         
         $tracks{$id}{$key} = $type;
         
-        if ($type eq 'bigbed') {
+        if ($type =~ /bed/i) {
           $tracks{$id}{'standard_fields'}   = shift @values;
-          $tracks{$id}{'additional_fields'} = $values[0] eq '+' ? 1 : 0;
-          $tracks{$id}{'configurable'}      = $values[0] eq '.' ? 1 : 0; # Don't really care for now
-        } elsif ($type eq 'bigwig') {
+          if (scalar @values) {
+            $tracks{$id}{'additional_fields'} = $values[0] eq '+' ? 1 : 0;
+            $tracks{$id}{'configurable'}      = $values[0] eq '.' ? 1 : 0; # Don't really care for now
+          }
+        } elsif ($type =~ /wig/i) {
           $tracks{$id}{'signal_range'} = \@values;
         }
       } elsif ($key eq 'bigDataUrl') {
