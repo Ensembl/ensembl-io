@@ -48,7 +48,13 @@ sub new {
   my $hub = $args{'hub'};
   $args{'timeout'} = $hub->param('udcTimeout') || $hub->species_defs->TRACKHUB_TIMEOUT;
 
-  ## TODO - replace with Bio::EnsEMBL::IO version when it's ready
+  ## Check for basic authentication
+  if ($args{'url'} =~ /^(https?:\/\/)(\w+):(\w+)@(.)$/) {
+    $args{'user'} = $2;
+    $args{'pass'} = $3;
+    $args{'url'} = $1.$4;
+  }
+
   unless ($args{'parser'}) {
     $args{'parser'} = Bio::EnsEMBL::IO::HubParser->new('url' => $args{'url'});
   }
