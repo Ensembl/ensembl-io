@@ -39,13 +39,14 @@ use strict;
 use warnings;
 
 use Carp;
+use Scalar::Util qw/openhandle/;
 
 use base qw/Bio::EnsEMBL::IO::Parser/;
 
 =head2 open
 
     Constructor
-    Argument [1] : Filepath
+    Argument [1] : Filepath or GLOB or open filehandle
     Argument [2+]: Hash of parameters for configuration, e.g. buffer sizes or 
                    specific functions for handling headers or data
     Returntype   : Bio::EnsEMBL::IO::TextParser
@@ -58,8 +59,15 @@ sub open {
 
     my $self = $class->SUPER::new(@other_args);
     if ($filename) {
-      $self->{'filename'} = $filename;
-      CORE::open($self->{'filehandle'}, $filename) || confess("Could not open " . $filename);
+      # If it was an open handle just set it
+      if(openhandle($filename)) {
+        $self->{filehandle} = $filename; 
+      }
+      # Or open
+      else {
+        $self->{'filename'} = $filename;
+        CORE::open($self->{'filehandle'}, $filename) || throw("Could not open " . $filename);
+      }
     }
     return $self;
 }
@@ -76,13 +84,11 @@ sub open {
 
 sub open_content {
     my ($caller, $content, @other_args) = @_;
-    my $class = ref($caller) || $caller;
-
-    my $self = $class->SUPER::new(@other_args);
-    if ($content) {
-      CORE::open($self->{'filehandle'}, '<', \$content) || confess("Could not open in-memory file");
+    my $fh = undef;
+    if($content) {
+      CORE::open($fh, '<', \$content) or confess("Could not open in-memory file: $!");      
     }
-    return $self;
+    return $caller->open($fh, @other_args);
 }
 
 =head2 close

@@ -18,13 +18,52 @@ use warnings;
 use Test::More;
 
 use Bio::EnsEMBL::IO::ListBasedParser;
+use IO::Uncompress::Gunzip qw/$GunzipError/;
 
 my $test_file = "modules/t/data.txt";
 
-my $parser = Bio::EnsEMBL::IO::ListBasedParser->open($test_file);
-ok ($parser->next(), "Loading first record");
-ok ($parser->get_value() eq 'ENSMUST00000062783');
-ok ($parser->next(), "Loading second record");
-ok ($parser->close(), "Closing file");
+note 'Processing file '.$test_file;
+test_parser($test_file);
+{
+  note 'Processing open filehandle to '.$test_file;
+  # Now check working with an already open file handle
+  open my $fh, '<', $test_file or fail "Cannot open $test_file: $!";
+  test_parser($fh);
+}
+{
+  note 'Processing slurped data';
+  my $content;
+  { #Need this otherwise the undef local of $/ perists into the parser
+    open my $fh, '<', $test_file or fail "Cannot open $test_file: $!";
+    local $/ = undef;
+    $content = <$fh>;
+    close $fh;
+  }
+  my $parser = Bio::EnsEMBL::IO::ListBasedParser->open_content($content);
+  test_parser_content($parser);
+}
+{
+  # Also check a gzipped version
+  my $test_gz_file = $test_file.'.gz';
+  note 'Processing open gzip filehandle to '.$test_gz_file;
+  my $z = IO::Uncompress::Gunzip->new($test_file) or fail "Cannot open $test_gz_file: $GunzipError";
+  test_parser($z);
+}
+
+sub test_parser {
+  my ($file) = @_;
+  my $parser = Bio::EnsEMBL::IO::ListBasedParser->open($file);
+  test_parser_content($parser);
+  return;
+}
+
+sub test_parser_content {
+  my ($parser) = @_;
+  ok($parser->next(), "Loading first record");
+  is($parser->get_value(), 'ENSMUST00000062783', 'ID as expected');
+  ok($parser->next(), "Loading second record");
+  ok($parser->close(), "Closing file");
+  return;
+}
 
 done_testing();
