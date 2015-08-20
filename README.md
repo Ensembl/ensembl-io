@@ -1,8 +1,8 @@
-ensembl-io
-==========
+# ensembl-io
 
-File parsing and writing code for Ensembl
-=========================================
+![Build Status](https://travis-ci.org/Ensembl/ensembl-io.svg)
+
+## File parsing and writing code for Ensembl
 
 The ensembl-io repo is intended as a shared codebase for handling 
 the parsing and writing of popular biological formats used by Ensembl, 
