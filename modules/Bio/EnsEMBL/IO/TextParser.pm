@@ -66,7 +66,7 @@ sub open {
       # Or open
       else {
         $self->{'filename'} = $filename;
-        CORE::open($self->{'filehandle'}, $filename) || throw("Could not open " . $filename);
+        CORE::open($self->{'filehandle'}, $filename) || confess("Could not open " . $filename);
       }
     }
     return $self;
