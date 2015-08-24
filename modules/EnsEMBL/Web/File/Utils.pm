@@ -28,7 +28,7 @@ use IO::Uncompress::Bunzip2;
 use IO::Uncompress::Gunzip;
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(sanitise_path sanitise_filename get_filename get_extension get_compression uncompress);
+our @EXPORT_OK = qw(sanitise_path sanitise_filename get_filename get_extension get_compression check_compression uncompress);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 sub sanitise_path {
@@ -130,6 +130,30 @@ sub get_compression {
   }
 }
 
+
+sub check_compression {
+### Check actual compression of file content
+### @param content_ref - reference to file content
+### @return compression String - type of compression
+  my $content_ref = shift;
+
+  ## avoid undef, so we don't have to keep checking it exists in uncompress (below)
+  my $compression = '';
+  return $compression unless $content_ref;
+
+  if (ord($$content_ref) == 31 && ord(substr($$content_ref,1)) == 157 ) {
+    $compression = 'zip';
+  }
+  elsif (ord($$content_ref) == 31 && ord(substr($$content_ref,1)) == 139 ) {
+    $compression = 'gz';
+  }
+  elsif ($$content_ref =~ /^BZh([1-9])1AY&SY/ ) {
+    $compression = 'bz';
+  }
+
+  return $compression;
+}
+
 sub uncompress {
 ### Compression support for remote files, which cannot use the built-in support
 ### in Bio::EnsEMBL::Utils::IO. If not passed an explicit compression type, will
@@ -138,20 +162,18 @@ sub uncompress {
 ### @param compression (optional) - compression type
 ### @return Void
   my ($content_ref, $compression) = @_;
-  $compression ||= ''; ## avoid undef, so we don't have to keep checking it exists!
+  $compression ||= check_compression($content_ref); 
   my $temp;
 
-  if ($compression eq 'zip' || 
-      ord($$content_ref) == 31 && ord(substr($$content_ref,1)) == 157 ) { ## ZIP...
+  if ($compression eq 'zip') { 
     $temp = Compress::Zlib::uncompress($$content_ref);
     $$content_ref = $temp;
   } 
-  elsif ($compression eq 'gz' || 
-      ord($$content_ref) == 31 && ord(substr($$content_ref,1)) == 139 ) { ## GZIP...
+  elsif ($compression eq 'gz') { 
     IO::Uncompress::Gunzip::gunzip($content_ref, \$temp, MultiStream => 1);
     $$content_ref = $temp;
   } 
-  elsif ($compression eq 'bz' || $$content_ref =~ /^BZh([1-9])1AY&SY/ ) {                            ## GZIP2
+  elsif ($compression eq 'bz') {
     my $temp = Compress::Bzip2::decompress($content_ref); ## Try to uncompress a 1.02 stream!
     unless($temp) {
       my $T = $$content_ref;
