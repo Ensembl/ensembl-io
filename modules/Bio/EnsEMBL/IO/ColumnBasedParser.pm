@@ -184,6 +184,7 @@ sub validate {
     while ($self->next) {
 
       next if $self->is_metadata;
+      next if $self->{'current_block'} !~ /\w/;
 
       $self->read_record;
 
