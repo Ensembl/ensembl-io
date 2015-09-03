@@ -18,6 +18,12 @@ limitations under the License.
 
 package Bio::EnsEMBL::IO::HubParser;
 
+### Parser for the configuration files used by a trackhub, i.e.
+### hub.txt, genomes.txt and trackDb.txt
+
+### Note that this parser does not fetch the individual .txt files - 
+### it requires a wrapper object such as EnsEMBL::Web::File::Utils::TrackHub
+
 use strict;
 use warnings;
 
@@ -78,7 +84,8 @@ sub get_genome_info {
 ### @param assembly_lookup Hashref (optional) - assemblies to include
 ### @return Hashref
   my ($self, $data, $assembly_lookup) = @_;
-  my $genome_info = {};
+  my $genome_info   = {};
+  my $other_genomes = [];
   my $genome;
 
   (my $genome_file = $data) =~ s/\r//g;
@@ -90,7 +97,9 @@ sub get_genome_info {
       $genome = $v;
       ## Optionally filter out unknown assemblies
       ## because we don't want to waste time parsing them
+      ## (but save them because we might need them for error-handling)
       if ($assembly_lookup && !$assembly_lookup->{$genome}) {
+        push @$other_genomes, $genome;
         $genome = undef;
         next;
       }
@@ -106,7 +115,7 @@ sub get_genome_info {
     }
   }
 
-  return $genome_info;
+  return ($genome_info, $other_genomes);
 }
 
 sub get_tracks {
