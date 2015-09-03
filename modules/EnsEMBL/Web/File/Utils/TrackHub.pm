@@ -18,7 +18,7 @@ limitations under the License.
 
 package EnsEMBL::Web::File::Utils::TrackHub;
 
-### Wrapper around Bio::EnsEMBL::IO::Parser::TrackHubParser 
+### Wrapper around Bio::EnsEMBL::IO::Parser::HubParser 
 ### which also fetches each file in the trackhub configuration
 
 use strict;
@@ -46,7 +46,8 @@ sub new {
   my ($class, %args) = @_;
 
   my $hub = $args{'hub'};
-  $args{'timeout'} = $hub->param('udcTimeout') || $hub->species_defs->TRACKHUB_TIMEOUT;
+  $args{'timeout'} = $hub ? ($hub->param('udcTimeout') || $hub->species_defs->TRACKHUB_TIMEOUT)
+                          : 0;
 
   unless ($args{'parser'}) {
     $args{'parser'} = Bio::EnsEMBL::IO::HubParser->new('url' => $args{'url'});
@@ -123,7 +124,7 @@ sub get_hub {
     $content = $response->{'content'};
   }
 
-  my $genome_info = $parser->get_genome_info($content, $args->{'assembly_lookup'});
+  my ($genome_info, $other_genomes) = $parser->get_genome_info($content, $args->{'assembly_lookup'});
 
   if (keys %$genome_info) {
     ## Only get track information if it's requested, as there can
@@ -167,7 +168,9 @@ sub get_hub {
   }
 
   if (scalar @errors) {
-    return { error => \@errors };
+    my $feedback = { error => \@errors};
+    $feedback->{'unsupported_genomes'} = $other_genomes if scalar @{$other_genomes||[]};
+    return $feedback;
   }
   else {
     my $trackhub = { details => $hub_info, genomes => $genome_info };
