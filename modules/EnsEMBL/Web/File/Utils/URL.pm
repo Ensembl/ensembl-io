@@ -49,19 +49,21 @@ sub chase_redirects {
 ### Deal with files "hidden" behind a URL-shortening service such as tinyurl
 ### @param File - EnsEMBL::Web::File object or path to file (String)
 ### @param args Hashref
-###                     hub EnsEMBL::Web::Hub
+###                     hub (optional) EnsEMBL::Web::Hub or
+###                     proxy (optional) String
 ###                     max_follow (optional) Integer - maximum number of redirects to follow
 ### @return url (String) or Hashref containing errors (ArrayRef)
   my ($file, $args) = @_;
   my $url = ref($file) ? $file->read_location : $file;
 
   $args->{'max_follow'} = 10 unless defined $args->{'max_follow'};
+  my $proxy = _proxy($args);
 
   if ($url =~ /^ftp/) {
     my $ua = LWP::UserAgent->new( max_redirect => $args->{'max_follow'} );
     $ua->timeout(10);
     $ua->env_proxy;
-    $ua->proxy([qw(http https)], $args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY) || ();
+    $ua->proxy([qw(http https)], $proxy) || ();
     my $response = $ua->head($url);
     if ($response->is_success) {
       return $response->request->uri->as_string;
@@ -88,9 +90,9 @@ sub chase_redirects {
               'timeout'       => 10,
               'max_redirect'  => $args->{'max_follow'},
               );
-    if ($args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY) {
-      $args{'http_proxy'}   = $args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY;
-      $args{'https_proxy'}  = $args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY;
+    if ($proxy) {
+      $args{'http_proxy'}   = $proxy;
+      $args{'https_proxy'}  = $proxy;
     }
     my $http = HTTP::Tiny->new(%args);
 
@@ -121,12 +123,14 @@ sub file_exists {
 ### Check if a file of this name exists
 ### @param File - EnsEMBL::Web::File object or path to file (String)
 ### @param Args Hashref 
-###         hub EnsEMBL::Web::Hub
+###         hub (optional) EnsEMBL::Web::Hub or
+###         proxy (optional) String
 ###         nice (optional) Boolean - see introduction
 ###         no_exception (optional) Boolean
 ### @return Hashref (nice mode) or Boolean 
   my ($file, $args) = @_;
   my $url = ref($file) ? $file->absolute_read_path : $file;
+  my $proxy = _proxy($args);
 
   my ($success, $error);
 
@@ -134,7 +138,7 @@ sub file_exists {
     my $ua = LWP::UserAgent->new();
     $ua->timeout(10);
     $ua->env_proxy;
-    $ua->proxy([qw(http https)], $args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY) || ();
+    $ua->proxy([qw(http https)], $proxy) || ();
     my $response = $ua->head($url);
     unless ($response->is_success) {
       $error = _get_lwp_useragent_error($response);
@@ -150,9 +154,9 @@ sub file_exists {
   }
   else {
     my %params = ('timeout'       => 10);
-    if ($args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY) {
-      $params{'http_proxy'}   = $args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY;
-      $params{'https_proxy'}  = $args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY;
+    if ($proxy) {
+      $params{'http_proxy'}   = $proxy;
+      $params{'https_proxy'}  = $proxy;
     }
     my $http = HTTP::Tiny->new(%params);
 
@@ -188,20 +192,23 @@ sub read_file {
 ### Get entire content of file
 ### @param File - EnsEMBL::Web::File object or path to file (String)
 ### @param Args Hashref 
-###         hub EnsEMBL::Web::Hub
+###         hub (optional) EnsEMBL::Web::Hub or
+###         proxy (optional) String
 ###         nice (optional) Boolean - see introduction
 ###         compression String (optional) - compression type
 ### @return Hashref (in nice mode) or String - contents of file
   my ($file, $args) = @_;
   my $url = ref($file) ? $file->absolute_read_path : $file;
+  my $proxy = _proxy($args);
 
   my ($content, $error);
+
 
   if ($url =~ /^ftp/) {
     my $ua = LWP::UserAgent->new();
     $ua->timeout(10);
     $ua->env_proxy;
-    $ua->proxy([qw(http https)], $args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY) || ();
+    $ua->proxy([qw(http https)], $proxy) || ();
     my $response = $ua->get($url, %{$args->{'headers'}});
     if ($response->is_success) {
       $content = $response->content;
@@ -213,9 +220,9 @@ sub read_file {
   }
   else {
     my %params = ('timeout'       => 10);
-    if ($args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY) {
-      $params{'http_proxy'}   = $args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY;
-      $params{'https_proxy'}  = $args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY;
+    if ($proxy) {
+      $params{'http_proxy'}   = $proxy;
+      $params{'https_proxy'}  = $proxy;
     }
     my $http = HTTP::Tiny->new(%params);
 
@@ -295,13 +302,15 @@ sub get_headers {
 ### @param url - URL of file
 ### @param Args Hashref 
 ###         header (optional) String - name of header
-###         hub EnsEMBL::Web::Hub
+###         hub (optional) EnsEMBL::Web::Hub or
+###         proxy (optional) String
 ###         nice (optional) Boolean - see introduction
 ###         compression String (optional) - compression type
 ### @return Hashref containing results (single header or hashref of headers) or errors (ArrayRef)
   my ($file, $args) = @_;
   my $url = ref($file) ? $file->absolute_read_path : $file;
   my ($all_headers, $result, $error);
+  my $proxy = _proxy($args);
 
   if ($url =~ /^ftp/) {
     ## TODO - support FTP properly!
@@ -309,9 +318,9 @@ sub get_headers {
   }
   else {
     my %params = ('timeout'       => 10);
-    if ($args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY) {
-      $params{'http_proxy'}   = $args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY;
-      $params{'https_proxy'}  = $args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY;
+    if ($proxy) {
+      $params{'http_proxy'}   = $proxy;
+      $params{'https_proxy'}  = $proxy;
     }
     my $http = HTTP::Tiny->new(%params);
 
@@ -353,7 +362,8 @@ sub get_filesize {
 ### Get size of remote file 
 ### @param url - URL of file
 ### @param Args Hashref 
-###         hub EnsEMBL::Web::Hub
+###         hub (optional) EnsEMBL::Web::Hub or
+###         proxy (optional) String
 ###         nice (optional) Boolean - see introduction
 ###         compression String (optional) - compression type
 ### @return Hashref containing results (Integer - file size in bytes) or errors (ArrayRef)
@@ -386,6 +396,15 @@ sub _get_http_tiny_error {
   return;
 }
 
+sub _proxy {
+  my $args = shift;
+
+  my $proxy = $args->{'proxy'};
+  if (!$proxy && $args->{'hub'}) {
+    $proxy = $args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY;
+  }
+  return $proxy;
+}
 
 1;
 
