@@ -270,7 +270,6 @@ sub fetch_features  {
   my ($self, $chr_id, $start, $end) = @_;
 
   my @features;
-  use Data::Dumper;
   my $names = $self->real_names;
   $self->fetch_rows($chr_id,$start,$end,sub {
     my ($row,$extra,$order) = $self->_as_transform(\@_);
