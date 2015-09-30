@@ -53,33 +53,37 @@ sub new {
 
 sub url { return $_[0]->{'_url'} };
 
-sub sam_open {
+#
+# Open a Bio::DB::HTS object
+#
+sub hts_open
+{
   my $self = shift;
 
-  $self->{_cache}->{_sam_handle} ||= Bio::DB::Sam->new(-bam => $self->url);
+  $self->{_cache}->{_sam_handle} ||= Bio::DB::HTS->new(-bam => $self->url);
   return $self->{_cache}->{_sam_handle};
 }
 
-sub bam_open {
+sub htsfile_open {
   my $self = shift;
 
   if (!$self->{_cache}->{_bam_handle}) {
-    if (Bio::DB::Bam->can('set_udc_defaults')) {
-      Bio::DB::Bam->set_udc_defaults;
+    if (Bio::DB::HTSfile->can('set_udc_defaults')) {
+      Bio::DB::HTSfile->set_udc_defaults;
     }
-    $self->{_cache}->{_bam_handle} = Bio::DB::Bam->open($self->url);
+    $self->{_cache}->{_bam_handle} = Bio::DB::HTSfile->open($self->url);
   }
   return $self->{_cache}->{_bam_handle};
 }
 
-sub bam_index {
+sub htsfile_index {
   my $self = shift;
 
   if (!$self->{_cache}->{_bam_index}) {
-    if (Bio::DB::Bam->can('set_udc_defaults')) {
-      Bio::DB::Bam->set_udc_defaults;
+    if (Bio::DB::HTSfile->can('set_udc_defaults')) {
+      Bio::DB::HTSfile->set_udc_defaults;
     }
-    $self->{_cache}->{_bam_index} = Bio::DB::Bam->index($self->url);
+    $self->{_cache}->{_bam_index} = Bio::DB::HTSfile->index($self->url);
   }
   return $self->{_cache}->{_bam_index};
 }
@@ -98,11 +102,11 @@ sub munge_chr_id {
 
   my $ret_id;
 
-  my $bam = $self->bam_open;
-  warn "Failed to open BAM file " . $self->url unless $bam;
-  return undef unless $bam;
+  my $htsfile = $self->htsfile_open;
+  warn "Failed to open BAM/CRAM file " . $self->url unless $htsfile;
+  return undef unless $htsfile;
 
-  my $header = $bam->header;
+  my $header = $htsfile->header_read;
 
   my $ret_id = $chr_id;
 
@@ -129,13 +133,13 @@ sub munge_chr_id {
 sub fetch_paired_alignments {
   my ($self, $chr_id, $start, $end) = @_;
 
-  my $sam = $self->sam_open;
-  warn "Failed to open BAM file (as SAM) " . $self->url unless $sam;
+  my $hts_obj = $self->hts_open;
+  warn "Failed to open HTS object for file " . $self->url unless $hts_obj;
   return [] unless $sam;
 
   my @features;
 
-  my $header = $sam->bam->header;
+  my $header = $hts_obj->hts_file->header_read;
 
   # Maybe need to add 'chr'
   my $seq_id = $self->munge_chr_id($chr_id);
@@ -148,7 +152,7 @@ sub fetch_paired_alignments {
     return [];
   }
 
-  @features = $sam->get_features_by_location(-type   => 'read_pair',
+  @features = $hts_obj->get_features_by_location(-type   => 'read_pair',
                                              -seq_id => $seq_id,
                                              -start  => $start,
                                              -end    => $end);
@@ -163,18 +167,13 @@ sub fetch_paired_alignments {
 sub fetch_alignments_filtered {
   my ($self, $chr_id, $start, $end, $filter) = @_;
 
-  #warn "bam url:" . $self->url if ($DEBUG > 2);
-
-  my $bam = $self->bam_open;
-  warn "Failed to open BAM file " . $self->url unless $bam;
-  return [] unless $bam;
+  my $htsfile = $self->hts_open;
+  warn "Failed to open file " . $self->url unless $htsfile;
+  return [] unless $htsfile;
 
   my $index = $self->bam_index;
-  warn "Failed to open BAM index for " . $self->url unless $index;
+  warn "Failed to open index for " . $self->url unless $index;
   return [] unless $index;
-
-  #warn Dumper $filter if ($DEBUG > 2);
-
 
   my @features = ();
 
@@ -212,22 +211,18 @@ sub fetch_alignments_filtered {
 sub fetch_coverage {
   my ($self, $chr_id, $start, $end, $bins, $filter) = @_;
 
-  #warn "bam url:" . $self->url if ($DEBUG > 2);
-
-  my $sam = $self->sam_open;
-  warn "Failed to open BAM file (as SAM)" . $self->url unless $sam;
-  return [] unless $sam;
+  my $hts_obj = $self->hts_open;
+  warn "Failed to make HTS object from file " . $self->url unless $hts_obj;
+  return [] unless $hts_obj;
 
   my $index = $self->bam_index;
   warn "Failed to open BAM index for " . $self->url unless $index;
   return [] unless $index;
 
-  #warn Dumper $filter if ($DEBUG > 2);
-
   # filter out unmapped mates - the ones that don't have location set
   $filter ||= sub {my $a = shift; return 0 unless $a->start; return 1};
 
-  my $header = $sam->bam->header;
+  my $header = $hts_object->hts_file->header_read;
 
   #  Maybe need to add 'chr'
   my $seq_id = $self->munge_chr_id($chr_id);
@@ -240,7 +235,7 @@ sub fetch_coverage {
     return [];
   }
 
-  my $segment = $sam->segment("$seq_id",$start,$end);
+  my $segment = $hts_obj->segment("$seq_id",$start,$end);
 
   my ($coverage) = $segment->features('coverage' . (defined($bins) ? ":$bins" : ""), $filter);
   my @data_points = $coverage->coverage;
@@ -323,9 +318,6 @@ sub fetch_consensus {
   return [] if !defined($seq_id);
 
   $bam->fast_pileup("${seq_id}:${start}-${end}", $consensus_caller);
-
-#  $bam->fast_pileup("chr${chr_id}:${start}-${end}", $consensus_caller);
-#  $bam->pileup("chr${chr_id}:${start}-${end}", $consensus_caller);
 
   return \@consensus;
 }
