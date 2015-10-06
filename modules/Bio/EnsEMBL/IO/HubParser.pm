@@ -255,7 +255,11 @@ sub get_tracks {
     # any track which doesn't have any of these is definitely invalid
     if ($tracks{$id}{'type'} || $tracks{$id}{'shortLabel'} || $tracks{$id}{'longLabel'}) {
       $tracks{$id}{'track'}           = $id;
-      $tracks{$id}{'description_url'} = "$url/$id.html" unless $tracks{$id}{'parent'};
+      if($tracks{$id}{'parent'}) {
+        $tracks{$id}{'description_url'} = $tracks{$tracks{$id}{'parent'}}{'html'} ? "$url/$tracks{$tracks{$id}{'parent'}}{'html'}.html" : "$url/$tracks{$tracks{$id}{'parent'}}.html";
+      } else {
+        $tracks{$id}{'description_url'} = $tracks{$id}{'html'} ? "$url/$tracks{$id}{'html'}.html" : "$url/$id.html";
+      }
       
       unless ($tracks{$id}{'type'}) {
         ## Set type based on file extension
