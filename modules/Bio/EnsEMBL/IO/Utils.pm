@@ -24,6 +24,7 @@ use warnings;
 sub format_to_class {
   return (
           'bed'       => 'Bed',
+          'bedgraph'  => 'Bed',
           'bigbed'    => 'BigBed',
           'bigwig'    => 'BigWig',
           'emf'       => 'EMF',
