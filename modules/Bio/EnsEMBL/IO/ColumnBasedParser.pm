@@ -74,6 +74,31 @@ sub open {
     return $self;
 }
 
+=head2 get_metadata_value
+
+    Argument [1] : Parameter name
+    Description: Getter for arbitrary parameter in track line 
+    Returntype : String
+
+=cut
+
+sub get_metadata_value {
+  my ($self, $key) = @_;
+  return $self->{'metadata'}{$key} || '';
+}
+
+=head2 get_all_metadata {
+
+    Description: Getter for all metadata
+    Returntype : Hashref 
+
+=cut
+
+sub get_all_metadata {
+    my $self = shift;
+    return $self->{'metadata'} || {};
+}
+
 =head2 get_fields
 
     Description: Getter 
