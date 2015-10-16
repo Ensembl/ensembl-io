@@ -64,7 +64,7 @@ sub read_metadata {
 
 sub set_fields {
   my $self = shift;
-  $self->{'fields'} = [qw(seqname source type start end score strand attributes)];
+  $self->{'fields'} = [qw(seqname source type start end score strand phase attributes)];
 }
 
 
