@@ -176,78 +176,6 @@ sub get_allele {
   return $self->get_raw_allele();
 }
 
-=head2 get_raw_gene
-
-    Description: Getter for  field
-    Returntype : String (stable ID) 
-
-=cut
-
-sub get_raw_gene {
-  my $self = shift;
-  return $self->{'record'}[3];
-}
-
-=head2 get_gene
-
-    Description: Getter - wrapper around raw method 
-    Returntype : String 
-
-=cut
-
-sub get_gene {
-  my $self = shift;
-  return $self->get_raw_gene();
-}
-
-=head2 get_raw_feature
-
-    Description: Getter for feature field
-    Returntype : String (stable id)
-
-=cut
-
-sub get_raw_feature {
-  my $self = shift;
-  return $self->{'record'}[4];
-}
-
-=head2 get_feature
-
-    Description: Getter - wrapper around raw method 
-    Returntype : String 
-
-=cut
-
-sub get_feature {
-  my $self = shift;
-  return $self->get_raw_feature();
-}
-
-=head2 get_raw_feature_type
-
-    Description: Getter for feature_type field
-    Returntype : String 
-
-=cut
-
-sub get_raw_feature_type {
-  my $self = shift;
-  return $self->{'record'}[5];
-}
-
-=head2 get_feature_type
-
-    Description: Getter - wrapper around raw method 
-    Returntype : String 
-
-=cut
-
-sub get_feature_type {
-  my $self = shift;
-  return $self->get_raw_feature_type();
-}
-
 =head2 get_raw_consequence
 
     Description: Getter for consequence field
@@ -257,7 +185,7 @@ sub get_feature_type {
 
 sub get_raw_consequence {
   my $self = shift;
-  return $self->{'record'}[6];
+  return $self->{'record'}[3];
 }
 
 =head2 get_consequence
@@ -272,6 +200,222 @@ sub get_consequence {
   return $self->get_raw_consequence();
 }
 
+=head2 get_raw_impact
+
+    Description: Getter for IMPACT field
+    Returntype : String 
+
+=cut
+
+sub get_raw_impact {
+  my $self = shift;
+  return $self->{'record'}[4];
+}
+
+=head2 get_impact
+
+    Description: Getter - wrapper around raw method 
+    Returntype : String 
+
+=cut
+
+sub get_impact {
+  my $self = shift;
+  return $self->get_raw_impact();
+}
+
+=head2 get_raw_symbol
+
+    Description: Getter for symbol field
+    Returntype : String (HGNC symbol or equivalent) 
+
+=cut
+
+sub get_raw_symbol {
+  my $self = shift;
+  return $self->{'record'}[5];
+}
+
+=head2 get_symbol
+
+    Description: Getter - wrapper around raw method 
+    Returntype : String 
+
+=cut
+
+sub get_symbol {
+  my $self = shift;
+  return $self->get_raw_symbol();
+}
+
+=head2 get_raw_gene
+
+    Description: Getter for  field
+    Returntype : String (stable ID) 
+
+=cut
+
+sub get_raw_gene {
+  my $self = shift;
+  return $self->{'record'}[6];
+}
+
+=head2 get_gene
+
+    Description: Getter - wrapper around raw method 
+    Returntype : String 
+
+=cut
+
+sub get_gene {
+  my $self = shift;
+  return $self->get_raw_gene();
+}
+
+=head2 get_raw_feature_type
+
+    Description: Getter for feature_type field
+    Returntype : String 
+
+=cut
+
+sub get_raw_feature_type {
+  my $self = shift;
+  return $self->{'record'}[7];
+}
+
+=head2 get_feature_type
+
+    Description: Getter - wrapper around raw method 
+    Returntype : String 
+
+=cut
+
+sub get_feature_type {
+  my $self = shift;
+  return $self->get_raw_feature_type();
+}
+
+=head2 get_raw_feature
+
+    Description: Getter for feature field
+    Returntype : String (stable id)
+
+=cut
+
+sub get_raw_feature {
+  my $self = shift;
+  return $self->{'record'}[8];
+}
+
+=head2 get_feature
+
+    Description: Getter - wrapper around raw method 
+    Returntype : String 
+
+=cut
+
+sub get_feature {
+  my $self = shift;
+  return $self->get_raw_feature();
+}
+
+=head2 get_raw_exon
+
+    Description: Getter for exon field
+    Returntype : String 
+
+=cut
+
+sub get_raw_exon {
+  my $self = shift;
+  return $self->{'record'}[9];
+}
+
+=head2 get_exon
+
+    Description: Getter - wrapper around raw method 
+    Returntype : String 
+
+=cut
+
+sub get_exon {
+  my $self = shift;
+  return $self->get_raw_exon();
+}
+
+=head2 get_raw_intron
+
+    Description: Getter for intron field
+    Returntype : String 
+
+=cut
+
+sub get_raw_intron {
+  my $self = shift;
+  return $self->{'record'}[10];
+}
+
+=head2 get_intron
+
+    Description: Getter - wrapper around raw method 
+    Returntype : String 
+
+=cut
+
+sub get_intron {
+  my $self = shift;
+  return $self->get_raw_intron();
+}
+
+=head2 get_raw_hgvsc
+
+    Description: Getter for HGVSc field
+    Returntype : String 
+
+=cut
+
+sub get_raw_hgvsc {
+  my $self = shift;
+  return $self->{'record'}[11];
+}
+
+=head2 get_hgvsc
+
+    Description: Getter - wrapper around raw method 
+    Returntype : String 
+
+=cut
+
+sub get_hgvsc {
+  my $self = shift;
+  return $self->get_raw_hgvsc();
+}
+
+=head2 get_raw_hgvsp
+
+    Description: Getter for HGVSp field
+    Returntype : String 
+
+=cut
+
+sub get_raw_hgvsp {
+  my $self = shift;
+  return $self->{'record'}[12];
+}
+
+=head2 get_hgvsp
+
+    Description: Getter - wrapper around raw method 
+    Returntype : String 
+
+=cut
+
+sub get_hgvsp {
+  my $self = shift;
+  return $self->get_raw_hgvsp();
+}
+
 =head2 get_raw_cdna_position
 
     Description: Getter for cdna_position field
@@ -281,7 +425,7 @@ sub get_consequence {
 
 sub get_raw_cdna_position {
   my $self = shift;
-  return $self->{'record'}[7];
+  return $self->{'record'}[13];
 }
 
 =head2 get_cdna_position
@@ -305,7 +449,7 @@ sub get_cdna_position {
 
 sub get_raw_cds_position {
   my $self = shift;
-  return $self->{'record'}[8];
+  return $self->{'record'}[14];
 }
 
 =head2 get_cds_position
@@ -329,7 +473,7 @@ sub get_cds_position {
 
 sub get_raw_protein_position {
   my $self = shift;
-  return $self->{'record'}[9];
+  return $self->{'record'}[15];
 }
 
 =head2 get_protein_position
@@ -344,88 +488,88 @@ sub get_protein_position {
   return $self->get_raw_protein_position();
 }
 
-=head2 get_raw_aa_change
+=head2 get_raw_amino_acids
 
-    Description: Getter for aa_change field
+    Description: Getter for amino_acids field
     Returntype : String 
 
 =cut
 
-sub get_raw_aa_change {
+sub get_raw_amino_acids {
   my $self = shift;
-  return $self->{'record'}[10];
+  return $self->{'record'}[16];
 }
 
-=head2 get_aa_change
+=head2 get_amino_acids
 
     Description: Getter - wrapper around raw method 
     Returntype : String 
 
 =cut
 
-sub get_aa_change {
+sub get_amino_acids {
   my $self = shift;
-  return $self->get_raw_aa_change();
+  return $self->get_raw_amino_acids();
 }
 
-=head2 get_raw_codon_change
+=head2 get_raw_codons
 
-    Description: Getter for codon_change field
+    Description: Getter for codons field
     Returntype : String 
 
 =cut
 
-sub get_raw_codon_change {
+sub get_raw_codons {
   my $self = shift;
-  return $self->{'record'}[11];
+  return $self->{'record'}[17];
 }
 
-=head2 get_codon_change
+=head2 get_codons
 
     Description: Getter - wrapper around raw method 
     Returntype : String 
 
 =cut
 
-sub get_codon_change {
+sub get_codons {
   my $self = shift;
-  return $self->get_raw_codon_change();
+  return $self->get_raw_codons();
 }
 
-=head2 get_raw_colocated
+=head2 get_raw_existing_variation
 
     Description: Getter for colocated field
     Returntype : String 
 
 =cut
 
-sub get_raw_colocated {
+sub get_raw_existing_variation {
   my $self = shift;
-  return $self->{'record'}[12];
+  return $self->{'record'}[18];
 }
 
-=head2 get_colocated
+=head2 get_existing_variation
 
     Description: Getter - wrapper around raw method 
     Returntype : String 
 
 =cut
 
-sub get_colocated {
+sub get_existing_variation {
   my $self = shift;
-  return $self->get_raw_colocated();
+  return $self->get_raw_existing_variation();
 }
 
 =head2 get_raw_extra
 
-    Description: Getter for  field
+    Description: Getter for extra field
     Returntype : String 
 
 =cut
 
 sub get_raw_extra {
   my $self = shift;
-  return $self->{'record'}[13];
+  return $self->{'record'}[19];
 }
 
 =head2 get_extra
