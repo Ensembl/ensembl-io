@@ -54,11 +54,15 @@ sub open {
     return $self;
 }
 
-## This format has no metadata
+sub is_metadata {
+    my $self = shift;
+    return $self->{'current_block'} =~ /^#/;
+}
 
-sub is_metadata { return undef; }
-
-sub read_metadata { return undef; }
+sub read_metadata {
+### No useful metadata, just column names
+  return undef;
+}
 
 =head2 set_fields
 
@@ -70,7 +74,7 @@ sub read_metadata { return undef; }
 
 sub set_fields {
   my $self = shift;
-  $self->{'fields'} = [qw(uploaded_variation location allele gene feature feature_type consequence cdna_position cds_position protein_position aa_change codon_change colocated extra)];
+  $self->{'fields'} = [qw(uploaded_variation location allele consequence impact symbol gene feature_type feature biotype exon intron hgvsc hgvsp cdna_position cds_position protein_position amino_acids codons existing_variation extra)];
 }
 
 
