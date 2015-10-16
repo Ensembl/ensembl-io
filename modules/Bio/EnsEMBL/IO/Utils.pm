@@ -23,20 +23,22 @@ use warnings;
 
 sub format_to_class {
   return (
-          'bed'       => 'Bed',
-          'bedgraph'  => 'Bed',
-          'bigbed'    => 'BigBed',
-          'bigwig'    => 'BigWig',
-          'emf'       => 'EMF',
-          'fasta'     => 'Fasta',
-          'gff'       => 'GFF3',
-          'gff3'      => 'GFF3',
-          'gtf'       => 'GTF',
-          'gvf'       => 'GVF',
-          'pairwise'  => 'PairwiseSimple',
-          'psl'       => 'Psl',
-          'vcf'       => 'VCF4',
-          'wig'       => 'Wig',
+          'bed'         => 'Bed',
+          'bedgraph'    => 'Bed',
+          'bigbed'      => 'BigBed',
+          'bigwig'      => 'BigWig',
+          'emf'         => 'EMF',
+          'fasta'       => 'Fasta',
+          'gff'         => 'GTF',
+          'gff3'        => 'GFF3',
+          'gtf'         => 'GTF',
+          'gvf'         => 'GVF',
+          'pairwise'    => 'PairwiseSimple',
+          'psl'         => 'Psl',
+          'vcf'         => 'VCF4',
+          'vep_input'   => 'VEP_input',
+          'vep_output'  => 'VEP_output',
+          'wig'         => 'Wig',
           );
 }
 
