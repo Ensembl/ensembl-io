@@ -46,6 +46,23 @@ sub open {
     return $self;
 }
 
+=head2 is_metadata
+
+    Description: Identifies track lines and other metadata 
+    Returntype : String 
+
+=cut
+
+sub is_metadata {
+    my $self = shift;
+    if ($self->{'current_block'} =~ /^track/
+        || $self->{'current_block'} =~ /^browser/
+        || $self->{'current_block'} =~ /^#/
+      ) {
+      return $self->{'current_block'};
+    }
+}
+
 sub read_metadata {
     my $self = shift;
     my $line = $self->{'current_block'};
@@ -56,6 +73,23 @@ sub read_metadata {
     elsif ($line =~ /^#/ and $line !~ /^#\s*$/) {
         chomp $line;
         push(@{$self->{metadata}->{comments}}, $line);
+    }
+    elsif ($line =~ /^browser\s+(\w+)\s+(.*)/i ) {
+      $self->{'metadata'}->{'browser_switches'}{$1} = $2;
+    }
+    elsif ($line =~ /^track/) {
+      ## Grab any params wrapped in double quotes (to enclose whitespace)
+      while ($line =~ s/(\w+)\s*=\s*"(([\\"]|[^"])+?)"//) {
+        my $key = $1;
+        (my $value = $2) =~ s/\\//g;
+        $self->{'metadata'}->{$key} = $value;
+      }
+      ## Deal with any remaining whitespace-free content
+      if ($line) {
+        while ($line =~ s/(\w+)\s*=\s*(\S+)//) {
+          $self->{'metadata'}->{$1} = $2;
+        }
+      }
     }
 }
 
