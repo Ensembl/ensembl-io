@@ -158,4 +158,22 @@ sub fasta_record {
     }
 }
 
+=head2 _validate 
+
+    Description: Additional format_specific validation
+    Returntype: Boolean
+
+=cut
+
+sub _validate {
+    my ($self, $column_count) = @_;
+    my $valid = 1;
+
+    $valid = 0 if !$self->get_seqname;
+
+    return $valid;
+}
+
+
+
 1;
