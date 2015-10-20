@@ -103,7 +103,7 @@ sub get_attributes {
   my %attributes;
   foreach my $attr (split(';',$self->get_raw_attributes)) {
     my ($key,$value) = split(' ',$attr, 2);
-    $value =~ s/"//g;
+    $value =~ s/"//g if $value;
     $attributes{$key} = $value;
   }
   return \%attributes;
