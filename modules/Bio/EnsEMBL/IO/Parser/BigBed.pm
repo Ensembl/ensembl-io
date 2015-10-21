@@ -41,4 +41,37 @@ sub type {
     return 'bigBed'; 
 }
 
+=head2 seek
+
+    Description: Fetches the raw data from the requested region and caches it 
+    Returntype : Void
+
+=cut
+
+sub seek {
+    my ($self, $chr_id, $start, $end) = @_;
+
+    my $fh = $self->open_file;
+    warn "Failed to open file ".$self->url unless $fh;
+    return unless $fh;
+
+    ## Get the internal chromosome name
+    my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
+    return unless $seq_id;
+
+    ## Remember this method takes half-open coords (subtract 1 from start)
+    my $list_head = $fh->bigBedIntervalQuery("$seq_id", $start-1, $end);
+
+    my $feature_cache = $self->cache->{'features'};
+
+    for (my $i=$list_head->head; $i; $i=$i->next) {
+      my @line = ($chr_id, $i->start, $i->end, split(/\t/,$i->rest));
+      push @$feature_cache, \@line;
+    }
+    ## pre-load peek buffer
+    $self->next_block();
+}
+
+
+
 1;
