@@ -59,17 +59,18 @@ sub seek {
     my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
     return unless $seq_id;
 
-    my $list_head = $fh->bigWigIntervalQuery("$seq_id", $start, $end);
+    my $list = $fh->bigWigIntervalQuery("$seq_id", $start, $end);
 
     my $feature_cache = $self->cache->{'features'};
 
-    for (my $i=$list_head->head; $i; $i=$i->next) {
+    for (my $i = $list->head; $i; $i = $i->next) {
       my @line = ($chr_id, $i->start-1, $i->end, $i->value);
       push @$feature_cache, \@line;
     }
     ## pre-load peek buffer
     $self->next_block();
 }
+
 
 =head2 get_raw_chrom
 
