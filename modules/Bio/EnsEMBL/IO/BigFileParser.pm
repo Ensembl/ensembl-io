@@ -191,6 +191,29 @@ sub fetch_summary_data {
     $self->next_block();
 }
 
+=head2 fetch_summary_array
+
+    Description: fetches values only from the requested region 
+    Returntype : ArrayRef
+
+=cut
+
+sub fetch_summary_array {
+    my ($self, $chr_id, $start, $end, $bins) = @_;
+
+    my $fh = $self->open_file;
+    warn "Failed to open file ".$self->url unless $fh;
+    return unless $fh;
+
+    ## Get the internal chromosome name
+    my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
+    return unless $seq_id;
+
+    my $method = $self->type.'SummaryArray';
+    return $fh->$method("$seq_id", $start-1, $end, 0, $bins);
+}
+
+
 
 =head2 next_block
 
