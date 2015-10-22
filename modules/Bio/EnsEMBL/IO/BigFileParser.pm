@@ -28,6 +28,7 @@ use strict;
 use warnings;
 
 use List::Util qw(max);
+use POSIX qw(floor ceil);
 
 use Bio::DB::BigFile;
 use Bio::DB::BigFile::Constants;
@@ -155,6 +156,41 @@ sub open_file {
   $self->{cache}->{file_handle} ||= Bio::DB::BigFile->$method($self->url);
   return $self->{cache}->{file_handle};
 }
+
+=head2 fetch_summary_data 
+
+    Description: fetches data from the requested region, grouped into 
+                  a set number of bins, and caches it
+    Returntype : Void
+
+=cut
+
+sub fetch_summary_data {
+    my ($self, $chr_id, $start, $end, $bins) = @_;
+    
+    my $fh = $self->open_file;
+    warn "Failed to open file ".$self->url unless $fh;
+    return unless $fh;
+
+    ## Get the internal chromosome name
+    my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
+    return unless $seq_id;
+
+    my $method = $self->type.'SummaryArray';
+    my $list = $fh->$method("$seq_id", $start-1, $end, 0, $bins);
+    my $bin_size = floor(($end - $start)/$bins);
+
+    my $feature_cache = $self->cache->{'features'};
+
+    foreach (@$list) {
+      my @line = ($chr_id, $start, $start + $bin_size, $_);
+      $start += $bin_size;
+      push @$feature_cache, \@line;
+    }
+    ## pre-load peek buffer
+    $self->next_block();
+}
+
 
 =head2 next_block
 

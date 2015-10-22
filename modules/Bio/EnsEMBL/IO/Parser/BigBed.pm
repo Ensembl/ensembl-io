@@ -72,6 +72,21 @@ sub seek {
     $self->next_block();
 }
 
+=head2 fetch_summary_data 
+
+    Description: fetches data from the requested region, grouped into 
+                  a set number of bins, and caches it
+    Returntype : Void
+
+=cut
+
+sub fetch_summary_data {
+    my ($self, @args) = @_;
+    
+    ## In effect we're creating a bedGraph, so tell the Bed parser this
+    $self->{'metadata'}{'type'} = 'bedGraph';
+    $self->SUPER::fetch_summary_data(@args);
+}
 
 
 1;
