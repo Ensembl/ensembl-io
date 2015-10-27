@@ -88,6 +88,7 @@ sub read_record {
             }
         }
         elsif ($field_type eq 'ACCESSION') {
+            $field .= $self->_get_multiline;
             $self->{'record'}->{'_raw_accession'} = $field;
         }
         elsif ($field_type eq 'VERSION') {

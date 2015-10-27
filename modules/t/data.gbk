@@ -1,6 +1,7 @@
 LOCUS       NC_012920              16569 bp    DNA     circular PRI 02-JAN-2014
 DEFINITION  Homo sapiens mitochondrion, complete genome.
 ACCESSION   NC_012920 AC_000021
+            AC_666
 VERSION     NC_012920.1  GI:251831106
 DBLINK      BioProject: PRJNA30353
 KEYWORDS    RefSeq.
