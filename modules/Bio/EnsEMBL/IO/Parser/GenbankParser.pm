@@ -20,7 +20,7 @@ package Bio::EnsEMBL::IO::Parser::GenbankParser;
 
 use strict;
 use warnings;
-use carp;
+use Carp;
 
 use base qw/Bio::EnsEMBL::IO::TokenBasedParser/;
 
