@@ -135,7 +135,7 @@ sub fetch_paired_alignments {
 
   my $hts_obj = $self->hts_open;
   warn "Failed to open HTS object for file " . $self->url unless $hts_obj;
-  return [] unless $sam;
+  return [] unless $hts_obj;
 
   my @features;
 
@@ -186,7 +186,7 @@ sub fetch_alignments_filtered {
     }
   };
 
-  my $header = $bam->header;
+  my $header = $htsfile->header;
 
   # Maybe need to add 'chr'
   my $seq_id = $self->munge_chr_id($chr_id);
@@ -199,7 +199,7 @@ sub fetch_alignments_filtered {
     return [];
   }
 
-  $index->fetch($bam, @coords, $callback);
+  $index->fetch($htsfile, @coords, $callback);
 
   if ($DEBUG) {
     warn " *** fetch alignments filtered: $chr_id:$start-$end : found ", scalar(@features), " alignments \n";
@@ -222,7 +222,7 @@ sub fetch_coverage {
   # filter out unmapped mates - the ones that don't have location set
   $filter ||= sub {my $a = shift; return 0 unless $a->start; return 1};
 
-  my $header = $hts_object->hts_file->header_read;
+  my $header = $hts_obj->hts_file->header_read;
 
   #  Maybe need to add 'chr'
   my $seq_id = $self->munge_chr_id($chr_id);
