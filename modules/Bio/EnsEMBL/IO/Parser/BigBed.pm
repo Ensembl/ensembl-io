@@ -29,6 +29,47 @@ use warnings;
 no warnings 'uninitialized';
 
 use parent qw/Bio::EnsEMBL::IO::BigFileParser Bio::EnsEMBL::IO::Parser::Bed/;
+
+=head2 init
+
+=cut
+
+sub init {
+  my $self = shift;
+
+  ## Define default column positions, because AutoSQL
+  $self->{'default_map'} = {
+                            'chrom'         => 0,
+                            'chromStart'    => 1,
+                            'chromEnd'      => 2,
+                            'name'          => 3,
+                            'score'         => 4,
+                            'strand'        => 5,
+                            'thickStart'    => 6,
+                            'thickEnd'      => 7,
+                            'itemRgb'       => 8,
+                            'blockCount'    => 9,
+                            'blockSizes'    => 10,
+                            'chromStarts'   => 11,
+                            'name2'         => 12,
+                            'cdsStartStat'  => 13,
+                            'cdsEndStat'    => 14,
+                            'exonFrames'    => 15,
+                            'type'          => 16,
+                            'geneName'      => 17,
+                            'geneName2'     => 18,
+                            'geneType'      => 19,
+                          };
+
+  ## Common alternative names for fields
+  $self->{'alt_names'} = {
+                          'item_colour' => 'itemRgb',
+                          'colour'      => 'itemRgb',
+                          'reserved'    => 'itemRgb',
+                          'age'         => 'score',
+                          };
+
+}
  
 =head2 type
 
@@ -68,6 +109,26 @@ sub seek {
       my @line = ($chr_id, $i->start, $i->end, split(/\t/,$i->rest));
       push @$feature_cache, \@line;
     }
+
+    ## Parse AutoSQL
+    my $autoSQL = $fh->bigBedAs;
+    my $column_map = {};
+    my $i = 0;
+    while ($autoSQL) {
+      next unless $autoSQL->isTable && $autoSQL->name =~ /bed/i;
+      my @table;
+      my $cols = $autoSQL->columnList;
+      while ($cols) {
+        my $real_name = $self->{'alt_names'}{$cols->name} || $cols->name;
+        $column_map->{$real_name} = $i;
+        $i++;
+        $cols = $cols->next;
+      }
+      $autoSQL = $autoSQL->next;
+    }
+    $self->{'autosql_map'} = $column_map;
+    use Data::Dumper; warn Dumper($column_map);
+
     ## pre-load peek buffer
     $self->next_block();
 }
@@ -87,6 +148,198 @@ sub fetch_summary_data {
     $self->{'metadata'}{'type'} = 'bedGraph';
     $self->SUPER::fetch_summary_data(@args);
 }
+
+
+#### Override the BED raw accessors, because AutoSQL
+
+=head2 get_raw_chrom
+
+    Description: Getter for chrom field
+    Returntype : String 
+
+=cut
+
+sub get_raw_chrom {
+  my $self = shift;
+  my $column = defined $self->{'autosql_map'}{'chrom'} 
+                ? $self->{'autosql_map'}{'chrom'} : $self->{'default_map'}{'chrom'};
+  return $self->{'record'}[$column];
+}
+
+
+=head2 get_raw_chromStart
+
+    Description: Getter for chromStart field
+    Returntype : Integer 
+
+=cut
+
+sub get_raw_chromStart {
+  my $self = shift;
+  my $column = defined $self->{'autosql_map'}{'chromStart'}
+                ? $self->{'autosql_map'}{'chromStart'} : $self->{'default_map'}{'chromStart'};
+  return $self->{'record'}[$column];
+}
+
+=head2 get_raw_chromEnd
+
+    Description: Getter for chromEnd field
+    Returntype : Integer 
+
+=cut
+
+sub get_raw_chromEnd {
+  my $self = shift;
+  my $column = defined $self->{'autosql_map'}{'chromEnd'}
+                ? $self->{'autosql_map'}{'chromEnd'} : $self->{'default_map'}{'chromEnd'};
+  return $self->{'record'}[$column];
+}
+
+=head2 get_raw_name
+
+    Description: Getter for name field
+    Returntype : String 
+
+=cut
+
+sub get_raw_name {
+  my $self = shift;
+  my $column = defined $self->{'autosql_map'}{'name'}
+                ? $self->{'autosql_map'}{'name'} : $self->{'default_map'}{'name'};
+  return $self->{'record'}[$column];
+}
+
+=head2 get_raw_score
+
+    Description: Getter for score field
+    Returntype : Number (usually floating point) or String (period = no data) 
+
+=cut
+
+sub get_raw_score {
+  my $self = shift;
+  my $column = defined $self->{'autosql_map'}{'score'}
+                ? $self->{'autosql_map'}{'score'} : $self->{'default_map'}{'score'};
+  return $self->{'record'}[$column];
+}
+
+=head2 get_raw_strand
+
+    Description: Getter for strand field
+    Returntype : String 
+
+=cut
+
+sub get_raw_strand {
+  my $self = shift;
+  my $column = defined $self->{'autosql_map'}{'strand'}
+                ? $self->{'autosql_map'}{'strand'} : $self->{'default_map'}{'strand'};
+  return $self->{'record'}[$column];
+}
+
+=head2 get_raw_thickStart
+
+    Description: Getter for thickStart field
+    Returntype : Integer
+
+=cut
+
+sub get_raw_thickStart {
+  my $self = shift;
+  my $column = defined $self->{'autosql_map'}{'thickStart'}
+                ? $self->{'autosql_map'}{'thickStart'} : $self->{'default_map'}{'thickStart'};
+  return $self->{'record'}[$column];
+}
+
+=head2 get_raw_thickEnd
+
+    Description: Getter for thickEnd field
+    Returntype : Integer 
+
+=cut
+
+sub get_raw_thickEnd {
+  my $self = shift;
+  my $column = defined $self->{'autosql_map'}{'thickEnd'}
+                ? $self->{'autosql_map'}{'thickEnd'} : $self->{'default_map'}{'thickEnd'};
+  return $self->{'record'}[$column];
+}
+
+=head2 get_raw_itemRgb
+
+    Description: Getter for itemRgb field
+    Returntype : String  (3 comma-separated values)
+
+=cut
+
+sub get_raw_itemRgb {
+  my $self = shift;
+  my $column = defined $self->{'autosql_map'}{'itemRgb'}
+                ? $self->{'autosql_map'}{'itemRgb'} : $self->{'default_map'}{'itemRgb'};
+  return $self->{'record'}[$column];
+}
+
+=head2 get_raw_blockCount
+
+    Description: Getter for blockCount field
+    Returntype : Integer 
+
+=cut
+
+sub get_raw_blockCount {
+  my $self = shift;
+  my $column = defined $self->{'autosql_map'}{'blockCount'}
+                ? $self->{'autosql_map'}{'blockCount'} : $self->{'default_map'}{'blockCount'};
+  return $self->{'record'}[$column];
+}
+
+=head2 get_raw_blockSizes
+
+    Description: Getter for blockSizes field
+    Returntype : String (comma-separated values)
+
+=cut
+
+sub get_raw_blockSizes {
+  my $self = shift;
+  my $column = defined $self->{'autosql_map'}{'blockSizes'}
+                ? $self->{'autosql_map'}{'blockSizes'} : $self->{'default_map'}{'blockSizes'};
+  return $self->{'record'}[$column];
+}
+
+=head2 get_raw_blockStarts
+
+    Description: Getter for blockStarts field
+    Returntype : String (comma-separated values)
+
+=cut
+
+sub get_raw_blockStarts {
+  my $self = shift;
+  my $column = defined $self->{'autosql_map'}{'blockStarts'}
+                ? $self->{'autosql_map'}{'blockStarts'} : $self->{'default_map'}{'blockStarts'};
+  return $self->{'record'}[$column];
+}
+
+### AUTOLOAD ANY LITTLE-USED ACCESSORS
+
+our $AUTOLOAD;
+
+sub AUTOLOAD {
+  my $self = shift;
+  my $method = our $AUTOLOAD;
+  $method =~ s/.*:://;
+  my $value;
+
+  if ($method =~ /^get_(raw)?_(\w)+/) {
+    my $key = $2;
+    my $column = defined $self->{'autosql_map'}{$key}
+                ? $self->{'autosql_map'}{$key} : $self->{'default_map'}{$key};
+    $value = $self->{'record'}[$column];
+  } 
+  return $value;
+}
+
 
 
 1;
