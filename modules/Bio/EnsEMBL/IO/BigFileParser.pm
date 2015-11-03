@@ -61,9 +61,18 @@ sub new {
     };
 
     bless $self, $class;
-   
+  
+    $self->init; 
     return $self;
 }
+
+=head2 init 
+
+    Description: placeholder - may need implementing in child
+
+=cut 
+
+sub init {}
 
 =head2 open
 
