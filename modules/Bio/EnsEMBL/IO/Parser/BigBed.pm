@@ -109,13 +109,14 @@ sub seek {
       my @line = ($chr_id, $i->start, $i->end, split(/\t/,$i->rest));
       push @$feature_cache, \@line;
     }
+    return unless scalar @$feature_cache;
 
     ## Parse AutoSQL
     my $autoSQL = $fh->bigBedAs;
     my $column_map = {};
     my $i = 0;
     while ($autoSQL) {
-      next unless $autoSQL->isTable && $autoSQL->name =~ /bed/i;
+      next unless $autoSQL->isTable; 
       my @table;
       my $cols = $autoSQL->columnList;
       while ($cols) {
@@ -127,7 +128,6 @@ sub seek {
       $autoSQL = $autoSQL->next;
     }
     $self->{'autosql_map'} = $column_map;
-    use Data::Dumper; warn Dumper($column_map);
 
     ## pre-load peek buffer
     $self->next_block();
