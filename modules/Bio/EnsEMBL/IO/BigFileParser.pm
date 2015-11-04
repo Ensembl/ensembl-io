@@ -62,17 +62,8 @@ sub new {
 
     bless $self, $class;
   
-    $self->init; 
     return $self;
 }
-
-=head2 init 
-
-    Description: placeholder - may need implementing in child
-
-=cut 
-
-sub init {}
 
 =head2 open
 
@@ -109,8 +100,19 @@ sub open {
     #use Data::Dumper; warn Dumper($chromosomes);
     $self->{cache}{chromosomes} = $chromosomes;
 
+    ## Do any additional pre-processing
+    $self->init($fh); 
+
     return $self;
 }
+
+=head2 init 
+
+    Description: placeholder - may need implementing in child
+
+=cut 
+
+sub init {}
 
 
 =head2 type

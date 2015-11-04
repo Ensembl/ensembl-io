@@ -32,13 +32,36 @@ use parent qw/Bio::EnsEMBL::IO::BigFileParser Bio::EnsEMBL::IO::Parser::Bed/;
 
 =head2 init
 
+    Definition: When we open the file, we want to check for AutoSQL 
+                and assign column positions
+    Return: Void
+
 =cut
 
 sub init {
-  my $self = shift;
+  my ($self, $fh) = @_;
 
   ## Define default column positions, because AutoSQL
-  $self->{'default_map'} = {
+  my $autoSQL = $fh->bigBedAs;
+  my $column_map = {};
+  my $i = 0;
+  while ($autoSQL) {
+    next unless $autoSQL->isTable; 
+    my @table;
+    my $cols = $autoSQL->columnList;
+    while ($cols) {
+      my $real_name = $self->{'alt_names'}{$cols->name} || $cols->name;
+      $column_map->{$real_name} = $i;
+      $i++;
+      $cols = $cols->next;
+    }
+    $autoSQL = $autoSQL->next;
+  }
+  if (keys %$column_map) {
+    $self->{'column_map'} = $column_map;
+  }
+  else {
+    $self->{'column_map'} = {
                             'chrom'         => 0,
                             'chromStart'    => 1,
                             'chromEnd'      => 2,
@@ -60,8 +83,9 @@ sub init {
                             'geneName2'     => 18,
                             'geneType'      => 19,
                           };
+  }
 
-  ## Common alternative names for fields
+  ## Also set common alternative names for fields
   $self->{'alt_names'} = {
                           'item_colour' => 'itemRgb',
                           'colour'      => 'itemRgb',
@@ -111,24 +135,6 @@ sub seek {
     }
     return unless scalar @$feature_cache;
 
-    ## Parse AutoSQL
-    my $autoSQL = $fh->bigBedAs;
-    my $column_map = {};
-    my $i = 0;
-    while ($autoSQL) {
-      next unless $autoSQL->isTable; 
-      my @table;
-      my $cols = $autoSQL->columnList;
-      while ($cols) {
-        my $real_name = $self->{'alt_names'}{$cols->name} || $cols->name;
-        $column_map->{$real_name} = $i;
-        $i++;
-        $cols = $cols->next;
-      }
-      $autoSQL = $autoSQL->next;
-    }
-    $self->{'autosql_map'} = $column_map;
-
     ## pre-load peek buffer
     $self->next_block();
 }
@@ -161,9 +167,7 @@ sub fetch_summary_data {
 
 sub get_raw_chrom {
   my $self = shift;
-  my $column = defined $self->{'autosql_map'}{'chrom'} 
-                ? $self->{'autosql_map'}{'chrom'} : $self->{'default_map'}{'chrom'};
-  return $self->{'record'}[$column];
+  return $self->{'record'}[$self->{'column_map'}{'chrom'}]; 
 }
 
 
@@ -176,9 +180,7 @@ sub get_raw_chrom {
 
 sub get_raw_chromStart {
   my $self = shift;
-  my $column = defined $self->{'autosql_map'}{'chromStart'}
-                ? $self->{'autosql_map'}{'chromStart'} : $self->{'default_map'}{'chromStart'};
-  return $self->{'record'}[$column];
+  return $self->{'record'}[$self->{'column_map'}{'chromStart'}];
 }
 
 =head2 get_raw_chromEnd
@@ -190,9 +192,7 @@ sub get_raw_chromStart {
 
 sub get_raw_chromEnd {
   my $self = shift;
-  my $column = defined $self->{'autosql_map'}{'chromEnd'}
-                ? $self->{'autosql_map'}{'chromEnd'} : $self->{'default_map'}{'chromEnd'};
-  return $self->{'record'}[$column];
+  return $self->{'record'}[$self->{'column_map'}{'chromEnd'}];
 }
 
 =head2 get_raw_name
@@ -204,9 +204,7 @@ sub get_raw_chromEnd {
 
 sub get_raw_name {
   my $self = shift;
-  my $column = defined $self->{'autosql_map'}{'name'}
-                ? $self->{'autosql_map'}{'name'} : $self->{'default_map'}{'name'};
-  return $self->{'record'}[$column];
+  return $self->{'record'}[$self->{'column_map'}{'name'}];
 }
 
 =head2 get_raw_score
@@ -218,9 +216,7 @@ sub get_raw_name {
 
 sub get_raw_score {
   my $self = shift;
-  my $column = defined $self->{'autosql_map'}{'score'}
-                ? $self->{'autosql_map'}{'score'} : $self->{'default_map'}{'score'};
-  return $self->{'record'}[$column];
+  return $self->{'record'}[$self->{'column_map'}{'score'}];
 }
 
 =head2 get_raw_strand
@@ -232,9 +228,7 @@ sub get_raw_score {
 
 sub get_raw_strand {
   my $self = shift;
-  my $column = defined $self->{'autosql_map'}{'strand'}
-                ? $self->{'autosql_map'}{'strand'} : $self->{'default_map'}{'strand'};
-  return $self->{'record'}[$column];
+  return $self->{'record'}[$self->{'column_map'}{'strand'}];
 }
 
 =head2 get_raw_thickStart
@@ -246,9 +240,7 @@ sub get_raw_strand {
 
 sub get_raw_thickStart {
   my $self = shift;
-  my $column = defined $self->{'autosql_map'}{'thickStart'}
-                ? $self->{'autosql_map'}{'thickStart'} : $self->{'default_map'}{'thickStart'};
-  return $self->{'record'}[$column];
+  return $self->{'record'}[$self->{'column_map'}{'thickStart'}];
 }
 
 =head2 get_raw_thickEnd
@@ -260,9 +252,7 @@ sub get_raw_thickStart {
 
 sub get_raw_thickEnd {
   my $self = shift;
-  my $column = defined $self->{'autosql_map'}{'thickEnd'}
-                ? $self->{'autosql_map'}{'thickEnd'} : $self->{'default_map'}{'thickEnd'};
-  return $self->{'record'}[$column];
+  return $self->{'record'}[$self->{'column_map'}{'thickEnd'}];
 }
 
 =head2 get_raw_itemRgb
@@ -274,9 +264,7 @@ sub get_raw_thickEnd {
 
 sub get_raw_itemRgb {
   my $self = shift;
-  my $column = defined $self->{'autosql_map'}{'itemRgb'}
-                ? $self->{'autosql_map'}{'itemRgb'} : $self->{'default_map'}{'itemRgb'};
-  return $self->{'record'}[$column];
+  return $self->{'record'}[$self->{'column_map'}{'itemRgb'}];
 }
 
 =head2 get_raw_blockCount
@@ -288,9 +276,7 @@ sub get_raw_itemRgb {
 
 sub get_raw_blockCount {
   my $self = shift;
-  my $column = defined $self->{'autosql_map'}{'blockCount'}
-                ? $self->{'autosql_map'}{'blockCount'} : $self->{'default_map'}{'blockCount'};
-  return $self->{'record'}[$column];
+  return $self->{'record'}[$self->{'column_map'}{'blockCount'}];
 }
 
 =head2 get_raw_blockSizes
@@ -302,9 +288,7 @@ sub get_raw_blockCount {
 
 sub get_raw_blockSizes {
   my $self = shift;
-  my $column = defined $self->{'autosql_map'}{'blockSizes'}
-                ? $self->{'autosql_map'}{'blockSizes'} : $self->{'default_map'}{'blockSizes'};
-  return $self->{'record'}[$column];
+  return $self->{'record'}[$self->{'column_map'}{'blockSizes'}];
 }
 
 =head2 get_raw_blockStarts
@@ -316,9 +300,7 @@ sub get_raw_blockSizes {
 
 sub get_raw_blockStarts {
   my $self = shift;
-  my $column = defined $self->{'autosql_map'}{'blockStarts'}
-                ? $self->{'autosql_map'}{'blockStarts'} : $self->{'default_map'}{'blockStarts'};
-  return $self->{'record'}[$column];
+  return $self->{'record'}[$self->{'column_map'}{'blockStarts'}];
 }
 
 ### AUTOLOAD ANY LITTLE-USED ACCESSORS
@@ -333,9 +315,7 @@ sub AUTOLOAD {
 
   if ($method =~ /^get_(raw)?_(\w)+/) {
     my $key = $2;
-    my $column = defined $self->{'autosql_map'}{$key}
-                ? $self->{'autosql_map'}{$key} : $self->{'default_map'}{$key};
-    $value = $self->{'record'}[$column];
+    $value = $self->{'record'}[$self->{'column_map'}{$key}];
   } 
   return $value;
 }
