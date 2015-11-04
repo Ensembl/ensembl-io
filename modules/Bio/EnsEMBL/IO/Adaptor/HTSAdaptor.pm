@@ -171,7 +171,7 @@ sub fetch_alignments_filtered {
   warn "Failed to open file " . $self->url unless $htsfile;
   return [] unless $htsfile;
 
-  my $index = $self->bam_index;
+  my $index = $self->htsfile_index;
   warn "Failed to open index for " . $self->url unless $index;
   return [] unless $index;
 
@@ -215,7 +215,7 @@ sub fetch_coverage {
   warn "Failed to make HTS object from file " . $self->url unless $hts_obj;
   return [] unless $hts_obj;
 
-  my $index = $self->bam_index;
+  my $index = $self->htsfile_index;
   warn "Failed to open BAM index for " . $self->url unless $index;
   return [] unless $index;
 
