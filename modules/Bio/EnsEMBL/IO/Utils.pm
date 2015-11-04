@@ -23,6 +23,7 @@ use warnings;
 
 sub format_to_class {
   return (
+          'bam'         => 'Bam',
           'bed'         => 'Bed',
           'bedgraph'    => 'Bed',
           'bigbed'      => 'BigBed',
