@@ -60,32 +60,32 @@ sub hts_open
 {
   my $self = shift;
 
-  $self->{_cache}->{_sam_handle} ||= Bio::DB::HTS->new(-bam => $self->url);
-  return $self->{_cache}->{_sam_handle};
+  $self->{_cache}->{_htsobj_handle} ||= Bio::DB::HTS->new(-bam => $self->url);
+  return $self->{_cache}->{_htsobj_handle};
 }
 
 sub htsfile_open {
   my $self = shift;
 
-  if (!$self->{_cache}->{_bam_handle}) {
+  if (!$self->{_cache}->{_htsfile_handle}) {
     if (Bio::DB::HTSfile->can('set_udc_defaults')) {
       Bio::DB::HTSfile->set_udc_defaults;
     }
-    $self->{_cache}->{_bam_handle} = Bio::DB::HTSfile->open($self->url);
+    $self->{_cache}->{_htsfile_handle} = Bio::DB::HTSfile->open($self->url);
   }
-  return $self->{_cache}->{_bam_handle};
+  return $self->{_cache}->{_htsfile_handle};
 }
 
 sub htsfile_index {
   my $self = shift;
 
-  if (!$self->{_cache}->{_bam_index}) {
+  if (!$self->{_cache}->{_htsfile_index}) {
     if (Bio::DB::HTSfile->can('set_udc_defaults')) {
       Bio::DB::HTSfile->set_udc_defaults;
     }
-    $self->{_cache}->{_bam_index} = Bio::DB::HTSfile->index($self->{_cache}->{_sam_handle});
+    $self->{_cache}->{_htsfile_index} = Bio::DB::HTSfile->index($self->{_cache}->{_htsobj_handle});
   }
-  return $self->{_cache}->{_bam_index};
+  return $self->{_cache}->{_htsfile_index};
 }
 
 sub snp_code {
