@@ -83,7 +83,7 @@ sub htsfile_index {
     if (Bio::DB::HTSfile->can('set_udc_defaults')) {
       Bio::DB::HTSfile->set_udc_defaults;
     }
-    $self->{_cache}->{_bam_index} = Bio::DB::HTSfile->index($self->url);
+    $self->{_cache}->{_bam_index} = Bio::DB::HTSfile->index($self->{_cache}->{_sam_handle});
   }
   return $self->{_cache}->{_bam_index};
 }
