@@ -167,9 +167,9 @@ sub fetch_paired_alignments {
 sub fetch_alignments_filtered {
   my ($self, $chr_id, $start, $end, $filter) = @_;
 
-  my $htsfile = $self->hts_open;
-  warn "Failed to open file " . $self->url unless $htsfile;
-  return [] unless $htsfile;
+  my $htsobj = $self->hts_open;
+  warn "Failed to open file " . $self->url unless $htsobj;
+  return [] unless $htsobj;
 
   my $index = $self->htsfile_index;
   warn "Failed to open index for " . $self->url unless $index;
@@ -186,7 +186,7 @@ sub fetch_alignments_filtered {
     }
   };
 
-  my $header = $htsfile->header;
+  my $header = $htsobj->header;
 
   # Maybe need to add 'chr'
   my $seq_id = $self->munge_chr_id($chr_id);
@@ -199,7 +199,7 @@ sub fetch_alignments_filtered {
     return [];
   }
 
-  $index->fetch($htsfile, @coords, $callback);
+  $index->fetch($htsobj->hts_file, @coords, $callback);
 
   if ($DEBUG) {
     warn " *** fetch alignments filtered: $chr_id:$start-$end : found ", scalar(@features), " alignments \n";
