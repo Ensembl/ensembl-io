@@ -64,7 +64,12 @@ sub seek {
   if (defined $self->{iterator}) {
     tabix_iter_free($self->{iterator});
   }
-  $self->{iterator} = tabix_query($self->{filehandle}, $chrom, $start, $end);
+
+  ## Check for both possible versions of chromosome name
+  foreach ($chrom, "chr$chrom") {
+    $self->{iterator} = tabix_query($self->{filehandle}, $_, $start, $end);
+    last if $self->{iterator};
+  }
 
   # pre-load peek buffer
   if ($self->{iterator}) {
