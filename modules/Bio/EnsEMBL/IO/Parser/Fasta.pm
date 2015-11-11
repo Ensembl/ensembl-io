@@ -55,13 +55,30 @@ sub open {
     return $self;
 }
 
+# We have to overload the next() function because
+# the SUPER::next() checks  $self->{'current_block'}
+# to decide if there's another record, unfortunately
+# if we don't read the sequence while cycling, this
+# contains a line...the next line of FASTA... nope.
+
+sub next {
+    my $self = shift;
+
+    # If the sequence of the previous record was not scanned
+    while (defined $self->{'current_block'} && not $self->is_at_end_of_record()) {
+        $self->next_block();
+    }
+
+    return $self->SUPER::next();
+}
+
 sub read_record {
     my $self = shift;
     $self->{'sequence'} = undef;
     # If the sequence of the previous record was not scanned
-    while (defined $self->{'current_block'} && not $self->is_at_beginning_of_record()) {
-        $self->next_block();
-    }
+#    while (defined $self->{'current_block'} && not $self->is_at_beginning_of_record()) {
+#        $self->next_block();
+#    }
     if (defined $self->{'current_block'} ) {
         $self->{'record'} = [ $self->{'current_block'} ];
         $self->next_block();

@@ -20,6 +20,7 @@ use Test::More;
 use Bio::EnsEMBL::IO::Parser::GFF3;
 
 my $test_file = "modules/t/data.gff3";
+my $test_with_fasta_file = "modules/t/data_with_fasta.gff3";
 
 my $parser = Bio::EnsEMBL::IO::Parser::GFF3->open($test_file);
 ## First record
@@ -55,5 +56,18 @@ for (1..8) {
 ok ($parser->get_raw_phase eq '0', 'Testing get_raw_phase');
 ok ($parser->get_phase eq 0, 'Testing get_phase');
 ok ($parser->close(), "Closing file");
+
+# Testing reading a GFF3 with embedded Fasta
+ok($parser = Bio::EnsEMBL::IO::Parser::GFF3->open($test_with_fasta_file), 'Open GFF3 with embedded Fasta');
+ok($parser->next(), "Loading first record");
+ok($parser->next(), "Loading second record");
+ok($parser->next(), "Loading third record");
+ok(!$parser->next(), "Should return empty, end of records");
+ok($parser->in_fasta_mode(), "We should be in Fasta mode");
+ok($parser->next_sequence(), "Read the first Fasta sequence");
+ok($parser->getHeader() eq 'HSBGPG Human gene for bone gla protein (BGP)', "Checking fasta header");
+ok($parser->next_sequence(), "Test jumping to the next record without reading the sequence");
+ok(length($parser->getSequence()) == 1020, "Checking the sequence is the correct length");
+ok(!$parser->next_sequence(), "Should return empty, end of sequences");
 
 done_testing();
