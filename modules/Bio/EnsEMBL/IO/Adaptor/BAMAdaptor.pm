@@ -47,7 +47,7 @@ sub new {
     _cache => {},
     _url => $url,
   }, $class;
-      
+
   return $self;
 }
 
@@ -86,7 +86,7 @@ sub bam_index {
 
 sub snp_code {
     my ($self, $allele) = @_;
-    
+
     return $snpCode->{$allele};
 }
 
@@ -104,26 +104,32 @@ sub munge_chr_id {
 
   my $header = $bam->header;
 
-  my $ret_id = $chr_id;
-
-  # Check we get values back for seq region. Maybe need to add 'chr' 
+  # Check we get values back for seq region. Maybe need to add 'chr' or Chr
 
   # Note there is a bug in samtools version 0.1.18 which means we can't just
   # use the chr_id as the region, we have to specify a range. The range I
   # use is 1-1 which is hopefully valid for all seq regions
   my @coords = $header->parse_region("$chr_id:1-1");
+  if (@coords) {
+    return "$chr_id";
+  }
 
   if (!@coords) {
     @coords = $header->parse_region("chr$chr_id:1-1");
     if (@coords) {
-      $ret_id = "chr$chr_id";
-    } else {
-      warn " *** could not parse_region for BAM with $chr_id in file " . $self->url ."\n";
-      return undef;
+      return "chr$chr_id";
     }
   }
 
-  return $ret_id;
+  if (!@coords) {
+    @coords = $header->parse_region("Chr$chr_id:1-1");
+    if (@coords) {
+      return "Chr$chr_id";
+    }
+  }
+
+  warn " *** could not parse_region for BAM with $chr_id in file " . $self->url ."\n";
+  return undef;
 }
 
 sub fetch_paired_alignments {
@@ -132,12 +138,12 @@ sub fetch_paired_alignments {
   my $sam = $self->sam_open;
   warn "Failed to open BAM file (as SAM) " . $self->url unless $sam;
   return [] unless $sam;
-  
+
   my @features;
 
   my $header = $sam->bam->header;
 
-  # Maybe need to add 'chr' 
+  # Maybe need to add 'chr'
   my $seq_id = $self->munge_chr_id($chr_id);
   return [] if !defined($seq_id);
 
@@ -152,11 +158,11 @@ sub fetch_paired_alignments {
                                              -seq_id => $seq_id,
                                              -start  => $start,
                                              -end    => $end);
-  
+
   if ($DEBUG) {
     warn " *** fetch paired alignments: $chr_id:$start-$end : found ", scalar(@features), " alignments \n";
   }
-  
+
   return \@features;
 }
 
@@ -164,11 +170,11 @@ sub fetch_alignments_filtered {
   my ($self, $chr_id, $start, $end, $filter) = @_;
 
   #warn "bam url:" . $self->url if ($DEBUG > 2);
-   
+
   my $bam = $self->bam_open;
   warn "Failed to open BAM file " . $self->url unless $bam;
   return [] unless $bam;
-  
+
   my $index = $self->bam_index;
   warn "Failed to open BAM index for " . $self->url unless $index;
   return [] unless $index;
@@ -189,7 +195,7 @@ sub fetch_alignments_filtered {
 
   my $header = $bam->header;
 
-  # Maybe need to add 'chr' 
+  # Maybe need to add 'chr'
   my $seq_id = $self->munge_chr_id($chr_id);
   return [] if !defined($seq_id);
 
@@ -201,11 +207,11 @@ sub fetch_alignments_filtered {
   }
 
   $index->fetch($bam, @coords, $callback);
-  
+
   if ($DEBUG) {
     warn " *** fetch alignments filtered: $chr_id:$start-$end : found ", scalar(@features), " alignments \n";
   }
-  
+
   return \@features;
 }
 
@@ -213,11 +219,11 @@ sub fetch_coverage {
   my ($self, $chr_id, $start, $end, $bins, $filter) = @_;
 
   #warn "bam url:" . $self->url if ($DEBUG > 2);
-   
+
   my $sam = $self->sam_open;
   warn "Failed to open BAM file (as SAM)" . $self->url unless $sam;
   return [] unless $sam;
-  
+
   my $index = $self->bam_index;
   warn "Failed to open BAM index for " . $self->url unless $index;
   return [] unless $index;
@@ -229,7 +235,7 @@ sub fetch_coverage {
 
   my $header = $sam->bam->header;
 
-  #  Maybe need to add 'chr' 
+  #  Maybe need to add 'chr'
   my $seq_id = $self->munge_chr_id($chr_id);
   return [] if !defined($seq_id);
 
@@ -244,11 +250,11 @@ sub fetch_coverage {
 
   my ($coverage) = $segment->features('coverage' . (defined($bins) ? ":$bins" : ""), $filter);
   my @data_points = $coverage->coverage;
-  
+
   if ($DEBUG) {
     warn " *** fetch coverage: $chr_id:$start-$end : found ", scalar(@data_points), " coverage points \n";
   }
-  
+
   return \@data_points;
 }
 
@@ -262,7 +268,7 @@ sub fetch_consensus {
 
   my $bam = $self->sam_open;
   return [] unless $bam;
-  
+
   my @consensus;    # this will be list of basepair
 
   # the consensus method is real simple:
@@ -271,7 +277,7 @@ sub fetch_consensus {
   # for the next stage we'd like to change it a bit:
   # call a SNP if various nucleotides appear in more than 20% of alignments
 
- 
+
   #print STDERR "Generating consensus for $chr_id $start $end\n";
 
 
@@ -318,7 +324,7 @@ sub fetch_consensus {
 
   };
 
-  # Maybe need to add 'chr' 
+  # Maybe need to add 'chr'
   my $seq_id = $self->munge_chr_id($chr_id);
   return [] if !defined($seq_id);
 
