@@ -66,9 +66,15 @@ sub seek {
     tabix_iter_free($self->{iterator});
   }
   $self->{iterator} = tabix_query($self->{filehandle}, $chrom, $start, $end);
-  
+
   # pre-load peek buffer
-  $self->next_block();
+  if ($self->{iterator}) {
+    $self->next_block();
+    return 1;
+  }
+  else {
+    return 0;
+  }
 }
 
 sub next_block {
