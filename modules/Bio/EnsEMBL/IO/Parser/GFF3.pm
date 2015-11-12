@@ -28,6 +28,8 @@ package Bio::EnsEMBL::IO::Parser::GFF3;
 use strict;
 use warnings;
 
+use Bio::EnsEMBL::IO::Parser::Fasta;
+
 use base qw/Bio::EnsEMBL::IO::Parser::GXF/;
 
 sub open {
@@ -42,10 +44,73 @@ sub open {
        $self->{'metadata'}->{'Type'} = 'DNA';
     }
 
+    # Default we haven't reached the ##FASTA block
+    $self->{'FASTA_found'} = 0;
+
     # pre-load peek buffer
     $self->next_block();
 
     return $self;
+}
+
+sub read_block {
+    my $self = shift;
+
+    # Fetch the next line unless we've
+    # entered the ##FASTA section of the file
+    $self->SUPER::read_block()
+	unless( $self->{'FASTA_found'} );
+
+    # See if we've found the ##FASTA block, if so
+    # remember and signal the file is finished reading
+    # (for this section at least)
+    if($self->{'waiting_block'}) {
+	if( $self->{'waiting_block'} =~ /\#\#FASTA/ ) {
+	    $self->{'waiting_block'} = undef;
+	    $self->{'FASTA_found'} = 1;
+
+	    # And pass it off to the Fasta parser...
+	    $self->{'FASTA_handle'} = Bio::EnsEMBL::IO::Parser::Fasta->open( $self->{'filehandle'} );
+	}
+    }
+
+    return $self->{'waiting_block'};
+}
+
+=head2 next_sequence
+
+    Description: Read the next sequence from the ##FASTA section of the GFF,
+                 only possible after you've cycled through all the line
+                 based records with next() until false is returned.
+    Returntype:  scalar
+
+=cut
+
+sub next_sequence {
+    my $self = shift;
+
+    # We're not in Fasta mode yet or none was found.
+    return 0
+	unless( $self->in_fasta_mode() );
+
+    # Pass over to the Fasta parser if we have
+    # any sequences in the remaining file
+    return $self->{'FASTA_handle'}->next();
+
+}
+
+=head2 in_fasta_mode
+
+    Description: Return if the parser has reached the ##FASTA section,
+                 if it exists
+    Returntype: scalar
+
+=cut
+
+sub in_fasta_mode {
+    my $self = shift;
+
+    return $self->{'FASTA_found'} && defined($self->{'FASTA_handle'})
 }
 
 sub read_metadata {
@@ -125,6 +190,44 @@ sub get_attributes {
     $attributes{$key} = $value;
   }
   return \%attributes;
+}
+
+## Passthru functions for the embedded Fasta within a GFF3, yuck
+
+sub getRawHeader {
+    my $self = shift;
+
+    return 0
+	unless( $self->in_fasta_mode() );
+
+    return $self->{'FASTA_handle'}->getRawHeader();
+}
+
+sub getHeader {
+    my $self = shift;
+
+    return 0
+	unless( $self->in_fasta_mode() );
+
+    return $self->{'FASTA_handle'}->getHeader();
+}
+
+sub getRawSequence {
+    my $self = shift;
+
+    return 0
+	unless( $self->in_fasta_mode() );
+
+    return $self->{'FASTA_handle'}->getRawSequence();
+}
+
+sub getSequence {
+    my $self = shift;
+
+    return 0
+	unless( $self->in_fasta_mode() );
+
+    return $self->{'FASTA_handle'}->getSequence();
 }
 
 

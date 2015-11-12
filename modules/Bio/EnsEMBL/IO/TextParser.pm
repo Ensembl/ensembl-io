@@ -120,6 +120,8 @@ sub read_block {
     } else {
         $self->{'waiting_block'} = <$fh> || confess ("Error reading file handle: $!");   
     }    
+
+    return $self->{'waiting_block'};
 }
 
 1;

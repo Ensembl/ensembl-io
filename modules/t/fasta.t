@@ -33,4 +33,17 @@ ok(scalar(@{$parser->getRawSequence()}) == 14,"Check size of second FASTA block"
 ok(!$parser->next(), "Final attempt to read returns nothing.");
 ok($parser->close());
 
+######################################################
+## Test 2
+##
+## Don't read the sequence, ensure the pointer moves
+## forward correctly between records
+##
+######################################################
+$parser = Bio::EnsEMBL::IO::Parser::Fasta->open($test_file);
+ok($parser->next(), 'Read the first record');
+ok($parser->next(), 'Second record, don\'t touch the sequence');
+ok(!$parser->next(), "Final attempt to read returns nothing.");
+ok($parser->close());
+
 done_testing;
