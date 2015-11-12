@@ -56,7 +56,7 @@ sub read_metadata {
 
 sub set_fields {
   my $self = shift;
-  $self->{'fields'} = [qw(seqname start end information interacting region score id direction)];
+  $self->{'fields'} = [qw(seqname start end information interacting_region score id direction)];
 }
 
 
@@ -189,7 +189,7 @@ sub get_information {
 sub get_interacting_region {
     my $self = shift;
     my @info = @{$self->get_information};
-    return $info[0..2];
+    return @info[0..2];
 }
 
 =head2 get_information
