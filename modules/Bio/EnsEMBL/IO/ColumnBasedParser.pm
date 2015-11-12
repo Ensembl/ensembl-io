@@ -179,15 +179,6 @@ sub set_maximum_column_count {
 
 =cut
 
-
-=head2 read_record
-
-    Description: Splits the current block along predefined delimiters
-    Returntype : Void 
-
-=cut
-
-
 sub read_record {
     my $self = shift;
     chomp $self->{'current_block'};
