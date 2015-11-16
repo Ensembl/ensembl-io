@@ -174,9 +174,12 @@ sub fetch_alignments_filtered {
   warn "Failed to open file " . $self->url unless $htsobj;
   return [] unless $htsobj;
 
+  warn "rn6DEBUG opened file " . $self->url ;
+
   my $index = $self->htsfile_index;
   warn "Failed to open index for " . $self->url unless $index;
   return [] unless $index;
+  warn "rn6DEBUG opened index file for " . $self->url ;
 
   my @features = ();
 
@@ -196,7 +199,6 @@ sub fetch_alignments_filtered {
   return [] if !defined($seq_id);
 
   my @coords = $header->parse_region("$seq_id:$start-$end");
-
   if (!@coords) {
     warn " *** could not parse_region for BAM with $chr_id:$start-$end\n";
     return [];
@@ -207,11 +209,17 @@ sub fetch_alignments_filtered {
   if ($DEBUG)
   {
     warn " *** fetch alignments filtered: $chr_id:$start-$end : found ", scalar(@features), " alignments \n";
-    #print the first 10 and last 10 features to see if this triggers an issue.
-    my $num_features = scalar(@features) ;
+  }
+  my $num_features = scalar(@features) ;
+  warn " rn6DEBUG:fetch alignments filtered: $chr_id:$start-$end : found ", $num_features, " alignments \n";
+
+  if ($DEBUG)
+  {
+    warn "The first 10 and last 10 features to see if this triggers an issue.\n" ;
     if( $num_features>10 )
     {
-      foreach my $i (0..9)
+      warn "The first 10\n" ;
+      for( my $i=0 ; $i<10 ; $i++ )
       {
         print( "Feature $i".@features[$i]."\n" ) ;
       }
