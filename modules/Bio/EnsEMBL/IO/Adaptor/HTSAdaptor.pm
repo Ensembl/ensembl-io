@@ -23,7 +23,10 @@ use Bio::EnsEMBL::Feature;
 use Data::Dumper;
 use Bio::DB::HTS;
 use Data::Dumper;
-my $DEBUG = 0;
+my $DEBUG = 1;
+
+$SIG{__DIE__} =  \&confess;
+$SIG{__WARN__} = \&confess;
 
 my $snpCode = {
     'AG' => 'R',
@@ -201,8 +204,22 @@ sub fetch_alignments_filtered {
 
   $index->fetch($htsobj->hts_file, @coords, $callback);
 
-  if ($DEBUG) {
+  if ($DEBUG)
+  {
     warn " *** fetch alignments filtered: $chr_id:$start-$end : found ", scalar(@features), " alignments \n";
+    #print the first 10 and last 10 features to see if this triggers an issue.
+    my $num_features = scalar(@features) ;
+    if( $num_features>10 )
+    {
+      foreach my $i (0..9)
+      {
+        print( "Feature $i".@features[$i]."\n" ) ;
+      }
+      #foreach my $i (($num_features-10)..($numfeatures-1))
+      #{
+      #  print( "Feature $i".@features[$i]."\n" ) ;
+      #}
+    }
   }
 
   return \@features;
@@ -240,8 +257,9 @@ sub fetch_coverage {
   my ($coverage) = $segment->features('coverage' . (defined($bins) ? ":$bins" : ""), $filter);
   my @data_points = $coverage->coverage;
 
-  if ($DEBUG) {
-    warn " *** fetch coverage: $chr_id:$start-$end : found ", scalar(@data_points), " coverage points \n";
+  if ($DEBUG) 
+  {
+    warn " *** fetch coverage: $chr_id:$start-$end : found ", scalar(@data_points), " coverage points \n";    
   }
 
   return \@data_points;
