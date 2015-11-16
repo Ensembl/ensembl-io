@@ -221,12 +221,13 @@ sub fetch_alignments_filtered {
       warn "The first 10\n" ;
       for( my $i=0 ; $i<10 ; $i++ )
       {
-        print( "Feature $i".@features[$i]."\n" ) ;
+        warn( "Feature $i: ".@features[$i]."\n" ) ;
       }
-      #foreach my $i (($num_features-10)..($numfeatures-1))
-      #{
-      #  print( "Feature $i".@features[$i]."\n" ) ;
-      #}
+      warn "The last 10\n" ;
+      for( my $i=($num_features-10) ; $i<$num_features ; $i++ )
+      {
+        warn( "Feature $i: ".@features[$i]."\n" ) ;
+      }
     }
   }
 
@@ -265,9 +266,9 @@ sub fetch_coverage {
   my ($coverage) = $segment->features('coverage' . (defined($bins) ? ":$bins" : ""), $filter);
   my @data_points = $coverage->coverage;
 
-  if ($DEBUG) 
+  if ($DEBUG)
   {
-    warn " *** fetch coverage: $chr_id:$start-$end : found ", scalar(@data_points), " coverage points \n";    
+    warn " *** fetch coverage: $chr_id:$start-$end : found ", scalar(@data_points), " coverage points \n";
   }
 
   return \@data_points;
