@@ -221,12 +221,14 @@ sub fetch_alignments_filtered {
       warn "The first 10\n" ;
       for( my $i=0 ; $i<10 ; $i++ )
       {
-        warn( "Feature $i: ".@features[$i]."\n" ) ;
+        my $f = @features[$i] ;
+        warn( "Feature $i: ".$f->start."\n" ) ;
       }
       warn "The last 10\n" ;
       for( my $i=($num_features-10) ; $i<$num_features ; $i++ )
       {
-        warn( "Feature $i: ".@features[$i]."\n" ) ;
+        my $f = @features[$i] ;
+        warn( "Feature $i: ".$f->start."\n" ) ;
       }
     }
   }
