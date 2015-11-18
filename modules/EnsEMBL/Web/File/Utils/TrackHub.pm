@@ -87,50 +87,58 @@ sub get_hub {
   my ($self, $args) = @_;
 
   ## First check the cache
-  my $cache = $self->web_hub ? $self->web_hub->cache : undef;
+  my $cache     = $self->web_hub ? $self->web_hub->cache : undef;
   my $cache_key = 'trackhub_'.md5_hex($self->url);
-  my $trackhub;
+  my $file_args = {'hub' => $self->{'hub'}, 'nice' => 1, 'headers' => $headers}; 
+  my ($trackhub, $content, @errors);
 
   if ($cache) {
     $trackhub = $cache->get($cache_key);
-    return $trackhub if $trackhub;
   }
 
-  ## Prepare to parse!
-  my $parser = $self->parser;
-  my $file_args = {'hub' => $self->{'hub'}, 'nice' => 1, 'headers' => $headers}; 
+  my $parser        = $self->parser;
+  my $genome_info   = {};
+  my $other_genomes = [];
+  my $response;
 
-  ## First read the hub.txt file and get the hub's metadata
-  my $response = read_file($parser->hub_file_path, $file_args);
-  my ($content, @errors);
- 
-  if ($response->{'error'}) {
-    return $response;
+  if ($trackhub) {
+    $genome_info = $trackhub->{'genomes'} || {};
   }
   else {
-    $content = $response->{'content'};
-  }
-
-  my $hub_info = $parser->get_hub_info($content);
-
-  return { error => ['No genomesFile found'] } unless $hub_info->{'genomesFile'}; 
+    ## First read the hub.txt file and get the hub's metadata
+    my $response = read_file($parser->hub_file_path, $file_args);
+    my ($content, @errors);
  
-  ## Now get genomes file and find out what species and assemblies it has
-  $response = read_file($hub_info->{'genomesFile'}, $file_args); 
-  if ($response->{'error'}) {
-    return $response;
-  }
-  else {
-    $content = $response->{'content'};
-  }
+    if ($response->{'error'}) {
+      return $response;
+    }
+    else {
+      $content = $response->{'content'};
+    }
 
-  my ($genome_info, $other_genomes) = $parser->get_genome_info($content, $args->{'assembly_lookup'});
+    my $hub_info = $parser->get_hub_info($content);
+
+    return { error => ['No genomesFile found'] } unless $hub_info->{'genomesFile'}; 
+ 
+    ## Now get genomes file and find out what species and assemblies it has
+    $response = read_file($hub_info->{'genomesFile'}, $file_args); 
+    if ($response->{'error'}) {
+      return $response;
+    }
+    else {
+      $content = $response->{'content'};
+    }
+
+    ($genome_info, $other_genomes) = $parser->get_genome_info($content, $args->{'assembly_lookup'});
+    $trackhub = { details => $hub_info, genomes => $genome_info };
+  }
 
   if (keys %$genome_info) {
     ## Only get track information if it's requested, as there can
     ## be thousands of the darned things!
     if ($args->{'parse_tracks'}) {
       while (my($genome, $info) = each (%$genome_info)) {
+        next if $info->{'tree'};
  
         my $tree = EnsEMBL::Web::Tree->new;
         my $options = {'tree' => $tree};
@@ -173,7 +181,6 @@ sub get_hub {
     return $feedback;
   }
   else {
-    my $trackhub = { details => $hub_info, genomes => $genome_info };
     if ($cache) {
       $cache->set($cache_key, $trackhub, $self->{'timeout'}, 'TRACKHUBS');
     }
