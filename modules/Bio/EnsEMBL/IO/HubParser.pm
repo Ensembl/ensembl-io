@@ -198,13 +198,17 @@ sub get_tracks {
             if ($key eq 'superTrack' && $values[0] eq 'on') {
               $tracks{$id}{'superTrack'}  = shift @values;
               my $on_off                  = shift @values if scalar @values;
-              $tracks{$id}{'on_off'}      = ($on_off && $on_off eq 'show') ? 'on' : 'off';
+              if ($on_off) {
+                $tracks{$id}{'on_off'}    = $on_off eq 'show' ? 'on' : 'off';
+              }
             }
             else {
               ## Hack for incorrect hubs that use 'superTrack' in children instead of 'parent'
-              $tracks{$id}{'parent'}  = shift @values;
-              my $on_off              = shift @values if scalar @values;
-              $tracks{$id}{'on_off'}  = ($on_off && ($on_off eq 'show' || $on_off eq 'on')) ? 'on' : 'off';
+              $tracks{$id}{'parent'}    = shift @values;
+              my $on_off                = shift @values if scalar @values;
+              if ($on_off) {
+                $tracks{$id}{'on_off'}  = ($on_off eq 'show' || $on_off eq 'on') ? 'on' : 'off';
+              }
             }
             next;
           } else {
