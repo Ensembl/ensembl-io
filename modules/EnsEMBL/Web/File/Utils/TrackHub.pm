@@ -83,6 +83,7 @@ sub get_hub {
 ### @param args Hashref (optional) 
 ###                     - parse_tracks Boolean
 ###                     - assembly_lookup Hashref
+###                     - refresh Boolean
 ### @return Hashref               
   my ($self, $args) = @_;
 
@@ -92,7 +93,7 @@ sub get_hub {
   my $file_args = {'hub' => $self->{'hub'}, 'nice' => 1, 'headers' => $headers}; 
   my ($trackhub, $content, @errors);
 
-  if ($cache) {
+  if ($cache && !$args->{'refresh'}) {
     $trackhub = $cache->get($cache_key);
   }
 
