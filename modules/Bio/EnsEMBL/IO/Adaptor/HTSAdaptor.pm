@@ -22,11 +22,8 @@ use strict;
 use Bio::EnsEMBL::Feature;
 use Data::Dumper;
 use Bio::DB::HTS;
-use Data::Dumper;
-my $DEBUG = 1;
 
-$SIG{__DIE__} =  \&confess;
-$SIG{__WARN__} = \&confess;
+my $DEBUG = 0;
 
 my $snpCode = {
     'AG' => 'R',
@@ -174,12 +171,9 @@ sub fetch_alignments_filtered {
   warn "Failed to open file " . $self->url unless $htsobj;
   return [] unless $htsobj;
 
-  warn "rn6DEBUG opened file " . $self->url ;
-
   my $index = $self->htsfile_index;
   warn "Failed to open index for " . $self->url unless $index;
   return [] unless $index;
-  warn "rn6DEBUG opened index file for " . $self->url ;
 
   my @features = ();
 
@@ -211,7 +205,6 @@ sub fetch_alignments_filtered {
     warn " *** fetch alignments filtered: $chr_id:$start-$end : found ", scalar(@features), " alignments \n";
   }
   my $num_features = scalar(@features) ;
-  warn " rn6DEBUG:fetch alignments filtered: $chr_id:$start-$end : found ", $num_features, " alignments \n";
 
   if ($DEBUG)
   {
