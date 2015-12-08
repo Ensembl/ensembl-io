@@ -1,0 +1,20 @@
+--- lincoln/Bio-BigFile-1.07/lib/Bio/DB/BigFile.xs  2012-02-24 17:20:04.000000000 +0000
++++ lincoln-patched/Bio-BigFile-1.07/lib/Bio/DB/BigFile.xs  2015-01-28 17:06:19.095211118 +0000
+@@ -117,7 +117,7 @@
+    char* filename
+   PROTOTYPE: $$
+   CODE:
+-  RETVAL = bigWigFileOpen(filename);
++  RETVAL = bigWigFileMayOpen(filename);
+   OUTPUT:
+   RETVAL
+ 
+@@ -127,7 +127,7 @@
+    char* filename
+   PROTOTYPE: $$
+   CODE:
+-  RETVAL = bigBedFileOpen(filename);
++  RETVAL = bigBedFileMayOpen(filename);
+   OUTPUT:
+   RETVAL
+

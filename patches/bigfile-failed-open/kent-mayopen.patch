@@ -1,0 +1,119 @@
+diff -ruN kent/src/inc/bbiFile.h kent-patched/src/inc/bbiFile.h
+--- kent/src/inc/bbiFile.h  2015-01-05 10:03:58.000000000 +0000
++++ kent-patched/src/inc/bbiFile.h  2015-01-28 17:05:15.870486265 +0000
+@@ -135,6 +135,9 @@
+ struct bbiFile *bbiFileOpen(char *fileName, bits32 sig, char *typeName);
+ /* Open up big wig or big bed file. */
+ 
++struct bbiFile *bbiFileMayOpen(char *fileName, bits32 sig, char *typeName);
++/* Open up big wig or big bed file if it exists. */
++
+ void bbiFileClose(struct bbiFile **pBwf);
+ /* Close down a big wig/big bed file. */
+ 
+diff -ruN kent/src/inc/bigBed.h kent-patched/src/inc/bigBed.h
+--- kent/src/inc/bigBed.h 2015-01-05 10:03:58.000000000 +0000
++++ kent-patched/src/inc/bigBed.h 2015-01-28 17:07:56.072322858 +0000
+@@ -59,6 +59,9 @@
+ struct bbiFile *bigBedFileOpen(char *fileName);
+ /* Open up big bed file.   Free this up with bbiFileClose. */
+ 
++struct bbiFile *bigBedFileMayOpen(char *fileName);
++/* Open up big bed file if exists.   Free this up with bbiFileClose. */
++
+ #define bigBedFileClose(a) bbiFileClose(a)
+ 
+ struct bigBedInterval *bigBedIntervalQuery(struct bbiFile *bbi, char *chrom,
+diff -ruN kent/src/inc/bigWig.h kent-patched/src/inc/bigWig.h
+--- kent/src/inc/bigWig.h 2015-01-05 10:03:58.000000000 +0000
++++ kent-patched/src/inc/bigWig.h 2015-01-28 17:07:47.576225461 +0000
+@@ -53,6 +53,9 @@
+ struct bbiFile *bigWigFileOpen(char *fileName);
+ /* Open up big wig file.   Free this up with bbiFileClose */
+ 
++struct bbiFile *bigWigFileMayOpen(char *fileName);
++/* Open up big wig file if exists.   Free this up with bbiFileClose */
++
+ #define bigWigFileClose(a) bbiFileClose(a)
+ 
+ struct bbiInterval *bigWigIntervalQuery(struct bbiFile *bwf, char *chrom, bits32 start, bits32 end,
+diff -ruN kent/src/lib/bbiRead.c kent-patched/src/lib/bbiRead.c
+--- kent/src/lib/bbiRead.c  2015-01-05 10:03:58.000000000 +0000
++++ kent-patched/src/lib/bbiRead.c  2015-01-28 17:02:17.224437924 +0000
+@@ -77,8 +77,8 @@
+ return TRUE;
+ }
+ 
+-struct bbiFile *bbiFileOpen(char *fileName, bits32 sig, char *typeName)
+-/* Open up big wig or big bed file. */
++struct bbiFile *bbiFileMayOpen(char *fileName, bits32 sig, char *typeName)
++/* Open up big wig or big bed file if exists */
+ {
+ /* This code needs to agree with code in two other places currently - bigBedFileCreate,
+  * and bigWigFileCreate.  I'm thinking of refactoring to share at least between
+@@ -89,7 +89,13 @@
+ struct bbiFile *bbi;
+ AllocVar(bbi);
+ bbi->fileName = cloneString(fileName);
+-struct udcFile *udc = bbi->udc = udcFileOpen(fileName, udcDefaultDir());
++struct udcFile *udc = bbi->udc = udcFileMayOpen(fileName, udcDefaultDir());
++if (udc == NULL)
++    {
++    freeMem(bbi->fileName);
++    freez(bbi);
++    return NULL;
++    }
+ 
+ /* Read magic number at head of file and use it to see if we are proper file type, and
+  * see if we are byte-swapped. */
+@@ -150,6 +156,16 @@
+ return bbi;
+ }
+ 
++struct bbiFile *bbiFileOpen(char *fileName, bits32 sig, char *typeName)
++/* Open up big wig or big bed file */
++{
++struct bbiFile *handle;
++handle = bbiFileMayOpen(fileName,sig,typeName);
++if(handle == NULL)
++  errAbort("Couldn't open %s", fileName);
++return handle;
++}
++
+ void bbiFileClose(struct bbiFile **pBwf)
+ /* Close down a big wig/big bed file. */
+ {
+diff -ruN kent/src/lib/bigBed.c kent-patched/src/lib/bigBed.c
+--- kent/src/lib/bigBed.c 2015-01-05 10:03:58.000000000 +0000
++++ kent-patched/src/lib/bigBed.c 2015-01-28 17:02:40.124700512 +0000
+@@ -26,6 +26,13 @@
+ return bbiFileOpen(fileName, bigBedSig, "big bed");
+ }
+ 
++struct bbiFile *bigBedFileMayOpen(char *fileName)
++/* Open up big bed file. */
++{
++return bbiFileMayOpen(fileName, bigBedSig, "big bed");
++}
++
++
+ boolean bigBedFileCheckSigs(char *fileName)
+ /* check file signatures at beginning and end of file */
+ {
+diff -ruN kent/src/lib/bwgQuery.c kent-patched/src/lib/bwgQuery.c
+--- kent/src/lib/bwgQuery.c 2015-01-05 10:03:58.000000000 +0000
++++ kent-patched/src/lib/bwgQuery.c 2015-01-28 17:04:19.365838458 +0000
+@@ -29,6 +29,12 @@
+ return bbiFileOpen(fileName, bigWigSig, "big wig");
+ }
+ 
++struct bbiFile *bigWigFileMayOpen(char *fileName)
++/* Open up big wig file. */
++{
++return bbiFileOpen(fileName, bigWigSig, "big wig");
++}
++
+ boolean bigWigFileCheckSigs(char *fileName)
+ /* check file signatures at beginning and end of file */
+ {
+

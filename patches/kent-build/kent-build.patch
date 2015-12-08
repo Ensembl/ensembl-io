@@ -1,0 +1,21 @@
+--- kent-old/src/inc/common.mk	2015-01-05 10:03:58.000000000 +0000
++++ kent-works/src/inc/common.mk	2015-01-28 16:38:34.912147760 +0000
+@@ -1,10 +1,10 @@
+ CC=gcc
+ # to build on sundance: CC=gcc -mcpu=v9 -m64
+ ifeq (${COPT},)
+-    COPT=-O -g
++    COPT=-O -g -fPIC
+ endif
+ ifeq (${CFLAGS},)
+-    CFLAGS=
++    CFLAGS=-fPIC
+ endif
+ ifeq (${MACHTYPE},)
+     MACHTYPE:=$(shell uname -m)
+diff -ruN kent-old/src/inc/localEnvironment.mk kent-works/src/inc/localEnvironment.mk
+--- kent-old/src/inc/localEnvironment.mk	2015-01-05 10:03:58.000000000 +0000
++++ kent-works/src/inc/localEnvironment.mk	2015-01-28 16:36:33.482757580 +0000
+@@ -0,0 +1,2 @@
++CFLAGS += -I/localsw/include -fPIC
++
