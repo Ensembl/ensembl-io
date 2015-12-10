@@ -131,8 +131,10 @@ sub get_tracks {
  
   ## Some hubs don't set the track type, so...
   my %format_lookup = (
-                      'bb' => 'bigBed',
-                      'bw' => 'bigWig',
+                      'bb'    => 'bigBed',
+                      'bw'    => 'bigWig',
+                      'bam'   => 'BAM',
+                      'cram'  => 'CRAM',
                       );
  
   foreach (@contents) {
