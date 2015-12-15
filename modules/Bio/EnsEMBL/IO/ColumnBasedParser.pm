@@ -30,6 +30,8 @@ use warnings;
 
 use Carp;
 
+use Bio::EnsEMBL::IO::Object::ColumnBasedGeneric;
+
 use base qw/Bio::EnsEMBL::IO::TextParser/;
 
 our %sub_strings = (
@@ -276,6 +278,34 @@ sub create_record {
     push @values, $value;
   }
   return $self->concatenate_fields(@values);
+}
+
+=head2
+
+    Description: Create a generic object for a record with setters and accessors
+                 for each column.
+    Returntype : Bio::EnsEMBL::IO::Object::ColumnBasedGeneric
+
+=cut
+
+sub create_object {
+    my $self = shift;
+
+    my $obj = Bio::EnsEMBL::IO::Object::ColumnBasedGeneric->new($self->get_fields);
+
+    foreach my $field (@{$self->get_fields}) {
+	my $getter = 'get_'.$field;
+	my $munger = 'munge_'.$field;
+	if ($self->can($getter)) {
+	    $obj->$munger($self->$getter);
+	}
+    }
+
+    # Set the fields for this object
+    $obj->fields($self->get_fields);
+
+    return $obj;
+
 }
 
 sub concatenate_fields {

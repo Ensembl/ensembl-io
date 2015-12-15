@@ -33,6 +33,7 @@ use strict;
 use warnings;
 
 use base qw/Bio::EnsEMBL::IO::TokenBasedParser/;
+use Bio::EnsEMBL::IO::Object::Fasta;
 
 =head2 open
 
@@ -70,6 +71,20 @@ sub next {
     }
 
     return $self->SUPER::next();
+}
+
+=head2 next_sequence
+
+    Description: Alias to next(), to maintain a consistant
+                 call to retrieve the next sequence when using
+                 Fasta or GFF3 parsers.
+
+=cut
+
+sub next_sequence {
+    my $self = shift;
+
+    return $self->next();
 }
 
 sub read_record {
@@ -163,6 +178,23 @@ sub getSequence {
     return join("", @$lines);
 }
 
+=head2
+
+    Description: Create a generic object for a record with setters and accessors
+                 for a fasta record
+    Returntype : Bio::EnsEMBL::IO::Object::Fasta
+
+=cut
+
+sub create_object {
+    my $self = shift;
+
+    my $obj = Bio::EnsEMBL::IO::Object::Fasta->new(-HEADER => $self->getHeader, -SEQUENCE => $self->getSequence);
+
+    return $obj;
+
+}
+
 =head2 is_metadata
 
     Description: default 0;
@@ -180,5 +212,13 @@ sub is_metadata { return 0; }
 =cut
 
 sub read_metadata {}
+
+=head2 in_fasta_mode
+    Description: For interoperability with mixed formats such as GFF3, to determine
+                 if the parser allows reading sequences. Default 1
+    Returntype : scalar
+=cut
+
+sub in_fasta_mode { return 1; }
 
 1;
