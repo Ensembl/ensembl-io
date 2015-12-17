@@ -196,12 +196,14 @@ sub read_file {
 ###         proxy (optional) String
 ###         nice (optional) Boolean - see introduction
 ###         compression String (optional) - compression type
+###         method String (optional) - defaults to 'get'
 ### @return Hashref (in nice mode) or String - contents of file
   my ($file, $args) = @_;
   my $url = ref($file) ? $file->absolute_read_path : $file;
   my $proxy = _proxy($args);
 
   my ($content, $error);
+  my $method = $args->{'method'} || 'get';
 
 
   if ($url =~ /^ftp/) {
@@ -209,7 +211,7 @@ sub read_file {
     $ua->timeout(10);
     $ua->env_proxy;
     $ua->proxy([qw(http https)], $proxy) || ();
-    my $response = $ua->get($url, %{$args->{'headers'}});
+    my $response = $ua->$method($url, %{$args->{'headers'}});
     if ($response->is_success) {
       $content = $response->content;
     }
@@ -224,11 +226,20 @@ sub read_file {
       $params{'http_proxy'}   = $proxy;
       $params{'https_proxy'}  = $proxy;
     }
+
     my $http = HTTP::Tiny->new(%params);
 
-    my $params = {};
-    $params->{'headers'} = $args->{'headers'} if $args->{'headers'};
-    my $response = $http->request('GET',$url,$params);
+    ## HTTP::Tiny separates content from other headers
+    my $options = {};
+    if ($args->{'headers'} && $args->{'headers'}{'Content'}) {
+      $options->{'content'} = $args->{'headers'}{'Content'};
+      delete $args->{'headers'}{'Content'};
+    }
+    if ($args->{'headers'} && keys %{$args->{'headers'}}) {
+      $options->{'headers'} = $args->{'headers'};
+    }
+
+    my $response = $http->request(uc($method),$url,$options);
     if ($response->{'success'}) {
       $content = $response->{'content'};
     }

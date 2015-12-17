@@ -46,6 +46,7 @@ sub open {
 
     # Default we haven't reached the ##FASTA block
     $self->{'FASTA_found'} = 0;
+    $self->{FASTA_read} = 0;
 
     # pre-load peek buffer
     $self->next_block();
@@ -92,6 +93,9 @@ sub next_sequence {
     # We're not in Fasta mode yet or none was found.
     return 0
 	unless( $self->in_fasta_mode() );
+
+    # Remember we've now read a fasta sequence
+    $self->{FASTA_read} = 1;
 
     # Pass over to the Fasta parser if we have
     # any sequences in the remaining file
@@ -190,6 +194,26 @@ sub get_attributes {
     $attributes{$key} = $value;
   }
   return \%attributes;
+}
+
+=head2 create_object
+
+    Description: Create an object encapsulation for the record, for the
+                 column based record if in the first half of the gff3 file
+                 or defer to the embedded fasta parser if we're in the
+                 fasta section of the file.
+    Returntype : Bio::EnsEMBL::IO::Object::ColumnBasedGeneric or
+                 Bio::EnsEMBL::IO::Object::Fasta
+=cut
+
+sub create_object {
+    my $self = shift;
+
+    if( $self->in_fasta_mode() && $self->{FASTA_read} ) {
+	return $self->{'FASTA_handle'}->create_object();
+    }
+
+    return $self->SUPER::create_object();
 }
 
 ## Passthru functions for the embedded Fasta within a GFF3, yuck

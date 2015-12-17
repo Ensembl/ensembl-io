@@ -28,7 +28,7 @@ my $parser = Bio::EnsEMBL::IO::Parser::Fasta->open($test_file);
 ok($parser->next());
 ok(length($parser->getHeader()) == 44, "Check length of header");
 ok(scalar(@{$parser->getRawSequence()}) == 17,"Check size of first FASTA block");
-ok($parser->next());
+ok($parser->next_sequence());
 ok(scalar(@{$parser->getRawSequence()}) == 14,"Check size of second FASTA block");
 ok(!$parser->next(), "Final attempt to read returns nothing.");
 ok($parser->close());
