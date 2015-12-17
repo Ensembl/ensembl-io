@@ -23,223 +23,303 @@ Bio::EnsEMBL::IO::Parser::BigBed - A line-based parser devoted to BigBed
 =cut
 
 package Bio::EnsEMBL::IO::Parser::BigBed;
+
 use strict;
 use warnings;
+no warnings 'uninitialized';
 
-use Bio::DB::BigBed;
+use parent qw/Bio::EnsEMBL::IO::BigFileParser Bio::EnsEMBL::IO::Parser::Bed/;
 
-sub open {
-  my ($class, $url, @options) = @_;
-  my %param_hash = @options;
+=head2 init
 
-  my $self = bless {
-    _cache => {},
-    _url => $url,
-    iterator => undef,
-    options => \%param_hash,
-    current => undef,
-  }, $class;
+    Definition: When we open the file, we want to check for AutoSQL 
+                and assign column positions
+    Return: Void
 
-  $self->{_cache}->{_bigbed_handle} = $self->bigbed_open;
-      
-  return $self;
+=cut
+
+sub init {
+  my ($self, $fh) = @_;
+
+  ## Define default column positions, because AutoSQL
+  my $autoSQL = $fh->bigBedAs;
+  my $column_map = {};
+  my $i = 0;
+  while ($autoSQL) {
+    next unless $autoSQL->isTable; 
+    my @table;
+    my $cols = $autoSQL->columnList;
+    while ($cols) {
+      my $real_name = $self->{'alt_names'}{$cols->name} || $cols->name;
+      $column_map->{$real_name} = $i;
+      $i++;
+      $cols = $cols->next;
+    }
+    $autoSQL = $autoSQL->next;
+  }
+  if (keys %$column_map) {
+    $self->{'column_map'} = $column_map;
+  }
+  else {
+    $self->{'column_map'} = {
+                            'chrom'         => 0,
+                            'chromStart'    => 1,
+                            'chromEnd'      => 2,
+                            'name'          => 3,
+                            'score'         => 4,
+                            'strand'        => 5,
+                            'thickStart'    => 6,
+                            'thickEnd'      => 7,
+                            'itemRgb'       => 8,
+                            'blockCount'    => 9,
+                            'blockSizes'    => 10,
+                            'chromStarts'   => 11,
+                            'name2'         => 12,
+                            'cdsStartStat'  => 13,
+                            'cdsEndStat'    => 14,
+                            'exonFrames'    => 15,
+                            'type'          => 16,
+                            'geneName'      => 17,
+                            'geneName2'     => 18,
+                            'geneType'      => 19,
+                          };
+  }
+
+  ## Also set common alternative names for fields
+  $self->{'alt_names'} = {
+                          'item_colour' => 'itemRgb',
+                          'colour'      => 'itemRgb',
+                          'reserved'    => 'itemRgb',
+                          'age'         => 'score',
+                          };
+
+}
+ 
+=head2 type
+
+    Description : Return case-correct version of format name, for use in method names 
+    Returntype  : String
+
+=cut
+
+sub type {
+    return 'bigBed'; 
 }
 
-sub close {}
+=head2 seek
 
-sub bigbed_open {
-  my $self = shift;
+    Description: Fetches the raw data from the requested region and caches it 
+    Returntype : Void
 
-  Bio::DB::BigFile->set_udc_defaults;
-  $self->{_cache}->{_bigbed_handle} ||= Bio::DB::BigBed->new(-bigbed => $self->{_url});
-  warn "Failed to open BigBed file " . $self->{_url} unless $self->{_cache}->{_bigbed_handle};
-  $self->{chromList} = $self->{_cache}->{_bigbed_handle}->bf->chromList;
-  $self->{nextChrom} = $self->{chromList}->head;
-  return $self->{_cache}->{_bigbed_handle};
-}
+=cut
 
 sub seek {
-  my ($self, $chr_id, $start, $finish) = @_;
-  $self->{nextChrom} = undef;
+    my ($self, $chr_id, $start, $end) = @_;
 
-  #  Maybe need to add 'chr' 
-  my $seq_id = $self->munge_chr_id($chr_id);
-  if (defined $seq_id) {
-     $self->{iterator} = $self->{_cache}->{_bigbed_handle}->get_seq_stream(-seq_id => $seq_id, -start => $start, -end => $finish);
-  } else {
-     $self->{iterator} = undef;
-  }
+    my $fh = $self->open_file;
+    warn "Failed to open file ".$self->url unless $fh;
+    return unless $fh;
+
+    ## Get the internal chromosome name
+    my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
+    return unless $seq_id;
+
+    ## Remember this method takes half-open coords (subtract 1 from start)
+    my $list_head = $fh->bigBedIntervalQuery("$seq_id", $start-1, $end);
+
+    my $feature_cache = $self->cache->{'features'};
+
+    for (my $i=$list_head->head; $i; $i=$i->next) {
+      my @line = ($chr_id, $i->start, $i->end, split(/\t/,$i->rest));
+      push @$feature_cache, \@line;
+    }
+    return unless scalar @$feature_cache;
+
+    ## pre-load peek buffer
+    $self->next_block();
 }
 
-sub next {
-  my $self = shift;
-  if (defined $self->{iterator}) {
-    $self->{current} = $self->{iterator}->next_seq;
-    if (defined $self->{current}) {
-      return 1;
-    } 
-  }
-  
-  if (defined $self->{nextChrom}) {
-    # If chromosomes left to visit, load next chromosome 
-    my $next_chrom = $self->{nextChrom}->name;
-    my $next_length = $self->{nextChrom}->size;
-    $self->{nextChrom} = $self->{nextChrom}->next;
-    $self->{iterator} = $self->{_cache}->{_bigbed_handle}->get_seq_stream(-seq_id => $next_chrom, -start => 0, -end => $next_length);
-    return $self->next;
-  } else {
-    return 0;
-  }
+=head2 fetch_summary_data 
+
+    Description: fetches data from the requested region, grouped into 
+                  a set number of bins, and caches it
+    Returntype : Void
+
+=cut
+
+sub fetch_summary_data {
+    my ($self, @args) = @_;
+    
+    ## In effect we're creating a bedGraph, so tell the Bed parser this
+    $self->{'metadata'}{'type'} = 'bedGraph';
+    $self->SUPER::fetch_summary_data(@args);
 }
+
+
+#### Override the BED raw accessors, because AutoSQL
+
+=head2 get_raw_chrom
+
+    Description: Getter for chrom field
+    Returntype : String 
+
+=cut
 
 sub get_raw_chrom {
   my $self = shift;
-  return $self->{current}->seq_id;
+  return $self->{'record'}[$self->{'column_map'}{'chrom'}]; 
 }
 
-sub get_chrom {
+
+=head2 get_raw_chromStart
+
+    Description: Getter for chromStart field
+    Returntype : Integer 
+
+=cut
+
+sub get_raw_chromStart {
   my $self = shift;
-  return $self->get_raw_chrom;
+  return $self->{'record'}[$self->{'column_map'}{'chromStart'}];
 }
 
-sub get_raw_start {
+=head2 get_raw_chromEnd
+
+    Description: Getter for chromEnd field
+    Returntype : Integer 
+
+=cut
+
+sub get_raw_chromEnd {
   my $self = shift;
-  return $self->{current}->start;
+  return $self->{'record'}[$self->{'column_map'}{'chromEnd'}];
 }
 
-sub get_start {
-  my $self = shift;
-  return $self->get_raw_start;
-}
+=head2 get_raw_name
 
-sub get_raw_end {
-  my $self = shift;
-  return $self->{current}->end;
-}
+    Description: Getter for name field
+    Returntype : String 
 
-sub get_end {
-  my $self = shift;
-  return $self->get_raw_end;
-}
-
-sub get_raw_score {
-  my $self = shift;
-  return $self->{current}->score;
-}
-
-sub get_score {
-  my $self = shift;
-  return $self->get_raw_score;
-}
-
-sub get_raw_strand {
-  my $self = shift;
-  return $self->{current}->strand;
-}
-
-sub get_strand {
-  my $self = shift;
-  return $self->get_raw_strand;
-}
-
-sub get_raw_parts {
-  my $self = shift;
-  return $self->{current}->get_SeqFeatures;
-}
-
-sub get_parts {
-  my $self = shift;
-  return $self->get_raw_parts;
-}
+=cut
 
 sub get_raw_name {
   my $self = shift;
-  return $self->{current}->name;
+  return $self->{'record'}[$self->{'column_map'}{'name'}];
 }
 
-sub get_name {
+=head2 get_raw_score
+
+    Description: Getter for score field
+    Returntype : Number (usually floating point) or String (period = no data) 
+
+=cut
+
+sub get_raw_score {
   my $self = shift;
-  return $self->get_raw_name;
+  return $self->{'record'}[$self->{'column_map'}{'score'}];
 }
 
-sub get_raw_rgb {
+=head2 get_raw_strand
+
+    Description: Getter for strand field
+    Returntype : String 
+
+=cut
+
+sub get_raw_strand {
   my $self = shift;
-  return $self->{current}->attributes('RGB');
+  return $self->{'record'}[$self->{'column_map'}{'strand'}];
 }
 
-sub get_rgb {
+=head2 get_raw_thickStart
+
+    Description: Getter for thickStart field
+    Returntype : Integer
+
+=cut
+
+sub get_raw_thickStart {
   my $self = shift;
-  return $self->get_raw_rgb;
+  return $self->{'record'}[$self->{'column_map'}{'thickStart'}];
 }
 
-sub get_bed_feature {
+=head2 get_raw_thickEnd
+
+    Description: Getter for thickEnd field
+    Returntype : Integer 
+
+=cut
+
+sub get_raw_thickEnd {
   my $self = shift;
-  return $self->{current};
+  return $self->{'record'}[$self->{'column_map'}{'thickEnd'}];
 }
 
-# UCSC prepend 'chr' on human chr ids. These are in some of the BigBed
-# files. This method returns a possibly modified chr_id after
-# checking whats in the BigBed file
-sub munge_chr_id {
-  my ($self, $chr_id) = @_;
+=head2 get_raw_itemRgb
 
-  # Check we get_ values back for seq region. Maybe need to add 'chr' 
-  if ($self->{_cache}->{_bigbed_handle}->chromSize($chr_id)) {
-      return $chr_id;
-  } elsif ($self->{_cache}->{_bigbed_handle}->chromSize("chr$chr_id")) {
-      return "chr$chr_id";
-  } else {
-      warn " *** could not find region $chr_id in BigBed file\n";
-      return undef;
-  }
-}
+    Description: Getter for itemRgb field
+    Returntype : String  (3 comma-separated values)
 
-sub fetch_extended_summary_array {
-  my ($self, $chr_id, $start, $end, $bins) = @_;
+=cut
 
-  #  Maybe need to add 'chr' 
-  my $seq_id = $self->munge_chr_id($chr_id);
-
-  if (defined $seq_id ) {
-    # Remember this method takes half-open coords (subtract 1 from start)
-    return $self->{_cache}->{_bigbed_handle}->bigBedSummaryArrayExtended($seq_id,$start-1,$end,$bins);
-  } else {
-    return [];
-  }
-}
-
-sub fetch_features  {
-  my ($self, $chr_id, $start, $end) = @_;
-  $self->seek($chr_id, $start, $end);
-
-  my @features;
-  while ($self->next) {
-    push @features,$self->get_bed_feature;
-  }
-  return \@features;
-}
-
-sub file_bedline_length {
+sub get_raw_itemRgb {
   my $self = shift;
-  my $length = 3;
-
-  # If already fetched some features using this adaptor then use cached max number of fields
-  if (exists($self->{_cache}->{numfield})) {
-    return $self->{_cache}->{numfield};
-  }
-
-  # Else sample the file - this is rather inefficient
-  my $num = 100;
-
-  # list needs to exist and not be undefed until done to avoid SIGSEG
-  for (my $c = $self->{_cache}->{_bigbed_handle}->chromList->head; $c && $num; $c=$c->next) {
-    my $intervals = $self->{_cache}->{_bigbed_handle}->bigBedIntervalQuery($c->name,0,$c->size,$num);
-    for (my $i=$intervals->head;$i && $num;$i=$i->next) {
-      $length = max($length,3 + scalar split(/\t/,$i->rest));
-      $num--;
-    }
-  }
-  return $length;
+  return $self->{'record'}[$self->{'column_map'}{'itemRgb'}];
 }
+
+=head2 get_raw_blockCount
+
+    Description: Getter for blockCount field
+    Returntype : Integer 
+
+=cut
+
+sub get_raw_blockCount {
+  my $self = shift;
+  return $self->{'record'}[$self->{'column_map'}{'blockCount'}];
+}
+
+=head2 get_raw_blockSizes
+
+    Description: Getter for blockSizes field
+    Returntype : String (comma-separated values)
+
+=cut
+
+sub get_raw_blockSizes {
+  my $self = shift;
+  return $self->{'record'}[$self->{'column_map'}{'blockSizes'}];
+}
+
+=head2 get_raw_blockStarts
+
+    Description: Getter for blockStarts field
+    Returntype : String (comma-separated values)
+
+=cut
+
+sub get_raw_blockStarts {
+  my $self = shift;
+  return $self->{'record'}[$self->{'column_map'}{'blockStarts'}];
+}
+
+### AUTOLOAD ANY LITTLE-USED ACCESSORS
+
+our $AUTOLOAD;
+
+sub AUTOLOAD {
+  my $self = shift;
+  my $method = our $AUTOLOAD;
+  $method =~ s/.*:://;
+  my $value;
+
+  if ($method =~ /^get_(raw)?_(\w)+/) {
+    my $key = $2;
+    $value = $self->{'record'}[$self->{'column_map'}{$key}];
+  } 
+  return $value;
+}
+
+
 
 1;

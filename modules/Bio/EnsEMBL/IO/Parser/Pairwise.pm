@@ -56,7 +56,7 @@ sub read_metadata {
 
 sub set_fields {
   my $self = shift;
-  $self->{'fields'} = [qw(seqname start end information interacting region score id direction)];
+  $self->{'fields'} = [qw(seqname start end information interacting_region score id direction)];
 }
 
 
@@ -188,8 +188,8 @@ sub get_information {
 
 sub get_interacting_region {
     my $self = shift;
-    my @info = @{$self->get_information};
-    return $info[0..2];
+    my $info = $self->get_information;
+    return [@$info[0..2]];
 }
 
 =head2 get_information
@@ -199,13 +199,13 @@ sub get_interacting_region {
 
 sub get_score {
     my $self = shift;
-    my $info = $self->get_information;
-    if ($info->[4]) {
+    my @info = @{$self->get_information};
+    if ($info[4]) {
       ## Comma-separated RGB
-      return join(',', $info->[3..5]);
+      return join(',', $info[3..5]);
     }
     else {
-      return $info->[3];
+      return $info[3];
     }
 }
 
