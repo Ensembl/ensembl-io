@@ -130,7 +130,12 @@ sub get_raw_score {
 
 sub _split_feature {
   my ($self, $feature) = @_;
-  return split(/,|:|-/, $feature);
+  ## Capture a final minus sign (direction) before splitting
+  $feature =~ /(-)$/;
+  my $direction = $1;
+  my @coords = split(/,|-|:/, $feature);
+  push @coords, $direction if $direction;
+  return @coords;
 }
 
 ## PUBLIC ACCESSORS
@@ -207,7 +212,7 @@ sub get_interacting_region {
 sub get_direction {
     my $self = shift;
     my @info = $self->_split_feature($self->get_raw_feature_1); 
-    return $info[3]; 
+    return @info[3]; 
 }
 
 =head2 get_score
