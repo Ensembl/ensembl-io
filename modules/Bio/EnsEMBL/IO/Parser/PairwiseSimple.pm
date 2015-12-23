@@ -195,8 +195,8 @@ sub get_information {
 
 sub get_interacting_region {
     my $self = shift;
-    my @info = @{$self->get_information};
-    return $info[0..2];
+    my @info = @{$self->get_information||[]};
+    return @info[0..2];
 }
 
 =head2 get_direction
