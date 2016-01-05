@@ -212,7 +212,7 @@ sub get_interacting_region {
 sub get_direction {
     my $self = shift;
     my @info = $self->_split_feature($self->get_raw_feature_1); 
-    return @info[3]; 
+    return $info[3]; 
 }
 
 =head2 get_score
