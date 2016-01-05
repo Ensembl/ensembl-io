@@ -86,7 +86,8 @@ sub get_raw_seqname {
 
 sub get_seqname {
     my $self = shift;
-    return $self->get_raw_seqname();
+    (my $chr = $self->get_raw_seqname()) =~ s/^chr//;
+    return $chr;
 }
 
 
