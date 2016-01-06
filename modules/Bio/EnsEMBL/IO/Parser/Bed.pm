@@ -41,7 +41,7 @@ use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
 sub set_fields {
   my $self = shift;
-  $self->{'fields'} = [qw(seqname start end name score strand thickStart thickEnd itemRgb)];
+  $self->{'fields'} = [qw(seqname start end name score strand thickStart thickEnd itemRgb blockCount blockSizes blockStarts)];
 }
 
 =head2 set_minimum_column_count
