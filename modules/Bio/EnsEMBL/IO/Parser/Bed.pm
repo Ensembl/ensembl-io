@@ -2,7 +2,7 @@
 
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
 sub set_fields {
   my $self = shift;
-  $self->{'fields'} = [qw(seqname start end name score strand thickStart thickEnd itemRgb)];
+  $self->{'fields'} = [qw(seqname start end name score strand thickStart thickEnd itemRgb blockCount blockSizes blockStarts)];
 }
 
 =head2 set_minimum_column_count
@@ -403,20 +403,49 @@ sub get_blockStarts {
   return \@res;
 }
 
-=head2 _validate 
+=head2 validate 
 
-    Description: Additional format_specific validation
-    Returntype: Boolean
+    Description: Format_specific validation
+    Returntype: String
 
 =cut
 
-sub _validate {
-    my ($self, $column_count) = @_;
-    my $valid = 1;
-  
-    $valid = 0 if !$self->get_seqname;
+sub validate {
+    my $self = shift;
 
-    return $valid;
+    my $valid   = 0;
+    my $format  = '';
+
+    while ($self->next) {
+     
+      ## Ignore metadata and empty lines - we want to check the actual data 
+      next if $self->is_metadata;
+      next if $self->{'current_block'} !~ /\w/;
+      $self->read_record;
+
+      ## Check we have the correct number of columns for this format
+      my $col_count = scalar(@{$self->{'record'}});
+
+      ## Identify bedgraph content
+      if ($col_count == 4 && $self->{'record'}[3] =~ /^[-+]?[0-9]*\.?[0-9]+$/) {
+        $format = 'bedgraph';
+        $valid = 1;
+      }
+      elsif ($col_count >= $self->get_minimum_column_count
+              && $col_count <= $self->get_maximum_column_count) {
+        $valid = 1;
+      }
+      last unless $valid;
+
+      ## Check we have coordinates
+      $valid = 0 if !$self->get_seqname;
+      $valid = 0 unless ($self->get_start =~ /\d+/ && $self->get_start > 0 && $self->get_end =~ /\d+/);
+      last;
+    }
+
+    if ($valid) {
+      return $format || $valid;
+    }
 }
 
 
