@@ -324,6 +324,30 @@ sub get_feature {
   return $self->get_raw_feature();
 }
 
+=head2 get_raw_biotype
+
+    Description: Getter for exon field
+    Returntype : String 
+
+=cut
+
+sub get_raw_biotype {
+  my $self = shift;
+  return $self->{'record'}[9];
+}
+
+=head2 get_biotype
+
+    Description: Getter - wrapper around raw method 
+    Returntype : String 
+
+=cut
+
+sub get_biotype {
+  my $self = shift;
+  return $self->get_raw_biotype();
+}
+
 =head2 get_raw_exon
 
     Description: Getter for exon field
@@ -333,7 +357,7 @@ sub get_feature {
 
 sub get_raw_exon {
   my $self = shift;
-  return $self->{'record'}[9];
+  return $self->{'record'}[10];
 }
 
 =head2 get_exon
@@ -357,7 +381,7 @@ sub get_exon {
 
 sub get_raw_intron {
   my $self = shift;
-  return $self->{'record'}[10];
+  return $self->{'record'}[11];
 }
 
 =head2 get_intron
@@ -381,7 +405,7 @@ sub get_intron {
 
 sub get_raw_hgvsc {
   my $self = shift;
-  return $self->{'record'}[11];
+  return $self->{'record'}[12];
 }
 
 =head2 get_hgvsc
@@ -405,7 +429,7 @@ sub get_hgvsc {
 
 sub get_raw_hgvsp {
   my $self = shift;
-  return $self->{'record'}[12];
+  return $self->{'record'}[13];
 }
 
 =head2 get_hgvsp
@@ -429,7 +453,7 @@ sub get_hgvsp {
 
 sub get_raw_cdna_position {
   my $self = shift;
-  return $self->{'record'}[13];
+  return $self->{'record'}[14];
 }
 
 =head2 get_cdna_position
@@ -453,7 +477,7 @@ sub get_cdna_position {
 
 sub get_raw_cds_position {
   my $self = shift;
-  return $self->{'record'}[14];
+  return $self->{'record'}[15];
 }
 
 =head2 get_cds_position
@@ -477,7 +501,7 @@ sub get_cds_position {
 
 sub get_raw_protein_position {
   my $self = shift;
-  return $self->{'record'}[15];
+  return $self->{'record'}[16];
 }
 
 =head2 get_protein_position
@@ -501,7 +525,7 @@ sub get_protein_position {
 
 sub get_raw_amino_acids {
   my $self = shift;
-  return $self->{'record'}[16];
+  return $self->{'record'}[17];
 }
 
 =head2 get_amino_acids
@@ -525,7 +549,7 @@ sub get_amino_acids {
 
 sub get_raw_codons {
   my $self = shift;
-  return $self->{'record'}[17];
+  return $self->{'record'}[18];
 }
 
 =head2 get_codons
@@ -549,7 +573,7 @@ sub get_codons {
 
 sub get_raw_existing_variation {
   my $self = shift;
-  return $self->{'record'}[18];
+  return $self->{'record'}[19];
 }
 
 =head2 get_existing_variation
@@ -573,7 +597,7 @@ sub get_existing_variation {
 
 sub get_raw_extra {
   my $self = shift;
-  return $self->{'record'}[19];
+  return $self->{'record'}[20];
 }
 
 =head2 get_extra
