@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,6 +19,11 @@ limitations under the License.
 package Bio::EnsEMBL::IO::Adaptor::BigWigAdaptor;
 use strict;
 
+#########################################################################
+# DEPRECATED MODULE - please use Bio::EnsEMBL::IO::Parser::BigBed instead
+#########################################################################
+
+
 use Data::Dumper;
 use Bio::DB::BigFile;
 use Bio::DB::BigFile::Constants;
@@ -26,6 +31,15 @@ my $DEBUG = 0;
 
 
 sub new {
+  warn qq(
+#############################################################################
+THIS MODULE HAS BEEN DEPRECATED, as we are moving to having all our parsers
+follow the Bio::EnsEMBL::IO::Parser pattern and will therefore not be
+maintaining this package. It will be removed altogether in November 2016. 
+Please use Bio::EnsEMBL::IO::Parser::BigWig instead
+#############################################################################
+  );
+
   my ($class, $url) = @_;
   
   my $self = bless {

@@ -2,7 +2,7 @@
 
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,146 +18,119 @@ limitations under the License.
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::BigWig - A line-based parser devoted to BigWigs
+Bio::EnsEMBL::IO::Parser::BigWig - A line-based parser devoted to BigWig
 
 =cut
 
 package Bio::EnsEMBL::IO::Parser::BigWig;
+
 use strict;
 use warnings;
+no warnings 'uninitialized';
 
-use Bio::DB::BigWig;
+use parent qw/Bio::EnsEMBL::IO::BigFileParser Bio::EnsEMBL::IO::Parser::Wig/;
+ 
+=head2 type
 
-sub open {
-  my ($class, $url, @options) = @_;
-  my %param_hash = @options;
+    Description : Return case-correct version of format name, for use in method names 
+    Returntype  : String
 
-  my $self = bless {
-    _cache => {},
-    _url => $url,
-    iterator => undef,
-    options => \%param_hash,
-    current => undef,
-  }, $class;
+=cut
 
-  $self->{_cache}->{_bigwig_handle} = $self->bigwig_open;
-      
-  return $self;
+sub type {
+    return 'bigWig'; 
 }
 
-sub close {}
+=head2 seek
 
-sub bigwig_open {
-  my $self = shift;
+    Description: Fetches the raw data from the requested region and caches it 
+    Returntype : Void
 
-  Bio::DB::BigFile->set_udc_defaults;
-  $self->{_cache}->{_bigwig_handle} ||= Bio::DB::BigWig->new(-bigwig => $self->{_url});
-  warn "Failed to open BigWig file " . $self->{_url} unless $self->{_cache}->{_bigwig_handle};
-  $self->{chromList} = $self->{_cache}->{_bigwig_handle}->bf->chromList;
-  $self->{nextChrom} = $self->{chromList}->head;
-  return $self->{_cache}->{_bigwig_handle};
-}
+=cut
 
 sub seek {
-  my ($self, $chr_id, $start, $finish) = @_;
-  $self->{nextChrom} = undef;
+    my ($self, $chr_id, $start, $end) = @_;
 
-  #  Maybe need to add 'chr' 
-  my $seq_id = $self->munge_chr_id($chr_id);
-  if (defined $seq_id) {
-     $self->{iterator} = $self->{_cache}->{_bigwig_handle}->get_seq_stream(-seq_id => $seq_id, -start => $start, -end => $finish);
-  } else {
-     $self->{iterator} = undef;
-  }
+    my $fh = $self->open_file;
+    warn "Failed to open file ".$self->url unless $fh;
+    return unless $fh;
+
+    ## Get the internal chromosome name
+    my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
+    return unless $seq_id;
+
+    my $list = $fh->bigWigIntervalQuery("$seq_id", $start, $end);
+
+    my $feature_cache = $self->cache->{'features'};
+
+    for (my $i = $list->head; $i; $i = $i->next) {
+      my @line = ($chr_id, $i->start-1, $i->end, $i->value);
+      push @$feature_cache, \@line;
+    }
+    ## pre-load peek buffer
+    $self->next_block();
 }
 
-sub next {
-  my $self = shift;
-  if (defined $self->{iterator}) {
-    $self->{current} = $self->{iterator}->next_seq;
-    if (defined $self->{current}) {
-      return 1;
-    } 
-  }
-  
-  if (defined $self->{nextChrom}) {
-    # If chromosomes left to visit, load next chromosome 
-    my $next_chrom = $self->{nextChrom}->name;
-    my $next_length = $self->{nextChrom}->size;
-    $self->{nextChrom} = $self->{nextChrom}->next;
-    $self->{iterator} = $self->{_cache}->{_bigwig_handle}->get_seq_stream(-seq_id => $next_chrom, -start => 0, -end => $next_length);
-    return $self->next;
-  } else {
-    return 0;
-  }
-}
+
+=head2 get_raw_chrom
+
+    Description: Getter for chrom field
+    Returntype : String 
+
+=cut
 
 sub get_raw_chrom {
   my $self = shift;
-  return $self->{current} ? $self->{current}->seq_id : undef;
+  return $self->{'record'}[0];
 }
 
-sub get_chrom {
-  my $self = shift;
-  return $self->get_raw_chrom;
-}
+=head2 get_raw_start
 
+    Description: Getter for start field
+    Returntype : Integer 
+
+=cut
 sub get_raw_start {
   my $self = shift;
-  return $self->{current}->start;
+  return $self->{'record'}[1];
 }
+
+=head2 get_start
+
+    Description: Getter - wrapper around get_raw_start
+    Returntype : Integer 
+
+=cut
 
 sub get_start {
   my $self = shift;
-  return $self->get_raw_start;
+  return $self->get_raw_start();
 }
 
-sub get_raw_end {
-  my $self = shift;
-  return $self->{current}->end;
-}
+
+=head2 get_end
+
+    Description: Getter - wrapper around get_raw_end 
+    Returntype : String 
+
+=cut
 
 sub get_end {
   my $self = shift;
-  return $self->get_raw_end;
+  return $self->get_raw_end();
 }
+
+=head2 get_raw_score
+
+    Description: Getter for score field
+    Returntype : Number (usually floating point) or String (period = no data)
+
+=cut
 
 sub get_raw_score {
   my $self = shift;
-  return $self->{current}->score;
+  return $self->{'record'}[3];
 }
 
-sub get_score {
-  my $self = shift;
-  return $self->get_raw_score;
-}
-
-# UCSC prepend 'chr' on human chr ids. These are in some of the BigBed
-# files. This method returns a possibly modified chr_id after
-# checking whats in the BigBed file
-sub munge_chr_id {
-  my ($self, $chr_id) = @_;
-
-  # Check we get_ values back for seq region. Maybe need to add 'chr' 
-  if ($self->{_cache}->{_bigbed_handle}->chromSize($chr_id)) {
-      return $chr_id;
-  } elsif ($self->{_cache}->{_bigbed_handle}->chromSize("chr$chr_id")) {
-      return "chr$chr_id";
-  } else {
-      warn " *** could not find region $chr_id in BigWig file\n";
-      return undef;
-  }
-}
-
-sub fetch_extended_summary_array {
-  my ($self, $chr_id, $start, $end, $bins) = @_;
-
-  #  Maybe need to add 'chr' 
-  my $seq_id = $self->munge_chr_id($chr_id);
-  return [] if !defined($seq_id);
-
-  # Remember this method takes half-open coords (subtract 1 from start)
-  return $self->{bw}->bigWigSummaryArrayExtended($seq_id,$start-1,$end,$bins);
-}
 
 1;

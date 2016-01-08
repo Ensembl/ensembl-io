@@ -2,7 +2,7 @@
 
 =head1 LICENSE
 
-  Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+  Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -64,10 +64,21 @@ sub seek {
   if (defined $self->{iterator}) {
     tabix_iter_free($self->{iterator});
   }
-  $self->{iterator} = tabix_query($self->{filehandle}, $chrom, $start, $end);
-  
+
+  ## Check for both possible versions of chromosome name
+  foreach ($chrom, "chr$chrom") {
+    $self->{iterator} = tabix_query($self->{filehandle}, $_, $start, $end);
+    last if $self->{iterator};
+  }
+
   # pre-load peek buffer
-  $self->next_block();
+  if ($self->{iterator}) {
+    $self->next_block();
+    return 1;
+  }
+  else {
+    return 0;
+  }
 }
 
 sub next_block {

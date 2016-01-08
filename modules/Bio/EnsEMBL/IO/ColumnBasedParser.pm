@@ -2,7 +2,7 @@
 
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -180,15 +180,6 @@ sub set_maximum_column_count {
     Returntype : Void 
 
 =cut
-
-
-=head2 read_record
-
-    Description: Splits the current block along predefined delimiters
-    Returntype : Void 
-
-=cut
-
 
 sub read_record {
     my $self = shift;

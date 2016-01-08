@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,6 +18,12 @@ limitations under the License.
 
 package Bio::EnsEMBL::IO::Adaptor::BigBedAdaptor;
 use strict;
+
+
+#########################################################################
+# DEPRECATED MODULE - please use Bio::EnsEMBL::IO::Parser::BigBed instead
+#########################################################################
+
 
 use List::Util qw(max);
 
@@ -49,7 +55,16 @@ my %global_name_map = (
 
 sub new {
   my ($class, $url) = @_;
-
+  warn qq(
+#############################################################################
+THIS MODULE HAS BEEN DEPRECATED, as it produces a data structure from AutoSQL
+that is specifically tailored to a now-obsolete EnsEMBL::Web module. It will 
+therefore not be maintained in future, and will be removed altogether in 
+November 2016. 
+Please use Bio::EnsEMBL::IO::Parser::BigBed instead - it is more efficient and 
+works in the same way as other ensembl-io parsers
+#############################################################################
+  );
     my $self = bless {
     _cache => {},
     _url => $url,

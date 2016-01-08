@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ use EnsEMBL::Web::File::Utils qw(get_filename get_compression);
 use EnsEMBL::Web::File::Utils::FileSystem qw(create_path);
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(file_exists fetch_file read_file read_lines preview_file write_file write_lines append_lines);
+our @EXPORT_OK = qw(file_exists touch_file delete_file fetch_file read_file read_lines preview_file write_file write_lines append_lines);
 our %EXPORT_TAGS = (all     => [@EXPORT_OK]);
 
 sub file_exists {

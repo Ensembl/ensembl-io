@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,6 +18,11 @@ limitations under the License.
 
 package Bio::EnsEMBL::IO::Adaptor::PairwiseAdaptor;
 
+######################## DEPRECATED ################################
+# No longer in use by the webcode; will be removed in November 2016
+####################################################################
+
+
 use strict;
 
 use Bio::EnsEMBL::IO::Parser::PairwiseTabix;
@@ -25,6 +30,11 @@ use Bio::EnsEMBL::IO::Parser::PairwiseTabix;
 my $DEBUG = 0;
 
 sub new {
+warn "################# DEPRECATED PACKAGE ######################################
+## Functionality has been moved into EnsEMBL::Web::IOWrapper::PairwiseTabix
+## in the ensembl-webcode repository
+###########################################################################
+";
   my ($class, $url) = @_;
   my $self = bless {
     _cache => {},

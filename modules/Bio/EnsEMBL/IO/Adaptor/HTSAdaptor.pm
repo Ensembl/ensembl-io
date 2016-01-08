@@ -16,13 +16,13 @@ limitations under the License.
 
 =cut
 
-package Bio::EnsEMBL::IO::Adaptor::BAMAdaptor;
+package Bio::EnsEMBL::IO::Adaptor::HTSAdaptor;
 use strict;
 
 use Bio::EnsEMBL::Feature;
 use Data::Dumper;
-use Bio::DB::Sam;
-use Data::Dumper;
+use Bio::DB::HTS;
+
 my $DEBUG = 0;
 
 my $snpCode = {
@@ -53,35 +53,39 @@ sub new {
 
 sub url { return $_[0]->{'_url'} };
 
-sub sam_open {
+#
+# Open a Bio::DB::HTS object
+#
+sub hts_open
+{
   my $self = shift;
 
-  $self->{_cache}->{_sam_handle} ||= Bio::DB::Sam->new(-bam => $self->url);
-  return $self->{_cache}->{_sam_handle};
+  $self->{_cache}->{_htsobj_handle} ||= Bio::DB::HTS->new(-bam => $self->url);
+  return $self->{_cache}->{_htsobj_handle};
 }
 
-sub bam_open {
+sub htsfile_open {
   my $self = shift;
 
-  if (!$self->{_cache}->{_bam_handle}) {
-    if (Bio::DB::Bam->can('set_udc_defaults')) {
-      Bio::DB::Bam->set_udc_defaults;
+  if (!$self->{_cache}->{_htsfile_handle}) {
+    if (Bio::DB::HTSfile->can('set_udc_defaults')) {
+      Bio::DB::HTSfile->set_udc_defaults;
     }
-    $self->{_cache}->{_bam_handle} = Bio::DB::Bam->open($self->url);
+    $self->{_cache}->{_htsfile_handle} = Bio::DB::HTSfile->open($self->url);
   }
-  return $self->{_cache}->{_bam_handle};
+  return $self->{_cache}->{_htsfile_handle};
 }
 
-sub bam_index {
+sub htsfile_index {
   my $self = shift;
 
-  if (!$self->{_cache}->{_bam_index}) {
-    if (Bio::DB::Bam->can('set_udc_defaults')) {
-      Bio::DB::Bam->set_udc_defaults;
+  if (!$self->{_cache}->{_htsfile_index}) {
+    if (Bio::DB::HTSfile->can('set_udc_defaults')) {
+      Bio::DB::HTSfile->set_udc_defaults;
     }
-    $self->{_cache}->{_bam_index} = Bio::DB::Bam->index($self->url);
+    $self->{_cache}->{_htsfile_index} = Bio::DB::HTSfile->index($self->{_cache}->{_htsobj_handle});
   }
-  return $self->{_cache}->{_bam_index};
+  return $self->{_cache}->{_htsfile_index};
 }
 
 sub snp_code {
@@ -98,50 +102,44 @@ sub munge_chr_id {
 
   my $ret_id;
 
-  my $bam = $self->bam_open;
-  warn "Failed to open BAM file " . $self->url unless $bam;
-  return undef unless $bam;
+  my $htsfile = $self->htsfile_open;
+  warn "Failed to open BAM/CRAM file " . $self->url unless $htsfile;
+  return undef unless $htsfile;
 
-  my $header = $bam->header;
+  my $header = $htsfile->header_read;
 
-  # Check we get values back for seq region. Maybe need to add 'chr' or Chr
+  my $ret_id = $chr_id;
+
+  # Check we get values back for seq region. Maybe need to add 'chr'
 
   # Note there is a bug in samtools version 0.1.18 which means we can't just
   # use the chr_id as the region, we have to specify a range. The range I
   # use is 1-1 which is hopefully valid for all seq regions
   my @coords = $header->parse_region("$chr_id:1-1");
-  if (@coords) {
-    return "$chr_id";
-  }
 
   if (!@coords) {
     @coords = $header->parse_region("chr$chr_id:1-1");
     if (@coords) {
-      return "chr$chr_id";
+      $ret_id = "chr$chr_id";
+    } else {
+      warn " *** could not parse_region for BAM with $chr_id in file " . $self->url ."\n";
+      return undef;
     }
   }
 
-  if (!@coords) {
-    @coords = $header->parse_region("Chr$chr_id:1-1");
-    if (@coords) {
-      return "Chr$chr_id";
-    }
-  }
-
-  warn " *** could not parse_region for BAM with $chr_id in file " . $self->url ."\n";
-  return undef;
+  return $ret_id;
 }
 
 sub fetch_paired_alignments {
   my ($self, $chr_id, $start, $end) = @_;
 
-  my $sam = $self->sam_open;
-  warn "Failed to open BAM file (as SAM) " . $self->url unless $sam;
-  return [] unless $sam;
+  my $hts_obj = $self->hts_open;
+  warn "Failed to open HTS object for file " . $self->url unless $hts_obj;
+  return [] unless $hts_obj;
 
   my @features;
 
-  my $header = $sam->bam->header;
+  my $header = $hts_obj->hts_file->header_read;
 
   # Maybe need to add 'chr'
   my $seq_id = $self->munge_chr_id($chr_id);
@@ -154,7 +152,7 @@ sub fetch_paired_alignments {
     return [];
   }
 
-  @features = $sam->get_features_by_location(-type   => 'read_pair',
+  @features = $hts_obj->get_features_by_location(-type   => 'read_pair',
                                              -seq_id => $seq_id,
                                              -start  => $start,
                                              -end    => $end);
@@ -169,18 +167,13 @@ sub fetch_paired_alignments {
 sub fetch_alignments_filtered {
   my ($self, $chr_id, $start, $end, $filter) = @_;
 
-  #warn "bam url:" . $self->url if ($DEBUG > 2);
+  my $htsobj = $self->hts_open;
+  warn "Failed to open file " . $self->url unless $htsobj;
+  return [] unless $htsobj;
 
-  my $bam = $self->bam_open;
-  warn "Failed to open BAM file " . $self->url unless $bam;
-  return [] unless $bam;
-
-  my $index = $self->bam_index;
-  warn "Failed to open BAM index for " . $self->url unless $index;
+  my $index = $self->htsfile_index;
+  warn "Failed to open index for " . $self->url unless $index;
   return [] unless $index;
-
-  #warn Dumper $filter if ($DEBUG > 2);
-
 
   my @features = ();
 
@@ -193,23 +186,44 @@ sub fetch_alignments_filtered {
     }
   };
 
-  my $header = $bam->header;
+  my $header = $htsobj->header;
 
   # Maybe need to add 'chr'
   my $seq_id = $self->munge_chr_id($chr_id);
   return [] if !defined($seq_id);
 
   my @coords = $header->parse_region("$seq_id:$start-$end");
-
   if (!@coords) {
     warn " *** could not parse_region for BAM with $chr_id:$start-$end\n";
     return [];
   }
 
-  $index->fetch($bam, @coords, $callback);
+  $index->fetch($htsobj->hts_file, @coords, $callback);
 
-  if ($DEBUG) {
+  if ($DEBUG)
+  {
     warn " *** fetch alignments filtered: $chr_id:$start-$end : found ", scalar(@features), " alignments \n";
+  }
+  my $num_features = scalar(@features) ;
+
+  if ($DEBUG)
+  {
+    warn "The first 10 and last 10 features to see if this triggers an issue.\n" ;
+    if( $num_features>10 )
+    {
+      warn "The first 10\n" ;
+      for( my $i=0 ; $i<10 ; $i++ )
+      {
+        my $f = @features[$i] ;
+        warn( "Feature $i: ".$f->start."\n" ) ;
+      }
+      warn "The last 10\n" ;
+      for( my $i=($num_features-10) ; $i<$num_features ; $i++ )
+      {
+        my $f = @features[$i] ;
+        warn( "Feature $i: ".$f->start."\n" ) ;
+      }
+    }
   }
 
   return \@features;
@@ -218,22 +232,18 @@ sub fetch_alignments_filtered {
 sub fetch_coverage {
   my ($self, $chr_id, $start, $end, $bins, $filter) = @_;
 
-  #warn "bam url:" . $self->url if ($DEBUG > 2);
+  my $hts_obj = $self->hts_open;
+  warn "Failed to make HTS object from file " . $self->url unless $hts_obj;
+  return [] unless $hts_obj;
 
-  my $sam = $self->sam_open;
-  warn "Failed to open BAM file (as SAM)" . $self->url unless $sam;
-  return [] unless $sam;
-
-  my $index = $self->bam_index;
+  my $index = $self->htsfile_index;
   warn "Failed to open BAM index for " . $self->url unless $index;
   return [] unless $index;
-
-  #warn Dumper $filter if ($DEBUG > 2);
 
   # filter out unmapped mates - the ones that don't have location set
   $filter ||= sub {my $a = shift; return 0 unless $a->start; return 1};
 
-  my $header = $sam->bam->header;
+  my $header = $hts_obj->hts_file->header_read;
 
   #  Maybe need to add 'chr'
   my $seq_id = $self->munge_chr_id($chr_id);
@@ -246,12 +256,13 @@ sub fetch_coverage {
     return [];
   }
 
-  my $segment = $sam->segment("$seq_id",$start,$end);
+  my $segment = $hts_obj->segment("$seq_id",$start,$end);
 
   my ($coverage) = $segment->features('coverage' . (defined($bins) ? ":$bins" : ""), $filter);
   my @data_points = $coverage->coverage;
 
-  if ($DEBUG) {
+  if ($DEBUG)
+  {
     warn " *** fetch coverage: $chr_id:$start-$end : found ", scalar(@data_points), " coverage points \n";
   }
 
@@ -329,9 +340,6 @@ sub fetch_consensus {
   return [] if !defined($seq_id);
 
   $bam->fast_pileup("${seq_id}:${start}-${end}", $consensus_caller);
-
-#  $bam->fast_pileup("chr${chr_id}:${start}-${end}", $consensus_caller);
-#  $bam->pileup("chr${chr_id}:${start}-${end}", $consensus_caller);
 
   return \@consensus;
 }
