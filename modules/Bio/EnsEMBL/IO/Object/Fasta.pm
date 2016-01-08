@@ -65,6 +65,8 @@ sub new {
 	$self->{sequence} = $seq;
     }
 
+    $self->{length} = length $seq || 0;
+
     return bless $self, $class;
 }
 
@@ -79,8 +81,51 @@ sub sequence {
 
     if(@_) {
 	$self->{sequence} = shift;
+	$self->{length} = length $self->{sequence};
     }
     return $self->{sequence};
+}
+
+=head2 seq
+
+    Description: Alias to sequence() for compatibility with other
+                 Ensembl modules
+=cut
+
+sub seq {
+    my $self = shift;
+
+    return $self->sequence(@_);
+}
+
+=head2
+
+    Description: Returns length of the stored sequence
+
+=cut
+
+sub length {
+    my $self = shift;
+
+    return $self->{length};
+}
+
+=head2 subseq
+
+    Description: Returns the sub-sequence for the given coordinates, for
+                 compatibility with other Ensembl libraries.
+
+                 Error checking should be performed by the caller to ensure
+                 the requested coordinates make sense.
+
+=cut
+
+sub subseq {
+    my $self = shift;
+    my $start = shift;
+    my $end = shift;
+
+    return substr $self->{sequence}, $start, ($end - $start);
 }
 
 =head2 header
@@ -111,6 +156,19 @@ sub id {
 	my $index = index $self->{header}, ' ';
 	return substr($self->{header}, 0, $index);
     }
+}
+
+=head2 display_id
+
+    Description: Alias to header for compatibility with other
+                 Ensembl libraries
+
+=cut
+
+sub display_id {
+    my $self = shift;
+
+    return $self->header(@_);
 }
 
 =head2 description
