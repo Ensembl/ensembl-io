@@ -74,14 +74,6 @@ sub init {
                             'blockCount'    => 9,
                             'blockSizes'    => 10,
                             'chromStarts'   => 11,
-                            'name2'         => 12,
-                            'cdsStartStat'  => 13,
-                            'cdsEndStat'    => 14,
-                            'exonFrames'    => 15,
-                            'type'          => 16,
-                            'geneName'      => 17,
-                            'geneName2'     => 18,
-                            'geneType'      => 19,
                           };
   }
 
