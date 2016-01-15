@@ -277,7 +277,7 @@ sub fetch_consensus {
     warn "*** consensus: $chr_id, $start, $end , $T_QSCORE\n";
   }
 
-  my $bam = $self->sam_open;
+  my $bam = $self->hts_open;
   return [] unless $bam;
 
   my @consensus;    # this will be list of basepair
