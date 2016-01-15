@@ -20,20 +20,17 @@ Bio::EnsEMBL::IO::Object::GFF3Metadata - Object to represent
 
 =head1 SYNOPSIS
 
-  use Bio::EnsEMBL::IO::Object::ColumnBasedGeneric;
+  use Bio::EnsEMBL::IO::Object::GFF3Metadata;
 
-  $fields = qw/seqname source type start/;
-  my $obj = Bio::EnsEMBL::IO::Object::ColumnBasedGeneric->new($fields);
+  $record = Bio::EnsEMBL::IO::Object::GFF3Metadata->new($line);
 
-  OR
+  $type = $record->{type};
 
-  use Bio::EnsEMBL::IO::Object::ColumnBasedGeneric;
-  use Bio::EnsEMBL::IO::Parser::GFF3;
+  $directive = $record->{directive};
 
-  my $parser = Bio::EnsEMBL::IO::Parser::GFF3->open('myfile.gff3');
-  my $obj = Bio::EnsEMBL::IO::Object::ColumnBasedGeneric->new($parser->get_fields);
+  @values = $record->{value};
 
-  $obj->munrge_seqname('my_seq');
+  $line = $record->create_record;
 
 =head1 Description
 
