@@ -42,6 +42,13 @@ sub init {
   my ($self, $fh) = @_;
 
   ## Define default column positions, because AutoSQL
+  $self->{'alt_names'} = {
+                          'item_colour' => 'itemRgb',
+                          'colour'      => 'itemRgb',
+                          'reserved'    => 'itemRgb',
+                          'age'         => 'score',
+                          };
+
   my $autoSQL = $fh->bigBedAs;
   my $column_map = {};
   my $i = 0;
@@ -73,18 +80,10 @@ sub init {
                             'itemRgb'       => 8,
                             'blockCount'    => 9,
                             'blockSizes'    => 10,
+                            'blockStarts'   => 11,
                             'chromStarts'   => 11,
                           };
   }
-
-  ## Also set common alternative names for fields
-  $self->{'alt_names'} = {
-                          'item_colour' => 'itemRgb',
-                          'colour'      => 'itemRgb',
-                          'reserved'    => 'itemRgb',
-                          'age'         => 'score',
-                          };
-
 }
  
 =head2 type
@@ -292,10 +291,12 @@ sub get_raw_blockSizes {
 
 sub get_raw_blockStarts {
   my $self = shift;
-  return $self->{'record'}[$self->{'column_map'}{'blockStarts'}];
+  ## This field, annoyingly, has two synonyms
+  my $index = $self->{'column_map'}{'blockStarts'} || $self->{'column_map'}{'chromStarts'};
+  return $self->{'record'}[$index];
 }
 
-### AUTOLOAD ANY LITTLE-USED ACCESSORS
+### AUTOLOAD ANY AUTOSQL ACCESSORS
 
 our $AUTOLOAD;
 
@@ -305,8 +306,8 @@ sub AUTOLOAD {
   $method =~ s/.*:://;
   my $value;
 
-  if ($method =~ /^get_(raw)?_(\w)+/) {
-    my $key = $2;
+  if ($method =~ /^get_(\w+)/) {
+    my $key = $1;
     $value = $self->{'record'}[$self->{'column_map'}{$key}];
   } 
   return $value;
