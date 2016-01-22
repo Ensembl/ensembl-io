@@ -188,18 +188,19 @@ sub fetch_summary_data {
     return unless $seq_id;
 
     my $method = $self->type.'SummaryArray';
-    my $list = $fh->$method("$seq_id", $start-1, $end, 0, $bins);
+    my $list = $fh->$method("$seq_id", $start-1, $end, bbiSumMean, $bins);
     my $bin_size = floor(($end - $start)/$bins);
 
-    my $feature_cache = $self->cache->{'features'};
+    my $feature_cache = []; 
 
     foreach (@$list) {
+      next unless defined($_);
       my @line = ($chr_id, $start, $start + $bin_size, $_);
       $start += $bin_size;
       push @$feature_cache, \@line;
     }
-    ## pre-load peek buffer
-    $self->next_block();
+
+    $self->cache->{'summary'} = $feature_cache;
 }
 
 =head2 fetch_summary_array
@@ -221,7 +222,7 @@ sub fetch_summary_array {
     return unless $seq_id;
 
     my $method = $self->type.'SummaryArray';
-    return $fh->$method("$seq_id", $start-1, $end, 0, $bins);
+    return $fh->$method("$seq_id", $start-1, $end, bbiSumMean, $bins);
 }
 
 
