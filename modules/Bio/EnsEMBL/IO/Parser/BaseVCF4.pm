@@ -871,4 +871,20 @@ sub get_samples_genotypes {
   return \%sample_gen;
 }
 
+sub is_polymorphic {
+  my $self = shift;
+  my $sample_ids = shift;
+
+  my $limit = $sample_ids ? $self->_get_sample_index_list($sample_ids) : [];
+
+  # get a list of indices
+  # this is either a limited list based on the samples provided
+  # or a list for all samples in the file
+  my @index_list = scalar @$limit ? @$limit : ($self->{sample_begin}..(scalar(@{$self->{metadata}{header}}) - 1));
+
+  my %uniq_gts = map {$self->{record}->[$_] => 1} @index_list;
+
+  return scalar keys %uniq_gts > 1 ? 1 : 0;
+}
+
 1;
