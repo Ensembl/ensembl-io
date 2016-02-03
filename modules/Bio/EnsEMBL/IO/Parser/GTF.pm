@@ -28,6 +28,8 @@ use warnings;
 
 use base qw/Bio::EnsEMBL::IO::Parser::GXF/;
 
+use Bio::EnsEMBL::IO::Object::GTF;
+
 sub open {
     my ($caller, $filename, @other_args) = @_;
     my $class = ref($caller) || $caller;
@@ -126,6 +128,18 @@ sub get_attribute_by_name {
     my (undef, $value) = $self->get_raw_attributes =~ /(\A|;) *$name "([^"]+)"/;
     # If $value is not undef, return decoded $value
     return $value ? $self->decode_string($value) : $value;
+}
+
+=head2 create_object
+
+    Description: Create an object encapsulation for the record
+    Returntype : Bio::EnsEMBL::IO::Object::GTF
+=cut
+
+sub create_object {
+    my $self = shift;
+
+    return $self->SUPER::create_object(Bio::EnsEMBL::IO::Object::GTF->new($self->get_fields));
 }
 
 1;

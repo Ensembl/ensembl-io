@@ -281,8 +281,7 @@ sub create_record {
 
 sub create_object {
     my $self = shift;
-
-    my $obj = Bio::EnsEMBL::IO::Object::ColumnBasedGeneric->new($self->get_fields);
+    my $obj = (@_ ? shift : Bio::EnsEMBL::IO::Object::ColumnBasedGeneric->new($self->get_fields) );
 
     foreach my $field (@{$self->get_fields}) {
 	my $getter = 'get_'.$field;

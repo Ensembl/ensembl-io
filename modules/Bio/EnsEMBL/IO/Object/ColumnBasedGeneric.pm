@@ -61,23 +61,28 @@ sub new {
 	no strict "refs"; 
 	# We don't want to redefine functions everytime
 	# a new instance is created
-	next if(defined *{$field});
-	*$field = sub :lvalue {
-	    my $me = shift;
-	    $me->{$field} = shift if @_;
-	    $me->{$field};
-	};
+	unless(defined *{$field}) {
+	    *$field = sub :lvalue {
+		my $me = shift;
+		$me->{$field} = shift if @_;
+		$me->{$field};
+	    };
+	}
 
-	*{"get_$field"} = sub {
-	    my $me = shift;
-	    $me->{$field};
-	};
+	unless(defined *{"get_$field"}) {
+	    *{"get_$field"} = sub {
+		my $me = shift;
+		$me->{$field};
+	    };
+	}
 
-	*{"munge_$field"} = sub {
-	    my $me = shift;
-	    my $value = shift;
-	    $me->{$field} = $value;
-	};
+	unless(defined *{"munge_$field"}) {
+	    *{"munge_$field"} = sub {
+		my $me = shift;
+		my $value = shift;
+		$me->{$field} = $value;
+	    };
+	}
     }
 
     bless $self, $class;
@@ -141,11 +146,13 @@ sub combine_fields {
     my $values = shift;
     my $delimiter = shift || ';';
     my $inc_field = shift || 1;
+    my $separator = shift || '=';
+    my $valuequotes = shift || '';
 
     my @values;
 
     foreach my $field (keys %$values) {
-	push @values, ($inc_field ? "$field=" : '') . $values->{$field};
+	push @values, ($inc_field ? "$field$separator" : '') . $valuequotes . $values->{$field} . $valuequotes;
     }
 
     return join $delimiter, @values;
