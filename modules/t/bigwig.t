@@ -23,21 +23,23 @@ use Bio::EnsEMBL::IO::Parser::BigWig;
 ######################################################
 my $parser = Bio::EnsEMBL::IO::Parser::BigWig->open("modules/t/data-variableStep.bw");
 
-ok($parser->next);
-ok($parser->get_chrom eq 'chr1');
-ok($parser->get_start == 1);
-ok($parser->get_end == 1);
-ok($parser->get_score == 1);
+note 'Querying for chr1:1-10. Expecting 5 data points';
+$parser->seek('chr1', 1, 10);
+ok($parser->next, 'Got next data value');
+is($parser->get_chrom, 'chr1', 'chromosome');
+is($parser->get_start, 1, 'start');
+is($parser->get_end, 1, 'end');
+is($parser->get_score, 1, 'score');
 
 for (my $i = 0; $i < 4; $i++) {
-  ok($parser->next);
-  ok($parser->get_chrom eq 'chr1');
-  ok($parser->get_start == 2 + 2 * $i);
-  ok($parser->get_end == 2 + 2 * $i);
-  ok($parser->get_score == 2 + $i);
+  ok($parser->next, 'Got next data value');
+  is($parser->get_chrom, 'chr1', 'chromosome');
+  is($parser->get_start, (2 + 2 * $i), 'start');
+  is($parser->get_end, (2 + 2 * $i), 'end');
+  is($parser->get_score, (2+$i), 'score');
 }
 
-ok(!$parser->next);
+ok(!$parser->next, 'Exhausted elements');
 
 $parser->close();
 
@@ -46,16 +48,18 @@ $parser->close();
 ######################################################
 $parser = Bio::EnsEMBL::IO::Parser::BigWig->open('modules/t/data-fixedStep.bw');
 
+note 'Querying for chr1:1-10. Expecting 10 fixed step data points';
+$parser->seek('chr1', 1, 10);
 for (my $i = 0; $i < 10; $i ++) {
-  ok($parser->next);
-  ok($parser->get_chrom eq 'chr1');
-  ok($parser->get_start == 1 + $i);
-  ok($parser->get_end == 1 + $i);
-  ok($parser->get_score == $i);
+  ok($parser->next, 'Got next data value');
+  is($parser->get_chrom, 'chr1', 'chromosome');
+  is($parser->get_start, (1 + $i), 'start');
+  is($parser->get_end, (1 + $i), 'end');
+  is($parser->get_score, $i, 'score');
 }
 
-ok(!$parser->next);
+ok(!$parser->next, "Exhausted elements");
 
 $parser->close();
 
-done_testing;
+done_testing();
