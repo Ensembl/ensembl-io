@@ -111,8 +111,7 @@ sub seek {
     warn "Failed to open file ".$self->url unless $fh;
     return unless $fh;
 
-    ## Get the internal chromosome name
-    my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
+    my $seq_id = $self->_map_chr_to_internal_name($chr_id);
     return unless $seq_id;
 
     ## Remember this method takes half-open coords (subtract 1 from start)

@@ -77,6 +77,7 @@ sub new {
 
 sub open {
     my ($caller, $url, @other_args) = @_;
+
     return unless $url;
 
     ## Trim any whitespace from the URL
@@ -85,8 +86,6 @@ sub open {
 
     my $class = ref($caller) || $caller;
     my $self = $class->new($url, @other_args);
-
-    ## Open and cache the file handle
     my $fh = $self->open_file;
     return unless $fh;
     #warn ">>> OPENED FILE WITH $fh";
@@ -94,21 +93,52 @@ sub open {
     ## Cache the chromosome list from the file, mapping Ensembl's non-'chr' names 
     ## to the file's actual chromosome names
     my $list = $fh->chromList;
-    my $head = $list->head;
-    my $chromosomes = {};
-    do {
-      if ($head->name && $head->size) {
-        (my $chr = $head->name) =~ s/^chr//;
-        $chromosomes->{$chr} = $head->name;
-      }
-    } while ($head && ($head = $head->next));
-    #use Data::Dumper; warn Dumper($chromosomes);
-    $self->{cache}{chromosomes} = $chromosomes;
 
     ## Do any additional pre-processing
     $self->init($fh); 
 
     return $self;
+}
+
+=head _chr_mapping
+
+  Description: Build the chromosome name mapping scheme for lookup
+
+=cut
+
+sub _chr_mapping {
+  my ($self, $bbi) = @_;
+  if(! exists $self->{cache}{chromosomes}) {
+    $bbi = $self->open_file() if ! defined $bbi;
+    my $list = $bbi->chromList;
+    my $head = $list->head;
+    my $chromosomes = {};
+    do {
+      if ($head->name && $head->size) {
+        my $chr = $head->name;
+        $chr =~ s/^chr//;
+        $chromosomes->{$chr} = $head->name;
+        $chromosomes->{$head->name} = $head->name;
+      }
+    } while ($head && ($head = $head->next));
+    $self->{cache}{chromosomes} = $chromosomes;
+  }
+  return $self->{cache}{chromosomes};
+}
+
+=head _map_chr_to_internal_name
+
+  Description: Map a name into the internal representation
+
+=cut
+
+sub _map_chr_to_internal_name {
+  my ($self, $chr_id) = @_;
+  return if ! defined $chr_id;
+  my $chr_mapping = $self->_chr_mapping();
+  my $seq_id = $chr_mapping->{$chr_id};
+  return if ! $seq_id;
+  return $seq_id;
 }
 
 =head2 init 
@@ -164,12 +194,13 @@ sub cache {
 =cut
 
 sub open_file {
-  my $self = shift;
-
+  my ($self) = @_;
+  if(defined $self->{cache}->{file_handle}) {
+    return $self->{cache}->{file_handle};
+  }
   Bio::DB::BigFile->set_udc_defaults;
-
   my $method = $self->type.'FileOpen';
-  $self->{cache}->{file_handle} ||= Bio::DB::BigFile->$method($self->url);
+  $self->{cache}->{file_handle} = Bio::DB::BigFile->$method($self->url);
   return $self->{cache}->{file_handle};
 }
 
@@ -188,8 +219,7 @@ sub fetch_summary_data {
     warn "Failed to open file ".$self->url unless $fh;
     return unless $fh;
 
-    ## Get the internal chromosome name
-    my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
+    my $seq_id = $self->_map_chr_to_internal_name($chr_id);
     return unless $seq_id;
 
     my $method = $self->type.'SummaryArray';
@@ -222,8 +252,7 @@ sub fetch_summary_array {
     warn "Failed to open file ".$self->url unless $fh;
     return unless $fh;
 
-    ## Get the internal chromosome name
-    my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
+    my $seq_id = $self->_map_chr_to_internal_name($chr_id);
     return unless $seq_id;
 
     my $method = $self->type.'SummaryArray';
@@ -301,6 +330,11 @@ sub read_record {
     my $self = shift;
     $self->{'record'} = $self->{'current_block'};
     #use Data::Dumper; warn '!!! RECORD '.Dumper($self->{'record'});
+}
+
+sub close {
+  my ($self) = @_;
+  delete $self->{cache}->{file_handle};
 }
 
 
