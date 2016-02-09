@@ -225,7 +225,33 @@ sub fetch_summary_array {
     return $fh->$method("$seq_id", $start-1, $end, bbiSumMean, $bins);
 }
 
+=head2 fetch_rows
 
+    Description: fetches rows for a requested region
+    Returntype: Arrayref
+
+=cut
+
+sub fetch_rows {
+    my ($self, $chr_id, $start, $end, $coderef) = @_;
+
+    my $fh = $self->open_file;
+    warn "Failed to open file ".$self->url unless $fh;
+    return unless $fh;
+
+    ## Get the internal chromosome name
+    my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
+    return unless $seq_id;
+
+    my $method = $self->type.'IntervalQuery';
+
+    my $list_head = $fh->$method("$seq_id",$start-1,$end);
+
+    for (my $i = $list_head->head; $i; $i = $i->next) {
+      my @bedline = ($chr_id, $i->start, $i->end, split(/\t/,$i->rest));
+      &{$coderef}(@bedline);
+    }
+}
 
 =head2 next_block
 
@@ -269,6 +295,7 @@ sub read_block {
 sub read_record {
     my $self = shift;
     $self->{'record'} = $self->{'current_block'};
+    #use Data::Dumper; warn Dumper($self->{'record'});
 }
 
 
