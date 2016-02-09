@@ -158,7 +158,8 @@ sub fetch_summary_data {
 
 sub get_raw_chrom {
   my $self = shift;
-  return $self->{'record'}[$self->{'column_map'}{'chrom'}]; 
+  my $index = $self->{'column_map'}{'chrom'};
+  return $self->{'record'}[$index] if $index;
 }
 
 
@@ -171,7 +172,8 @@ sub get_raw_chrom {
 
 sub get_raw_chromStart {
   my $self = shift;
-  return $self->{'record'}[$self->{'column_map'}{'chromStart'}];
+  my $index = $self->{'column_map'}{'chromStart'};
+  return $self->{'record'}[$index] if $index;
 }
 
 =head2 get_raw_chromEnd
@@ -183,7 +185,8 @@ sub get_raw_chromStart {
 
 sub get_raw_chromEnd {
   my $self = shift;
-  return $self->{'record'}[$self->{'column_map'}{'chromEnd'}];
+  my $index = $self->{'column_map'}{'chromEnd'};
+  return $self->{'record'}[$index] if $index;
 }
 
 =head2 get_raw_name
@@ -195,7 +198,8 @@ sub get_raw_chromEnd {
 
 sub get_raw_name {
   my $self = shift;
-  return $self->{'record'}[$self->{'column_map'}{'name'}];
+  my $index = $self->{'column_map'}{'name'};
+  return $self->{'record'}[$index] if $index;
 }
 
 =head2 get_raw_score
@@ -207,7 +211,8 @@ sub get_raw_name {
 
 sub get_raw_score {
   my $self = shift;
-  return $self->{'record'}[$self->{'column_map'}{'score'}];
+  my $index = $self->{'column_map'}{'score'};
+  return $self->{'record'}[$index] if $index;
 }
 
 =head2 get_raw_strand
@@ -219,7 +224,8 @@ sub get_raw_score {
 
 sub get_raw_strand {
   my $self = shift;
-  return $self->{'record'}[$self->{'column_map'}{'strand'}];
+  my $index = $self->{'column_map'}{'strand'};
+  return $self->{'record'}[$index] if $index;
 }
 
 =head2 get_raw_thickStart
@@ -231,7 +237,8 @@ sub get_raw_strand {
 
 sub get_raw_thickStart {
   my $self = shift;
-  return $self->{'record'}[$self->{'column_map'}{'thickStart'}];
+  my $index = $self->{'column_map'}{'thickStart'};
+  return $self->{'record'}[$index] if $index;
 }
 
 =head2 get_raw_thickEnd
@@ -243,7 +250,8 @@ sub get_raw_thickStart {
 
 sub get_raw_thickEnd {
   my $self = shift;
-  return $self->{'record'}[$self->{'column_map'}{'thickEnd'}];
+  my $index = $self->{'column_map'}{'thickEnd'};
+  return $self->{'record'}[$index] if $index;
 }
 
 =head2 get_raw_itemRgb
@@ -255,7 +263,8 @@ sub get_raw_thickEnd {
 
 sub get_raw_itemRgb {
   my $self = shift;
-  return $self->{'record'}[$self->{'column_map'}{'itemRgb'}];
+  my $index = $self->{'column_map'}{'itemRgb'};
+  return $self->{'record'}[$index] if $index;
 }
 
 =head2 get_raw_blockCount
@@ -267,7 +276,8 @@ sub get_raw_itemRgb {
 
 sub get_raw_blockCount {
   my $self = shift;
-  return $self->{'record'}[$self->{'column_map'}{'blockCount'}];
+  my $index = $self->{'column_map'}{'blockCount'};
+  return $self->{'record'}[$index] if $index;
 }
 
 =head2 get_raw_blockSizes
@@ -279,7 +289,8 @@ sub get_raw_blockCount {
 
 sub get_raw_blockSizes {
   my $self = shift;
-  return $self->{'record'}[$self->{'column_map'}{'blockSizes'}];
+  my $index = $self->{'column_map'}{'blockSizes'};
+  return $self->{'record'}[$index] if $index;
 }
 
 =head2 get_raw_blockStarts
@@ -293,7 +304,7 @@ sub get_raw_blockStarts {
   my $self = shift;
   ## This field, annoyingly, has two synonyms
   my $index = $self->{'column_map'}{'blockStarts'} || $self->{'column_map'}{'chromStarts'};
-  return $self->{'record'}[$index];
+  return $self->{'record'}[$index] if $index;
 }
 
 ### AUTOLOAD ANY AUTOSQL ACCESSORS
