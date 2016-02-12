@@ -401,7 +401,10 @@ sub _get_http_tiny_error {
   my $response = shift;
 
   return 'timeout' unless $response->{'status'};
-  if ($response->{'status'} >= 400) {
+  if($response->{'status'} == 599) {
+    # HTTP::Tiny errors are reported via code 599.
+    return "Internal: $response->{'content'}";
+  } elsif($response->{'status'} >= 400) {
     return $response->{'status'}.': '.$response->{'reason'};
   }
   return;
