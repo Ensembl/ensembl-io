@@ -214,29 +214,20 @@ sub validate {
         $valid = 1;
       }
 
-      if ($self->get_start =~ /\d+/ && $self->get_start > 0 && $self->get_end =~ /\d+/) {
+      if ($self->get_start && $self->get_start =~ /^\d+$/ && $self->get_start > 0 
+            && $self->get_end && $self->get_end =~ /^\d+$/) {
         $valid = 1;
       }
 
       ## Additional format-specific validation
-      $valid = $self->_validate($col_count) ? 1 : 0;
+      if ($self->can('_validate')) {
+        $valid = $self->_validate($col_count) ? 1 : 0;
+      }
 
       last;
     }
 
     return $valid;
-}
-
-=head2 _validate 
-
-    Description: Stub - most formats will require additional validation
-    Returntype: Boolean
-
-=cut
-
-sub _validate {
-    my $self = shift;
-    return 1;
 }
 
 #---------- OUTPUT METHODS --------------
