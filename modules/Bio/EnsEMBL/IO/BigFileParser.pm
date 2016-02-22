@@ -77,6 +77,7 @@ sub new {
 
 sub open {
     my ($caller, $url, @other_args) = @_;
+    return unless $url;
     #warn ">>> OPENING BIGFILE $url";
     my $class = ref($caller) || $caller;
 
