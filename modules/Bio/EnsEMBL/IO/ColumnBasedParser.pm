@@ -67,6 +67,7 @@ sub open {
     my $self;
 
     $self = $class->SUPER::open($filepath, @other_args);
+    return unless $self;
     $self->set_fields;
     $self->set_minimum_column_count;
     $self->set_maximum_column_count;

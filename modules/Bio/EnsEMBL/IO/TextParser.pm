@@ -69,7 +69,7 @@ sub open {
         CORE::open($self->{'filehandle'}, $filename) || confess("Could not open " . $filename);
       }
     }
-    return $self;
+    return $self->{'filehandle'} ? $self : undef;
 }
 
 =head2 open_content

@@ -54,6 +54,7 @@ sub open {
     my $self;
 
     $self = $class->SUPER::open($filename, '\t|\s+', @other_args);
+    return unless $self;
 
     if ($filename) {
       # pre-load peek buffer

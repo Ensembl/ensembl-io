@@ -85,6 +85,7 @@ sub open {
 
     ## Open and cache the file handle
     my $fh = $self->open_file;
+    return unless $fh;
     #warn ">>> OPENED FILE WITH $fh";
  
     ## Cache the chromosome list from the file, mapping Ensembl's non-'chr' names 
