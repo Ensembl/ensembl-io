@@ -48,6 +48,18 @@ sub open {
     return $self;
 }
 
+=head2 set_minimum_column_count
+
+    Description: Sets minimum column count for a valid GTF file
+    Returntype : Void
+
+=cut
+
+sub set_minimum_column_count {
+    my $self = shift;
+    $self->{'min_col_count'} = 8;
+}
+
 =head2 is_metadata
 
     Description: Identifies track lines and other metadata 
