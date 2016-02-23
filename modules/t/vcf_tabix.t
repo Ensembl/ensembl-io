@@ -36,11 +36,11 @@ note "Testing each column of the row";
 do_the_tests(\@test_row);
 my $index = 0;
 my $row_index = 9 + $index;
-$test_sample = "$inds[$index]:$test_row[$row_index]";
+$test_sample = [$inds[$index], $test_row[$row_index]];
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
-ok($test_sample eq $ind_info->[$index], 'Individual data (DEPRECATED)');
+is_deeply($test_sample, $ind_info->[$index], 'Individual data (DEPRECATED)');
 $sample_info = $parser->get_raw_samples_info($inds[$index]);
-ok($test_sample eq $sample_info->[$index], 'Sample data');
+is_deeply($test_sample, $sample_info->[$index], 'Sample data');
 
 
 note "Record 2";
@@ -51,11 +51,11 @@ note "Testing each column of the row";
 do_the_tests(\@test_row);
 $index = 1;
 $row_index = 9 + $index;
-$test_sample = "$inds[$index]:$test_row[$row_index]";
+$test_sample = [$inds[$index], $test_row[$row_index]];
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
-ok($test_sample eq $ind_info->[$index], 'Individual data (DEPRECATED)');
+is_deeply($test_sample, $ind_info->[$index], 'Individual data (DEPRECATED)');
 $sample_info = $parser->get_raw_samples_info($inds[$index]);
-ok($test_sample eq $sample_info->[$index], 'Sample data');
+is_deeply($test_sample, $sample_info->[$index], 'Sample data');
 
 
 note "Record 3";
@@ -66,11 +66,11 @@ note "Testing each column of the row";
 do_the_tests(\@test_row);
 $index = 2;
 $row_index = 9 + $index;
-$test_sample = "$inds[$index]:$test_row[$row_index]";
+$test_sample = [$inds[$index], $test_row[$row_index]];
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
-ok($test_sample eq $ind_info->[$index], 'Individual data (DEPRECATED)');
+is_deeply($test_sample, $ind_info->[$index], 'Individual data (DEPRECATED)');
 $sample_info = $parser->get_raw_samples_info($inds[$index]);
-ok($test_sample eq $sample_info->[$index], 'Sample data');
+is_deeply($test_sample, $sample_info->[$index], 'Sample data');
 
 
 note "Record 4";
@@ -81,11 +81,11 @@ note "Testing each column of the row";
 do_the_tests(\@test_row);
 $index = 0;
 $row_index = 9 + $index;
-$test_sample = "$inds[$index]:$test_row[$row_index]";
+$test_sample = [$inds[$index], $test_row[$row_index]];
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
-ok($test_sample eq $ind_info->[$index], 'Individual data (DEPRECATED)');
+is_deeply($test_sample, $ind_info->[$index], 'Individual data (DEPRECATED)');
 $sample_info = $parser->get_raw_samples_info($inds[$index]);
-ok($test_sample eq $sample_info->[$index], 'Sample data');
+is_deeply($test_sample, $sample_info->[$index], 'Sample data');
 
 
 print "\n> Testing the getters (only for the last record):\n";
