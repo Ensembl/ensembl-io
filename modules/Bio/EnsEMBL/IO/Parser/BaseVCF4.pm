@@ -653,8 +653,8 @@ sub get_individual_column_indices {
 }
 
 =head2 get_raw_individuals_info
-    Description: Returns the list of individual name concatenated with the content of individual genotype data
-                 e.g. 'NA10000:0|1:44:23'
+    Description: Returns the listref of listrefs of individual name and individual genotype data
+                 e.g. ['NA10000', '0|1:44:23'], ['NA10001', '1|1:34:30']
     Returntype : List reference of strings
     Status     : DEPRECATED
 =cut
@@ -736,8 +736,8 @@ sub get_sample_column_indices {
 }
 
 =head2 get_raw_samples_info
-    Description: Returns the list of sample name concatenated with the content of sample genotype data
-                 e.g. 'NA10000:0|1:44:23'
+    Description: Returns the listref of listrefs of sample name and sample genotype data
+                 e.g. ['NA10000', '0|1:44:23'], ['NA10001', '1|1:34:30']
     Returntype : List reference of strings
 =cut
 
@@ -755,7 +755,7 @@ sub get_raw_samples_info {
   my @index_list = scalar @$limit ? @$limit : ($self->{sample_begin}..(scalar(@{$self->{metadata}{header}}) - 1));
 
   return [
-    map {$self->{metadata}{header}->[$_].':'.$self->{record}[$_]}
+    map {[$self->{metadata}{header}->[$_], $self->{record}[$_]]}
     @index_list
   ];
 }
@@ -819,8 +819,11 @@ sub get_samples_info {
     confess("ERROR: Key '$key' not found in format string ".join("|", @$formats)) unless defined($format_index);
   }
 
-  foreach my $sample (@{$self->get_raw_samples_info($sample_ids)}) {
-    my @sample_data = split(':',$sample);
+  foreach my $tmp_sample_data (@{$self->get_raw_samples_info($sample_ids)}) {
+
+    # first element is sample name, second element is ":"-separated string
+    my @sample_data = shift @$tmp_sample_data;
+    push @sample_data, split(':', $tmp_sample_data->[0]);
 
     # limit to one key
     if(defined($format_index)) {
