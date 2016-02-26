@@ -88,7 +88,7 @@ sub read_block {
 
 sub close {
   my $self = shift;
-  tabix_iter_free($self->{iterator});
+  tabix_iter_free($self->{iterator}) if $self->{iterator};
   my $report = tabix_close($self->{filehandle});
   return (defined $report) ? 0 : 1;
 }
