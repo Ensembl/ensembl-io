@@ -78,9 +78,12 @@ sub new {
 sub open {
     my ($caller, $url, @other_args) = @_;
     return unless $url;
-    #warn ">>> OPENING BIGFILE $url";
-    my $class = ref($caller) || $caller;
 
+    ## Trim any whitespace from the URL
+    $url =~ s/^\s+//g;
+    $url =~ s/\s+$//g;
+
+    my $class = ref($caller) || $caller;
     my $self = $class->new($url, @other_args);
 
     ## Open and cache the file handle
