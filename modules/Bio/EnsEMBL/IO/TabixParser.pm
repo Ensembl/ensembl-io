@@ -37,7 +37,8 @@ use strict;
 use warnings;
 
 use Carp;
-use Tabix;
+use Bio::DB::HTS::Tabix;
+use Bio::DB::HTS::Tabix::Iterator;
 
 use base qw/Bio::EnsEMBL::IO::Parser/;
 
@@ -59,13 +60,15 @@ sub open {
 
 sub seek {
   my ($self, $chrom, $start, $end) = @_;
-  if (defined $self->{iterator}) {
-    tabix_iter_free($self->{iterator});
+  if (defined $self->{iterator})
+  {
+    $self->{iterator}->DEMOLISH();
   }
 
   ## Check for both possible versions of chromosome name
-  foreach ($chrom, "chr$chrom") {
-    $self->{iterator} = tabix_query($self->{filehandle}, $_, $start, $end);
+  foreach ($chrom, "chr$chrom")
+  {
+    $self->{iterator} = $self->{tabix_file}->query("$chrom:$start-$end") ;
     last if $self->{iterator};
   }
 
@@ -92,13 +95,13 @@ sub next_block {
 
 sub read_block {
     my $self = shift;
-    $self->{waiting_block} = tabix_read($self->{filehandle}, $self->{iterator});
+    $self->{waiting_block} = $self->{iterator}->next;
 }
 
 sub close {
   my $self = shift;
-  tabix_iter_free($self->{iterator}) if $self->{iterator};
-  my $report = tabix_close($self->{filehandle});
+  $self->{iterator}->DEMOLISH if $self->{iterator};
+  my $report = $self->{tabix_file}->DEMOLISH;
   return (defined $report) ? 0 : 1;
 }
 
