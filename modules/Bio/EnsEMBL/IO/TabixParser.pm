@@ -44,18 +44,16 @@ use base qw/Bio::EnsEMBL::IO::Parser/;
 sub open {
   my ($caller, $filename, @other_args) = @_;
   my $class = ref($caller) || $caller;
-  
-  my $delimiter = "\t";   
+
+  my $delimiter = "\t";
   my $self = $class->SUPER::new(@other_args);
-  
-  confess "ERROR: tabix does not seem to be in your path - required to parse the file\n" unless `which tabix 2>&1` =~ /tabix$/;
+
   confess "ERROR: Input file is not bgzipped, cannot use tabix\n" unless $filename =~ /\.gz$/;
-	#die "ERROR: Tabix index file $filename.tbi not found, cannot use tabix\n" unless -e $filename.'.tbi';
-  
+
   $self->{record}     = undef;
-  $self->{filehandle} = tabix_open($filename);
+  $self->{tabix_file} = Bio::DB::HTS::Tabix->new(filename => $filename);
   $self->{iterator}   = undef;
-    
+
   return $self;
 }
 
