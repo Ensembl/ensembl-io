@@ -38,6 +38,7 @@ use strict;
 use warnings;
 use Bio::EnsEMBL::IO::TabixParser;
 use Bio::EnsEMBL::IO::Parser::Pairwise;
+use Bio::DB::HTS::Tabix;
 
 use base qw/Bio::EnsEMBL::IO::TabixParser Bio::EnsEMBL::IO::Parser::Pairwise/;
 
@@ -67,5 +68,9 @@ sub read_record {
     my $self = shift;
     $self->Bio::EnsEMBL::IO::Parser::Pairwise::read_record(@_);
 }
+
+
+
+
 
 1;
