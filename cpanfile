@@ -1,2 +1,2 @@
 requires 'Bio::DB::BigFile';
-requires 'Bio::DB::Sam';
+requires 'Bio::DB::HTS';

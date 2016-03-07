@@ -7,13 +7,6 @@ if [ ! -f libhts.a ]; then
 fi
 cd $DEPS
 
-#Bio::DB::HTS
-cd Bio-HTS
-perl Build.PL
-./Build
-./Build test
-./Build install
-cd $DEPS
 
 
 # kent src

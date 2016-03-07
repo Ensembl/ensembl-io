@@ -45,9 +45,10 @@ install:
     - export CWD=$PWD
     - export DEPS=$HOME/dependencies
     - export KENT_SRC="$DEPS/kent/src"
-    - export HTSLIB_DIR="$DEPS/htslib"
+    - export HTSLIB_DIR=$DEPS/htslib
     - export MACHTYPE=$(uname -m)
     - export CFLAGS="-fPIC"
+    - export PERL5LIB=$DEPS/bioperl-live-bioperl-release-1-2-3:$PERL5LIB
     - cd $DEPS
     - $CWD/travisci/build_c.sh
     - cd $CWD
