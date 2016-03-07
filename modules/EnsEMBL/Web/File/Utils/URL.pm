@@ -259,7 +259,7 @@ sub read_file {
     }
   }
   else {
-    my $compression = defined($args->{'compression'}) || get_compression($url);
+    my $compression = $args->{'compression'} || get_compression($url);
     if ($compression) {
       uncompress(\$content, $compression);
     }
