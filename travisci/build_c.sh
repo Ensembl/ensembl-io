@@ -1,25 +1,20 @@
 #!/bin/bash
 
-# Tabix first
-cd tabix
-if [ ! -f tabix ]; then
-  make
-fi
-
-cd perl
-if [ ! -d blib ]; then
-  perl Makefile.PL
+# HTSlib first
+cd htslib
+if [ ! -f libhts.a ]; then
   make
 fi
 cd $DEPS
 
-# subshell for samtools
-cd samtools
-if [ ! -f libbam.a ]; then
-  make dylib
-  make
-fi
+#Bio::DB::HTS
+cd Bio-HTS
+perl Build.PL
+./Build
+./Build test
+./Build install
 cd $DEPS
+
 
 # kent src
 export MACHTYPE=$(uname -m)
@@ -30,5 +25,5 @@ export MYSQLLIBS=`mysql_config --libs`
 cd kent/src/lib
 echo 'CFLAGS="-fPIC"' > ../inc/localEnvironment.mk
 make
-cd ../jkOwnLib 
+cd ../jkOwnLib
 make

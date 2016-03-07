@@ -45,7 +45,7 @@ install:
     - export CWD=$PWD
     - export DEPS=$HOME/dependencies
     - export KENT_SRC="$DEPS/kent/src"
-    - export SAMTOOLS="$DEPS/samtools"
+    - export HTSLIB_DIR="$DEPS/htslib"
     - export MACHTYPE=$(uname -m)
     - export CFLAGS="-fPIC"
     - cd $DEPS

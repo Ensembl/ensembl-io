@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export PERL5LIB=$PWD/bioperl-live-bioperl-release-1-2-3:$PWD/ensembl-test/modules:$PWD/ensembl/modules:$PWD/modules:$DEPS/tabix/perl/blib/lib/:$DEPS/tabix/perl/blib/arch:$PERL5LIB
-export PATH=$DEPS/tabix:$PATH
+export PERL5LIB=$PWD/bioperl-live-bioperl-release-1-2-3:$PWD/ensembl-test/modules:$PWD/ensembl/modules:$PWD/modules:$DEPS/Bio-HTS/blib/lib/:$DEPS/Bio-HTS/blib/arch:$PERL5LIB
+
 
 # if [ "$DB" = 'mysql' ]; then
 #     (cd modules/t && ln -sf MultiTestDB.conf.mysql MultiTestDB.conf)
