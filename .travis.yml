@@ -54,7 +54,7 @@ install:
     - cd $CWD
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
     - cpanm -v --installdeps --notest .
-    - ls
+    - cpanm Bio::DB::HTS
     - cpanm -n Devel::Cover::Report::Coveralls
     - cpanm -n DBD::SQLite
 #    - cp travisci/MultiTestDB.conf.travisci.mysql  modules/t/MultiTestDB.conf.mysql
