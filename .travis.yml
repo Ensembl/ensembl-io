@@ -54,10 +54,12 @@ install:
     - cd $CWD
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
     - cpanm -v --installdeps --notest .
+    - ls
     - cpanm -n Devel::Cover::Report::Coveralls
     - cpanm -n DBD::SQLite
 #    - cp travisci/MultiTestDB.conf.travisci.mysql  modules/t/MultiTestDB.conf.mysql
 #    - cp travisci/MultiTestDB.conf.travisci.SQLite modules/t/MultiTestDB.conf.SQLite
+
 
 script: "./travisci/harness.sh"
 
