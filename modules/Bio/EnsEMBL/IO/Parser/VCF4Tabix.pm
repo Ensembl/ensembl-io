@@ -64,6 +64,7 @@ sub open {
 =head2 read_record
     Description: Splits the current block along predefined delimiters
     Returntype : Void
+
 =cut
 
 sub read_record {
