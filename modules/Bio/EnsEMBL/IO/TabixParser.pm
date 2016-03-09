@@ -62,7 +62,7 @@ sub seek {
   my ($self, $chrom, $start, $end) = @_;
   if (defined $self->{iterator})
   {
-    $self->{iterator}->DEMOLISH();
+    $self->{iterator}->close();
   }
 
   ## Check for both possible versions of chromosome name
@@ -100,8 +100,8 @@ sub read_block {
 
 sub close {
   my $self = shift;
-  $self->{iterator}->DEMOLISH if $self->{iterator};
-  my $report = $self->{tabix_file}->DEMOLISH;
+  $self->{iterator}->close if $self->{iterator};
+  my $report = $self->{tabix_file}->close;
   return (defined $report) ? 0 : 1;
 }
 
