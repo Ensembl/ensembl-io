@@ -267,7 +267,7 @@ sub get_tracks {
         $tracks{$id}{'description_url'} = $tracks{$id}{'html'} ? "$url/$tracks{$id}{'html'}.html" : "$url/$id.html";
       }
       
-      unless ($tracks{$id}{'type'}) {
+      if (!$tracks{$id}{'type'} && !$tracks{$id}{'superTrack'}) {
         ## Set type based on file extension
         my @path = split(/\./, $tracks{$id}{'bigDataUrl'});
         $tracks{$id}{'type'} = $format_lookup{$path[-1]};
