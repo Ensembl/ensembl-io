@@ -50,28 +50,28 @@ sub is_metadata {
 sub read_metadata {
   my $self = shift;
   my $line = ($self->{'current_block'}) ? $self->{'current_block'} : shift;
-  
-  my %meta_info = ( 'INFO'     => 1, 
-                    'FILTER'   => 1, 
+
+  my %meta_info = ( 'INFO'     => 1,
+                    'FILTER'   => 1,
                     'FORMAT'   => 1,
                     'ALT'      => 1,
                     'SAMPLE'   => 1,
                     'PEDIGREE' => 1 );
-  
+
   if ($line =~ /^##\s*(\w+)=(.+)$/) {
     my $m_type = $1;
     my $m_data = $2;
-    
+
     # Check the fileformat
     if ($m_type eq 'fileformat') {
       if ($m_data =~ /(\d+)\.(\d+)/) {
         my ($file_version_major, $file_version_minor) = ($1, $2);
         my $f_version = $file_version_major.'.'.$file_version_minor;
-        
+
         # get version of this parser
         $version =~ /(\d+)\.(\d+)/;
         my ($parser_version_major, $parser_version_minor) = ($1, $2);
-        
+
         confess "The VCF file format version $f_version is not compatible with the parser version (VCF v$version)" if ($file_version_major != $parser_version_major) || ($file_version_major == $parser_version_major && $parser_version_major < $file_version_major);
         #warn "VCF file version $f_version may be incompatible with parser version $version" if ($file_version_major == $parser_version_major && $parser_version_minor != $file_version_minor);
       }
@@ -79,12 +79,12 @@ sub read_metadata {
         die "The script can't read the VCF file format version of '$m_type'";
       }
     }
-    
+
     # Can have more than 1 sequence region
-    if ($meta_info{$m_type}) { 
+    if ($meta_info{$m_type}) {
       $m_data =~ s/[<>]//g;
       my %metadata;
-      
+
       # Fix when the character "," is found in the description field
       if($m_data =~ /(.*)(".+")(.*)/) {
         my ($before, $content, $after) = ($1, $2, $3);
@@ -92,13 +92,13 @@ sub read_metadata {
         $m_data = ($before || '').$content.($after || '');
       }
       foreach my $meta (split(',',$m_data)) {
-        
+
         my ($key,$value) = split('=',$meta);
         $value =~ s/"//g;
         $value =~ s/!#!/,/g; # Revert the fix for the character ","
         $metadata{$key}=$value;
       }
-     
+
       if ($self->{'metadata'}->{$m_type}) {
         push(@{$self->{'metadata'}->{$m_type}}, \%metadata);
       }
@@ -118,7 +118,7 @@ sub read_metadata {
 
 
 =head2 get_metadata_key_list
-    Description : Retrieve the list of metadata keys available as a 
+    Description : Retrieve the list of metadata keys available as a
                   string with each term separated by a comma.
     Returntype  : String
 =cut
@@ -202,14 +202,14 @@ sub get_raw_start {
 
 
 =head2 get_start
-    Description : Return the adjusted start position of the feature 
+    Description : Return the adjusted start position of the feature
     Returntype  : Integer
 =cut
 
 sub get_start {
     my $self = shift;
     my $start = $self->get_raw_start();
-    
+
     # Like indels, SVs have the base before included for reference
     if ($self->get_raw_info =~ /SVTYPE/ || $self->get_alternatives =~ /\<|\[|\]|\>/ ) {
       $start ++;
@@ -254,7 +254,7 @@ sub get_raw_end {
 
 
 =head2 get_end
-    Description : Return the adjusted end position of the feature 
+    Description : Return the adjusted end position of the feature
     Returntype  : Integer
 =cut
 
@@ -277,7 +277,7 @@ sub get_end {
 
 
 =head2 get_outer_start
-    Description : Return the outer start position of the feature if the start 
+    Description : Return the outer start position of the feature if the start
                   position is imprecise (only for structural variant)
     Returntype  : Integer
 =cut
@@ -286,17 +286,17 @@ sub get_outer_start {
     my $self = shift;
     my $start = $self->get_start();
     my $key = 'CIPOS';
- 
+
     return $start if ($self->get_raw_info !~ /$key/);
-    
+
     $start += $self->_get_interval_coordinates($key,'outer');
-    
+
     return $start;
 }
 
 
 =head2 get_inner_start
-    Description : Return the inner start position of the feature if the start 
+    Description : Return the inner start position of the feature if the start
                   position is imprecise (only for structural variant)
     Returntype  : Integer
 =cut
@@ -305,17 +305,17 @@ sub get_inner_start {
     my $self = shift;
     my $start = $self->get_start();
     my $key = 'CIPOS';
- 
+
     return $start if ($self->get_raw_info !~ /$key/);
-    
+
     $start += $self->_get_interval_coordinates($key,'inner');
-    
+
     return $start;
 }
 
 
 =head2 get_inner_end
-    Description : Return the inner end position of the feature if the end 
+    Description : Return the inner end position of the feature if the end
                   position is imprecise (only for structural variant)
     Returntype  : Integer
 =cut
@@ -324,17 +324,17 @@ sub get_inner_end {
     my $self = shift;
     my $end = $self->get_end();
     my $key = 'CIEND';
- 
+
     return $end if ($self->get_raw_info !~ /$key/);
-    
+
     $end += $self->_get_interval_coordinates($key,'inner');
-    
+
     return $end;
 }
 
 
 =head2 get_outer_end
-    Description : Return the outer end position of the feature if the end 
+    Description : Return the outer end position of the feature if the end
                   position is imprecise (only for structural variant)
     Returntype  : Integer
 =cut
@@ -343,19 +343,19 @@ sub get_outer_end {
     my $self = shift;
     my $end = $self->get_end();
     my $key = 'CIEND';
- 
+
     return $end if ($self->get_raw_info !~ /$key/);
-    
+
     $end += $self->_get_interval_coordinates($key,'outer');
-    
+
     return $end;
 }
 
 
 =head2 _get_interval_coordinates
-    Arg [1]     : String $key (i.e. 'CIPOS' or 'CIEND') 
+    Arg [1]     : String $key (i.e. 'CIPOS' or 'CIEND')
     Arg [2]     : String $outer_inner (i.e. 'outer' or 'inner')
-    Description : Return the outer or inner position of the start (CIPOS) or end (CIEND) 
+    Description : Return the outer or inner position of the start (CIPOS) or end (CIEND)
                   of the imprecise feature (only for structural variant)
     Returntype  : Integer
 =cut
@@ -364,12 +364,12 @@ sub _get_interval_coordinates {
     my $self = shift;
     my $key  = shift;
     my $outer_inner = shift;
-    
+
     my $info = $self->get_info;
-    
+
     my $pos = $info->{$key};
     my $type = ($outer_inner eq 'outer') ? ($key =~ /cipos/i ? 0 : 1) : ($key =~ /ciend/i ? 0 : 1);
-    
+
     return(split(',',$pos))[$type];
 }
 
@@ -450,7 +450,7 @@ sub get_alternatives {
 
 
 =head2 get_alternative_description
-    Arg [1]     : String $alt (alternative sequence) 
+    Arg [1]     : String $alt (alternative sequence)
     Description : Return the description of the given alternative sequence of the feature
     Returntype  : String
 =cut
@@ -544,7 +544,7 @@ sub get_info {
 
 
 =head2 get_info_description
-    Arg [1]     : String $info (INFO key, e.g. 'AA') 
+    Arg [1]     : String $info (INFO key, e.g. 'AA')
     Example     : $info_desc = $vcf->get_info_description('AA');
                   The result is "Ancestral Allele"
     Description : Return the description of the given INFO key.
@@ -587,7 +587,7 @@ sub get_formats {
 
 
 =head2 get_format_description
-    Arg [1]     : String $format (FORMAT key, e.g. 'GT') 
+    Arg [1]     : String $format (FORMAT key, e.g. 'GT')
     Example     : $format_desc = $vcf->get_format_description('GT');
                   The result is "Genotype"
     Description : Return the description of the given FORMAT key.
@@ -612,12 +612,12 @@ sub get_metadata_description {
   my $self = shift;
   my $type = shift;
   my $id   = shift;
-  
+
   if (!defined($type) || !defined($id)) {
     carp("You need to provide a meta type (e.g. 'INFO') and a meta entry ID (e.g. 'AA')");
     return undef;
   }
-  
+
   my $meta = $self->get_metadata_by_pragma($type);
   foreach my $meta_entry (@$meta) {
     return $meta_entry->{'Description'} if ($meta_entry->{'ID'} eq $id);
@@ -635,7 +635,7 @@ sub get_metadata_description {
 
 sub get_individuals {
   my $self = shift;
-  
+
   return $self->get_samples;
 }
 
@@ -648,7 +648,7 @@ sub get_individuals {
 
 sub get_individual_column_indices {
   my $self = shift;
-  
+
   return $self->get_sample_column_indices;
 }
 
@@ -662,14 +662,14 @@ sub get_individual_column_indices {
 sub get_raw_individuals_info {
   my $self = shift;
   my $individual_ids = shift;
-  
+
   return $self->get_raw_samples_info($individual_ids);
 }
 
 # this sub caches a list of individual column indices
 # might be unnecessary, but every millisecond counts!
 sub _get_individual_index_list {
-  my $self = shift;  
+  my $self = shift;
   return $self->_get_sample_index_list(@_);
 }
 
@@ -855,10 +855,10 @@ sub get_samples_genotypes {
   my %sample_gen;
   my $sample_info = $self->get_samples_info($sample_ids, 'GT');
   my @alleles = (($self->get_reference),@{$self->get_alternatives});
-  
+
   foreach my $sample (keys(%$sample_info)) {
     my $gt = $sample_info->{$sample}{'GT'};
-    
+
     # skip reference homozygotes if $non_ref_only is true
     # e.g. 0|0 (phased diploid), 0/0/0 (unphased triploid), 0 (monoploid e.g. male X)
     next if $non_ref_only && $gt =~ /^(0[\\\|\/]?)+$/;

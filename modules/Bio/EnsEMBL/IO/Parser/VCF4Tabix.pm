@@ -40,21 +40,22 @@ use strict;
 use warnings;
 use Bio::EnsEMBL::IO::TabixParser;
 use Bio::EnsEMBL::IO::Parser::BaseVCF4;
+use Bio::DB::HTS::Tabix;
 
 use base qw/Bio::EnsEMBL::IO::TabixParser Bio::EnsEMBL::IO::Parser::BaseVCF4/;
 
 sub open {
   my ($caller, $filename, @other_args) = @_;
   my $class = ref($caller) || $caller;
-  
-  my $delimiter = "\t";   
+
+  my $delimiter = "\t";
   my $self = $class->SUPER::open($filename, @other_args);
-  
-  my $tabix_data = `tabix -f -h $filename 0:0-0`;
+
+  my $tabix_data = $self->{tabix_file}->header;
   foreach my $line (split("\n",$tabix_data)) {
     $self->Bio::EnsEMBL::IO::Parser::BaseVCF4::read_metadata($line);
   }
-  
+
   $self->{'delimiter'} = $delimiter;
   return $self;
 }
@@ -62,7 +63,8 @@ sub open {
 
 =head2 read_record
     Description: Splits the current block along predefined delimiters
-    Returntype : Void 
+    Returntype : Void
+
 =cut
 
 sub read_record {

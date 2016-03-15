@@ -37,37 +37,38 @@ use strict;
 use warnings;
 
 use Carp;
-use Tabix;
+use Bio::DB::HTS::Tabix;
+use Bio::DB::HTS::Tabix::Iterator;
 
 use base qw/Bio::EnsEMBL::IO::Parser/;
 
 sub open {
   my ($caller, $filename, @other_args) = @_;
   my $class = ref($caller) || $caller;
-  
-  my $delimiter = "\t";   
+
+  my $delimiter = "\t";
   my $self = $class->SUPER::new(@other_args);
-  
-  confess "ERROR: tabix does not seem to be in your path - required to parse the file\n" unless `which tabix 2>&1` =~ /tabix$/;
+
   confess "ERROR: Input file is not bgzipped, cannot use tabix\n" unless $filename =~ /\.gz$/;
-	#die "ERROR: Tabix index file $filename.tbi not found, cannot use tabix\n" unless -e $filename.'.tbi';
-  
+
   $self->{record}     = undef;
-  $self->{filehandle} = tabix_open($filename);
+  $self->{tabix_file} = Bio::DB::HTS::Tabix->new(filename => $filename);
   $self->{iterator}   = undef;
-    
+
   return $self;
 }
 
 sub seek {
   my ($self, $chrom, $start, $end) = @_;
-  if (defined $self->{iterator}) {
-    tabix_iter_free($self->{iterator});
+  if (defined $self->{iterator})
+  {
+    $self->{iterator}->close();
   }
 
   ## Check for both possible versions of chromosome name
-  foreach ($chrom, "chr$chrom") {
-    $self->{iterator} = tabix_query($self->{filehandle}, $_, $start, $end);
+  foreach ($chrom, "chr$chrom")
+  {
+    $self->{iterator} = $self->{tabix_file}->query("$chrom:$start-$end") ;
     last if $self->{iterator};
   }
 
@@ -94,13 +95,13 @@ sub next_block {
 
 sub read_block {
     my $self = shift;
-    $self->{waiting_block} = tabix_read($self->{filehandle}, $self->{iterator});
+    $self->{waiting_block} = $self->{iterator}->next;
 }
 
 sub close {
   my $self = shift;
-  tabix_iter_free($self->{iterator}) if $self->{iterator};
-  my $report = tabix_close($self->{filehandle});
+  $self->{iterator}->close if $self->{iterator};
+  my $report = $self->{tabix_file}->close;
   return (defined $report) ? 0 : 1;
 }
 
