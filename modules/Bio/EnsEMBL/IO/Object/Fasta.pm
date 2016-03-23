@@ -40,7 +40,6 @@ use strict;
 use warnings;
 use Carp;
 
-use Bio::EnsEMBL::Utils::Argument qw(rearrange);
 
 =head2
 
@@ -54,15 +53,14 @@ sub new {
 
     my $self = {};
 
-    my($header, $seq) =
-	rearrange([qw(HEADER SEQUENCE)], @_);
+    my($header, $seq) = @_;
 
     if($header) {
-	$self->{header} = $header;
+      $self->{header} = $header;
     }
 
     if($seq) {
-	$self->{sequence} = $seq;
+      $self->{sequence} = $seq;
     }
 
     $self->{length} = length $seq || 0;
