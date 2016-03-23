@@ -21,7 +21,14 @@ eval "require Bio::DB::HTS::Tabix";
 my $tabix_unavailable = $@;
 
 SKIP: {
-  skip 'Bio::DB::HTS::Tabix is not installed. Cannot run tests', 1 if $tabix_unavailable;
+  if($tabix_unavailable) {
+    if($ENV{TRAVIS}) {
+      fail('Bio::DB::HTS:::Tabix is not installed');
+    }
+    else {
+      skip 'Bio::DB::HTS::Tabix is not installed. Cannot run tests', 1;
+    }
+  }
   require Bio::EnsEMBL::IO::Parser::VCF4Tabix;
 
   my $test_file = "modules/t/data.vcf.gz";

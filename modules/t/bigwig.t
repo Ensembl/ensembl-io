@@ -21,7 +21,14 @@ eval "require Bio::DB::BigFile";
 my $big_file_unavailable = $@;
 
 SKIP: {
-  skip 'Bio::DB::BigFile is not installed. Cannot run tests', 1 if $big_file_unavailable;
+  if($big_file_unavailable) {
+    if($ENV{TRAVIS}) {
+      fail('Bio::DB::BigFile is not installed');
+    }
+    else {
+      skip 'Bio::DB::BigFile is not installed. Cannot run tests', 1;
+    }
+  }
   require Bio::EnsEMBL::IO::Parser::BigWig;
 
   ######################################################

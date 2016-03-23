@@ -23,7 +23,15 @@ eval "require Bio::EnsEMBL::CoordSystem";
 my $api_unavailable = $@;
 
 SKIP: {
-  skip 'Bio::EnsEMBL::CoordSystem is not installed. Cannot run tests as they rely on the Ensembl API to work', 1 if $api_unavailable;
+  if($api_unavailable) {
+    if($ENV{TRAVIS}) {
+      fail('Bio::EnsEMBL::CoordSystem is not installed');
+    }
+    else {
+      skip 'Bio::EnsEMBL::CoordSystem is not installed. Cannot run tests', 1;
+    }
+  }
+  
   require Bio::EnsEMBL::Slice;
   require Bio::EnsEMBL::Gene;
   require Bio::EnsEMBL::Transcript;
