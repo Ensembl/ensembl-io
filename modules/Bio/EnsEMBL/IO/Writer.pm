@@ -21,6 +21,7 @@ package Bio::EnsEMBL::IO::Writer;
 use strict;
 use warnings;
 use Carp;
+use Scalar::Util qw/openhandle/;
 
 =head2 new
 
@@ -44,7 +45,10 @@ sub new {
     confess ("Cannot use $parser_class - format unknown ($@)");
   }
   else {
-    my $parser = $parser_class->open();
+    # Ugly hack. We need to do this because open() is the only method to correctly initalise a parser class
+    my $tmp = q{};
+    open(my $fh, '<', \$tmp);
+    my $parser = $parser_class->open($fh);
 
     ## Optional track colour configuration (requires ensembl-webcode)
     unless ($sd) {
@@ -149,7 +153,7 @@ sub output_dataset {
   }
 
   ## close output file
-  #$self->close;
+  # $self->close;
 }
 
 =head2 output_metadata
@@ -194,9 +198,20 @@ sub output_feature {
 sub write {
   my ($self, $content) = @_;
   my $file = $self->{filename};
-  open my $fh, '>>', $file or confess "Cannot open '${file}' for appending: $!";
+  my $is_file = 0;
+  my $fh;
+  if(openhandle($file)) {
+    $fh = $file; 
+  }
+  # Or open
+  else {
+    open $fh, '>>', $file or confess "Cannot open '${file}' for appending: $!";
+    $is_file = 1;
+  }
   print $fh $content or confess "Cannot write content to '${file}: $!";
-  close $fh or confess "Cannot close '${file}: $!";
+  if($is_file) {
+    close $fh or confess "Cannot close '${file}: $!";
+  }
   return;
 }
 

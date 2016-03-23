@@ -19,11 +19,12 @@ use Test::More;
 
 eval "require Bio::DB::HTS::Tabix";
 my $tabix_unavailable = $@;
+note $tabix_unavailable;
 
 SKIP: {
   if($tabix_unavailable) {
     if($ENV{TRAVIS}) {
-      fail('Bio::DB::HTS:::Tabix is not installed');
+      fail('Bio::DB::HTS::Tabix is not installed');
     }
     else {
       skip 'Bio::DB::HTS::Tabix is not installed. Cannot run tests', 1;
@@ -61,7 +62,7 @@ SKIP: {
   @test_row = qw(1	875552	rs4970452	G	A	.	PASS	AA=.;DP=120;GP=1:885689;BN=111	GT:GQ:DP	1|1:100:33	1|1:57:26	1|1:100:49);
   is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
   note "Testing each column of the row";
-  do_the_tests(\@test_row);
+  do_the_tests(\@test_row, $parser);
   $index = 1;
   $row_index = 9 + $index;
   $test_sample = [$inds[$index], $test_row[$row_index]];

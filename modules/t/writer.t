@@ -74,8 +74,17 @@ SKIP: {
                 }];
 
   ## Create writer and write data to file
-  my $writer = Bio::EnsEMBL::IO::Writer->new('Bed', 'output.bed');
+  my $output = q{};
+  open(my $fh, '>', \$output) or die "Cannot open scalar for writing";
+  my $writer = Bio::EnsEMBL::IO::Writer->new('Bed', $fh);
   $writer->output_dataset($datasets);
+
+  my $expected = qq{track name="Test 1" description="Test of writing genes and their transcripts to a BED file"
+chr6\t133043925\t133055904\tENSG00000093134\t0\t-\t133043925\t133055904\t.
+chr6\t133073813\t133075090\tENSG00000234484\t0\t+\t133073813\t133075090\t.
+chr6\t133065008\t133084598\tENSG00000112303\t0\t-\t133065008\t133084598\t.
+};
+  is($output, $expected, 'Checking BED written correctly');
 }
 
 done_testing();
