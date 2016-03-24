@@ -260,11 +260,18 @@ sub get_tracks {
     
     # any track which doesn't have any of these is definitely invalid
     if ($tracks{$id}{'type'} || $tracks{$id}{'shortLabel'} || $tracks{$id}{'longLabel'}) {
-      $tracks{$id}{'track'}           = $id;
-      if($tracks{$id}{'parent'}) {
-        $tracks{$id}{'description_url'} = $tracks{$tracks{$id}{'parent'}}{'html'} ? "$url/$tracks{$tracks{$id}{'parent'}}{'html'}.html" : "$url/$tracks{$tracks{$id}{'parent'}}.html";
-      } else {
-        $tracks{$id}{'description_url'} = $tracks{$id}{'html'} ? "$url/$tracks{$id}{'html'}.html" : "$url/$id.html";
+      $tracks{$id}{'track'} = $id;
+
+      my $description_url;
+      if ($tracks{$id}{'html'}) {
+        $description_url = $url.'/'.$tracks{$id}{'html'};
+      }
+      elsif ($tracks{$id}{'parent'} && $tracks{$tracks{$id}{'parent'}}{'html'}) {
+        $description_url = $url.'/'.$tracks{$tracks{$id}{'parent'}}{'html'}; 
+      }
+      if ($description_url) {
+        $description_url .= '.html' unless $description_url =~ /\.html$/;
+        $tracks{$id}{'description_url'} = $description_url;
       }
       
       if (!$tracks{$id}{'type'} && !$tracks{$id}{'superTrack'}) {
