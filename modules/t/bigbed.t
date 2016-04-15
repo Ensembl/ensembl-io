@@ -16,39 +16,54 @@ use strict;
 use warnings;
 
 use Test::More;
-use Bio::EnsEMBL::IO::Parser::BigBed;
+eval "require Bio::DB::BigFile";
+my $big_file_unavailable = $@;
 
-######################################################
-## Test 1
-######################################################
-my $parser = Bio::EnsEMBL::IO::Parser::BigBed->open('modules/t/data.bb');
+SKIP: {
+  if($big_file_unavailable) {
+    if($ENV{TRAVIS}) {
+      fail('Bio::DB::BigFile is not installed');
+    }
+    else {
+      skip 'Bio::DB::BigFile is not installed. Cannot run tests', 1;
+    }
+  }
 
-ok($parser->next());
-ok($parser->get_chrom eq 'chr1');
-ok($parser->get_start == 3);
-ok($parser->get_end == 6);
-is($parser->get_strand, 1, 'strand');
-ok($parser->get_name eq 'Mo');
-ok($parser->get_score == 1000);
 
-ok($parser->next);
-ok($parser->get_chrom eq 'chr1');
-ok($parser->get_start == 4);
-ok($parser->get_end == 8);
-ok($parser->get_strand);
-ok($parser->get_name eq 'Larry');
-ok($parser->get_score == 1000);
+  require Bio::EnsEMBL::IO::Parser::BigBed;
 
-ok($parser->next);
-ok($parser->get_chrom eq 'chr2');
-ok($parser->get_start == 2);
-ok($parser->get_end == 7);
-ok($parser->get_strand == -1);
-ok($parser->get_name eq 'Curly');
-ok($parser->get_score == 1000);
+  ######################################################
+  ## Test 1
+  ######################################################
+  my $parser = Bio::EnsEMBL::IO::Parser::BigBed->open('modules/t/data.bb');
 
-ok(!$parser->next);
+  $parser->seek('chr1', 1, 2000);
+  ok($parser->next(), 'Can read BED rows after seek');
+  is($parser->get_chrom, 'chr1', 'chromosome');
+  is($parser->get_start, 3, 'start');
+  is($parser->get_end, 6, 'end');
+  is($parser->get_strand, 0, 'strand');
+  is($parser->get_name, 'Mo', 'name');
+  is($parser->get_score, 1000, 'score');
 
-$parser->close();
+  ok($parser->next(), 'Can read BED rows without another seek');
+  is($parser->get_chrom, 'chr1', 'chromosome');
+  is($parser->get_start, 4, 'start');
+  is($parser->get_end, 8, 'end');
+  is($parser->get_strand, 1, 'strand');
+  is($parser->get_name, 'Larry', 'name');
+  is($parser->get_score, 1000, 'score');
+  ok(!$parser->next, 'No more features left');
 
+  $parser->seek('chr2', 1, 2000);
+  ok($parser->next(), 'Can read BED rows after seek');
+  is($parser->get_chrom, 'chr2', 'chromosome');
+  is($parser->get_start, 2, 'start');
+  is($parser->get_end, 7, 'end');
+  is($parser->get_strand, -1, 'strand');
+  is($parser->get_name, 'Curly', 'name');
+  is($parser->get_score, 1000, 'score');
+
+  $parser->close();
+}
 done_testing;

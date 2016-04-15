@@ -19,7 +19,6 @@ limitations under the License.
 package Bio::EnsEMBL::IO::Adaptor::BAMAdaptor;
 use strict;
 
-use Bio::EnsEMBL::Feature;
 use Data::Dumper;
 use Bio::DB::Sam;
 use Data::Dumper;

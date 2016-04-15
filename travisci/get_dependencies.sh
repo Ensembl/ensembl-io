@@ -8,7 +8,11 @@ fi
 
 echo 'Getting HTSlib'
 if [ ! -d htslib ]; then
-  git clone --branch master --depth 1 https://github.com/samtools/htslib.git
+  url=$(curl -s https://api.github.com/repos/samtools/htslib/releases | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
+  curl -sL $url > htslib.tar.bz2
+  tar jxf htslib.tar.bz2
+  htslib=$(find . -name 'htslib*' -type d -depth 1)
+  mv $htslib htslib
 fi
 
 echo 'Getting jksrc'

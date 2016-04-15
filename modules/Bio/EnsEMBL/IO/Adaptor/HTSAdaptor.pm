@@ -19,7 +19,6 @@ limitations under the License.
 package Bio::EnsEMBL::IO::Adaptor::HTSAdaptor;
 use strict;
 
-use Bio::EnsEMBL::Feature;
 use Data::Dumper;
 use Bio::DB::HTS;
 

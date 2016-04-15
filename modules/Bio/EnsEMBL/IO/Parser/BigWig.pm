@@ -56,16 +56,16 @@ sub seek {
     return unless $fh;
 
     ## Get the internal chromosome name
-    my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
+    my $seq_id = $self->_map_chr_to_internal_name($chr_id);
     return unless $seq_id;
 
-    my $list = $fh->bigWigIntervalQuery("$seq_id", $start, $end);
+    my $list = $fh->bigWigIntervalQuery("$seq_id", $start-1, $end);
 
     my $feature_cache = $self->cache->{'features'};
 
     for (my $i = $list->head; $i; $i = $i->next) {
-      my @line = ($chr_id, $i->start-1, $i->end, $i->value);
-      push @$feature_cache, \@line;
+      my $line = [$chr_id, $i->start, $i->end, $i->value];
+      push(@{$feature_cache}, $line);
     }
     ## pre-load peek buffer
     $self->next_block();
@@ -82,6 +82,18 @@ sub seek {
 sub get_raw_chrom {
   my $self = shift;
   return $self->{'record'}[0];
+}
+
+=head2 get_chrom
+
+    Description: Getter - wrapper around get_raw_chrom
+    Returntype : String 
+
+=cut
+
+sub get_chrom {
+  my $self = shift;
+  return $self->get_raw_chrom();
 }
 
 =head2 get_raw_start
@@ -104,7 +116,7 @@ sub get_raw_start {
 
 sub get_start {
   my $self = shift;
-  return $self->get_raw_start();
+  return $self->get_raw_start()+1;
 }
 
 
@@ -130,6 +142,11 @@ sub get_end {
 sub get_raw_score {
   my $self = shift;
   return $self->{'record'}[3];
+}
+
+sub get_score {
+  my ($self) = @_;
+  return $self->get_raw_score();
 }
 
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PERL5LIB=$PWD/bioperl-live-bioperl-release-1-2-3:$PWD/ensembl-test/modules:$PWD/ensembl/modules:$PWD/modules:$DEPS/Bio-HTS/blib/lib/:$DEPS/Bio-HTS/blib/arch:$PERL5LIB
+export PERL5LIB=$PWD/bioperl-live-bioperl-release-1-2-3:$PWD/ensembl-test/modules:$PWD/ensembl/modules:$PWD/modules:$PERL5LIB
 
 
 # if [ "$DB" = 'mysql' ]; then

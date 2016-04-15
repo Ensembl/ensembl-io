@@ -189,7 +189,7 @@ sub getSequence {
 sub create_object {
     my $self = shift;
 
-    my $obj = Bio::EnsEMBL::IO::Object::Fasta->new(-HEADER => $self->getHeader, -SEQUENCE => $self->getSequence);
+    my $obj = Bio::EnsEMBL::IO::Object::Fasta->new($self->getHeader, $self->getSequence);
 
     return $obj;
 
