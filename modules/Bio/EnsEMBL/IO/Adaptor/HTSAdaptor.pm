@@ -76,6 +76,15 @@ sub htsfile_open {
   return $self->{_cache}->{_htsfile_handle};
 }
 
+sub htsfile_close {
+  my $self = shift;
+
+  if ($self->{_cache}->{_htsfile_handle}) {
+    $self->{_cache}->{_htsfile_handle}->close();
+  }
+  return;
+}
+
 sub htsfile_index {
   my $self = shift;
 
