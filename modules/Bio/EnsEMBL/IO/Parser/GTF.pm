@@ -116,9 +116,11 @@ sub get_attributes {
   my $self = shift;
   my %attributes;
   foreach my $attr (split(';',$self->get_raw_attributes)) {
-    my ($key,$value) = split(' ',$attr, 2);
+    my ($key, $value) = split(' ',$attr, 2);
     $value =~ s/"//g if $value;
-    $attributes{$key} = $value;
+    $key =~ s/^\s+//;
+    $key =~ s/\s+$//;
+    $attributes{$key} = $value ? $self->decode_string($value) : $value;
   }
   return \%attributes;
 }
