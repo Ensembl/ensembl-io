@@ -18,7 +18,7 @@ limitations under the License.
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::GFF3 - A line-based parser devoted to GFF3
+Bio::EnsEMBL::IO::Parser::GXF - parent of various related parsers such as GFF and GVF
 
 =cut
 
