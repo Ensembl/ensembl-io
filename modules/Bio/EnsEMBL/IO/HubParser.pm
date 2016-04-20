@@ -126,7 +126,7 @@ sub get_tracks {
   my ($self, $content, $file) = @_;
   my %tracks;
   my $url      = $file =~ s|^(.+)/.+|$1|r; # URL relative to the file (up until the last slash before the file name)
-  my @contents = split /\s*track\s+/, $content;
+  my @contents = split /(^track|\s+track)\s/, $content;
   shift @contents;
  
   ## Some hubs don't set the track type, so...
@@ -274,7 +274,7 @@ sub get_tracks {
         $tracks{$id}{'description_url'} = $description_url;
       }
       
-      if (!$tracks{$id}{'type'} && !$tracks{$id}{'superTrack'}) {
+      if (!$tracks{$id}{'type'} && !$tracks{$id}{'superTrack'} && $tracks{$id}{'bigDataUrl'}) {
         ## Set type based on file extension
         my @path = split(/\./, $tracks{$id}{'bigDataUrl'});
         $tracks{$id}{'type'} = $format_lookup{$path[-1]};
