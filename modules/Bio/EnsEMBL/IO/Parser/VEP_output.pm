@@ -74,7 +74,7 @@ sub read_metadata {
 
 sub set_fields {
   my $self = shift;
-  $self->{'fields'} = [qw(uploaded_variation location allele consequence impact symbol gene feature_type feature biotype exon intron hgvsc hgvsp cdna_position cds_position protein_position amino_acids codons existing_variation extra)];
+  $self->{'fields'} = [qw(uploaded_variation location allele gene feature feature_type consequence cdna_position cds_position protein_position amino_acids codons existing_variant extra)]; 
 }
 
 
@@ -180,78 +180,6 @@ sub get_allele {
   return $self->get_raw_allele();
 }
 
-=head2 get_raw_consequence
-
-    Description: Getter for consequence field
-    Returntype : String 
-
-=cut
-
-sub get_raw_consequence {
-  my $self = shift;
-  return $self->{'record'}[3];
-}
-
-=head2 get_consequence
-
-    Description: Getter - wrapper around raw method 
-    Returntype : String 
-
-=cut
-
-sub get_consequence {
-  my $self = shift;
-  return $self->get_raw_consequence();
-}
-
-=head2 get_raw_impact
-
-    Description: Getter for IMPACT field
-    Returntype : String 
-
-=cut
-
-sub get_raw_impact {
-  my $self = shift;
-  return $self->{'record'}[4];
-}
-
-=head2 get_impact
-
-    Description: Getter - wrapper around raw method 
-    Returntype : String 
-
-=cut
-
-sub get_impact {
-  my $self = shift;
-  return $self->get_raw_impact();
-}
-
-=head2 get_raw_symbol
-
-    Description: Getter for symbol field
-    Returntype : String (HGNC symbol or equivalent) 
-
-=cut
-
-sub get_raw_symbol {
-  my $self = shift;
-  return $self->{'record'}[5];
-}
-
-=head2 get_symbol
-
-    Description: Getter - wrapper around raw method 
-    Returntype : String 
-
-=cut
-
-sub get_symbol {
-  my $self = shift;
-  return $self->get_raw_symbol();
-}
-
 =head2 get_raw_gene
 
     Description: Getter for  field
@@ -261,7 +189,7 @@ sub get_symbol {
 
 sub get_raw_gene {
   my $self = shift;
-  return $self->{'record'}[6];
+  return $self->{'record'}[3];
 }
 
 =head2 get_gene
@@ -276,30 +204,6 @@ sub get_gene {
   return $self->get_raw_gene();
 }
 
-=head2 get_raw_feature_type
-
-    Description: Getter for feature_type field
-    Returntype : String 
-
-=cut
-
-sub get_raw_feature_type {
-  my $self = shift;
-  return $self->{'record'}[7];
-}
-
-=head2 get_feature_type
-
-    Description: Getter - wrapper around raw method 
-    Returntype : String 
-
-=cut
-
-sub get_feature_type {
-  my $self = shift;
-  return $self->get_raw_feature_type();
-}
-
 =head2 get_raw_feature
 
     Description: Getter for feature field
@@ -309,7 +213,7 @@ sub get_feature_type {
 
 sub get_raw_feature {
   my $self = shift;
-  return $self->{'record'}[8];
+  return $self->{'record'}[4];
 }
 
 =head2 get_feature
@@ -324,124 +228,52 @@ sub get_feature {
   return $self->get_raw_feature();
 }
 
-=head2 get_raw_biotype
+=head2 get_raw_feature_type
 
-    Description: Getter for exon field
+    Description: Getter for feature_type field
     Returntype : String 
 
 =cut
 
-sub get_raw_biotype {
+sub get_raw_feature_type {
   my $self = shift;
-  return $self->{'record'}[9];
+  return $self->{'record'}[5];
 }
 
-=head2 get_biotype
+=head2 get_feature_type
 
     Description: Getter - wrapper around raw method 
     Returntype : String 
 
 =cut
 
-sub get_biotype {
+sub get_feature_type {
   my $self = shift;
-  return $self->get_raw_biotype();
+  return $self->get_raw_feature_type();
 }
 
-=head2 get_raw_exon
+=head2 get_raw_consequence
 
-    Description: Getter for exon field
+    Description: Getter for consequence field
     Returntype : String 
 
 =cut
 
-sub get_raw_exon {
+sub get_raw_consequence {
   my $self = shift;
-  return $self->{'record'}[10];
+  return $self->{'record'}[6];
 }
 
-=head2 get_exon
+=head2 get_consequence
 
     Description: Getter - wrapper around raw method 
     Returntype : String 
 
 =cut
 
-sub get_exon {
+sub get_consequence {
   my $self = shift;
-  return $self->get_raw_exon();
-}
-
-=head2 get_raw_intron
-
-    Description: Getter for intron field
-    Returntype : String 
-
-=cut
-
-sub get_raw_intron {
-  my $self = shift;
-  return $self->{'record'}[11];
-}
-
-=head2 get_intron
-
-    Description: Getter - wrapper around raw method 
-    Returntype : String 
-
-=cut
-
-sub get_intron {
-  my $self = shift;
-  return $self->get_raw_intron();
-}
-
-=head2 get_raw_hgvsc
-
-    Description: Getter for HGVSc field
-    Returntype : String 
-
-=cut
-
-sub get_raw_hgvsc {
-  my $self = shift;
-  return $self->{'record'}[12];
-}
-
-=head2 get_hgvsc
-
-    Description: Getter - wrapper around raw method 
-    Returntype : String 
-
-=cut
-
-sub get_hgvsc {
-  my $self = shift;
-  return $self->get_raw_hgvsc();
-}
-
-=head2 get_raw_hgvsp
-
-    Description: Getter for HGVSp field
-    Returntype : String 
-
-=cut
-
-sub get_raw_hgvsp {
-  my $self = shift;
-  return $self->{'record'}[13];
-}
-
-=head2 get_hgvsp
-
-    Description: Getter - wrapper around raw method 
-    Returntype : String 
-
-=cut
-
-sub get_hgvsp {
-  my $self = shift;
-  return $self->get_raw_hgvsp();
+  return $self->get_raw_consequence();
 }
 
 =head2 get_raw_cdna_position
@@ -453,7 +285,7 @@ sub get_hgvsp {
 
 sub get_raw_cdna_position {
   my $self = shift;
-  return $self->{'record'}[14];
+  return $self->{'record'}[7];
 }
 
 =head2 get_cdna_position
@@ -477,7 +309,7 @@ sub get_cdna_position {
 
 sub get_raw_cds_position {
   my $self = shift;
-  return $self->{'record'}[15];
+  return $self->{'record'}[8];
 }
 
 =head2 get_cds_position
@@ -501,7 +333,7 @@ sub get_cds_position {
 
 sub get_raw_protein_position {
   my $self = shift;
-  return $self->{'record'}[16];
+  return $self->{'record'}[9];
 }
 
 =head2 get_protein_position
@@ -525,7 +357,7 @@ sub get_protein_position {
 
 sub get_raw_amino_acids {
   my $self = shift;
-  return $self->{'record'}[17];
+  return $self->{'record'}[10];
 }
 
 =head2 get_amino_acids
@@ -549,7 +381,7 @@ sub get_amino_acids {
 
 sub get_raw_codons {
   my $self = shift;
-  return $self->{'record'}[18];
+  return $self->{'record'}[11];
 }
 
 =head2 get_codons
@@ -573,7 +405,7 @@ sub get_codons {
 
 sub get_raw_existing_variation {
   my $self = shift;
-  return $self->{'record'}[19];
+  return $self->{'record'}[12];
 }
 
 =head2 get_existing_variation
@@ -597,7 +429,7 @@ sub get_existing_variation {
 
 sub get_raw_extra {
   my $self = shift;
-  return $self->{'record'}[20];
+  return $self->{'record'}[13];
 }
 
 =head2 get_extra
