@@ -4,11 +4,11 @@ use warnings;
 use Test::More;
 
 use Bio::EnsEMBL::Utils::IO qw( work_with_file );
-use Bio::EnsEMBL::IO::Parser::GenbankParser;
+use Bio::EnsEMBL::IO::Parser::Genbank;
 
 my $test_file = 'modules/t/data.gbk';
 
-my $parser = Bio::EnsEMBL::IO::Parser::GenbankParser->open($test_file);
+my $parser = Bio::EnsEMBL::IO::Parser::Genbank->open($test_file);
 ok ($parser->next(), "Loading first record");
 is($parser->get_accession,'NC_012920',"Testing get_accession");
 is($parser->get_sequence_name,'NC_012920.1',"Testing get_sequence_name");

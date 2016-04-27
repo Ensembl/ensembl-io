@@ -12,11 +12,11 @@
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::GenbankParser - GenBankParser
+Bio::EnsEMBL::IO::Parser::Genbank - GenBankParser
 
 =cut
 
-package Bio::EnsEMBL::IO::Parser::GenbankParser;
+package Bio::EnsEMBL::IO::Parser::Genbank;
 
 use strict;
 use warnings;
