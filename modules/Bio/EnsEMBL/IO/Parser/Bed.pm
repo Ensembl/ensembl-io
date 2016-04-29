@@ -443,6 +443,9 @@ sub validate {
       last;
     }
 
+    ## Finished validating, so return parser to beginning of file
+    $self->reset;
+
     if ($valid) {
       return $format || $valid;
     }
