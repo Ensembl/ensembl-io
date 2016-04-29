@@ -124,4 +124,18 @@ sub read_block {
     return $self->{'waiting_block'};
 }
 
+=head2 reset
+
+    Description : Resets the filehandle to the beginning of the file
+    Returntype  : True/False based on success/failure
+
+=cut
+
+sub reset {
+    my $self = shift;
+    my $fh = $self->{'filehandle'};
+    seek($fh, 0, 0);
+    return 1;
+}
+
 1;
