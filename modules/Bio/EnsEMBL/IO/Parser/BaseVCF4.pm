@@ -62,6 +62,8 @@ sub read_metadata {
     my $m_type = $1;
     my $m_data = $2;
 
+    push @{$self->{_metadata_order}}, $m_type;
+
     # Check the fileformat
     if ($m_type eq 'fileformat') {
       if ($m_data =~ /(\d+)\.(\d+)/) {
