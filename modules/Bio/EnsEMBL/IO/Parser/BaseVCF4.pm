@@ -42,6 +42,15 @@ use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
 my $version = 4.2;
 
+sub next {
+  my $self = shift;
+
+  # reset the per-record cache
+  $self->{_cache} = {};
+
+  return $self->SUPER::next(@_);
+}
+
 sub is_metadata {
     my $self = shift;
     return $self->{'current_block'} =~ /^#/;
@@ -536,12 +545,17 @@ sub get_raw_info {
 
 sub get_info {
   my $self = shift;
-  my %info_data;
-  foreach my $info (split(';',$self->get_raw_info)) {
-    my ($key,$value) = split('=',$info);
-    $info_data{$key} = $value;
+
+  if(!exists($self->{_cache}->{info})) {
+    my %info_data;
+    foreach my $info (split(';',$self->get_raw_info)) {
+      my ($key,$value) = split('=',$info);
+      $info_data{$key} = $value;
+    }
+    $self->{_cache}->{info} = \%info_data;
   }
-  return \%info_data;
+
+  return $self->{_cache}->{info};
 }
 
 
