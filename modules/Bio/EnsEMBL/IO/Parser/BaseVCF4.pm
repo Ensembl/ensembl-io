@@ -222,7 +222,7 @@ sub get_start {
     my $start = $self->get_raw_start();
 
     # Like indels, SVs have the base before included for reference
-    if ($self->get_raw_info =~ /SVTYPE/ || $self->get_alternatives =~ /\<|\[|\]|\>/ ) {
+    if ($self->get_raw_info =~ /SVTYPE/ || join(",", @{$self->get_alternatives}) =~ /\<|\[|\]|\>/) {
       $start ++;
     }
     else {
