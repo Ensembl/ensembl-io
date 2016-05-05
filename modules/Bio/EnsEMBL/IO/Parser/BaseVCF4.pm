@@ -864,12 +864,15 @@ sub get_samples_genotypes {
     next if $non_ref_only && $gt =~ /^(0[\\\|\/]?)+$/;
 
     my $phased = ($gt =~ /\|/ ? 1 : 0);
-    $sample_gen{$sample} = join(
+    my $translated_gt = join(
       ($phased ? '|' : '/'),
       map {$alleles[$_]}
       grep {$_ ne '.'}
       split(($phased ? '\|' : '/'), $gt)
     );
+    next if (!$translated_gt);
+    $sample_gen{$sample} = $translated_gt;
+
   }
   return \%sample_gen;
 }
