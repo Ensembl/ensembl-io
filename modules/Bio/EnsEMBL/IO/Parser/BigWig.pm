@@ -97,14 +97,15 @@ sub get_raw_start {
 
 =head2 get_start
 
-    Description: Getter - wrapper around get_raw_start
+    Description: Getter - wrapper around get_raw_start. Since bigWig features are
+                  effectively bedGraph lines, they have semi-open coordinates
     Returntype : Integer 
 
 =cut
 
 sub get_start {
   my $self = shift;
-  return $self->get_raw_start();
+  return $self->get_raw_start() + 1;
 }
 
 

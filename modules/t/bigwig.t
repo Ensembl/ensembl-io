@@ -21,20 +21,23 @@ use Bio::EnsEMBL::IO::Parser::BigWig;
 ######################################################
 ## Test 1
 ######################################################
-my $parser = Bio::EnsEMBL::IO::Parser::BigWig->open("modules/t/data-variableStep.bw");
+my $parser = Bio::EnsEMBL::IO::Parser::BigWig->open("input/data-variableStep.bw");
+ok($parser->seek(1, 1, 100));
 
 ok($parser->next);
-ok($parser->get_chrom eq 'chr1');
+ok($parser->get_seqname eq '1');
 ok($parser->get_start == 1);
-ok($parser->get_end == 1);
-ok($parser->get_score == 1);
+ok($parser->get_end == 2);
+ok($parser->get_score == 2);
 
-for (my $i = 0; $i < 4; $i++) {
+for (my $i = 1; $i < 4; $i++) {
   ok($parser->next);
-  ok($parser->get_chrom eq 'chr1');
-  ok($parser->get_start == 2 + 2 * $i);
-  ok($parser->get_end == 2 + 2 * $i);
-  ok($parser->get_score == 2 + $i);
+  next if $parser->empty_block;
+  ok($parser->get_seqname eq '1');
+  my $start = $i * 2 + 1;
+  ok($parser->get_start == $start);
+  ok($parser->get_end == $start + 1);
+  ok($parser->get_score == $i + 2);
 }
 
 ok(!$parser->next);
@@ -44,18 +47,18 @@ $parser->close();
 ######################################################
 ## Test 2
 ######################################################
-$parser = Bio::EnsEMBL::IO::Parser::BigWig->open('modules/t/data-fixedStep.bw');
+$parser = Bio::EnsEMBL::IO::Parser::BigWig->open('input/data-fixedStep.bw');
+ok($parser->seek(1, 1, 100));
 
-for (my $i = 0; $i < 10; $i ++) {
+for (my $i = 1; $i < 10; $i ++) {
   ok($parser->next);
-  ok($parser->get_chrom eq 'chr1');
-  ok($parser->get_start == 1 + $i);
-  ok($parser->get_end == 1 + $i);
+  ok($parser->get_seqname eq '1');
+  ok($parser->get_start == $i);
+  ok($parser->get_end == $i + 1);
   ok($parser->get_score == $i);
 }
 
 ok(!$parser->next);
-
 $parser->close();
 
 done_testing;
