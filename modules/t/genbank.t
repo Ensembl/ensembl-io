@@ -6,7 +6,7 @@ use Test::More;
 use Bio::EnsEMBL::Utils::IO qw( work_with_file );
 use Bio::EnsEMBL::IO::Parser::Genbank;
 
-my $test_file = 'modules/t/data.gbk';
+my $test_file = 'modules/t/input/data.gbk';
 
 my $parser = Bio::EnsEMBL::IO::Parser::Genbank->open($test_file);
 ok ($parser->next(), "Loading first record");

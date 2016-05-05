@@ -19,7 +19,7 @@ use Test::More;
 
 use Bio::EnsEMBL::IO::Parser::Fasta;
 
-my $test_file = "modules/t/data.fasta";
+my $test_file = "modules/t/input/data.fasta";
 
 ######################################################
 ## Test 1

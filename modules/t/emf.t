@@ -27,7 +27,7 @@ use Bio::EnsEMBL::IO::Parser::EMF;
 ########
 ## Resequencing
 subtest 'EMF Resequencing format', sub {
-	my $test_file = 'modules/t/Homo_sapiens.GRCh37.73.resequencing.chromosome.21.emf';
+	my $test_file = 'modules/t/input/Homo_sapiens.GRCh37.73.resequencing.chromosome.21.emf';
 	my $parser = Bio::EnsEMBL::IO::Parser::EMF->open($test_file);
 	isa_ok($parser, 'Bio::EnsEMBL::IO::Parser::EMF', "correct class");
 	my $next_record = $parser->next;
@@ -53,7 +53,7 @@ subtest 'EMF Resequencing format', sub {
 
 ## Compara
 subtest 'Compara format', sub {
-	my $test_file = 'modules/t/Compara.13_eutherian_mammals_EPO.chr1_26.emf';
+	my $test_file = 'modules/t/input/Compara.13_eutherian_mammals_EPO.chr1_26.emf';
 	my $parser = Bio::EnsEMBL::IO::Parser::EMF->open($test_file);	
 	isa_ok($parser, 'Bio::EnsEMBL::IO::Parser::EMF', "correct class");
 	my $next_record = $parser->next;
