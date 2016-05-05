@@ -11,8 +11,8 @@ see the child objects in modules/Bio/EnsEMBL/IO/Parser/.
 
 As the code matures, it is anticipated that various teams within the
 Ensembl project will begin to integrate Bio::EnsEMBL::IO modules into
-their pipelines; it will also be used in future releases of the Ensembl
-website to handle parsing of uploaded data and output of exported data.
+their pipelines; it is now used in future releases of the Ensembl
+website to handle parsing of uploaded data.
 
 All parsers should have associated unit tests, which can also serve as
 simple tutorials on how to use ensembl-io.
