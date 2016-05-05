@@ -19,7 +19,7 @@ use Test::More;
 
 use Bio::EnsEMBL::IO::Parser::VEP_output;
 
-my $test_file = "modules/t/data.vepo";
+my $test_file = "modules/t/input/data.vepo";
 
 my $parser = Bio::EnsEMBL::IO::Parser::VEP_output->open($test_file);
 ok ($parser->next(), "Loading first record");
@@ -35,9 +35,9 @@ ok ($parser->get_consequence() eq 'missense_variant');
 ok ($parser->get_cdna_position() == 742);
 ok ($parser->get_cds_position() == 716);
 ok ($parser->get_protein_position() == 239);
-ok ($parser->get_aa_change() eq 'T/N');
-ok ($parser->get_codon_change() eq 'aCc/aAc');
-ok ($parser->get_colocated() eq '-');
+ok ($parser->get_amino_acids() eq 'T/N');
+ok ($parser->get_codons() eq 'aCc/aAc');
+ok ($parser->get_existing_variation() eq '-');
 my $extra = $parser->get_extra;
 ok ($extra->{'SIFT'} eq 'deleterious(0)');
 ok ($parser->next(), "Loading second record");

@@ -31,7 +31,7 @@ use Bio::EnsEMBL::IO::Parser::GTF;
 
 #1	ensembl	CDS	144373415	144373470	.	-	2	gene_id "ENSGALG00000016887"; gene_version "3"; transcript_id "ENSGALT00000027289"; transcript_version "3"; exon_number "21"; gene_source "ensembl"; gene_biotype "protein_coding"; transcript_source "ensembl"; transcript_biotype "protein_coding"; protein_id "ENSGALP00000027238"; protein_version "3";
 
-my $test_file = "modules/t/data.gtf";
+my $test_file = "modules/t/input/data.gtf";
 my $parser    = Bio::EnsEMBL::IO::Parser::GTF->open($test_file);
 
 ## First record
