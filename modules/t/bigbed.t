@@ -21,7 +21,7 @@ use Bio::EnsEMBL::IO::Parser::BigBed;
 ######################################################
 ## Test 1
 ######################################################
-my $parser = Bio::EnsEMBL::IO::Parser::BigBed->open('input/data.bb');
+my $parser = Bio::EnsEMBL::IO::Parser::BigBed->open('modules/t/input/data.bb');
 ok($parser->seek(1, 1, 10));
 
 ok($parser->next());

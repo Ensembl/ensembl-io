@@ -21,7 +21,7 @@ use Bio::EnsEMBL::IO::Parser::BigWig;
 ######################################################
 ## Test 1
 ######################################################
-my $parser = Bio::EnsEMBL::IO::Parser::BigWig->open("input/data-variableStep.bw");
+my $parser = Bio::EnsEMBL::IO::Parser::BigWig->open("modules/t/input/data-variableStep.bw");
 ok($parser->seek(1, 1, 100));
 
 ok($parser->next);
@@ -32,7 +32,6 @@ ok($parser->get_score == 2);
 
 for (my $i = 1; $i < 4; $i++) {
   ok($parser->next);
-  next if $parser->empty_block;
   ok($parser->get_seqname eq '1');
   my $start = $i * 2 + 1;
   ok($parser->get_start == $start);
@@ -47,7 +46,7 @@ $parser->close();
 ######################################################
 ## Test 2
 ######################################################
-$parser = Bio::EnsEMBL::IO::Parser::BigWig->open('input/data-fixedStep.bw');
+$parser = Bio::EnsEMBL::IO::Parser::BigWig->open('modules/t/input/data-fixedStep.bw');
 ok($parser->seek(1, 1, 100));
 
 for (my $i = 1; $i < 10; $i ++) {
