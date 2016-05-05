@@ -23,7 +23,7 @@ BEGIN { use_ok('Bio::EnsEMBL::IO::Parser::BLASTFormatter'); }
 
 my $prefix = $FindBin::Bin;
 my $parser;
-my $test_file = "$prefix/blast_test.6.default.tab";
+my $test_file = "$prefix/input/blast_test.6.default.tab";
 
 ###########################################
 #
@@ -100,7 +100,7 @@ throws_ok { $parser->get_mismatch() }
 #
 note("Test tabular format with default specifiers");
 $outfmt = 6; # default format specifiers
-$test_file = "$prefix/blast_test.6.default.tab";
+$test_file = "$prefix/input/blast_test.6.default.tab";
 $parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
 ok($parser->next(), "Loading first record");
 my @expected_record = ( qw/gnl|MYDB|1	gi|405832|gb|U00001.1|HSCDC27	100.00	720	0	0	1	720	1	720	0.0	1330/ );
@@ -134,7 +134,7 @@ ok(!$parser->next(), 'No more records');
 #
 note("Test Compara format specifiers");
 $outfmt = '7 qacc sacc evalue score nident pident qstart qend sstart send length positive ppos qseq sseq';
-$test_file = "$prefix/blast_test.7.compara.tab";
+$test_file = "$prefix/input/blast_test.7.compara.tab";
 $parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
 ok($parser->next(), 'Loading first record');
 is($parser->get_qacc, 'gnl|MYDB|1', 'Query accession');
@@ -179,7 +179,7 @@ ok(!$parser->next(), 'No more records');
 #
 note("Test Ensembl Web format specifiers");
 $outfmt = '7 qseqid qstart qend sseqid sstart send score evalue pident length qframe sframe';
-$test_file = "$prefix/blast_test.7.web.tab";
+$test_file = "$prefix/input/blast_test.7.web.tab";
 $parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
 ok($parser->next(), 'Loading first record');
 is($parser->get_qseqid, 'gnl|MYDB|1', 'Query seq-id');
@@ -218,7 +218,7 @@ ok(!$parser->next(), 'No more records');
 #
 note("Test comma-separated format with default specifiers");
 $outfmt = '10';
-$test_file = "$prefix/blast_test.10.default.csv";
+$test_file = "$prefix/input/blast_test.10.default.csv";
 $parser = Bio::EnsEMBL::IO::Parser::BLASTFormatter->open($test_file, $outfmt);
 ok($parser->next(), 'Loading first record');
 is($parser->get_qseqid, 'gnl|MYDB|1', 'Query seq-id');
