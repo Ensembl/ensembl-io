@@ -111,6 +111,15 @@ sub open {
     return $self;
 }
 
+=close
+
+    Description : Dummy method in case a script calls close on a file
+    Returntype  : True
+
+=cut
+
+sub close { return 1; }
+
 =head2 init 
 
     Description: placeholder - may need implementing in child
