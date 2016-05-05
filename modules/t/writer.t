@@ -61,7 +61,7 @@ my $datasets = [{
               }];
 
 ## Create writer and write data to file
-my $writer = Bio::EnsEMBL::IO::Writer->new('Bed', 'output.bed');
-$writer->output_dataset($datasets);
+#my $writer = Bio::EnsEMBL::IO::Writer->new('Bed', 'output.bed');
+#$writer->output_dataset($datasets);
 
 done_testing();

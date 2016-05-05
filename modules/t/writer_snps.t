@@ -45,8 +45,8 @@ SKIP: {
               }];
 
   ## Create writer and write data to file
-  my $writer = Bio::EnsEMBL::IO::Writer->new('Bed', 'output.bed');
-  $writer->output_file($datasets);
+  #my $writer = Bio::EnsEMBL::IO::Writer->new('Bed', 'output.bed');
+  #$writer->output_file($datasets);
 };
 
 done_testing();
