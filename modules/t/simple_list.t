@@ -20,7 +20,7 @@ use Test::More;
 use Bio::EnsEMBL::IO::ListBasedParser;
 use IO::Uncompress::Gunzip qw/$GunzipError/;
 
-my $test_file = "modules/t/input/data.txt";
+my $test_file = "modules/t/data.txt";
 
 note 'Processing file '.$test_file;
 test_parser($test_file);
