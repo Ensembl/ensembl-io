@@ -18,6 +18,7 @@ use warnings;
 use Test::More;
 
 use Bio::EnsEMBL::IO::Writer;
+=pod
 use Bio::EnsEMBL::Registry;
 
 ## Get some data from the db
@@ -45,8 +46,9 @@ SKIP: {
               }];
 
   ## Create writer and write data to file
-  #my $writer = Bio::EnsEMBL::IO::Writer->new('Bed', 'output.bed');
-  #$writer->output_file($datasets);
+  my $writer = Bio::EnsEMBL::IO::Writer->new('Bed', 'output.bed');
+  $writer->output_file($datasets);
 };
-
+=cut
+ 
 done_testing();
