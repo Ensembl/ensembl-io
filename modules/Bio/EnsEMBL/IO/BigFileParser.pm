@@ -39,14 +39,15 @@ use parent qw(Bio::EnsEMBL::IO::Parser);
 =head2 new
 
     Constructor
-    Argument [1+]: Hash of parameters for configuration, e.g. buffer sizes or 
+    Argument [1] : URL of file
+    Argument [2] : Hash of parameters for configuration, e.g. buffer sizes or 
                    specific functions for handling headers or data
     Returntype   : Bio::EnsEMBL::IO::BigFileParser
 
 =cut
 
 sub new {
-    my ($class, $url) = @_;
+    my ($class, $url, $args) = @_;
     
     my $self = {
       url               => $url,
@@ -58,6 +59,7 @@ sub new {
       waiting_block     => undef,
       record            => undef,
       strand_conversion => {'+' => '1', '.' => '0', '-' => '-1'},
+      %{$args||{}},
     };
 
     bless $self, $class;
@@ -165,7 +167,7 @@ sub cache {
 }
 
 
-=head2 open
+=head2 open_file
 
     Description: Opens a remote file from URL
     Returntype : Filehandle 
