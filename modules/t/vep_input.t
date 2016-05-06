@@ -19,7 +19,7 @@ use Test::More;
 
 use Bio::EnsEMBL::IO::Parser::VEP_input;
 
-my $test_file = "modules/t/data.vepi";
+my $test_file = "modules/t/input/data.vepi";
 
 my $parser = Bio::EnsEMBL::IO::Parser::VEP_input->open($test_file);
 ok ($parser->next(), "Loading first record");
