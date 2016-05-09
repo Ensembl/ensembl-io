@@ -119,24 +119,32 @@ sub munge_chr_id {
 
   my $ret_id = $chr_id;
 
-  # Check we get values back for seq region. Maybe need to add 'chr'
+  # Check we get values back for seq region. Maybe need to add 'chr' or Chr
 
   # Note there is a bug in samtools version 0.1.18 which means we can't just
   # use the chr_id as the region, we have to specify a range. The range I
   # use is 1-1 which is hopefully valid for all seq regions
   my @coords = $header->parse_region("$chr_id:1-1");
+  if (@coords) {
+    return "$chr_id";
+  }
 
   if (!@coords) {
     @coords = $header->parse_region("chr$chr_id:1-1");
     if (@coords) {
-      $ret_id = "chr$chr_id";
-    } else {
-      warn " *** could not parse_region for BAM with $chr_id in file " . $self->url ."\n";
-      return undef;
+      return "chr$chr_id";
     }
   }
 
-  return $ret_id;
+  if (!@coords) {
+    @coords = $header->parse_region("Chr$chr_id:1-1");
+    if (@coords) {
+      return "Chr$chr_id";
+    }
+  }
+
+  warn " *** could not parse_region for BAM/CRAM with $chr_id in file " . $self->url ."\n";
+  return undef;
 }
 
 sub fetch_paired_alignments {
