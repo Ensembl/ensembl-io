@@ -105,10 +105,8 @@ sub read_record {
             push(@{$self->{'record'}->{'_raw_'.lc($field_type)}},  $field.$self->_get_multiline);
         }
         elsif ($field_type eq 'DEFINITION') {
-            print STDOUT "Definition section\n";
             $field .= $self->_get_multiline;
             $self->{'record'}->{'_raw_definition'} = $field;
-            print STDOUT "Definition = $field\n";
         }
         elsif ($field_type eq 'ORIGIN') {
             $field .= $self->_get_multiline;
