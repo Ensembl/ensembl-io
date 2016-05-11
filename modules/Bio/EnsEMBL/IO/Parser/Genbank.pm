@@ -36,7 +36,7 @@ sub open {
     my $class = ref($caller) || $caller;
     my $filename = shift;
     
-    my $self = $class->SUPER::open($filename, 'LOCUS', '^//', @_);
+    my $self = $class->SUPER::open($filename, '^LOCUS', '^//', @_);
     
     $self->next_block();
     return $self;
@@ -103,6 +103,12 @@ sub read_record {
         elsif ($field_type eq 'COMMENT' || $field_type eq 'REFERENCE') {
             # REFERENCE is not used by the genebuild team so it can be "removed"
             push(@{$self->{'record'}->{'_raw_'.lc($field_type)}},  $field.$self->_get_multiline);
+        }
+        elsif ($field_type eq 'DEFINITION') {
+            print STDOUT "Definition section\n";
+            $field .= $self->_get_multiline;
+            $self->{'record'}->{'_raw_definition'} = $field;
+            print STDOUT "Definition = $field\n";
         }
         elsif ($field_type eq 'ORIGIN') {
             $field .= $self->_get_multiline;
@@ -448,8 +454,6 @@ sub get_features {
             }
         }
     }
-    use Data::Dumper;
-    print Dumper $self->{'record'}->{'_features'};
     return $self->{'record'}->{'_features'};
 }
 
