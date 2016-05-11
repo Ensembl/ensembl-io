@@ -433,6 +433,7 @@ sub validate {
       }
       elsif ($col_count >= $self->get_minimum_column_count
               && $col_count <= $self->get_maximum_column_count) {
+        $format = 'bed';
         $valid = 1;
       }
       last unless $valid;
