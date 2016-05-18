@@ -86,7 +86,9 @@ sub get_raw_seqname {
 
 sub get_seqname {
     my $self = shift;
-    (my $chr = $self->get_raw_seqname()) =~ s/^chr//;
+    my $chr = $self->get_raw_seqname();
+    return unless $chr;
+    $chr =~ s/^chr//;
     return $chr;
 }
 
@@ -233,7 +235,7 @@ sub get_raw_strand {
 sub get_strand {
     my $self = shift;
     my $val = $self->get_raw_strand();
-    return $strand_conversion{$val};
+    return $val ? $strand_conversion{$val} : undef;
 }
 
 
