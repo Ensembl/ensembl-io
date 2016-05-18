@@ -198,7 +198,7 @@ sub read_record {
 sub validate {
     my $self = shift;
 
-    my $valid   = 0;
+    my $valid = 0;
 
     while ($self->next) {
 
@@ -214,10 +214,16 @@ sub validate {
             && $col_count <= $self->get_maximum_column_count) {
         $valid = 1;
       }
+      else {
+        $valid = 0;
+      }
 
       if ($self->get_start && $self->get_start =~ /^\d+$/ && $self->get_start > 0 
             && $self->get_end && $self->get_end =~ /^\d+$/) {
         $valid = 1;
+      }
+      else {
+        $valid = 0;
       }
 
       ## Additional format-specific validation
