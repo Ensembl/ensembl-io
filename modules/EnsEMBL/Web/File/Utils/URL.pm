@@ -40,7 +40,7 @@ use EnsEMBL::Web::File::Utils qw(get_compression uncompress);
 use Bio::EnsEMBL::Utils::Exception qw(throw);
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(chase_redirects file_exists read_file write_file delete_file get_filesize);
+our @EXPORT_OK = qw(chase_redirects file_exists read_file write_file delete_file get_filesize fetch_file);
 our %EXPORT_TAGS = (all     => [@EXPORT_OK]);
 
 use constant 'MAX_HIGHLIGHT_FILESIZE' => 1048576;  # (bytes) = 1Mb
@@ -304,6 +304,36 @@ sub delete_file {
   }
   else {
     throw("Deleting remote files not permitted!") unless $args->{'no_exception'};
+    return 0;
+  }
+}
+
+sub fetch_file {
+### Download file (URL based) to local file system
+### @param file_url - File URL
+### @param Args (optional) Hashref
+###                     nice Boolean - see introduction
+###                     destination_path - path where to store file (if not specified will store it in /tmp/)
+### @return zero or Hashref containing error
+### CAUTION: Fetching large file will cause the page to hang as it waits for the whole file to finish download and then proceed
+  my ($file_url, $args) = @_;
+
+  $file_url     =~ m!([^/]+)$!;
+  my $filename  = $1;
+  my $proxy     = _proxy($args);
+  my $ua        = LWP::UserAgent->new();
+
+  $ua->timeout(10);
+  $ua->env_proxy;
+  $ua->proxy([qw(http https)], $proxy) || ();
+
+  my $response = $ua->mirror($file_url, $args->{'destination_path'} ? $args->{'destination_path'}."/$filename" : "/tmp/$filename");
+  return if $response->{_msg} eq 'OK';
+
+  if($args->{'nice'}) {
+     return {'error' => "Cannot download file ($file_url). HTTP request error code ".$response->{_rc}};
+  } else {
+    throw("Cannot download file ($file_url). HTTP request error code ".$response->{_rc}) unless $args->{'no_exception'};
     return 0;
   }
 }
