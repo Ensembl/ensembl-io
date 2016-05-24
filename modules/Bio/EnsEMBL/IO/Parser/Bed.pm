@@ -411,25 +411,29 @@ sub get_blockStarts {
 =cut
 
 sub validate {
-    my $self = shift;
+    my ($self, $subtype) = @_;
 
-    my $valid   = 0;
-    my $format  = '';
+    my $valid     = 0;
+    my $col_count = 0;
+    my $format    = '';
 
     while ($self->next) {
      
-      ## Ignore metadata and empty lines - we want to check the actual data 
-      next if $self->is_metadata;
+      if ($self->is_metadata && !$subtype) {
+        $subtype = $self->get_metadata_value('type');
+      }
       next if $self->{'current_block'} !~ /\w/;
       $self->read_record;
 
       ## Check we have the correct number of columns for this format
-      my $col_count = scalar(@{$self->{'record'}});
+      $col_count = scalar(@{$self->{'record'}});
 
       ## Identify bedgraph content
       if ($col_count == 4 && $self->{'record'}[3] =~ /^[-+]?[0-9]*\.?[0-9]+$/) {
         $format = 'bedgraph';
-        $valid = 1;
+        if ($subtype =~ /bedgraph/i) {
+          $valid = 1;
+        }
       }
       elsif ($col_count >= $self->get_minimum_column_count
               && $col_count <= $self->get_maximum_column_count) {
@@ -447,9 +451,7 @@ sub validate {
     ## Finished validating, so return parser to beginning of file
     $self->reset;
 
-    if ($valid) {
-      return $format || $valid;
-    }
+    return ($valid, $format, $col_count);
 }
 
 
