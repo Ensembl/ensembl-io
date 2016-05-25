@@ -314,7 +314,7 @@ sub fetch_file {
 ### @param Args (optional) Hashref
 ###                     nice Boolean - see introduction
 ###                     destination_path - path where to store file (if not specified will store it in /tmp/)
-### @return zero or Hashref containing error
+### @return location of downloaded file or Hashref containing error
 ### CAUTION: Fetching large file will cause the page to hang as it waits for the whole file to finish download and then proceed
   my ($file_url, $args) = @_;
 
@@ -327,8 +327,9 @@ sub fetch_file {
   $ua->env_proxy;
   $ua->proxy([qw(http https)], $proxy) || ();
 
-  my $response = $ua->mirror($file_url, $args->{'destination_path'} ? $args->{'destination_path'}."/$filename" : "/tmp/$filename");
-  return if $response->{_msg} eq 'OK';
+  my $dest     = $args->{'destination_path'} ? $args->{'destination_path'}."$filename" : "/tmp/$filename";
+  my $response = $ua->mirror($file_url, $dest);
+  return $dest if ($response->{_msg} eq 'OK');
 
   if($args->{'nice'}) {
      return {'error' => "Cannot download file ($file_url). HTTP request error code ".$response->{_rc}};
