@@ -548,7 +548,7 @@ sub get_info {
 
   if(!exists($self->{_cache}->{info})) {
     my %info_data;
-    foreach my $info (split(';',$self->get_raw_info)) {
+    foreach my $info (split(';', ($self->get_raw_info || ''))) {
       my ($key,$value) = split('=',$info);
       $info_data{$key} = $value;
     }

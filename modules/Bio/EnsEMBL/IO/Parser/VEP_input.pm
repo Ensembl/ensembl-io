@@ -194,7 +194,8 @@ sub get_raw_strand {
 
 sub get_strand {
   my $self = shift;
-  return $self->{'strand_conversion'}{$self->get_raw_strand // 1};
+  my $raw_strand = $self->get_raw_strand;
+  return $self->{'strand_conversion'}{defined($raw_strand) ? $raw_strand : 1};
 }
 
 =head2 get_raw_identifier
