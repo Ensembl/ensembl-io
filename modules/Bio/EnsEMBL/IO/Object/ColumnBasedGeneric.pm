@@ -134,6 +134,22 @@ sub fields {
     }
 }
 
+=head2 length
+
+    Description: If the object has a start and end attribute
+                 calculate it's length and return that. Otherwise
+                 return undef.
+
+=cut
+
+sub length {
+    my $self = shift;
+
+    if($self->can('start') && $self->can('end')) {
+	return abs($self->end - $self->start);
+    }
+}
+
 =head2 combine_fields
 
     Description: For fields that are composite fields (ie. attributes in
