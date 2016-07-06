@@ -73,4 +73,13 @@ sub read_record {
     $self->Bio::EnsEMBL::IO::Parser::BaseVCF4::read_record(@_);
 }
 
+sub next {
+  my $self = shift;
+
+  # reset the per-record cache
+  $self->{_cache} = {};
+
+  return $self->SUPER::next(@_);
+}
+
 1;
