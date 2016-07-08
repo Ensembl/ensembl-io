@@ -186,7 +186,8 @@ sub get_tracks {
         }
       } elsif ($key eq 'bigDataUrl') {
         if ($value =~ /^\//) { ## path is relative to server, not to hub.txt
-          (my $root = $url) =~ s/^(ftp|https?):\/\/([\w|-|\.]+)//;
+          $url =~ /^(\w+:\/\/(\w|-|\.)+)/;
+          my $root = $1;
           $tracks{$id}{$key} = $root.$value;
         }
         else {
