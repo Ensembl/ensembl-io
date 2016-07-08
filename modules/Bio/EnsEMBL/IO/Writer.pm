@@ -21,52 +21,102 @@ package Bio::EnsEMBL::IO::Writer;
 use strict;
 use warnings;
 use Carp;
+use Scalar::Util qw/openhandle/;
 
 =head2 new
 
     Constructor
-    Argument [1] : Format of output file
-    Argument [2] : Filename of output file 
-    Argument [3] : SpeciesDefs object (optional) 
     Returntype   : Bio::EnsEMBL::IO::Writer
 
 =cut
 
-
 sub new {
-  my ($class, $format, $filename, $sd) = @_;
-  $format ||= 'Bed';
+  my ($class) = @_;
 
-  my $parser_class = 'Bio::EnsEMBL::IO::Parser::'.$format;
-  eval "require $parser_class";
-
-  if ($@) {
-    confess ("Cannot use $parser_class - format unknown ($@)");
-  }
-  else {
-    my $parser = $parser_class->open();
-
-    ## Optional track colour configuration (requires ensembl-webcode)
-    unless ($sd) {
-      eval "require EnsEMBL::Web::SpeciesDefs";
-      if (!$@) {
-        $sd = new EnsEMBL::Web::SpeciesDefs;
-      }
-    }
-
-    my $self = {
-      'filename'      => $filename,
-      'parser'        => $parser,
-      'species_defs'  => $sd,
-      'translator'    => {},
-    };
+  my $self = {};
   
-    bless $self, $class;
+  bless $self, $class;
 
-    return $self;
-  }
+  return $self;
 
 }
+
+=head2 open
+
+    Description: Set the file to write records to, either a filename
+                 or an existing file handle
+    Args[1]    : A file name or open file handle
+    Exceptions : If the file name can't be openned for writing
+
+=cut
+
+sub open {
+    my ($self, $file) = @_;
+
+    if(openhandle($file)) {
+	$self->{writer_handle} = $file;
+    } else {
+	CORE::open($self->{writer_handle}, ">$file") ||
+	    throw("Error opening output file $file: $@");
+    }
+}
+
+=head2 close
+
+    Description: Close an existing writer file handle
+    Exceptions : If the file handle isn't currently open
+
+=cut
+
+sub close {
+    my $self = shift;
+
+    if(openhandle($self->{writer_handle})) {
+	CORE::close($self->{writer_handle});
+	$self->{writer_handle} = undef;
+    } else {
+	throw("Error, writing file handle isn't open");
+    }
+
+}
+
+=head2 translator
+
+    Type: Setter/getter
+    Description: Setter/getter for the translator, the translator is
+                 what converts objects in to the requested format
+                 based on the subclassing of Writer
+    Returntype : Translator object
+
+=cut
+
+sub translator {
+    my $self = shift;
+
+    if(@_) {
+	my $translator = shift;
+	$self->{translator} = $translator;
+    }
+
+    return $self->{translator};
+}
+
+=head2 write
+
+    Description: Dummy writer function for the base class,
+                 should be implemented in derived classes
+
+=cut
+
+sub write {
+    my $self = shift;
+
+    croak "Not implemented in base writer class";
+}
+
+#############################
+# OLD CRAP
+#############################
 
 =head2 parser
 
@@ -191,13 +241,13 @@ sub output_feature {
 
 =cut
 
-sub write {
-  my ($self, $content) = @_;
-  my $file = $self->{filename};
-  open my $fh, '>>', $file or confess "Cannot open '${file}' for appending: $!";
-  print $fh $content or confess "Cannot write content to '${file}: $!";
-  close $fh or confess "Cannot close '${file}: $!";
-  return;
-}
+#sub write {
+#  my ($self, $content) = @_;
+#  my $file = $self->{filename};
+#  CORE::open my $fh, '>>', $file or confess "Cannot open '${file}' for appending: $!";
+#  print $fh $content or confess "Cannot write content to '${file}: $!";
+#  CORE::close $fh or confess "Cannot close '${file}: $!";
+#  return;
+#}
 
 1;
