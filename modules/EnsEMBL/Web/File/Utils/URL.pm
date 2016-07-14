@@ -198,6 +198,7 @@ sub read_file {
 ###         nice (optional) Boolean - see introduction
 ###         compression String (optional) - compression type
 ###         method String (optional) - defaults to 'get'
+###         size_limit (optional) - max size for the file to be read
 ### @return Hashref (in nice mode) or String - contents of file
   my ($file, $args) = @_;
   my $url = ref($file) ? $file->absolute_read_path : $file;
@@ -240,9 +241,18 @@ sub read_file {
       $options->{'headers'} = $args->{'headers'};
     }
 
+    # max size limit provided ?
+    my $_content = '';
+    if ($args->{'size_limit'}) {
+      $options->{'data_callback'} = sub {
+        $_content .= $_[0];
+        die "File size exceeds maximum allowed size\n" if length $_content > $args->{'size_limit'};
+      }
+    }
+
     my $response = $http->request(uc($method),$url,$options);
     if ($response->{'success'}) {
-      $content = $response->{'content'};
+      $content = $args->{'size_limit'} ? $_content : $response->{'content'};
     }
     else {
       $error = _get_http_tiny_error($response);
