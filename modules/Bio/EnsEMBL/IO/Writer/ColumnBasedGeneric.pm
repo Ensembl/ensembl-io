@@ -69,7 +69,14 @@ sub write {
     my $self = shift;
     my $object = shift;
 
-    print { $self->{writer_handle} } $self->create_record($object);
+    # Metadata are a specific case, they are format specific, if
+    # you need to translate a feature in to a metadata record (ie. GFF3
+    # chromosome list), create a metadata specific translator for that
+    if($object->isa('Bio::EnsEMBL::IO::Object::Metadata')) {
+	print { $self->{writer_handle} } $object->create_record();
+    } else {
+	print { $self->{writer_handle} } $self->create_record($object);
+    }
 
 }
 

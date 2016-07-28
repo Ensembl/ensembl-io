@@ -16,7 +16,7 @@ limitations under the License.
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Object::GFF3Metadata - Object to represent 
+Bio::EnsEMBL::IO::Object::GFF3Metadata - Object to represent GFF3 metadata
 
 =head1 SYNOPSIS
 
@@ -40,6 +40,8 @@ elements via setters/getters. Setter/getters are dynamically added to the class 
 =cut
 
 package Bio::EnsEMBL::IO::Object::GFF3Metadata;
+
+use base qw/Bio::EnsEMBL::IO::Object::Metadata/;
 
 use strict;
 use warnings;
@@ -70,6 +72,59 @@ sub new {
     bless $self, $class;
 
     return $self;
+}
+
+=head2 directive
+
+    Description: Create a directive type GFF metadata (##)
+    Args[1]    : The directive type (ie. sequence-region)
+    Args[2]    : Directive values, either a string or array of
+                 values. An array will be put together as a space
+                 separated string when create_record is called.
+    Returntype : Bio::EnsEMBL::IO::Object::GFF3Metadata
+
+=cut
+
+sub directive {
+    my $class = shift;
+    my $directive = shift;
+    my @args = @_;
+
+    return bless {type => 'directive', directive => $directive, value => \@args}, $class;
+}
+
+=head2 directive
+
+    Description: Create an Ensembl directive type GFF metadata (#!)
+    Args[1]    : The ens-directive type (ie. sequence-region)
+    Args[2]    : Directive values, either a string or array of
+                 values. An array will be put together as a space
+                 separated string when create_record is called.
+    Returntype : Bio::EnsEMBL::IO::Object::GFF3Metadata
+
+=cut
+
+sub ens_directive {
+    my $class = shift;
+    my $directive = shift;
+    my @args = @_;
+
+    return bless {type => 'ens-directive', directive => $directive, value => \@args}, $class;
+}
+
+=head2 directive
+
+    Description: Create an Ensembl directive type GFF metadata (#)
+    Args[1]    : The comment value
+    Returntype : Bio::EnsEMBL::IO::Object::GFF3Metadata
+
+=cut
+
+sub comment {
+    my $class = shift;
+    my $comment = shift;
+
+    return bless {type => 'comment', value => $comment}, $class;
 }
 
 sub create_record {

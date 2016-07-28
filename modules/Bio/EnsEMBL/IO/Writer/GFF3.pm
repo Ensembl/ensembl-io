@@ -47,6 +47,7 @@ use warnings;
 use Carp;
 
 use Bio::EnsEMBL::IO::Object::GFF3;
+use Bio::EnsEMBL::IO::Object::GFF3Metadata;
 
 my @default_order = qw(ID Parent Name Alias Target Gap Derives_from Note Dbxref Ontology_term Is_circular);
 
@@ -70,7 +71,24 @@ sub new {
 	$translator->strand_conversion(Bio::EnsEMBL::IO::Object::GFF3->strand_conversion());
     }
 
+    # Cheat and make a GFF3Metadata object in a really quick and lighttweight manner.
+    # We need one hanging around for the fwd-ref writer call
+    $self->{fwd_ref} = bless { type => 'fwd-ref-delimeter' }, 'Bio::EnsEMBL::IO::Object::GFF3Metadata';
+
     return $self;
+}
+
+=head2 fwd_ref_delimeter
+
+    Description: Shortcut to write a forward reference delimeter in the GFF3 format,
+                 ie. ###
+
+=cut
+
+sub fwd_ref_delimeter {
+    my $self = shift;
+
+    $self->write( $self->{fwd_ref} );
 }
 
 =head2 create_record

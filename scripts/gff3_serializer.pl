@@ -17,17 +17,19 @@ use Data::Dumper;
 use Bio::EnsEMBL::Registry;
 use Bio::EnsEMBL::IO::Translator::EnsFeature;
 use Bio::EnsEMBL::IO::Writer::GFF3;
+use Bio::EnsEMBL::IO::Object::GFF3Metadata;
 
 # Connect to the Ensembl Registry to access the databases
 Bio::EnsEMBL::Registry->load_registry_from_db(
     -host => 'ensembldb.ensembl.org',
     -user => 'anonymous',
-    -db_version => '84'
+    -db_version => '85'
     );
 
 # Create your slice adaptor to search for chromosomes
 my $adaptor = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Slice" );
 my $ga = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Gene" );
+my $dba = $adaptor->db();
 
 my $translator = Bio::EnsEMBL::IO::Translator::EnsFeature->new();
 my $serializer = Bio::EnsEMBL::IO::Writer::GFF3->new($translator);
@@ -36,9 +38,54 @@ $serializer->open('/tmp/test.gff');
 # Fetch chromosome 1
 my $features = [$adaptor->fetch_by_region('chromosome', 1)];
 
+
 ###
 #
-#  Missing: GFF3 headers print, coming soon, not yet in GFF3 serializer!
+#  Print the GFF3 headers
+#
+###
+
+$serializer->write(Bio::EnsEMBL::IO::Object::GFF3Metadata->directive('gff-version', 3));
+foreach my $chromosome (@{$features}) {
+    $serializer->write( Bio::EnsEMBL::IO::Object::GFF3Metadata->directive('sequence-region', 
+									  $chromosome->seq_region_name,
+									  $chromosome->start,
+									  $chromosome->end) );
+}
+my $mc = $dba->get_MetaContainer();
+my $gc = $dba->get_GenomeContainer();
+
+# Get the build. name gives us GRCh37.p1 where as default gives us GRCh37
+my $assembly_name = $gc->get_assembly_name();
+my $providers = $mc->list_value_by_key('provider.name') || '';
+my $provider = join(";", @$providers);
+$serializer->write(Bio::EnsEMBL::IO::Object::GFF3Metadata->ens_directive('genome-build', $provider, $assembly_name)) if $assembly_name;
+ 
+# Get the build default
+my $version = $gc->get_version();
+$serializer->write(Bio::EnsEMBL::IO::Object::GFF3Metadata->ens_directive('genome-version', $version)) if $version;
+  
+# Get the date of the genome build
+my $assembly_date = $gc->get_assembly_date();
+$serializer->write(Bio::EnsEMBL::IO::Object::GFF3Metadata->ens_directive('genome-date', $assembly_date)) if $assembly_date;
+  
+# Get accession and only print if it is there
+my $accession = $gc->get_accession();
+if($accession) {
+    my $accession_source = $mc->single_value_by_key('assembly.web_accession_source');
+    my $string;
+    $string .= "$accession_source:" if $accession_source;
+    $string .= "$accession";
+    $serializer->write(Bio::EnsEMBL::IO::Object::GFF3Metadata->ens_directive('genome-build-accession', $string));
+}
+  
+# Genebuild last updated
+my $genebuild_last_date = $gc->get_genebuild_last_geneset_update();
+$serializer->write(Bio::EnsEMBL::IO::Object::GFF3Metadata->ens_directive('genebuild_last_date', $genebuild_last_date)) if $genebuild_last_date;
+
+###
+#
+#  Cycle through and print the features
 #
 ###
 
@@ -48,6 +95,9 @@ while(my $chromosome = shift @{$features}) {
 
     # Write the chromosome
     $serializer->write($chromosome);
+
+    # Write out the end of section separator for the GFF3 (ie. ###)
+    $serializer->fwd_ref_delimeter();
 
     # Cycle through and print chromosomes, depends on DB ordering, not likely
     # good for production
@@ -73,12 +123,8 @@ while(my $chromosome = shift @{$features}) {
 
 	}
 
-###
-#
-# Missing: GFF3 end of section separators, not yet in GFF3 serializer,
-#          coming soon!
-#
-###
+	# Write out the end of section separator for the GFF3 (ie. ###)
+	$serializer->fwd_ref_delimeter();
 
     }
 }
