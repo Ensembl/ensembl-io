@@ -64,10 +64,11 @@ use Bio::EnsEMBL::IO::NamedColours;
 ## Default parameters needed by constructor
 
 our %params = (
-              'has_metadata'  => 0,
-              'metadata_info' => {},
-              'field_info'    => {},
-              'field_order'   => [], 
+              'can_multitrack'  => 0,
+              'can_metadata'    => 0,
+              'metadata_info'   => {},
+              'field_info'      => {},
+              'field_order'     => [], 
               );
 
 =head2 new
@@ -89,16 +90,27 @@ sub new {
 
 ######## BASIC ACCESSORS #############
 
-=head2 has_metadata 
+=head2 can_multitrack 
+
+    Description : getter for multitrack flag
+    Returntype  : 1 if format can have multiple tracks, 0 if it can't 
+=cut
+
+sub can_multitrack {
+  my $self = shift;
+  return $self->{'can_multitrack'};
+}
+
+=head2 can_metadata 
 
     Description : getter for metadata flag
     Returntype  : 0 if format cannot have metadata, 1 if metadata is mandatory,
                   -1 if metadata is optional
 =cut
 
-sub has_metadata {
+sub can_metadata {
   my $self = shift;
-  return $self->{'has_metadata'};
+  return $self->{'can_metadata'};
 }
 
 =head2 get_metadata_info 
@@ -217,10 +229,10 @@ sub get_value_for_field {
 =cut
 
 sub validate_as {
-  my ($self, $type, $value, $exemplar) = @_;
+  my ($self, $type, $value, $match) = @_;
   my $method = 'validate_as_'.$type;
   if ($self->can($method)) {
-    return $self->$method($value);
+    return $self->$method($value, $match);
   }
   return 0;
 }
@@ -251,9 +263,9 @@ sub validate_as_boolean {
 =cut
 
 sub validate_as_string {
-  my ($self, $value, $exemplar) = @_;
-  if ($exemplar) {
-    return $value eq $exemplar ? 1 : 0;
+  my ($self, $value, $match) = @_;
+  if ($match) {
+    return $value eq $match ? 1 : 0;
   }
   else {
     return $value =~ /[[:print:]]+/ ? 1 : 0;
@@ -299,9 +311,9 @@ sub validate_as_boolean {
 =cut
 
 sub validate_as_range {
-  my ($self, $value, $exemplar) = @_;
-  return 0 unless ($exemplar && ref $exemplar eq 'ARRAY');
-  my ($min, $max) = @$exemplar;
+  my ($self, $value, $match) = @_;
+  return 0 unless ($match && ref $match eq 'ARRAY');
+  my ($min, $max) = @$match;
   return ($value <= $max && $value >= $min) ? 1 : 0;
 }
 
@@ -330,9 +342,9 @@ sub validate_as_comma_separated {
 =cut
 
 sub validate_as_case_insensitive {
-  my ($self, $value, $exemplar) = @_;
-  return 0 unless $exemplar;
-  return $value =~ /$exemplar/i ? 1 : 0;
+  my ($self, $value, $match) = @_;
+  return 0 unless $match;
+  return $value =~ /$match/i ? 1 : 0;
 }
 
 =head2 validate_as_rgb_string
