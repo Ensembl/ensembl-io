@@ -73,6 +73,11 @@ sub new {
 
     bless $self, $class;
     
+    ## Add format object if available (work in progress!)
+    if ($self->can('add_format')) {
+      $self->add_format;
+    }
+
     return $self;
 }
 
@@ -289,6 +294,21 @@ sub _open_as {
         return $object;
       }
     }
+}
+
+=head format
+
+    Description : Setter/getter for format object
+    Returntype  : Bio::EnsEMBL::IO::Format object
+
+=cut
+
+sub format {
+  my ($self, $format) = @_;
+  if ($format && ref $format =~ /Bio::EnsEMBL::IO::Format/) {
+    $self->{'format'} = $format;
+  }
+  return $self->{'format'};
 }
 
 1;
