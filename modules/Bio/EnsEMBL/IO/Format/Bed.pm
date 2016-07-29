@@ -33,9 +33,10 @@ use strict;
 use warnings;
 
 our %params = (
-                'delimiter'     => ['\t', '\s'],
-                'has_metadata'  => -1,
-                'metadata_info' => {
+                'delimiter'       => ['\t', '\s'],
+                'can_multitrack'  => 1,
+                'can_metadata'    => -1,
+                'metadata_info'   => {
                                     'name' => {
                                                 'optional'    => 0, 
                                                 'validate_as' => 'string',
@@ -56,7 +57,7 @@ our %params = (
                                     'itemRgb' => {
                                                 'optional'    => 1, 
                                                 'validate_as' => 'case_insensitive',
-                                                'values'      => ['on'],
+                                                'match'       => 'on',
                                               },
                                     'useScore' => {
                                                 'optional'    => 1, 
@@ -86,8 +87,8 @@ our %params = (
                                                 'optional'    => 1,  
                                                 },
                                     'score' => {
-                                                'validate_as' => 'integer',
-                                                'range'       => [0, 1000],
+                                                'validate_as' => 'range',
+                                                'match'       => [0, 1000],
                                                 'optional'    => 1,  
                                                 },
                                     'strand' => {
