@@ -29,32 +29,18 @@ use strict;
 use warnings;
 no warnings 'uninitialized';
 
+use Bio::EnsEMBL::IO::Format::Bed;
+
 use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
  
 
-=head2 set_fields
-
-    Description: Setter for list of fields used in this format - uses the
-                  "public" (i.e. non-raw) names of getter methods
-    Returntype : Void
+=head2 add_format
 
 =cut
 
-sub set_fields {
+sub add_format {
   my $self = shift;
-  $self->{'fields'} = [qw(seqname start end name score strand thickStart thickEnd itemRgb blockCount blockSizes blockStarts)];
-}
-
-=head2 set_minimum_column_count
-
-    Description: Sets minimum column count for a valid BED file 
-    Returntype : Void 
-
-=cut
-
-sub set_minimum_column_count {
-    my $self = shift;
-    $self->{'min_col_count'} = 3;
+  $self->format(new Bio::EnsEMBL::IO::Format::Bed);
 }
 
 ## ----------- Mandatory fields -------------
