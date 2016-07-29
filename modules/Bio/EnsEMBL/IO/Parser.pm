@@ -305,7 +305,7 @@ sub _open_as {
 
 sub format {
   my ($self, $format) = @_;
-  if ($format && ref $format =~ /Bio::EnsEMBL::IO::Format/) {
+  if ($format && ref($format) =~ /Bio::EnsEMBL::IO::Format/) {
     $self->{'format'} = $format;
   }
   return $self->{'format'};

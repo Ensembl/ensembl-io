@@ -32,6 +32,8 @@ package Bio::EnsEMBL::IO::Format::Bed;
 use strict;
 use warnings;
 
+use parent qw(Bio::EnsEMBL::IO::Format);
+
 our %params = (
                 'delimiter'       => ['\t', '\s'],
                 'can_multitrack'  => 1,

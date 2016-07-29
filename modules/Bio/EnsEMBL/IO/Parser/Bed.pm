@@ -40,7 +40,8 @@ use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
 sub add_format {
   my $self = shift;
-  $self->format(new Bio::EnsEMBL::IO::Format::Bed);
+  my $format = Bio::EnsEMBL::IO::Format::Bed->new();
+  $self->format($format);
 }
 
 ## ----------- Mandatory fields -------------

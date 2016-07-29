@@ -169,7 +169,7 @@ sub set_minimum_column_count {
 
   if ($format) {
     my $count = 0;
-    while (my ($field, $info) = each (%{$format->field_info})) {
+    while (my ($field, $info) = each (%{$format->get_field_info})) {
       $count++ if $info->{'optional'} == 0;
     }
   }

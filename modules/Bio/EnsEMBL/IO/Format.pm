@@ -81,7 +81,7 @@ our %params = (
 sub new {
   my ($class, $custom_params) = @_;
 
-  my $self = {%params, %$custom_params};
+  my $self = {%params, %{$custom_params||{}}};
 
   bless $self, $class;
 
