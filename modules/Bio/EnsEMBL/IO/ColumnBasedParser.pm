@@ -76,7 +76,7 @@ sub open {
     my @delimiters       = split('\|', $delimiter);
     $self->{'default_delimiter'} = $delimiters[0];
     return $self;
-}
+  }
 
 =head2 get_metadata_value
 
@@ -99,8 +99,8 @@ sub get_metadata_value {
 =cut
 
 sub get_all_metadata {
-    my $self = shift;
-    return $self->{'metadata'} || {};
+  my $self = shift;
+  return $self->{'metadata'} || {};
 }
 
 =head2 get_fields
@@ -111,19 +111,37 @@ sub get_all_metadata {
 =cut
 
 sub get_fields {
-    my $self = shift;
-    return $self->{'fields'} || [];
+  my $self = shift;
+  return $self->{'fields'} || [];
 }
 
 =head2 set_fields
 
-    Description: Placeholder for user-defined list of fields
+    Description: Generic method for setting fields based on format definition (if available) 
     Returntype : Void 
 
 =cut
 
 sub set_fields {
-    confess("Method not implemented. This is really important");
+  my $self = shift;
+  my $format = $self->format;
+  if (!$format) {
+    confess("You need to either override this method or create a Format module to provide field definitions. This is really important");
+  }
+
+  my $fields = [];
+  my $field_info  = $format->get_field_info;
+  my $field_order = $format->get_field_order;
+
+  foreach my $name (@$field_order) {
+    ## The keys of the field_info hash are the official names from the format specification
+    my $field = $field_info->{$name};
+    ## however our internal name may be different, so look it up
+    my $accessor = $field->{'accessor'} || $name;
+    push @$fields, $accessor;
+  }
+
+  $self->{'fields'} = $fields;
 }
 
 =head2 get_minimum_column_count
@@ -140,14 +158,24 @@ sub get_minimum_column_count {
 
 =head2 set_minimum_column_count
 
-    Description: Placeholder for user-defined minimum field count (defaults to 1)
+    Description: Placeholder for user-defined minimum field count (defaults to 1 if no Format module is available)
     Returntype : Void 
 
 =cut
 
 sub set_minimum_column_count {
-    my $self = shift;
+  my $self = shift;
+  my $format = $self->format;
+
+  if ($format) {
+    my $count = 0;
+    while (my ($field, $info) = each (%{$format->field_info})) {
+      $count++ if $info->{'optional'} == 0;
+    }
+  }
+  else {
     $self->{'min_col_count'} = 1;
+  }
 }
 
 =head2 get_maximum_column_count
@@ -158,8 +186,8 @@ sub set_minimum_column_count {
 =cut
 
 sub get_maximum_column_count {
-    my $self = shift;
-    return $self->{'max_col_count'};
+  my $self = shift;
+  return $self->{'max_col_count'};
 }
 
 =head2 set_maximum_column_count
@@ -171,8 +199,8 @@ sub get_maximum_column_count {
 =cut
 
 sub set_maximum_column_count {
-    my $self = shift;
-    $self->{'max_col_count'} = scalar(@{$self->{'fields'}});
+  my $self = shift;
+  $self->{'max_col_count'} = scalar(@{$self->{'fields'}});
 }
 
 
@@ -184,61 +212,130 @@ sub set_maximum_column_count {
 =cut
 
 sub read_record {
-    my $self = shift;
-    chomp $self->{'current_block'};
-    $self->{'record'} = [ split($self->{'delimiter'},$self->{'current_block'}) ] ;
+  my $self = shift;
+  chomp $self->{'current_block'};
+  $self->{'record'} = [ split($self->{'delimiter'},$self->{'current_block'}) ] ;
 }
 
 =head2 validate
     
-    Description: Performs very basic validation on the content
-    Returntype: Boolean
+    Description : Validates a format, using a Format definition if available 
+    Returntype  : Boolean
 
 =cut
 
 sub validate {
-    my $self = shift;
+  my $self = shift;
+  my $valid = 0;
+  my $count = 0;
+  my $record_limit = 1; ## For now, just check first record
 
-    my $valid = 0;
+  my $format = $self->format;
 
+  if ($format) {
     while ($self->next) {
-
-      next if $self->is_metadata;
       next if $self->{'current_block'} !~ /\w/;
-
-      $self->read_record;
-
-      ## Check we have the minimum number of columns for this format
-      my $col_count = scalar(@{$self->{'record'}});
-
-      if ($col_count >= $self->get_minimum_column_count
-            && $col_count <= $self->get_maximum_column_count) {
-        $valid = 1;
+      if ($self->is_metadata) {
+        $valid = $self->validate_metadata;
       }
       else {
-        $valid = 0;
+        $valid = $self->validate_record;
+        $count++;
+        if ($valid == 0) {
+          ## Bail out if we hit an invalid record
+          return 0;
+        }
+        elsif ($count == $record_limit) {
+          return $valid;
+        }
       }
+    }
+  }
+  else {
+    $valid = $self->_validate_basic;
+  }
 
-      if ($self->get_start && $self->get_start =~ /^\d+$/ && $self->get_start > 0 
-            && $self->get_end && $self->get_end =~ /^\d+$/) {
-        $valid = 1;
-      }
-      else {
-        $valid = 0;
-      }
+  return $valid;
+}
 
-      ## Additional format-specific validation
-      if ($self->can('_validate')) {
-        $valid = $self->_validate($col_count) ? 1 : 0;
-      }
+=head2 validate_record
 
-      last;
+  Description : Validate a record based on definitions in the Format object
+  Returntype  : Boolean
+
+=cut
+
+sub validate_record {
+  my $self = shift;
+  my $format = $self->format;
+  return 0 unless $format;
+
+  my $field_info  = $format->get_field_info;
+  my $field_order = $format->get_field_order;
+  my $valid       = 0;
+
+  foreach my $key (@$field_order) {
+    my $accessor  = $field_info->{$key}{'accessor'} || $key;
+    my $method    = 'get_'.$accessor;
+    my $value     = $self->$method;
+    my $type      = $field_info->{$key}{'type'};
+    my $match     = $field_info->{$key}{'match'};
+    $valid        = $format->validate_as($type, $value, $match);
+    return 0 if $valid = 0;
+  }
+
+  return 1;
+}
+
+=head2 _validate_basic 
+
+  Description : Performs basic validation for parsers with no corresponding Format module  
+  Returntype  : Boolean
+
+=cut
+
+sub _validate_basic {
+  my $self = shift;
+  my $valid = 0;
+
+  while ($self->next) {
+
+    next if $self->is_metadata;
+    next if $self->{'current_block'} !~ /\w/;
+
+    $self->read_record;
+
+    ## Check we have the minimum number of columns for this format
+    my $col_count = scalar(@{$self->{'record'}});
+
+    if ($col_count >= $self->get_minimum_column_count
+          && $col_count <= $self->get_maximum_column_count) {
+      $valid = 1;
+    }
+    else {
+      $valid = 0;
     }
 
-    ## Finished validating, so return parser to beginning of file
-    $self->reset;
+    if ($self->get_start && $self->get_start =~ /^\d+$/ && $self->get_start > 0 
+          && $self->get_end && $self->get_end =~ /^\d+$/) {
+      $valid = 1;
+    }
+    else {
+      $valid = 0;
+    }
 
-    return $valid;
+    ## Additional format-specific validation
+    if ($self->can('_validate')) {
+      $valid = $self->_validate($col_count) ? 1 : 0;
+    }
+
+    last;
+  }
+
+  ## Finished validating, so return parser to beginning of file
+  $self->reset;
+
+  return $valid;
 }
 
 #---------- OUTPUT METHODS --------------
