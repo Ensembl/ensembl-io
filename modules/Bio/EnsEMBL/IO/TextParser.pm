@@ -122,6 +122,7 @@ sub read_block {
         $self->{'waiting_block'} = <$fh> || confess ("Error reading file handle: $!");   
     }    
 
+    $self->{'waiting_block'} =~ s/\r\n/\n/;
     return $self->{'waiting_block'};
 }
 
