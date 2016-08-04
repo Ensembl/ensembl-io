@@ -35,6 +35,8 @@ use warnings;
 use parent qw(Bio::EnsEMBL::IO::Format);
 
 our %params = (
+                'name'            => 'Bed',
+                'extensions'      => ['bed'],
                 'delimiter'       => ['\t', '\s'],
                 'can_multitrack'  => 1,
                 'can_metadata'    => -1,

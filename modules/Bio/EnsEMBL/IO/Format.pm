@@ -64,6 +64,8 @@ use Bio::EnsEMBL::IO::NamedColours;
 ## Default parameters needed by constructor
 
 our %params = (
+              'name'            => '',
+              'extensions'      => ['txt'],
               'can_multitrack'  => 0,
               'can_metadata'    => 0,
               'metadata_info'   => {},
@@ -90,6 +92,30 @@ sub new {
 
 ######## BASIC ACCESSORS #############
 
+=head2 name
+
+    Description : getter for format name
+    Returntype  : String
+
+=cut
+
+sub name {
+  my $self = shift;
+  return $self->{'name'} || '';
+}
+
+=head2 extensions
+
+    Description : getter for allowed file extension(s)
+    Returntype  : Arrayref
+
+=cut
+
+sub extensions {
+  my $self = shift;
+  return $self->{'extensions'} || [];
+}
+
 =head2 can_multitrack 
 
     Description : getter for multitrack flag
@@ -98,7 +124,7 @@ sub new {
 
 sub can_multitrack {
   my $self = shift;
-  return $self->{'can_multitrack'};
+  return $self->{'can_multitrack'} || 0;
 }
 
 =head2 can_metadata 
