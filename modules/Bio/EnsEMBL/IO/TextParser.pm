@@ -115,6 +115,7 @@ sub close {
 sub read_block {
     my $self = shift;
     my $fh = $self->{'filehandle'};
+    return 0 unless $fh;
 
     if (eof($fh)) {
         $self->{'waiting_block'} = undef;
@@ -136,6 +137,7 @@ sub read_block {
 sub reset {
     my $self = shift;
     my $fh = $self->{'filehandle'};
+    return 0 unless $fh;
     seek($fh, 0, 0);
     return 1;
 }
