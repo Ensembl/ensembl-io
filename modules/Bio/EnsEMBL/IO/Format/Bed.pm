@@ -37,7 +37,7 @@ use parent qw(Bio::EnsEMBL::IO::Format);
 our %params = (
                 'name'            => 'Bed',
                 'extensions'      => ['bed'],
-                'delimiter'       => ['\t', '\s'],
+                'delimiter'       => '\t|\s',
                 'can_multitrack'  => 1,
                 'can_metadata'    => -1,
                 'metadata_info'   => {
@@ -130,6 +130,5 @@ our %params = (
                                     },
                 'field_order'   => [qw(chrom chromStart chromEnd name score strand thickStart thickEnd itemRgb blockCount blockSizes blockStarts)],
               );
-
 
 1;

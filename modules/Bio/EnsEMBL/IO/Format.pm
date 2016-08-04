@@ -116,6 +116,18 @@ sub extensions {
   return $self->{'extensions'} || [];
 }
 
+=head2 delimiter
+
+    Description : getter for delimiter (if format has one)
+    Returntype  : String
+
+=cut
+
+sub delimiter {
+  my $self = shift;
+  return $self->{'delimiter'};
+}
+
 =head2 can_multitrack 
 
     Description : getter for multitrack flag

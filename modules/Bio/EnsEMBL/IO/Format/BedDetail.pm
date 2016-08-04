@@ -33,7 +33,7 @@ use parent qw(Bio::EnsEMBL::IO::Format);
 our %params = (
                 'name'            => 'BedDetail',
                 'extensions'      => ['bed'],
-                'delimiter'       => ['\t'],
+                'delimiter'       => '\t',
                 'can_multitrack'  => 1,
                 'can_metadata'    => -1,
                 'metadata_info'   => {
