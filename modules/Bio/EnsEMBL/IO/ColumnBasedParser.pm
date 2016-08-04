@@ -72,6 +72,7 @@ sub open {
     $self->set_fields;
     $self->set_minimum_column_count;
     $self->set_maximum_column_count;
+    $self->{'col_count'} = 0;
     $self->{'delimiter'} = $delimiter;
     my @delimiters       = split('\|', $delimiter);
     $self->{'default_delimiter'} = $delimiters[0];
@@ -142,6 +143,31 @@ sub set_fields {
   }
 
   $self->{'fields'} = $fields;
+}
+
+=head2 get_column_count
+
+    Description : Getter
+    Returntype  : Integer
+
+=cut
+
+sub get_column_count {
+    my $self = shift;
+    return $self->{'col_count'};
+}
+
+=head2 set_column_count
+
+    Description : Setter
+    Returntype  : 
+
+=cut
+
+sub set_column_count {
+    my ($self, $count) = @_;
+    $count ||= 0;
+    $self->{'col_count'} = $count;
 }
 
 =head2 get_minimum_column_count
@@ -239,6 +265,7 @@ sub validate {
         $valid = $self->validate_metadata;
       }
       else {
+        $self->set_column_count(scalar @{$self->{'record'}});
         $valid = $self->validate_record;
         $count++;
         if ($valid == 0) {
@@ -281,7 +308,7 @@ sub validate_record {
     my $type      = $field_info->{$key}{'type'};
     my $match     = $field_info->{$key}{'match'};
     $valid        = $format->validate_as($type, $value, $match);
-    return 0 if $valid = 0;
+    return 0 if $valid == 0;
   }
 
   return 1;
