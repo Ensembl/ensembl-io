@@ -42,9 +42,13 @@ our %params = (
                 'can_metadata'    => -1,
                 'metadata_info'   => {
                                     'name' => {
-                                                'optional'    => 0, 
+                                                'optional'    => 1, 
                                                 'validate_as' => 'string',
                                                 'unique'      => 1,
+                                              },
+                                    'url' => {
+                                                'optional'    => 1,
+                                                'validate_as' => 'url',
                                               },
                                     'description' => {
                                                 'optional'    => 1, 
