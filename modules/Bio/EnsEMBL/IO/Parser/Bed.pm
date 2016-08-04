@@ -19,7 +19,9 @@ limitations under the License.
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::Bed - A line-based parser devoted to BED format
+Bio::EnsEMBL::IO::Parser::Bed - A line-based parser devoted to BED-derived formats
+
+Bed files come with a very flexible field order, so we have to allow for that
 
 =cut
 
@@ -29,12 +31,12 @@ use strict;
 use warnings;
 no warnings 'uninitialized';
 
-use Bio::EnsEMBL::IO::Format::Bed;
-
 use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
- 
 
 =head2 add_format
+
+    Description : Add a format object and configure the parser
+    Returntype  : none
 
 =cut
 
@@ -42,8 +44,21 @@ sub add_format {
   my $self = shift;
   my $format = Bio::EnsEMBL::IO::Format::Bed->new();
   $self->format($format);
+  ## Configure delimiter
+  my $delimiter = $self->format->delimiter;
+  if ($delimiter) {
+    $self->{'delimiter'} = $delimiter;
+    my @delimiters       = split('\|', $delimiter);
+    $self->{'default_delimiter'} = $delimiters[0];
+  }
+  ## Configure columns
+  my $index = 0;
+  foreach (@{$format->field_order}) {
+    $self->{'column_map'}{$_} = $index;
+    $index++;
+  }
 }
-
+ 
 ## ----------- Mandatory fields -------------
 
 =head2 get_raw_chrom
@@ -55,7 +70,8 @@ sub add_format {
 
 sub get_raw_chrom {
   my $self = shift;
-  return $self->{'record'}[0];
+  my $index = $self->{'column_map'}{'chrom'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_seqname
@@ -68,7 +84,7 @@ sub get_raw_chrom {
 
 sub get_seqname {
   my $self = shift;
-  (my $chr = $self->get_raw_chrom()) =~ s/^chr//;
+  (my $chr = $self->get_raw_chrom()) =~ s/^chr//i;
   return $chr;
 }
 
@@ -81,7 +97,7 @@ sub get_seqname {
 
 sub munge_seqname {
   my ($self, $value) = @_;
-  $value = "chr$value" unless $value =~ /^chr/;
+  $value = "chr$value" unless $value =~ /^chr/i;
   return $value;
 }
 
@@ -94,7 +110,8 @@ sub munge_seqname {
 
 sub get_raw_chromStart {
   my $self = shift;
-  return $self->{'record'}[1];
+  my $index = $self->{'column_map'}{'chromStart'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_start
@@ -132,7 +149,8 @@ sub munge_start {
 
 sub get_raw_chromEnd {
   my $self = shift;
-  return $self->{'record'}[2];
+  my $index = $self->{'column_map'}{'chromEnd'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_end
@@ -148,7 +166,7 @@ sub get_end {
   return $self->get_raw_chromEnd();
 }
 
-## ----------- Optional fields -------------
+## ----------- Optional (in some subformats) fields -------------
 
 =head2 get_raw_name
 
@@ -159,8 +177,8 @@ sub get_end {
 
 sub get_raw_name {
   my $self = shift;
-  my $column = $self->get_metadata_value('type') eq 'bedGraph' ? undef : $self->{'record'}[3];
-  return $column;
+  my $index = $self->{'column_map'}{'name'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_name
@@ -184,8 +202,8 @@ sub get_name {
 
 sub get_raw_score {
   my $self = shift;
-  my $column = $self->get_metadata_value('type') eq 'bedGraph' ? 3 : 4;
-  return $self->{'record'}[$column];
+  my $index = $self->{'column_map'}{'score'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_score
@@ -214,7 +232,8 @@ sub get_score {
 
 sub get_raw_strand {
   my $self = shift;
-  return $self->{'record'}[5];
+  my $index = $self->{'column_map'}{'strand'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_strand
@@ -253,7 +272,8 @@ sub munge_strand {
 
 sub get_raw_thickStart {
   my $self = shift;
-  return $self->{'record'}[6];
+  my $index = $self->{'column_map'}{'thickStart'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_thickStart
@@ -278,7 +298,8 @@ sub get_thickStart {
 
 sub get_raw_thickEnd {
   my $self = shift;
-  return $self->{'record'}[7];
+  my $index = $self->{'column_map'}{'thickEnd'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_thickEnd
@@ -302,7 +323,8 @@ sub get_thickEnd {
 
 sub get_raw_itemRgb {
   my $self = shift;
-  return $self->{'record'}[8];
+  my $index = $self->{'column_map'}{'itemRgb'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_itemRgb
@@ -326,7 +348,8 @@ sub get_itemRgb {
 
 sub get_raw_blockCount {
   my $self = shift;
-  return $self->{'record'}[9];
+  my $index = $self->{'column_map'}{'blockCount'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_blockCount
@@ -350,7 +373,8 @@ sub get_blockCount {
 
 sub get_raw_blockSizes {
   my $self = shift;
-  return $self->{'record'}[10];
+  my $index = $self->{'column_map'}{'blockSizes'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_blockSizes
@@ -375,7 +399,8 @@ sub get_blockSizes {
 
 sub get_raw_blockStarts {
   my $self = shift;
-  return $self->{'record'}[11];
+  my $index = $self->{'column_map'}{'blockStarts'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_blockStarts
@@ -390,6 +415,12 @@ sub get_blockStarts {
   my @res = split ",", $self->get_raw_blockStarts();
   return \@res;
 }
+
+###################################################################
+
+##### OLD FILE WRITING CODE - DEPRECATED
+
+###################################################################
 
 =head2 create_record
 
