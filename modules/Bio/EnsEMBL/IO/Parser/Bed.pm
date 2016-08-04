@@ -60,8 +60,8 @@ sub add_format {
     else {
       if ($subformat eq 'bedDetail') {
         $column_count = scalar @{$self->{'record'}};
-        last;
       }
+      last;
     }
   }
   $self->reset; ## Reset pointer
@@ -82,14 +82,14 @@ sub add_format {
     $self->{'column_map'}{'description'}  = $column_count - 1;
 
     ## Map remaining columns to valid fields
-    my @fields = @{$format->field_order};
+    my @fields = @{$format->get_field_order};
     for (my $index = 0; $index < $column_count - 2; $index++) {
       $self->{'column_map'}{$fields[$index]} = $index;
     }
   }
   else {
     my $index = 0;
-    foreach (@{$format->field_order}) {
+    foreach (@{$format->get_field_order}) {
       $self->{'column_map'}{$_} = $index;
       $index++;
     }
