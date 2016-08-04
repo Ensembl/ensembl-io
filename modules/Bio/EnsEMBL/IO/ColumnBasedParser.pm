@@ -282,6 +282,9 @@ sub validate {
     $valid = $self->_validate_basic;
   }
 
+  ## Finished validating, so return parser to beginning of file
+  $self->reset;
+
   return $valid;
 }
 
@@ -358,9 +361,6 @@ sub _validate_basic {
 
     last;
   }
-
-  ## Finished validating, so return parser to beginning of file
-  $self->reset;
 
   return $valid;
 }
