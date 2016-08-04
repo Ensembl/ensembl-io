@@ -31,6 +31,10 @@ use strict;
 use warnings;
 no warnings 'uninitialized';
 
+use Bio::EnsEMBL::IO::Format::Bed;
+use Bio::EnsEMBL::IO::Format::BedDetail;
+use Bio::EnsEMBL::IO::Format::BedGraph;
+
 use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
 =head2 add_format
@@ -42,7 +46,28 @@ use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
 sub add_format {
   my $self = shift;
-  my $format = Bio::EnsEMBL::IO::Format::Bed->new();
+
+  ## Which subformat are we dealing with?
+  my $subformat = 'Bed';
+  my $column_count;
+  while ($self->next) {
+    next if $self->{'current_block'} !~ /\w/;
+    if ($self->is_metadata) {
+      my $type = $self->get_metadata('type');
+      $subformat = $type if $type;
+      last;
+    }
+    else {
+      if ($subformat eq 'bedDetail') {
+        $column_count = scalar @{$self->{'record'}};
+        last;
+      }
+    }
+  }
+  $self->reset; ## Reset pointer
+
+  my $class = "Bio::EnsEMBL::IO::Format::$subformat";
+  my $format = $class->new();
   $self->format($format);
   ## Configure delimiter
   my $delimiter = $self->format->delimiter;
@@ -52,10 +77,22 @@ sub add_format {
     $self->{'default_delimiter'} = $delimiters[0];
   }
   ## Configure columns
-  my $index = 0;
-  foreach (@{$format->field_order}) {
-    $self->{'column_map'}{$_} = $index;
-    $index++;
+  if ($column_count) {
+    $self->{'column_map'}{'id'}           = $column_count - 2;
+    $self->{'column_map'}{'description'}  = $column_count - 1;
+
+    ## Map remaining columns to valid fields
+    my @fields = @{$format->field_order};
+    for (my $index = 0; $index < $column_count - 2; $index++) {
+      $self->{'column_map'}{$fields[$index]} = $index;
+    }
+  }
+  else {
+    my $index = 0;
+    foreach (@{$format->field_order}) {
+      $self->{'column_map'}{$_} = $index;
+      $index++;
+    }
   }
 }
  
@@ -415,6 +452,59 @@ sub get_blockStarts {
   my @res = split ",", $self->get_raw_blockStarts();
   return \@res;
 }
+
+## ----------- BedDetails accessors ------------------------
+
+=head2 get_raw_id
+
+    Description: Getter for id field, which is always the penultimate column
+    Returntype : String 
+
+=cut
+
+sub get_raw_id {
+  my $self = shift;
+  return $self->{'record'}[-2];
+}
+
+=head2 get_id
+
+    Description: Getter - wrapper around get_raw_id
+    Returntype : String 
+
+=cut
+
+sub get_id {
+  my $self = shift;
+  return $self->get_raw_id();
+}
+
+=head2 get_raw_description
+
+    Description: Getter for description field, which is always the last column
+    Returntype : String 
+
+=cut
+
+sub get_raw_description {
+  my $self = shift;
+  return $self->{'record'}[-1];
+}
+
+=head2 get_description
+
+    Description: Getter - wrapper around get_raw_description
+    Returntype : String 
+
+=cut
+
+sub get_description {
+  my $self = shift;
+  return $self->get_raw_description();
+}
+
+
+
 
 ###################################################################
 
