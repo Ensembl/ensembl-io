@@ -391,58 +391,6 @@ sub get_blockStarts {
   return \@res;
 }
 
-=head2 validate 
-
-    Description: Format_specific validation
-    Returntype: String
-
-=cut
-
-sub validate {
-    my ($self, $subtype) = @_;
-
-    my $valid     = 0;
-    my $col_count = 0;
-    my $format    = '';
-
-    while ($self->next) {
-     
-      if ($self->is_metadata && !$subtype) {
-        $subtype = $self->get_metadata_value('type');
-      }
-      next if $self->{'current_block'} !~ /\w/;
-      $self->read_record;
-
-      ## Check we have the correct number of columns for this format
-      $col_count = scalar(@{$self->{'record'}});
-
-      ## Identify bedgraph content
-      if ($col_count == 4 && $self->{'record'}[3] =~ /^[-+]?[0-9]*\.?[0-9]+$/) {
-        $format = 'bedgraph';
-        if ($subtype =~ /bedgraph/i) {
-          $valid = 1;
-        }
-      }
-      elsif ($col_count >= $self->get_minimum_column_count
-              && $col_count <= $self->get_maximum_column_count) {
-        $format = 'bed';
-        $valid = 1;
-      }
-      last unless $valid;
-
-      ## Check we have coordinates
-      $valid = 0 if !$self->get_seqname;
-      $valid = 0 unless ($self->get_start =~ /\d+/ && $self->get_start > 0 && $self->get_end =~ /\d+/);
-      last;
-    }
-
-    ## Finished validating, so return parser to beginning of file
-    $self->reset;
-
-    return ($valid, $format, $col_count);
-}
-
-
 =head2 create_record
 
     Description: Creates a single line of a BED file from an API object 
