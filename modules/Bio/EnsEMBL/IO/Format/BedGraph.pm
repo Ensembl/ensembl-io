@@ -30,7 +30,10 @@ use warnings;
 
 use parent qw(Bio::EnsEMBL::IO::Format);
 
-our %params = (
+sub new {
+  my $class = shift;
+
+  my $self = {
                 'name'            => 'BedGraph',
                 'extensions'      => ['bed'],
                 'delimiter'       => '\t|\s',
@@ -97,6 +100,12 @@ our %params = (
                                                 },
                                     },
                 'field_order'   => [qw(chrom chromStart chromEnd score)],
-              );
+  };
+
+  bless $self, $class;
+
+  return $self;
+}
+
 
 1;

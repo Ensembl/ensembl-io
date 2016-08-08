@@ -54,16 +54,15 @@ use Bio::EnsEMBL::IO::NamedColours;
 
 =head2 new
 
-    Constructor
-    Argument [1+]: Hash of parameters for configuration, e.g. buffer sizes or 
-                   specific functions for handling headers or data
-    Returntype   : Bio::EnsEMBL::IO::Parser
+    Description : constructor
+    Returntype  : Bio::EnsEMBL::IO::Format object
 
 =cut
 
-## Default parameters needed by constructor
+sub new {
+  my $class = shift;
 
-our %params = (
+  my $self = {
               'name'            => '',
               'extensions'      => ['txt'],
               'can_multitrack'  => 0,
@@ -71,19 +70,7 @@ our %params = (
               'metadata_info'   => {},
               'field_info'      => {},
               'field_order'     => [], 
-              );
-
-=head2 new
-
-    Description : constructor
-    Returntype  : Bio::EnsEMBL::IO::Format object
-
-=cut
-
-sub new {
-  my ($class, $custom_params) = @_;
-
-  my $self = {%params, %{$custom_params||{}}};
+  };
 
   bless $self, $class;
 
@@ -261,13 +248,14 @@ sub get_value_for_field {
     Description : wrapper around more specific validators, for easy processing
     Args        : Type - validation type
                 : Value - value to be checked
-                : Exemplar (optional) - a specific value or range to be compared against
+                : Match (optional) - a specific value or range to be compared against
     Returntype  : Boolean
 
 =cut
 
 sub validate_as {
   my ($self, $type, $value, $match) = @_;
+  return 0 unless ($type && defined($value));
   my $method = 'validate_as_'.$type;
   if ($self->can($method)) {
     return $self->$method($value, $match);
@@ -278,8 +266,7 @@ sub validate_as {
 =head2 validate_as_boolean 
 
     Description : Validator for fields that should contain either 0 or 1
-    Args        : Type - validation type
-                : Value - value to be checked
+    Args        : Value - value to be checked
     Returntype  : Boolean
 
 =cut
@@ -293,8 +280,7 @@ sub validate_as_boolean {
 
     Description : Validator for fields that should contain alphanumeric characters, 
                     punctuation and/or spaces
-    Args        : Type - validation type
-                : Value - value to be checked
+    Args        : Value - value to be checked
                 : Exemplar (optional) - a specific value or range to be compared against
     Returntype  : Boolean
 
@@ -313,8 +299,7 @@ sub validate_as_string {
 =head2 validate_as_integer 
 
     Description : Validator for fields that should contain an unsigned integer 
-    Args        : Type - validation type
-                : Value - value to be checked
+    Args        : Value - value to be checked
     Returntype  : Boolean
 
 =cut
@@ -327,8 +312,7 @@ sub validate_as_integer {
 =head2 validate_as_floating_point 
 
     Description : Validator for fields that should contain a floating point number
-    Args        : Type - validation type
-                : Value - value to be checked
+    Args        : Value - value to be checked
     Returntype  : Boolean
 
 =cut
@@ -341,9 +325,8 @@ sub validate_as_boolean {
 =head2 validate_as_range
 
     Description : Validator for fields that can contain a range of numerical values
-    Args        : Type - validation type
-                : Value - value to be checked
-                : Exemplar - range to be compared against
+    Args        : Value - value to be checked
+                : Match - range to be compared against
     Returntype  : Boolean
 
 =cut
@@ -358,23 +341,22 @@ sub validate_as_range {
 =head2 validate_as_comma_separated
 
     Description : Validator for fields that should contain alphanumeric strings and commas
-    Args        : Type - validation type
-                : Value - value to be checked
+                  Note that it is valid for a comma-separated field to end in a comma
+    Args        : Value - value to be checked
     Returntype  : Boolean
 
 =cut
 
 sub validate_as_comma_separated {
   my ($self, $value) = @_;
-  return $value =~ /^(\w+,)+\w+$/ ? 1 : 0;
+  return $value =~ /^(\w+,?)+$/ ? 1 : 0;
 }
 
 =head2 validate_as_case_insensitive 
 
     Description : Validator for fields that should contain a specific value but can
                     case-insensitive
-    Args        : Type - validation type
-                : Value - value to be checked
+    Args        : Value - value to be checked
     Returntype  : Boolean
 
 =cut
@@ -385,25 +367,10 @@ sub validate_as_case_insensitive {
   return $value =~ /$match/i ? 1 : 0;
 }
 
-=head2 validate_as_rgb_string
-
-    Description : Validator for fields that should contain an RGB colour as a comma-separated string 
-    Args        : Type - validation type
-                : Value - value to be checked
-    Returntype  : Boolean
-
-=cut
-
-sub validate_as_rgb_string {
-  my ($self, $value) = @_;
-  return $value =~ /^(\d){1,3},(\d){1,3},(\d){1,3}$/ ? 1 : 0;
-}
-
 =head2 validate_as_strand_integer
 
     Description : Validator for fields that should contain a strand as 0, 1 or -1
-    Args        : Type - validation type
-                : Value - value to be checked
+    Args        : Value - value to be checked
     Returntype  : Boolean
 
 =cut
@@ -414,12 +381,10 @@ sub validate_as_strand_integer {
 }
 
 =head2 validate_as_strand_plusminus
-
     Description : Validator for fields that should contain a strand as + or -
     Args        : Type - validation type
                 : Value - value to be checked
     Returntype  : Boolean
-
 =cut
 
 sub validate_as_strand_plusminus {
@@ -427,23 +392,39 @@ sub validate_as_strand_plusminus {
   return $value =~ /^\+|-$/ ? 1 : 0;
 }
 
+=head2 validate_as_rgb_string
+
+    Description : Validator for fields that should contain an RGB colour as a comma-separated string 
+    Args        : Value - value to be checked
+    Returntype  : Boolean
+
+=cut
+
+sub validate_as_rgb_string {
+  my ($self, $value) = @_;
+  return $value =~ /^(\d){1,3},(\d){1,3},(\d){1,3}$/ ? 1 : 0;
+}
+
 =head2 validate_as_colour 
 
     Description : Validator for fields that should hold a colour, either as RGB, hex or name
+    Args        : Value - value to be checked
     Returntype  : Boolean
 =cut
 
 sub validate_as_colour {
   my ($self, $value) = @_;
 
+  ## Technically 0 is not a valid colour, but it's used instead of '.' in some UCSC examples
+  return 1 if $value == 0;
+
   ## Try RGB first, as that's most usual
-  my $valid = $self->validate_as_rgb($value);
+  my $valid = $self->validate_as_rgb_string($value);
 
   ## If not, how about web-friendly hex colours, e.g. #ffcc00?
   unless ($valid) {
-    $valid = 1 if $value =~ /^#?[A-Fa-f0-9]{3,6}/;
+    $valid = 1 if ($value =~ /^#?[A-Fa-f0-9]{3}/ || $value =~ /^#?[A-Fa-f0-9]{6}/);
   }
-
   ## Fall back to checking Unix named colours
   unless ($valid) {
     my $lookup = Bio::EnsEMBL::IO::NamedColours::named_colours;
@@ -456,8 +437,7 @@ sub validate_as_colour {
 =head2 validate_as_sequence
 
     Description : Validator for fields that should contain sequence (DNA, RNA or protein) 
-    Args        : Type - validation type
-                : Value - value to be checked
+    Args        : Value - value to be checked
     Returntype  : Boolean
 
 =cut
@@ -470,8 +450,7 @@ sub validate_as_sequence {
 =head2 validate_as_dna_sequence
 
     Description : Validator for fields that should contain DNA sequence only 
-    Args        : Type - validation type
-                : Value - value to be checked
+    Args        : Value - value to be checked
     Returntype  : Boolean
 
 =cut

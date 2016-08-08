@@ -30,7 +30,10 @@ use warnings;
 
 use parent qw(Bio::EnsEMBL::IO::Format);
 
-our %params = (
+sub new {
+  my $class = shift;
+
+  my $self = {
                 'name'            => 'BedDetail',
                 'extensions'      => ['bed'],
                 'delimiter'       => '\t',
@@ -138,7 +141,10 @@ our %params = (
                                                 },
                                     },
                 'field_order'   => [qw(chrom chromStart chromEnd name score strand thickStart thickEnd itemRgb blockCount blockSizes blockStarts id description)],
-              );
+              };
+  bless $self, $class;
 
+  return $self;
+}
 
 1;

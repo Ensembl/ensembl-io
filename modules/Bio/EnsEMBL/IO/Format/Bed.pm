@@ -34,101 +34,103 @@ use warnings;
 
 use parent qw(Bio::EnsEMBL::IO::Format);
 
-our %params = (
-                'name'            => 'Bed',
-                'extensions'      => ['bed'],
-                'delimiter'       => '\t|\s',
-                'can_multitrack'  => 1,
-                'can_metadata'    => -1,
-                'metadata_info'   => {
-                                    'name' => {
+sub new {
+  my $class = shift;
+
+  my $self = {
+          'name'            => 'Bed',
+          'extensions'      => ['bed'],
+          'delimiter'       => '\t|\s',
+          'can_multitrack'  => 1,
+          'can_metadata'    => -1,
+          'metadata_info'   => {
+                                'name' => {
+                                           'optional'    => 1, 
+                                           'validate_as' => 'string',
+                                           'unique'      => 1,
+                                           },
+                                'url' => {
+                                          'optional'    => 1,
+                                          'validate_as' => 'url',
+                                          },
+                                'description' => {
                                                 'optional'    => 1, 
                                                 'validate_as' => 'string',
-                                                'unique'      => 1,
                                               },
-                                    'url' => {
-                                                'optional'    => 1,
-                                                'validate_as' => 'url',
-                                              },
-                                    'description' => {
-                                                'optional'    => 1, 
-                                                'validate_as' => 'string',
-                                              },
-                                    'priority' => {
+                                'priority' => {
                                                 'optional'    => 1, 
                                                 'validate_as' => 'integer',
                                               },
-                                    'colour' => {
-                                                'optional'    => 1, 
-                                                'validate_as' => 'colour',
+                                'colour' => {
+                                              'optional'    => 1, 
+                                              'validate_as' => 'colour',
+                                            },
+                                'itemRgb' => {
+                                              'optional'    => 1, 
+                                              'validate_as' => 'case_insensitive',
+                                              'match'       => 'on',
                                               },
-                                    'itemRgb' => {
-                                                'optional'    => 1, 
-                                                'validate_as' => 'case_insensitive',
-                                                'match'       => 'on',
-                                              },
-                                    'useScore' => {
+                                'useScore' => {
                                                 'optional'    => 1, 
                                                 'validate_as' => 'boolean',
                                               },
-                                  
                                     },
-                'field_info'    => {
-                                    'chrom' => {
-                                                'accessor'    => 'seqname',
+            'field_info'    => {
+                                'chrom' => {
                                                 'validate_as' => 'string',
                                                 'optional'    => 0,  
                                                 },
-                                    'chromStart' => {
-                                                'accessor'    => 'start',
+                                'chromStart' => {
                                                 'validate_as' => 'integer',
                                                 'optional'    => 0,  
                                                 },
-                                    'chromEnd' => {
-                                                'accessor'    => 'end',
+                                'chromEnd' => {
                                                 'validate_as' => 'integer',
                                                 'optional'    => 0,  
                                                 },
-                                    'name' => {
-                                                'accessor'    => 'name',
+                                'name' => {
                                                 'validate_as' => 'string',
                                                 'optional'    => 1,  
                                                 },
-                                    'score' => {
+                                'score' => {
                                                 'validate_as' => 'range',
                                                 'match'       => [0, 1000],
                                                 'optional'    => 1,  
                                                 },
-                                    'strand' => {
+                                'strand' => {
                                                 'validate_as' => 'strand_plusminus',
                                                 'optional'    => 1,  
                                                 },
-                                    'thickStart' => {
+                                'thickStart' => {
                                                 'validate_as' => 'integer',
                                                 'optional'    => 1,  
                                                 },
-                                    'thickEnd' => {
+                                'thickEnd' => {
                                                 'validate_as' => 'integer',
                                                 'optional'    => 1,  
                                                 },
-                                    'itemRgb' => {
-                                                'validate_as' => 'rgb_string',
+                                'itemRgb' => {
+                                                'validate_as' => 'colour',
                                                 'optional'    => 1,  
                                                 },
-                                    'blockCount' => {
+                                'blockCount' => {
                                                 'validate_as' => 'integer',
                                                 'optional'    => 1,  
                                                 },
-                                    'blockSizes' => {
+                                'blockSizes' => {
                                                 'validate_as' => 'comma_separated',
                                                 'optional'    => 1,  
                                                 },
-                                    'blockStarts' => {
+                                'blockStarts' => {
                                                 'validate_as' => 'comma_separated',
                                                 'optional'    => 1,  
                                                 },
-                                    },
-                'field_order'   => [qw(chrom chromStart chromEnd name score strand thickStart thickEnd itemRgb blockCount blockSizes blockStarts)],
-              );
+                                },
+            'field_order'   => [qw(chrom chromStart chromEnd name score strand thickStart thickEnd itemRgb blockCount blockSizes blockStarts)],
+          };
+  bless $self, $class;
+
+  return $self;
+}
 
 1;
