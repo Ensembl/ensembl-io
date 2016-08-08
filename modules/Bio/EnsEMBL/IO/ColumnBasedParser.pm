@@ -195,7 +195,7 @@ sub set_minimum_column_count {
 
   if ($format) {
     my $count = 0;
-    while (my ($field, $info) = each (%{$format->get_field_info})) {
+    while (my ($field, $info) = each (%{$format->get_field_info||{}})) {
       $count++ if $info->{'optional'} == 0;
     }
   }
@@ -288,6 +288,16 @@ sub validate {
   return $valid;
 }
 
+=head2 validate_metadata
+
+=cut
+
+sub validate_metadata {
+  my $self = shift;
+  warn "!!! VALIDATING METADATA";
+  return 1;
+}
+
 =head2 validate_record
 
   Description : Validate a record based on definitions in the Format object
@@ -300,15 +310,15 @@ sub validate_record {
   my $format = $self->format;
   return 0 unless $format;
 
-  my $field_info  = $format->get_field_info;
-  my $field_order = $format->get_field_order;
+  my $field_info  = $format->get_field_info || {};
+  my $field_order = $format->get_field_order || [];
   my $valid       = 0;
 
-  foreach my $key (@$field_order) {
-    my $accessor  = $field_info->{$key}{'accessor'} || $key;
-    my $method    = 'get_'.$accessor;
+  foreach my $key (@{$field_order}) {
+    my $method    = "get_raw_$key";
     my $value     = $self->$method;
-    my $type      = $field_info->{$key}{'type'};
+    next if ($field_info->{$key}{'optional'} && $value eq '.');
+    my $type      = $field_info->{$key}{'validate_as'};
     my $match     = $field_info->{$key}{'match'};
     $valid        = $format->validate_as($type, $value, $match);
     return 0 if $valid == 0;
