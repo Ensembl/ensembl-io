@@ -50,7 +50,7 @@ sub open {
   my $delimiter = "\t";
   my $self = $class->SUPER::open($filename, @other_args);
 
-  my $tabix_data = $self->{tabix_file}->tbx_header;
+  my $tabix_data = $self->{tabix_file}->header;
   foreach my $line (split("\n",$tabix_data)) {
     $self->Bio::EnsEMBL::IO::Parser::Pairwise::read_metadata($line);
   }
