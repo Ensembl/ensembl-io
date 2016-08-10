@@ -90,29 +90,54 @@ sub new {
     return $self;
 }
 
-=head2 create_record
+=head2 batch_fetch
 
-    Description: Serialize the record to it's native format, pieces may
-                 need to be overridden by inherited types.
+    Description: Fetch multiple fields from the object in one go, this
+                 allows an Object to be it's own translator. Because
+                 Objects are very simple encapsulations of records, there
+                 should be a one-to-one mapping between fields and accessor
+                 methods in the object, if there isn't, you're in big
+                 trouble to begin with.
+    Args[1]    : Object to retrieve fields from, usually self
+    Args[2]    : Arrayref, Fields to return
+    Returntype : Array, field values
 
 =cut
 
-sub create_record {
+sub batch_fields {
     my $self = shift;
+    my $object = shift;
+    my $fields = shift;
+
     my @values;
 
-    foreach my $field (@{$self->fields}) {
-	my $value;
-	if(defined($self->$field) && ref $self->$field eq 'HASH') {
-	    $value = $self->combine_fields($self->$field);
-	} else {
-	    $value = $self->$field || '.';
-	}
-
+    # Cycle through fields and fetch values
+    foreach my $field (@{$fields}) {
+	my $value = $object->$field();
 	push @values, $value;
     }
 
-    return $self->concatenate_fields(\@values) . "\n";
+    return @values;
+}
+
+=head2 set_fields
+
+    Description: Set the fields for an object in a batch,
+                 to save multiple calls to mutators
+    Args[1]    : Hashref, field/value pairs
+    Returntype : undef
+    Exceptions : If a field in the values hash doesn't
+                 exist in this object type
+
+=cut
+
+sub set_fields {
+    my $self = shift;
+    my $values = shift;
+
+    foreach my $key (keys %{$values}) {
+	$self->$key( $values->{$key} );
+    }
 }
 
 =head2 fields
@@ -150,6 +175,35 @@ sub length {
     }
 }
 
+##########################################
+# Old functionality that's going away
+##########################################
+
+=head2 create_record
+
+    Description: Serialize the record to it's native format, pieces may
+                 need to be overridden by inherited types.
+
+=cut
+
+sub create_record {
+    my $self = shift;
+    my @values;
+
+    foreach my $field (@{$self->fields}) {
+	my $value;
+	if(defined($self->$field) && ref $self->$field eq 'HASH') {
+	    $value = $self->combine_fields($self->$field);
+	} else {
+	    $value = $self->$field || '.';
+	}
+
+	push @values, $value;
+    }
+
+    return $self->concatenate_fields(\@values) . "\n";
+}
+
 =head2 combine_fields
 
     Description: For fields that are composite fields (ie. attributes in
@@ -166,7 +220,6 @@ sub combine_fields {
     my $valuequotes = shift || '';
 
     my @values;
-
     foreach my $field (keys %$values) {
 	push @values, ($inc_field ? "$field$separator" : '') . $valuequotes . $values->{$field} . $valuequotes;
     }

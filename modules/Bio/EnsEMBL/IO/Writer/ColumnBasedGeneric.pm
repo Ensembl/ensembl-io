@@ -62,12 +62,14 @@ sub new {
     Description: Write a record to the output, it will use the given
                  translator to interrogate the object for the needed fields
     Args[1]    : Object to write out
+    Args[2]    : Optional, alternative translator to use for this record
 
 =cut
 
 sub write {
     my $self = shift;
     my $object = shift;
+    my $translator = shift;
 
     # Metadata are a specific case, they are format specific, if
     # you need to translate a feature in to a metadata record (ie. GFF3
@@ -75,7 +77,9 @@ sub write {
     if($object->isa('Bio::EnsEMBL::IO::Object::Metadata')) {
 	print { $self->{writer_handle} } $object->create_record();
     } else {
-	print { $self->{writer_handle} } $self->create_record($object);
+	# Use the default translator if we haven't been given one
+	$translator ||= $self->{translator};
+	print { $self->{writer_handle} } $self->create_record($object, $translator);
     }
 
 }
@@ -84,6 +88,7 @@ sub write {
 
     Description: Create the record in native format to write out to the file
     Args[1]    : Object to format
+    Args[2]    : Translator
     Returntype : String
 
 =cut
@@ -91,10 +96,11 @@ sub write {
 sub create_record {
     my $self = shift;
     my $object = shift;
+    my $translator = shift;
 
     # Maybe... but this would involve looping through the fields twice,
     # perhaps save this for formats like fasta
-    my @values = $self->{translator}->batch_fetch($object, $self->fields());
+    my @values = $translator->batch_fields($object, $self->fields());
 
     return $self->concatenate_fields(\@values), "\n";
     
@@ -140,6 +146,7 @@ sub combine_fields {
     my $inc_field = shift || 1;
     my $separator = shift || '=';
     my $valuequotes = shift || '';
+    my $multi_delimiter = shift || undef;
 
     my @values;
     my @keys;
@@ -152,7 +159,18 @@ sub combine_fields {
 
     foreach my $field (@keys) {
 	next if( !defined($values->{$field}) );
-	push @values, ($inc_field ? "$field$separator" : '') . $valuequotes . $values->{$field} . $valuequotes;
+
+	if(ref($values->{$field}) eq 'ARRAY') {
+	    if($multi_delimiter) {
+		push @values, ($inc_field ? "$field$separator" : '') . join($multi_delimiter, map {qq($valuequotes$_$valuequotes)} @{$values->{$field}});
+	    } else {
+		foreach my $v (@{$values->{$field}}) {
+		    push @values, ($inc_field ? "$field$separator" : '') . qq($valuequotes$v$valuequotes);
+		}
+	    }
+	} else {
+	    push @values, ($inc_field ? "$field$separator" : '') . $valuequotes . $values->{$field} . $valuequotes;
+	}
     }
 
     return join $delimiter, @values;

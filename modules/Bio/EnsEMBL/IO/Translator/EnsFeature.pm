@@ -47,15 +47,15 @@ use URI::Escape;
 use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
 use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
-my %ens_field_callbacks = (seqname => '$self->can(\'seqname\')',
-                           source  => '$self->can(\'source\')',
-                           type  => '$self->can(\'type\')',
-                           start  => '$self->can(\'start\')',
-                           end  => '$self->can(\'end\')',
-                           score  => '$self->can(\'score\')',
-                           strand  => '$self->can(\'strand\')',
-                           phase  => '$self->can(\'phase\')',
-                           attributes  => '$self->can(\'attributes\')'
+my %ens_field_callbacks = (seqname => 'seqname',
+                           source  => 'source',
+                           type  => 'type',
+                           start  => 'start',
+                           end  => 'end',
+                           score  => 'score',
+                           strand  => 'strand',
+                           phase  => 'phase',
+                           attributes  => 'attributes'
                            );
 
 =head2 new
@@ -129,25 +129,25 @@ sub start {
     my $self = shift;
     my $object = shift;
 
-    return $object->start();
+    return $object->seq_region_start();
 }
 
 sub end {
     my $self = shift;
     my $object = shift;
 
-    my $end = $object->end();
+    my $end = $object->seq_region_end();
 
     # the start coordinate of the feature, here shifted to chromosomal coordinates
     # Start and end must be in ascending order for GXF. Circular genomes require the length of 
     # the circuit to be added on.    
-    if( $object->start() > $object->end() ) {
+    if( $object->seq_region_start() > $object->seq_region_end() ) {
 	if ($object->slice() && $object->slice()->is_circular() ) {
 	    $end = $end + $object->seq_region_length;
 	}
 	# non-circular, but end still before start
 	else {
-	    $end = $object->start();
+	    $end = $object->seq_region_start();
 	}
     }
 
@@ -183,6 +183,15 @@ sub phase {
 	return '.';
     }
 }
+
+=head2 attributes
+
+    Description: The default attributes is for GFF3, it needs to be
+                 updated in the field callback table for other formats
+    Args[1]    : Object to be serialized as an attributes field
+    Returntype : Hash of attributes
+
+=cut
 
 sub attributes {
     my $self = shift;
@@ -262,12 +271,125 @@ sub attributes {
     return \%attrs;
 }
 
+=head2 gtf_attributes
+
+    Description: Specifically create attributes for a gtf file from an Ensembl feature.
+                 Because our GTF files are fairly cumulative in the attributes included
+                 (transcript includes everything for a gene, etc), it becomes a little
+                 simpler.
+    Args[1]    : The feature to extract and build attributes from
+    Args[2]    : [Optional] Any attributes to attach and add to
+=cut
+
 sub gtf_attributes {
     my $self = shift;
     my $object = shift;
+    my $attrs = (defined($object->{extra_attrs}) ? $object->{extra_attrs} : {});
 
-    my %attrs;
-    
+    # Oh this is a mess... hopefully we can refactor and find a better way
+    my %summary = %{$object->summary_as_hash};
+
+    my $gene;
+    if ( $object->isa('Bio::EnsEMBL::Gene') ) {
+	# For Genes only
+	$gene = $object;
+    } else {
+	# For anything but a Gene
+	my $transcript;
+
+	if ( $object->isa('Bio::EnsEMBL::Transcript') ) {
+	    $transcript = $object;
+
+	    foreach my $tag (qw/cds_end_NF cds_start_NF mRNA_end_NF mRNA_start_NF gencode_basic/) {
+		my $attributes = $transcript->get_all_Attributes($tag);
+		if(@{$attributes}) {
+		    my $value = $tag;
+		    $value = "basic" if $tag eq "gencode_basic";
+		    $self->add_attr($attrs, 'tag', $value);
+		}
+	    }
+
+	} else {
+	    if ( $object->isa('Bio::EnsEMBL::ExonTranscript') ) {
+
+	    }
+
+	    $transcript = $object->transcript();
+	}
+
+	# CCDS records
+	my $ccds_entries = $transcript->get_all_DBEntries('CCDS');
+	if(@{$ccds_entries}) {
+	    $self->add_attr($attrs, 'tag', 'CCDS');
+	    foreach my $ccds (sort { $a->primary_id() cmp $b->primary_id() } @{$ccds_entries}) {
+		my $primary_ccds_id = $ccds->primary_id();
+		$self->add_attr($attrs, 'ccds_id', $primary_ccds_id);
+	    }
+	}
+
+	$attrs->{transcript_id} = $transcript->display_id;
+	$attrs->{transcript_version} = $transcript->version;
+	$attrs->{transcript_name} = $transcript->external_name if $transcript->external_name;
+	$attrs->{transcript_source} = $transcript->source;
+	$attrs->{transcript_biotype} = $transcript->biotype();
+	$attrs->{havana_transcript} = $transcript->havana_transcript()->display_id if $transcript->havana_transcript();
+	$attrs->{havana_version} = $transcript->havana_transcript()->version if $transcript->havana_transcript();
+	$self->add_attr($attrs, 'tag', 'basic') if $transcript->gencode_basic();
+	$attrs->{transcript_support_level} = $transcript->tsl() if $transcript->tsl();
+
+	$gene = $object->get_Gene();
+    }
+
+    $attrs->{gene_id} = $gene->display_id;
+    $attrs->{gene_version} = $gene->version;
+    $attrs->{gene_name} = $gene->external_name if $gene->external_name;
+    $attrs->{gene_source} = $gene->source;
+    $attrs->{gene_biotype} = $gene->biotype;
+    $attrs->{havana_gene} = $gene->havana_gene()->display_id() if $gene->havana_gene();
+    $attrs->{havana_gene_version} = $gene->havana_gene()->version() if $gene->havana_gene();
+
+    return $attrs;
+}
+
+=head2 add_attr
+
+    Description: For GTF files, multiple attributes with the same key are allowed.
+                 We'll store these as an array associated with the key, and the writer
+                 will be intelligent enough that if it sees an array for a hash
+                 element to decompose this.
+
+                 Conversely, GFF3 concatonates the values for an identical key as
+                 a comma separated list. The GFF writer should be similarly intelligent
+                 to comma join the array values when writing the attributes field.
+
+                 If the key doesn't already exist in the attributes hash, add
+                 it as a scalar. If it does, if it's a scalar, convert to an
+                 array and append. If it's already an array, just append the value.
+
+    Args[1]    : Hashref, the hash the attribute should be appended to, this is a
+                 destructive operation.
+    Args[2]    : Attribute key being appended to
+    Args[3]    : Value to append
+    Returntype : Undef
+
+=cut
+
+sub add_attr {
+    my $self = shift;
+    my $attrs = shift;
+    my $attr = shift;
+    my $value = shift;
+
+    if(defined($attrs->{$attr})) {
+	if( ref($attrs->{$attr}) eq 'ARRAY' ) {
+	    push @{$attrs->{$attr}}, $value;
+	} else {
+	    $attrs->{$attr} = [ $attrs->{$attr}, $value ];
+	}
+    } else {
+	$attrs->{$attr} = $value;
+    }
+
 }
 
 =head2 so_term

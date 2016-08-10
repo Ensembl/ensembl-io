@@ -16,13 +16,13 @@ limitations under the License.
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Object::GFF3Metadata - Object to represent GFF3 metadata
+Bio::EnsEMBL::IO::Object::GXFMetadata - Object to represent GXF metadata
 
 =head1 SYNOPSIS
 
-  use Bio::EnsEMBL::IO::Object::GFF3Metadata;
+  use Bio::EnsEMBL::IO::Object::GXFMetadata;
 
-  $record = Bio::EnsEMBL::IO::Object::GFF3Metadata->new($line);
+  $record = Bio::EnsEMBL::IO::Object::GXFMetadata->new($line);
 
   $type = $record->{type};
 
@@ -39,7 +39,7 @@ elements via setters/getters. Setter/getters are dynamically added to the class 
 
 =cut
 
-package Bio::EnsEMBL::IO::Object::GFF3Metadata;
+package Bio::EnsEMBL::IO::Object::GXFMetadata;
 
 use base qw/Bio::EnsEMBL::IO::Object::Metadata/;
 
@@ -81,7 +81,7 @@ sub new {
     Args[2]    : Directive values, either a string or array of
                  values. An array will be put together as a space
                  separated string when create_record is called.
-    Returntype : Bio::EnsEMBL::IO::Object::GFF3Metadata
+    Returntype : Bio::EnsEMBL::IO::Object::GXFMetadata
 
 =cut
 
@@ -100,7 +100,7 @@ sub directive {
     Args[2]    : Directive values, either a string or array of
                  values. An array will be put together as a space
                  separated string when create_record is called.
-    Returntype : Bio::EnsEMBL::IO::Object::GFF3Metadata
+    Returntype : Bio::EnsEMBL::IO::Object::GXFMetadata
 
 =cut
 
@@ -116,7 +116,7 @@ sub ens_directive {
 
     Description: Create an Ensembl directive type GFF metadata (#)
     Args[1]    : The comment value
-    Returntype : Bio::EnsEMBL::IO::Object::GFF3Metadata
+    Returntype : Bio::EnsEMBL::IO::Object::GXFMetadata
 
 =cut
 

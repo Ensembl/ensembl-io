@@ -58,42 +58,33 @@ use Bio::EnsEMBL::IO::Object::GTF;
 
 sub new {
     my $class = shift;
-    my $translator = shift;
 
-    my $self = $class->SUPER::new($translator);
+    my $self = $class->SUPER::new(@_);
 
     $self->fields( Bio::EnsEMBL::IO::Object::GTF->fields() );
-
-    if( $translator->can('strand_conversion') ) {
-	$translator->strand_conversion(Bio::EnsEMBL::IO::Object::GTF->strand_conversion());
-    }
 
     return $self;
 }
 
-=head2 create_record
+=head2 translator
 
-    Description: Create the record in GTF to write out to the file
-    Args[1]    : Object to format
-    Returntype : String
+    Description: Setter/getter for a translator, with the added feature
+                 that the translator's strand_conversion is set if available.
+    Args[1]    : Translator object
+    Returntype : Translator object
 
 =cut
 
-sub create_record {
+sub translator {
     my $self = shift;
-    my $object = shift;
 
-    my @values = $self->{translator}->batch_fields($object, $self->fields());
-
-    # Special case to handle attributes field and it's ordering
-#    my $attr = pop @values;
-    # We get the attribute values back as an arrayref, combine the ordered list
-    # using the GTF style '; ' delimiter and push back on to the values
-#    $attr = $self->concatenate_fields($attr, '; ');
-#    push @values, $attr;
-
-    return $self->concatenate_fields(\@values), "\n";
+    my $translator = $self->SUPER::translator(@_);
     
+    if( @_ &&  $translator->can('strand_conversion') ) {
+	$translator->strand_conversion(Bio::EnsEMBL::IO::Object::GTF->strand_conversion());
+    }
+
+    return $translator;
 }
 
 =head2 combine_fields

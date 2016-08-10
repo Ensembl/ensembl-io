@@ -16,8 +16,9 @@ use Data::Dumper;
 
 use Bio::EnsEMBL::Registry;
 use Bio::EnsEMBL::IO::Translator::EnsFeature;
-use Bio::EnsEMBL::IO::Writer::GFF3;
+use Bio::EnsEMBL::IO::Writer::GTF;
 use Bio::EnsEMBL::IO::Object::GXFMetadata;
+use Bio::EnsEMBL::IO::Object::GTF;
 
 # Connect to the Ensembl Registry to access the databases
 Bio::EnsEMBL::Registry->load_registry_from_db(
@@ -32,8 +33,13 @@ my $ga = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Gene" );
 my $dba = $adaptor->db();
 
 my $translator = Bio::EnsEMBL::IO::Translator::EnsFeature->new();
-my $serializer = Bio::EnsEMBL::IO::Writer::GFF3->new($translator);
-$serializer->open('/tmp/test.gff');
+my $serializer = Bio::EnsEMBL::IO::Writer::GTF->new($translator);
+
+# Two ways to override the callback table
+$translator->add_callbacks( { attributes => sub { $translator->gtf_attributes(@_) } } );
+#$translator->add_callbacks( { attributes => 'gtf_attributes' });
+
+$serializer->open('/tmp/test.gtf');
 
 # Fetch chromosome 1
 my $features = [$adaptor->fetch_by_region('chromosome', 1)];
@@ -41,17 +47,10 @@ my $features = [$adaptor->fetch_by_region('chromosome', 1)];
 
 ###
 #
-#  Print the GFF3 headers
+#  Print the Ensembl GTF headers
 #
 ###
 
-$serializer->write(Bio::EnsEMBL::IO::Object::GXFMetadata->directive('gff-version', 3));
-foreach my $chromosome (@{$features}) {
-    $serializer->write( Bio::EnsEMBL::IO::Object::GXFMetadata->directive('sequence-region', 
-									  $chromosome->seq_region_name,
-									  $chromosome->start,
-									  $chromosome->end) );
-}
 my $mc = $dba->get_MetaContainer();
 my $gc = $dba->get_GenomeContainer();
 
@@ -93,12 +92,6 @@ $serializer->write(Bio::EnsEMBL::IO::Object::GXFMetadata->ens_directive('genebui
 # chr1 restriction off the fetch_by_region()
 while(my $chromosome = shift @{$features}) {
 
-    # Write the chromosome
-    $serializer->write($chromosome);
-
-    # Write out the end of section separator for the GFF3 (ie. ###)
-    $serializer->fwd_ref_delimeter();
-
     # Cycle through and print chromosomes, depends on DB ordering, not likely
     # good for production
     my $genes = $ga->fetch_all_by_Slice($chromosome);
@@ -108,7 +101,44 @@ while(my $chromosome = shift @{$features}) {
   
 	# Serialize transcripts in start/end order for a gene
 	foreach my $transcript (sort { $a->start() <=> $b->start() } @{$gene->get_all_Transcripts()}) {
+	    # We're shifting logic about sub-objects and special attributes to be
+	    # handled by the calling code
+	    my $translation = $transcript->translation();
+	    my $selenocysteines; my $has_selenocysteines;
+	    
+	    if($translation) {
+		$selenocysteines = $translation->get_all_selenocysteine_SeqEdits();
+		if(@{$selenocysteines}) {
+		    $has_selenocysteines = 1;
+		    $transcript->{extra_attrs}->{tag} = 'seleno';
+		}
+	    }
+
 	    $serializer->write($transcript);
+
+	    # Handle selenocysteine
+	    if($translation && @{$selenocysteines}) {
+		foreach my $edit (@{$selenocysteines}) {
+		    my $edit_start = $edit->start();
+		    my @projections = $transcript->pep2genomic($edit_start, $edit_start);
+		    foreach my $projection (@projections) {
+			# Make a GTF object to store the Selenocysteine record
+			my $obj = Bio::EnsEMBL::IO::Object::GTF->new(Bio::EnsEMBL::IO::Object::GTF->fields());
+			$obj->set_fields( {seqname => $transcript->seq_region_name(),
+					      source  => $transcript->source,
+					      type    => 'Selenocysteine',
+					      start   => $projection->start(),
+					      end     => $projection->end(),
+					      score   => '.',
+					      strand  => $transcript->strand(),
+					      phase   => '.',
+					      attributes => $translator->attributes($transcript),
+					     } );
+#			$obj->{extra_attrs} = $translator->attributes($transcript);
+			$serializer->write($obj, $obj);
+		    }
+		}
+	    }
 
 	    # Collect the sub-transcript level features for serialization
 	    my @exons_cds_and_utrs = @{$transcript->get_all_ExonTranscripts()};
@@ -118,13 +148,11 @@ while(my $chromosome = shift @{$features}) {
 
 	    # Sort by start and end, and serialize
 	    foreach my $feature (sort { $a->start() <=> $b->start() || $a->end() <=> $b->end() } @exons_cds_and_utrs) {
+		$feature->{extra_attrs}->{tag} = 'seleno' if $has_selenocysteines;
 		$serializer->write($feature);
 	    }
 
 	}
-
-	# Write out the end of section separator for the GFF3 (ie. ###)
-	$serializer->fwd_ref_delimeter();
 
     }
 }

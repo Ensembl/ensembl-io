@@ -32,6 +32,16 @@ Bio::EnsEMBL::IO::Translator - Base class for object translator
 
   $translator->add_callbacks($ref_of_hash_of_callbacks);
 
+  # There are two main ways to override callbacks for attributes
+
+  # The first will use the given function name and attempt to call it on $self in
+  # the translator, ie. $self->attribute_callback($object)
+  $translator->add_callbacks( { attribute_name => 'attribute_callback' } );
+
+  # The second, the callback can be a CODE reference, to call a method in a
+  # different translator object you might do something like:
+  $translator->add_callbacks( { attribute_name => sub { $other_translator->get_attribute(@_) } } );
+
 =head1 Description
 
 Base class for a translator, the purpose of a translator is to translate between the object types
@@ -84,7 +94,14 @@ sub get_field {
 
     # If we have the requested field, return it
     if(defined( $field_callbacks{$field} )) {
-	return $field_callbacks{$field}->($object);
+	my $value;
+	if( ref($field_callbacks{$field}) eq 'CODE' ) {
+	    $value = $field_callbacks{$field}($object);
+	} else {
+	    my $callback = $field_callbacks{$field};
+	    $value = $self->$callback($object);
+	}
+	return $value;
     }
 
     # If the field doesn't exist, return undef
@@ -96,7 +113,7 @@ sub get_field {
     Description: Fetch a list of fields from the object in one call, fields are returned
                  in the same order requested
     Args[1]    : Object to fetch fields from
-    Args[2]    : List of fields to return
+    Args[2]    : Arrayref, List of fields to return
     Returntype : Array
 
 =cut
@@ -110,7 +127,7 @@ sub batch_fields {
 
     # Cycle through fields and fetch values
     foreach my $field (@{$fields}) {
-	my $value = $self->$field($object);
+	my $value = $self->get_field($object, $field);
 	push @values, $value;
     }
     
@@ -129,8 +146,6 @@ sub add_callbacks {
     my $self = shift;
     my $callbacks = shift;
 
-    # Splice new callbacks in to existing set, overwritting any
-    # previous callback
     @field_callbacks{ keys %$callbacks } = values %$callbacks;
 }
 

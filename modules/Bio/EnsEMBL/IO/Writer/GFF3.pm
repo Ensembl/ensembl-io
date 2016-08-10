@@ -47,7 +47,7 @@ use warnings;
 use Carp;
 
 use Bio::EnsEMBL::IO::Object::GFF3;
-use Bio::EnsEMBL::IO::Object::GFF3Metadata;
+use Bio::EnsEMBL::IO::Object::GXFMetadata;
 
 my @default_order = qw(ID Parent Name Alias Target Gap Derives_from Note Dbxref Ontology_term Is_circular);
 
@@ -71,9 +71,9 @@ sub new {
 	$translator->strand_conversion(Bio::EnsEMBL::IO::Object::GFF3->strand_conversion());
     }
 
-    # Cheat and make a GFF3Metadata object in a really quick and lighttweight manner.
+    # Cheat and make a GXFMetadata object in a really quick and lighttweight manner.
     # We need one hanging around for the fwd-ref writer call
-    $self->{fwd_ref} = bless { type => 'fwd-ref-delimeter' }, 'Bio::EnsEMBL::IO::Object::GFF3Metadata';
+    $self->{fwd_ref} = bless { type => 'fwd-ref-delimeter' }, 'Bio::EnsEMBL::IO::Object::GXFMetadata';
 
     return $self;
 }
@@ -89,31 +89,6 @@ sub fwd_ref_delimeter {
     my $self = shift;
 
     $self->write( $self->{fwd_ref} );
-}
-
-=head2 create_record
-
-    Description: Create the record in GFF3 to write out to the file
-    Args[1]    : Object to format
-    Returntype : String
-
-=cut
-
-sub create_record {
-    my $self = shift;
-    my $object = shift;
-
-    my @values = $self->{translator}->batch_fields($object, $self->fields());
-
-    # Special case to handle attributes field and it's ordering
-#    my $attr = pop @values;
-    # We get the attribute values back as an arrayref, combine the ordered list
-    # using the GFF3 style '; ' delimiter and push back on to the values
-#    $attr = $self->concatenate_fields($attr, '; ');
-#    push @values, $attr;
-
-    return $self->concatenate_fields(\@values), "\n";
-    
 }
 
 =head2 combine_fields
