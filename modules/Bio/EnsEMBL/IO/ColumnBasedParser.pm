@@ -335,6 +335,7 @@ sub validate_record {
     my $type      = $field_info->{$key}{'validate_as'};
     my $match     = $field_info->{$key}{'match'};
     $valid        = $format->validate_as($type, $value, $match);
+    #warn ">>> VALIDATED $key AS $type WITH VALUE $value: VALID = $valid";
     return 0 if $valid == 0;
   }
 
