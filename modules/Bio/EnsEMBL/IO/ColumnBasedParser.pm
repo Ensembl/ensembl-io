@@ -69,6 +69,12 @@ sub open {
 
     $self = $class->SUPER::open($filepath, @other_args);
     return unless $self;
+
+    ## Add format object if available
+    if ($self->can('add_format')) {
+      $self->add_format;
+    }
+    
     $self->set_fields;
     $self->set_minimum_column_count;
     $self->set_maximum_column_count;
@@ -259,6 +265,7 @@ sub validate {
   my $format = $self->format;
 
   if ($format) {
+    $self->shift_block;
     while ($self->next) {
       next if $self->{'current_block'} !~ /\w/;
       if ($self->is_metadata) {
@@ -294,8 +301,15 @@ sub validate {
 
 sub validate_metadata {
   my $self = shift;
-  warn "!!! VALIDATING METADATA";
-  return 1;
+  ## Metadata is optional, so default is for it to be valid
+  my $valid = 1;
+
+  my $metadata = $self->metadata;
+  if ($metadata) {
+    ## TODO - implement validation! 
+  }
+
+  return $valid;
 }
 
 =head2 validate_record
