@@ -153,7 +153,7 @@ sub create_metadata {
   while (my($k,$v) = each(%$metadata)) {
     if ($k eq 'browser_switches') {
       $has_switches = 1;
-      while (my($a, $b) = each ($browser_switches)) {
+      while (my($a, $b) = each (%$v)) {
         $browser_switches .= " $a $b";
       }
     }
