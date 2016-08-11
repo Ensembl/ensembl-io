@@ -245,6 +245,7 @@ sub set_maximum_column_count {
 
 sub read_record {
   my $self = shift;
+  return [] unless (defined $self->{'current_block'} && defined $self->{'delimiter'});
   chomp $self->{'current_block'};
   $self->{'record'} = [ split($self->{'delimiter'},$self->{'current_block'}) ] ;
 }
@@ -267,30 +268,34 @@ sub validate {
   if ($format) {
     $self->shift_block;
     while ($self->next) {
+
+      ## Validate metadata
       next if $self->{'current_block'} !~ /\w/;
-      if ($self->is_metadata) {
-        $valid = $self->validate_metadata;
+      $valid = $self->validate_metadata;
+      if ($valid == 0) {
+        ## Bail out if we hit an invalid record
+        $self->reset;
+        return 0;
       }
-      else {
-        $self->set_column_count(scalar @{$self->{'record'}});
-        $valid = $self->validate_record;
-        $count++;
-        if ($valid == 0) {
-          ## Bail out if we hit an invalid record
-          return 0;
-        }
-        elsif ($count == $record_limit) {
-          return $valid;
-        }
+
+      ## Now do record
+      $self->set_column_count(scalar @{$self->{'record'}});
+      $valid = $self->validate_record;
+      $count++;
+      if ($valid == 0) {
+        ## Bail out if we hit an invalid record
+        $self->reset;
+        return 0;
+      }
+      elsif ($count == $record_limit) {
+        $self->reset;
+        return $valid;
       }
     }
   }
   else {
     $valid = $self->_validate_basic;
   }
-
-  ## Finished validating, so return parser to beginning of file
-  $self->reset;
 
   return $valid;
 }
@@ -386,6 +391,7 @@ sub _validate_basic {
 
     last;
   }
+  $self->reset;
 
   return $valid;
 }
