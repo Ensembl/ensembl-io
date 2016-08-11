@@ -50,19 +50,15 @@ sub add_format {
   ## Which subformat are we dealing with?
   my $subformat = 'Bed';
   my $column_count;
+  $self->shift_block; ## Move first block into "memory"
   while ($self->next) {
-    next if $self->{'current_block'} !~ /\w/;
-    if ($self->is_metadata) {
-      my $type = $self->get_metadata('type');
-      $subformat = $type if $type;
-      last;
+    my $type = $self->get_metadata_value('type');
+    $subformat = ucfirst($type) if $type;
+
+    if ($subformat eq 'bedDetail') {
+      $column_count = scalar @{$self->{'record'}};
     }
-    else {
-      if ($subformat eq 'bedDetail') {
-        $column_count = scalar @{$self->{'record'}};
-      }
-      last;
-    }
+    last;
   }
   $self->reset; ## Reset pointer
 
@@ -70,7 +66,7 @@ sub add_format {
   my $format = $class->new();
   $self->format($format);
   ## Configure delimiter
-  my $delimiter = $self->format->delimiter;
+  my $delimiter = $format->delimiter;
   if ($delimiter) {
     $self->{'delimiter'} = $delimiter;
     my @delimiters       = split('\|', $delimiter);
@@ -82,14 +78,14 @@ sub add_format {
     $self->{'column_map'}{'description'}  = $column_count - 1;
 
     ## Map remaining columns to valid fields
-    my @fields = @{$format->get_field_order};
+    my @fields = @{$format->get_field_order||[]};
     for (my $index = 0; $index < $column_count - 2; $index++) {
       $self->{'column_map'}{$fields[$index]} = $index;
     }
   }
   else {
     my $index = 0;
-    foreach (@{$format->get_field_order}) {
+    foreach (@{$format->get_field_order||[]}) {
       $self->{'column_map'}{$_} = $index;
       $index++;
     }
