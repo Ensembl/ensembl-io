@@ -317,7 +317,7 @@ sub validate_as_integer {
 
 =cut
 
-sub validate_as_boolean {
+sub validate_as_floating_point {
   my ($self, $value) = @_;
   return $value =~ /^-?\d+\.?\d*$/ ? 1 : 0;
 }
