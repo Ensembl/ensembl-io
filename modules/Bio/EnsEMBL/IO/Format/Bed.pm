@@ -110,7 +110,7 @@ sub new {
                                                 'optional'    => 1,  
                                                 },
                                 'itemRgb' => {
-                                                'validate_as' => 'colour',
+                                                'validate_as' => 'rgb_string',
                                                 'optional'    => 1,  
                                                 },
                                 'blockCount' => {
