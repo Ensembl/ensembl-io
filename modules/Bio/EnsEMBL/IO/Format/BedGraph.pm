@@ -79,17 +79,14 @@ sub new {
                                     },
                 'field_info'    => {
                                     'chrom' => {
-                                                'accessor'    => 'seqname',
                                                 'validate_as' => 'string',
                                                 'optional'    => 0,  
                                                 },
                                     'chromStart' => {
-                                                'accessor'    => 'start',
                                                 'validate_as' => 'integer',
                                                 'optional'    => 0,  
                                                 },
                                     'chromEnd' => {
-                                                'accessor'    => 'end',
                                                 'validate_as' => 'integer',
                                                 'optional'    => 0,  
                                                 },
