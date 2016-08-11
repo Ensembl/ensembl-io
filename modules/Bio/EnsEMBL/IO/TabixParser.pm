@@ -47,7 +47,6 @@ sub open {
   my ($caller, $filename, @other_args) = @_;
   my $class = ref($caller) || $caller;
 
-  my $delimiter = "\t";
   my $self = $class->SUPER::new(@other_args);
 
   confess "ERROR: Input file is not bgzipped, cannot use tabix\n" unless $filename =~ /\.gz$/;
@@ -55,6 +54,13 @@ sub open {
   $self->{record}     = undef;
   $self->{tabix_file} = Bio::DB::HTS::Tabix->new(filename => $filename);
   $self->{iterator}   = undef;
+  $self->{delimiter}  = "\t";
+
+  ## Add format object if available
+  if ($self->can('add_format')) {
+    $self->seek($self->{tabix_file}->seqnames->[0], 1, 1e8);
+    $self->add_format;
+  }
 
   return $self;
 }

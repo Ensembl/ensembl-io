@@ -46,7 +46,6 @@ sub open {
   my ($caller, $filename, @other_args) = @_;
   my $class = ref($caller) || $caller;
 
-  my $delimiter = "\t";
   my $self = $class->SUPER::open($filename, @other_args);
 
   my $tabix_data = $self->{tabix_file}->header;
@@ -57,7 +56,6 @@ sub open {
 
   delete($self->{'current_block'});
 
-  $self->{'delimiter'} = $delimiter;
   return $self;
 }
 

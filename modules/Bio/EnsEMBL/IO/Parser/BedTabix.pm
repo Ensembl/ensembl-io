@@ -46,15 +46,16 @@ sub open {
   my ($caller, $filename, @other_args) = @_;
   my $class = ref($caller) || $caller;
 
-  my $delimiter = "\t";
   my $self = $class->SUPER::open($filename, @other_args);
 
   my $tabix_data = $self->{tabix_file}->header;
   foreach my $line (split("\n",$tabix_data || '')) {
+    $self->{'current_block'} = $line;
     $self->Bio::EnsEMBL::IO::Parser::Bed::read_metadata($line);
   }
 
-  $self->{'delimiter'} = $delimiter;
+  delete($self->{'current_block'});
+
   return $self;
 }
 
