@@ -69,7 +69,7 @@ sub seek {
   ## Check for both possible versions of chromosome name
   foreach ($chrom, "chr$chrom")
   {
-    $self->{iterator} = $self->{tabix_file}->query("$chrom:$start-$end") ;
+    $self->{iterator} = $self->{tabix_file}->query("$_:$start-$end") ;
     last if $self->{iterator};
   }
 
