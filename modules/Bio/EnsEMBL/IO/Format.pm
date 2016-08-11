@@ -402,6 +402,10 @@ sub validate_as_strand_plusminus {
 
 sub validate_as_rgb_string {
   my ($self, $value) = @_;
+
+  ## Technically 0 is not a valid colour, but it's used instead of '.' in some UCSC examples
+  return 1 if $value == 0;
+
   return $value =~ /^(\d){1,3},(\d){1,3},(\d){1,3}$/ ? 1 : 0;
 }
 
