@@ -72,12 +72,7 @@ sub new {
     }
 
     bless $self, $class;
-    
-    ## Add format object if available (work in progress!)
-    if ($self->can('add_format')) {
-      $self->add_format;
-    }
-
+   
     return $self;
 }
 
