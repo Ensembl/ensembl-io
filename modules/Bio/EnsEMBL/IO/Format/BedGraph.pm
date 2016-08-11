@@ -91,8 +91,7 @@ sub new {
                                                 'optional'    => 0,  
                                                 },
                                     'score' => {
-                                                'validate_as' => 'range',
-                                                'match'       => [0, 1000],
+                                                'validate_as' => 'floating_point',
                                                 'optional'    => 0,  
                                                 },
                                     },
