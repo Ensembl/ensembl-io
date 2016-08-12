@@ -43,14 +43,14 @@ sub start {
   my $self = shift;
   my $object = shift;
 
-  return ( $object->seq_region_start() > $object->end() ) ? $object->end() : $object->seq_region_start();
+  return ( $object->seq_region_start() > $object->seq_region_end() ) ? $object->seq_region_end() : $object->seq_region_start();
 }
 
 sub end {
   my $self = shift;
   my $object = shift;
 
-  return ( $object->start() > $object->end() ) ? $object->start() : $object->end();
+  return ( $object->seq_region_start() > $object->seq_region_end() ) ? $object->seq_region_start() : $object->seq_region_end();
 }
 
 sub name {
