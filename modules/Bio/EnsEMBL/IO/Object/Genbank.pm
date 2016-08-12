@@ -35,8 +35,6 @@ Bio::EnsEMBL::IO::Object::Genbank - Generic object for holding Genbank based rec
 
 package Bio::EnsEMBL::IO::Object::Genbank;
 
-use base qw/Bio::EnsEMBL::IO::Object::ColumnBasedGeneric/;
-
 use strict;
 use warnings;
 use Carp;

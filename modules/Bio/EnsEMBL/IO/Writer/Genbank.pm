@@ -40,8 +40,6 @@ Bio::EnsEMBL::IO::Writer::Genbank - Generic Genbank Writer
 
 package Bio::EnsEMBL::IO::Writer::Genbank;
 
-use base qw/Bio::EnsEMBL::IO::Writer::ColumnBasedGeneric/;
-
 use strict;
 use warnings;
 use Carp;
