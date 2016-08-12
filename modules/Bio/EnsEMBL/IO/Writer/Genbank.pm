@@ -16,29 +16,29 @@ limitations under the License.
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Writer::GFF3 - Generic GFF3 Writer
+Bio::EnsEMBL::IO::Writer::Genbank - Generic Genbank Writer
 
 =head1 SYNOPSIS
 
-  use Bio::EnsEMBL::IO::Writer::GFF3;
+  use Bio::EnsEMBL::IO::Writer::Genbank;
 
-  my $writer = Bio::EnsEMBL::IO::Writer::GFF3->new($translator);
+  my $writer = Bio::EnsEMBL::IO::Writer::Genbank->new($translator);
 
   $writer->write($object);
 
 =head1 Description
 
-  Write records out in GFF3 format. The module uses a translator given
+  Write records out in Genbank format. The module uses a translator given
   at creation time which knows how to interrogate a specified type
   of feature/object that will be passed in to the write function.
 
-  As in, for the GFF3 format the translator must know how to retrieve
+  As in, for the Genbank format the translator must know how to retrieve
   seqname, source, type, start, end, score, strand, phase and attributes
   fromt he objects you plan to feed the writer.
 
 =cut
 
-package Bio::EnsEMBL::IO::Writer::GFF3;
+package Bio::EnsEMBL::IO::Writer::Genbank;
 
 use base qw/Bio::EnsEMBL::IO::Writer::ColumnBasedGeneric/;
 
@@ -46,14 +46,14 @@ use strict;
 use warnings;
 use Carp;
 
-use Bio::EnsEMBL::IO::Object::GFF3;
+use Bio::EnsEMBL::IO::Object::Genbank;
 
 my @default_order = qw(ID Parent Name Alias Target Gap Derives_from Note Dbxref Ontology_term Is_circular);
 
 =head2 new
 
     Description: Constructor for a column based generic writer
-    Args[1]    : Translator object for the type of object being written 
+    Args[1]    : Translator object for the type of object being written
                  (ie. for Ensembl Features, etc)
 
 =cut
@@ -64,10 +64,10 @@ sub new {
 
     my $self = $class->SUPER::new($translator);
 
-    $self->fields( Bio::EnsEMBL::IO::Object::GFF3->fields() );
+    $self->fields( Bio::EnsEMBL::IO::Object::Genbank->fields() );
 
     if( $translator->can('strand_conversion') ) {
-	$translator->strand_conversion(Bio::EnsEMBL::IO::Object::GFF3->strand_conversion());
+	$translator->strand_conversion(Bio::EnsEMBL::IO::Object::Genbank->strand_conversion());
     }
 
     return $self;
@@ -75,7 +75,7 @@ sub new {
 
 =head2 create_record
 
-    Description: Create the record in GFF3 to write out to the file
+    Description: Create the record in Genbank to write out to the file
     Args[1]    : Object to format
     Returntype : String
 
@@ -90,37 +90,14 @@ sub create_record {
     # Special case to handle attributes field and it's ordering
 #    my $attr = pop @values;
     # We get the attribute values back as an arrayref, combine the ordered list
-    # using the GFF3 style '; ' delimiter and push back on to the values
+    # using the Genbank style '; ' delimiter and push back on to the values
 #    $attr = $self->concatenate_fields($attr, '; ');
 #    push @values, $attr;
 
     return $self->concatenate_fields(\@values), "\n";
-    
+
 }
 
-=head2 combine_fields
-
-    Description: For fields that are composite fields (ie. attributes in
-                 GFF3), combine the pieces of the field using the correct
-                 delimiters for GFF3
-    Returntype : String of concatenated fields
-
-=cut
-
-sub combine_fields {
-    my $self = shift;
-    my $values = shift;
-
-    my $order = $self->attributes_order();
-    if($order) {
-	my %seen;
-	@seen{@{$order}} = ();
-	my @attrs = (@{$order}, grep{!exists $seen{$_}} sort keys %{$values});
-	$order = \@attrs;
-    }
-
-    return $self->SUPER::combine_fields($values, $order);
-}
 
 sub attributes_order {
     my $self = shift;

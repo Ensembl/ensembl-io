@@ -16,7 +16,7 @@ use Data::Dumper;
 
 use Bio::EnsEMBL::Registry;
 use Bio::EnsEMBL::IO::Translator::EnsFeature;
-use Bio::EnsEMBL::IO::Writer::GFF3;
+use Bio::EnsEMBL::IO::Writer::Genbank;
 
 # Connect to the Ensembl Registry to access the databases
 Bio::EnsEMBL::Registry->load_registry_from_db(
@@ -30,7 +30,7 @@ my $adaptor = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Slice" );
 my $ga = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Gene" );
 
 my $translator = Bio::EnsEMBL::IO::Translator::EnsFeature->new();
-my $serializer = Bio::EnsEMBL::IO::Writer::GFF3->new($translator);
+my $serializer = Bio::EnsEMBL::IO::Writer::Genbank->new($translator);
 $serializer->open('/tmp/test.gff');
 
 # Fetch chromosome 1
@@ -38,7 +38,7 @@ my $features = [$adaptor->fetch_by_region('chromosome', 1)];
 
 ###
 #
-#  Missing: GFF3 headers print, coming soon, not yet in GFF3 serializer!
+#  Missing: Genbank headers print, coming soon, not yet in Genbank serializer!
 #
 ###
 
@@ -55,7 +55,7 @@ while(my $chromosome = shift @{$features}) {
     while(my $gene = shift @{$genes}) {
 	my %seen_exons = ();
 	$serializer->write($gene);
-  
+
 	# Serialize transcripts in start/end order for a gene
 	foreach my $transcript (sort { $a->start() <=> $b->start() } @{$gene->get_all_Transcripts()}) {
 	    $serializer->write($transcript);
@@ -75,7 +75,7 @@ while(my $chromosome = shift @{$features}) {
 
 ###
 #
-# Missing: GFF3 end of section separators, not yet in GFF3 serializer,
+# Missing: Genbank end of section separators, not yet in Genbank serializer,
 #          coming soon!
 #
 ###
