@@ -95,10 +95,8 @@ sub new {
 =head2 directive
 
     Description: Create a directive type VCF metadata (##)
-    Args[1]    : The directive type (ie. fileformat)
-    Args[2]    : Directive values, either a string or array of
-                 values. An array will be put together as a '='
-                 separated string when create_record is called.
+    Args[1]    : The directive type (e.g. fileformat)
+    Args[2]    : Directive value (e.g. VCFv4.2).
     Returntype : Bio::EnsEMBL::IO::Object::VCF4Metadata
 
 =cut
@@ -106,15 +104,15 @@ sub new {
 sub directive {
     my $class = shift;
     my $directive = shift;
-    my @args = @_;
+    my $arg = shift;
 
-    return bless {type => 'directive', directive => $directive, value => \@args}, $class;
+    return bless {type => 'directive', directive => $directive, value => [$arg]}, $class;
 }
 
 =head2 info
 
     Description: Create a info directive type VCF metadata (##INFO)
-    Args[1]    : INFO value, e.g. AA.
+    Args[1]    : INFO value (e.g. AA).
     Returntype : Bio::EnsEMBL::IO::Object::VCF4Metadata
 
 =cut
@@ -129,7 +127,7 @@ sub info {
 =head2 format
 
     Description: Create a format directive type VCF metadata (##FORMAT)
-    Args[1]    : FORMAT value, e.g. GT.
+    Args[1]    : FORMAT value (e.g. GT).
     Returntype : Bio::EnsEMBL::IO::Object::VCF4Metadata
 
 =cut
