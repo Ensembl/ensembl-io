@@ -48,6 +48,8 @@ use Carp;
 
 use Bio::EnsEMBL::IO::Object::GFF3;
 
+my @default_order = qw(ID Parent Name Alias Target Gap Derives_from Note Dbxref Ontology_term Is_circular);
+
 =head2 new
 
     Description: Constructor for a column based generic writer
@@ -109,12 +111,32 @@ sub combine_fields {
     my $self = shift;
     my $values = shift;
 
-    my @order = qw(ID Parent Name Alias Target Gap Derives_from Note Dbxref Ontology_term Is_circular);
-    my %seen;
-    @seen{@order} = ();
-    my @attrs = (@order, grep{!exists $seen{$_}} sort keys %{$values});
+    my $order = $self->attributes_order();
+    if($order) {
+	my %seen;
+	@seen{@{$order}} = ();
+	my @attrs = (@{$order}, grep{!exists $seen{$_}} sort keys %{$values});
+	$order = \@attrs;
+    }
 
-    return $self->SUPER::combine_fields($values, \@attrs);
+    return $self->SUPER::combine_fields($values, $order);
+}
+
+sub attributes_order {
+    my $self = shift;
+    my $order = shift;
+
+    if($order) {
+	@default_order = @{$order};
+    }
+
+    return \@default_order;
+}
+
+sub clear_attributes_order {
+    my $self = shift;
+
+    @default_order = undef;
 }
 
 1;
