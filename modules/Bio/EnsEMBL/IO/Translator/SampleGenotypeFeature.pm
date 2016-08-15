@@ -74,7 +74,6 @@ sub new {
     
     $self->{'info_list'}    = $info_list;
     $self->{'formats_list'} = $formats_list;
-    
 
     return $self;
 }
@@ -132,8 +131,15 @@ sub chrom {
 sub pos {
   my $self = shift;
   my $object = shift;
-  
-  return $self->start($object);
+
+  my $pos = $self->start($object);
+
+  # Get the alleles to check if we need to change the position
+  # For indel/insertion/deletion/unbalanced variants, we need to
+  # get the ref base (and position) before the variation
+  $pos = $pos - 1 if ($self->get_previous_base_position($object));
+
+  return $pos;
 }
 
 sub id {
@@ -147,19 +153,20 @@ sub ref {
   my $self = shift;
   my $object = shift;
   
-  my @alleles = split(/\//,$self->alleles($object));
+  my @alleles = @{$self->get_alleles($object)};
   
-  return 'N'.$alleles[0];
+  return $alleles[0];
 }
 
 sub alt {
   my $self = shift;
   my $object = shift;
-  
-  my @alleles = split(/\//,$self->alleles($object));
+
+  my @alleles = @{$self->get_alleles($object)};
+
   shift @alleles;
-  
-  return 'N'.join(',N',@alleles);
+
+  return join(',',@alleles);
 }
 
 sub qual {
@@ -216,6 +223,46 @@ sub genotype_vcf {
   my @genotype_vcf = map { $gen_al->{$_} } @$genotype;
   
   return \@genotype_vcf;
+}
+
+sub get_alleles {
+  my $self = shift;
+  my $object = shift;
+
+  my %allele_lengths;
+  my @alleles = split /\//, $self->alleles($object);
+
+  foreach my $allele(@alleles) {
+    $allele =~ s/\-//g;
+    $allele_lengths{length($allele)} = 1;
+  }
+
+  if (scalar keys %allele_lengths > 1) {
+    my $prev_base = 'N';
+    #### TODO ####
+    # Replace the 'N' by the real nucleotide (need access to Core DB or FASTA file ?)
+    ##############
+    for my $i(0..$#alleles) {
+      $alleles[$i] = $prev_base.$alleles[$i];
+    }
+  }
+  return \@alleles;
+}
+
+sub get_previous_base_position {
+  my $self = shift;
+  my $object = shift;
+
+  my %allele_lengths;
+  my @alleles = split /\//, $self->alleles($object);
+
+  foreach my $allele(@alleles) {
+    $allele =~ s/\-//g;
+    $allele_lengths{length($allele)} = 1;
+  }
+
+  # Use the previous base coordinate except for insertion (when ref == '').
+  return (scalar keys %allele_lengths > 1 && $alleles[0] ne '') ? 1 : 0;
 }
 
 #### INFO METHODS ####

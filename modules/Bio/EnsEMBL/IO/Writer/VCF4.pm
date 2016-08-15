@@ -74,18 +74,6 @@ sub new {
   return $self;
 }
 
-#=head2 header
-#
-#  Description: Shortcut to write the header in the VCF4 format,
-#         ie. #CHROM POS ID REF ALT QUAL FILTER INFO FORMAT
-#
-#=cut
-
-#sub header {
-#  my $self = shift;
-#
-#  $self->write( $self->{header} );
-#}
 
 =head2 create_record
 
@@ -100,7 +88,7 @@ sub create_record {
   my $object = shift;
 
   my $fields = $self->fields();
-  my @values = $self->{translator}->batch_fields($object, $fields);
+  my @values = $self->translator->batch_fields($object, $fields);
 
   #### Create check for Ref and Alt ####
   my $ref_col_id;
@@ -114,11 +102,11 @@ sub create_record {
     }
   }
   
-  return unless $values[$ref_col_id] =~ /^[ATGCN]+$/i;
-  return unless $values[$alt_col_id] =~ /^[ATGCN\*]+$/i;
+  return unless $values[$ref_col_id] && $values[$ref_col_id] =~ /^[ATGCN]+$/i;
+  return unless $values[$alt_col_id] && $values[$alt_col_id] =~ /^[ATGCN\*]+$/i;
 
   # Sample genotypes
-  my $s_gen = $self->{translator}->samples_genotypes($object);
+  my $s_gen = $self->translator->samples_genotypes($object);
   foreach my $sample (@{$self->{'translator'}{'samples_list'}}) {
     my $genotype;
     if ($s_gen->{$sample}) {
@@ -167,21 +155,5 @@ sub combine_fields {
   return $self->SUPER::combine_fields($values, $order);
 }
 
-#sub attributes_order {
-#  my $self = shift;
-#  my $order = shift;
-#
-#  if($order) {
-#	@default_order = @{$order};
-#  }
-#
-#  return \@default_order;
-#}
-
-#sub clear_attributes_order {
-#  my $self = shift;
-#
-#  @default_order = undef;
-#}
 
 1;

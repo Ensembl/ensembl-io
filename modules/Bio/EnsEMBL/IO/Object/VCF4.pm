@@ -42,7 +42,7 @@ use strict;
 use warnings;
 use Carp;
 
-my @FIELDS = qw(CHROM POS ID REF ALT QUAL FILTER INFO FORMAT);
+my @fields = qw(chrom pos id ref alt qual filter info format);
 
 =head2 fields
 
@@ -52,10 +52,6 @@ my @FIELDS = qw(CHROM POS ID REF ALT QUAL FILTER INFO FORMAT);
 =cut
 
 sub fields {
-  my $self = shift;
-  
-  my @fields = map { lc($_)} @FIELDS;
-
   return \@fields;
 }
 

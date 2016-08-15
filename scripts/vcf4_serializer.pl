@@ -14,11 +14,13 @@ use Bio::EnsEMBL::IO::Translator::SampleGenotypeFeature;
 use Bio::EnsEMBL::IO::Writer::VCF4;
 use Bio::EnsEMBL::IO::Object::VCF4Metadata;
 
+my $db_version = Bio::EnsEMBL::ApiVersion->software_version;
+
 # Connect to the Ensembl Registry to access the databases
 Bio::EnsEMBL::Registry->load_registry_from_db(
     -host => 'ensembldb.ensembl.org',
     -user => 'anonymous',
-    -db_version => '85'
+    -db_version => $db_version
     );
 
 # Create your slice adaptor to search for chromosomes
