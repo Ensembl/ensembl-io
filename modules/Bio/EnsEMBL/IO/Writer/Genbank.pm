@@ -40,78 +40,31 @@ Bio::EnsEMBL::IO::Writer::Genbank - Generic Genbank Writer
 
 package Bio::EnsEMBL::IO::Writer::Genbank;
 
+use base qw/Bio::EnsEMBL::IO::Writer/;
+
 use strict;
 use warnings;
 use Carp;
 
 use Bio::EnsEMBL::IO::Object::Genbank;
 
-my @default_order = qw(ID Parent Name Alias Target Gap Derives_from Note Dbxref Ontology_term Is_circular);
+my @order = qw(LOCUS DEFINITION ACCESSION VERSION KEYWORDS SOURCE REFERENCE FEATURES ORIGIN);
 
-=head2 new
+my %fields_with_subfields =
+(
+ "REFERENCE"  => ["AUTHORS","TITLE","JOURNAL","PUBMED"],
+ "SOURCE"  => ["ORGANISM"],
+ "FEATURES" => ["CDS","source","gene"],
+) ;
 
-    Description: Constructor for a column based generic writer
-    Args[1]    : Translator object for the type of object being written
-                 (ie. for Ensembl Features, etc)
 
-=cut
 
-sub new {
-    my $class = shift;
-    my $translator = shift;
 
-    my $self = $class->SUPER::new($translator);
-
-    $self->fields( Bio::EnsEMBL::IO::Object::Genbank->fields() );
-
-    if( $translator->can('strand_conversion') ) {
-	$translator->strand_conversion(Bio::EnsEMBL::IO::Object::Genbank->strand_conversion());
-    }
-
-    return $self;
-}
-
-=head2 create_record
-
-    Description: Create the record in Genbank to write out to the file
-    Args[1]    : Object to format
-    Returntype : String
-
-=cut
-
-sub create_record {
-    my $self = shift;
-    my $object = shift;
-
-    my @values = $self->{translator}->batch_fields($object, $self->fields());
-
-    # Special case to handle attributes field and it's ordering
-#    my $attr = pop @values;
-    # We get the attribute values back as an arrayref, combine the ordered list
-    # using the Genbank style '; ' delimiter and push back on to the values
-#    $attr = $self->concatenate_fields($attr, '; ');
-#    push @values, $attr;
-
-    return $self->concatenate_fields(\@values), "\n";
+sub write
+{
 
 }
 
 
-sub attributes_order {
-    my $self = shift;
-    my $order = shift;
-
-    if($order) {
-	@default_order = @{$order};
-    }
-
-    return \@default_order;
-}
-
-sub clear_attributes_order {
-    my $self = shift;
-
-    @default_order = undef;
-}
 
 1;
