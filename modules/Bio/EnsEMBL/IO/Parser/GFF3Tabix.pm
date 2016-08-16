@@ -48,13 +48,15 @@ sub open {
 
   my $self = $class->SUPER::open($filename, @other_args);
 
-  my $tabix_data = $self->{tabix_file}->header;
-  foreach my $line (split("\n",$tabix_data || '')) {
-    $self->{'current_block'} = $line;
-    $self->Bio::EnsEMBL::IO::Parser::GFF3::read_metadata();
-  }
+  if($self->{'params'}->{'must_parse_metadata'}) {
+    my $tabix_data = $self->{tabix_file}->header;
+    foreach my $line (split("\n",$tabix_data || '')) {
+      $self->{'current_block'} = $line;
+      $self->Bio::EnsEMBL::IO::Parser::GFF3::read_metadata();
+    }
 
-  delete($self->{'current_block'});
+    delete($self->{'current_block'});
+  }
 
   return $self;
 }
