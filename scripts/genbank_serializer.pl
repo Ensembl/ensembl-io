@@ -31,20 +31,16 @@ my $ga = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Gene" );
 
 my $translator = Bio::EnsEMBL::IO::Translator::EnsFeature->new();
 my $serializer = Bio::EnsEMBL::IO::Writer::Genbank->new($translator);
-$serializer->open('/tmp/test.gff');
+$serializer->open('test.genbank.dat');
 
 # Fetch chromosome 1
 my $features = [$adaptor->fetch_by_region('chromosome', 1)];
 
-###
-#
-#  Missing: Genbank headers print, coming soon, not yet in Genbank serializer!
-#
-###
 
 # Designed to go through multiple chromosomes if you take the
 # chr1 restriction off the fetch_by_region()
-while(my $chromosome = shift @{$features}) {
+while(my $chromosome = shift @{$features})
+{
 
     # Write the chromosome
     $serializer->write($chromosome);
@@ -52,33 +48,8 @@ while(my $chromosome = shift @{$features}) {
     # Cycle through and print chromosomes, depends on DB ordering, not likely
     # good for production
     my $genes = $ga->fetch_all_by_Slice($chromosome);
-    while(my $gene = shift @{$genes}) {
-	my %seen_exons = ();
-	$serializer->write($gene);
-
-	# Serialize transcripts in start/end order for a gene
-	foreach my $transcript (sort { $a->start() <=> $b->start() } @{$gene->get_all_Transcripts()}) {
-	    $serializer->write($transcript);
-
-	    # Collect the sub-transcript level features for serialization
-	    my @exons_cds_and_utrs = @{$transcript->get_all_ExonTranscripts()};
-	    push @exons_cds_and_utrs, @{$transcript->get_all_five_prime_UTRs()};
-	    push @exons_cds_and_utrs, @{$transcript->get_all_three_prime_UTRs()};
-	    push @exons_cds_and_utrs, @{$transcript->get_all_CDS()};
-
-	    # Sort by start and end, and serialize
-	    foreach my $feature (sort { $a->start() <=> $b->start() || $a->end() <=> $b->end() } @exons_cds_and_utrs) {
-		$serializer->write($feature);
-	    }
-
-	}
-
-###
-#
-# Missing: Genbank end of section separators, not yet in Genbank serializer,
-#          coming soon!
-#
-###
-
+    while(my $gene = shift @{$genes})
+    {
+      $serializer->write($gene);
     }
 }

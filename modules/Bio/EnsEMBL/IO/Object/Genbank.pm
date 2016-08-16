@@ -20,11 +20,6 @@ Bio::EnsEMBL::IO::Object::Genbank - Generic object for holding Genbank based rec
 
 =head1 SYNOPSIS
 
-  use Bio::EnsEMBL::IO::Object::Genbank;
-  use Bio::EnsEMBL::IO::Parser::Genbank;
-
-  my $parser = Bio::EnsEMBL::IO::Parser::Genbank->open('myfile.gff3');
-  my $obj = Bio::EnsEMBL::IO::Object::Genbank->new($parser->get_fields);
 
 
 
@@ -39,8 +34,6 @@ use strict;
 use warnings;
 use Carp;
 
-my %strand_mapping = (1 => '+', -1 => '-');
-
 =head2 fields
 
     Description: Access the fields for a Genbank type record
@@ -48,20 +41,9 @@ my %strand_mapping = (1 => '+', -1 => '-');
 
 =cut
 
-sub fields {
+sub fields
+{
     my $self = shift;
 
-    return [qw(seqname source type start end score strand phase attributes)];
-}
-
-=head2 strand_conversion
-
-    Description: Access the strand conversion mappings
-
-=cut
-
-sub strand_conversion {
-    my $self = shift;
-
-    return \%strand_mapping;
+    return [qw(LOCUS DEFINITION ACCESSION VERSION KEYWORDS SOURCE COMMENT REFERENCE FEATURES ORIGIN)];
 }

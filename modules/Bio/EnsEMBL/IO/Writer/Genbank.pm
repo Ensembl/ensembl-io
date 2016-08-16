@@ -48,20 +48,69 @@ use Carp;
 
 use Bio::EnsEMBL::IO::Object::Genbank;
 
-my @order = qw(LOCUS DEFINITION ACCESSION VERSION KEYWORDS SOURCE REFERENCE FEATURES ORIGIN);
+my @order = qw(LOCUS DEFINITION ACCESSION VERSION KEYWORDS SOURCE COMMENT REFERENCE FEATURES ORIGIN);
 
+#not including FEATURES in this list, as it's a bit of special case
 my %fields_with_subfields =
 (
  "REFERENCE"  => ["AUTHORS","TITLE","JOURNAL","PUBMED"],
  "SOURCE"  => ["ORGANISM"],
- "FEATURES" => ["CDS","source","gene"],
 ) ;
 
 
+=head2 new
+
+    Description: Constructor for a genback writer
+    Args[1]    : Translator object for the type of object being written
+                 (ie. for Ensembl Features, etc)
+
+=cut
+
+sub new
+{
+    my $class = shift;
+    my $translator = shift;
+
+    my $self = $class->SUPER::new();
+    $self->translator($translator);
+    return $self;
+}
 
 
+
+=head2 write
+
+    Description: Write a record to the output, it will use the given
+                 translator to interrogate the object for the needed fields
+    Args[1]    : Object to write out
+
+=cut
 sub write
 {
+    my $self = shift;
+    my $object = shift;
+
+    #write out the header
+    print { $self->{writer_handle} } $self->create_record($object);
+
+}
+
+
+=head2 create_record
+
+    Description: Create the record in native format to write out to the file
+    Args[1]    : Object to format
+    Returntype : String
+
+=cut
+
+sub create_record
+{
+    my $self = shift;
+    my $object = shift;
+
+    my @values = $self->{translator}->batch_fetch($object, $self->fields());
+
 
 }
 
