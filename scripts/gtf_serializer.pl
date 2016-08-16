@@ -56,7 +56,6 @@ my $serializer = Bio::EnsEMBL::IO::Writer::GTF->new($translator);
 
 # Two ways to override the callback table
 $translator->add_callbacks( { attributes => sub { $translator->gtf_attributes(@_) } } );
-#$translator->add_callbacks( { attributes => 'gtf_attributes' });
 
 $serializer->open($outfile);
 
