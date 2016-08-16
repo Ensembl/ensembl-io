@@ -78,7 +78,7 @@ sub write {
 	print { $self->{writer_handle} } $object->create_record();
     } else {
 	# Use the default translator if we haven't been given one
-	$translator ||= $self->{translator};
+	$translator ||= $self->translator();
 	print { $self->{writer_handle} } $self->create_record($object, $translator);
     }
 

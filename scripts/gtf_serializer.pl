@@ -13,6 +13,7 @@ $|++;
 use strict;
 use warnings;
 use Data::Dumper;
+use Getopt::Long;
 
 use Bio::EnsEMBL::Registry;
 use Bio::EnsEMBL::IO::Translator::EnsFeature;
@@ -20,11 +21,29 @@ use Bio::EnsEMBL::IO::Writer::GTF;
 use Bio::EnsEMBL::IO::Object::GXFMetadata;
 use Bio::EnsEMBL::IO::Object::GTF;
 
+my $dbhost = 'ensembldb.ensembl.org';
+my $dbuser = 'anonymous';
+my $dbpass;
+my $dbport = 3306;
+my $dbversion = Bio::EnsEMBL::ApiVersion->software_version;
+my $outfile = '/tmp/test.gtf';
+
+GetOptions(
+    'dbuser|user=s'     => \$dbuser,
+    'dbpass|pass=s'     => \$dbpass,
+    'dbhost|host=s'     => \$dbhost,
+    'dbport|port=i'     => \$dbport,
+    'version|version=s' => \$dbversion,
+    'outfile=s'         => \$outfile,
+    );
+
 # Connect to the Ensembl Registry to access the databases
 Bio::EnsEMBL::Registry->load_registry_from_db(
-    -host => 'ensembldb.ensembl.org',
-    -user => 'anonymous',
-    -db_version => '85'
+    -host       => $dbhost,
+    -user       => $dbuser,
+    -pass       => $dbpass,
+    -port       => $dbport,
+    -db_version => $dbversion
     );
 
 # Create your slice adaptor to search for chromosomes
@@ -39,7 +58,7 @@ my $serializer = Bio::EnsEMBL::IO::Writer::GTF->new($translator);
 $translator->add_callbacks( { attributes => sub { $translator->gtf_attributes(@_) } } );
 #$translator->add_callbacks( { attributes => 'gtf_attributes' });
 
-$serializer->open('/tmp/test.gtf');
+$serializer->open($outfile);
 
 # Fetch chromosome 1
 my $features = [$adaptor->fetch_by_region('chromosome', 1)];
