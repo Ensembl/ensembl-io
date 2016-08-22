@@ -374,6 +374,7 @@ sub _validate_basic {
     }
     else {
       $valid = 0;
+      last;
     }
 
     if ($self->get_start && $self->get_start =~ /^\d+$/ && $self->get_start > 0 
@@ -382,6 +383,7 @@ sub _validate_basic {
     }
     else {
       $valid = 0;
+      last;
     }
 
     ## Additional format-specific validation
