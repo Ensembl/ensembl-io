@@ -309,7 +309,7 @@ sub validate_metadata {
   ## Metadata is optional, so default is for it to be valid
   my $valid = 1;
 
-  my $metadata = $self->metadata;
+  my $metadata; # = $self->metadata;
   if ($metadata) {
     ## TODO - implement validation! 
   }
