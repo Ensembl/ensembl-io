@@ -34,16 +34,70 @@ use strict;
 use warnings;
 use Carp;
 
-=head2 fields
+
+my %writable_object_fields = (
+    gene => [ "location", "gene", "locus_tag","note" ],
+    mRNA => [ "location", "gene", "note" ],
+    misc_RNA => [ "location", "gene", "note", "db_xref" ],
+    CDS => [ "location", "gene", "protein_id", "note", "db_xref", "translation" ]
+);
+
+
+=head2 section_header_fields
 
     Description: Access the fields for a Genbank type record
-    Returntype : Array of fields
+    Returntype : Array of header fields. Currently the last of the these is the header for the body section.
 
 =cut
 
-sub fields
+sub section_header_fields
 {
     my $self = shift;
 
-    return [qw(LOCUS DEFINITION ACCESSION VERSION KEYWORDS SOURCE COMMENT REFERENCE FEATURES ORIGIN)];
+    return [qw(LOCUS DEFINITION ACCESSION VERSION KEYWORDS SOURCE COMMENT REFERENCE FEATURES)];
+}
+
+
+=head2 section_body_fields
+
+    Description: Access the fields for a Genbank type record.
+    Parameter: The type of object which needs to be printed
+    Returntype: Array of header fields
+
+=cut
+
+sub section_body_fields
+{
+    my $self = shift;
+    return %writable_object_field{$key} ;
+}
+
+
+
+=head2 section_footer_fields
+
+    Description: Access the fields for a Genbank type record
+    Returntype : Array of footer fields
+
+=cut
+
+sub section_footer_fields
+{
+    my $self = shift;
+    return ["BASE COUNT","ORIGIN"];
+}
+
+
+
+
+=head2 strand_conversion
+
+    Description: Access the strand conversion mappings
+
+=cut
+
+sub strand_convert
+{
+    my $self = shift;
+    return \%strand_mapping;
 }
