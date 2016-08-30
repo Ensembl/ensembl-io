@@ -49,13 +49,17 @@ while(my $chromosome = shift @{$features})
     my $genes = $ga->fetch_all_by_Slice($chromosome);
     while(my $gene = shift @{$genes})
     {
-      $serializer->write($gene);
+      my $transcript = undef ;
+      my $translation = undef ;
+      my %gene_plus_object{'gene'} = $gene ;
+      %gene_plus_object{'transcript'} = $transcript ;
+      %gene_plus_object{'translation'} = $translation ;
+      $serializer->write($gene_plus_object);
     }
+
 
     #TODO: Footer for this section
 
-    # Write the chromosome
-#    $serializer->write($chromosome);
 
 
 }

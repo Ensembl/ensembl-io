@@ -48,15 +48,6 @@ use Carp;
 
 use Bio::EnsEMBL::IO::Object::Genbank;
 
-my @order = qw(LOCUS DEFINITION ACCESSION VERSION KEYWORDS SOURCE COMMENT REFERENCE FEATURES ORIGIN);
-
-#not including FEATURES in this list, as it's a bit of special case
-my %fields_with_subfields =
-(
- "REFERENCE"  => ["AUTHORS","TITLE","JOURNAL","PUBMED"],
- "SOURCE"  => ["ORGANISM"],
-) ;
-
 
 =head2 new
 
@@ -88,10 +79,10 @@ sub new
 sub write
 {
     my $self = shift;
-    my $object = shift;
+    my $feature_object = shift;
 
     #write out the header
-    print { $self->{writer_handle} } $self->create_record($object);
+    print { $self->{writer_handle} } $self->create_record($feature_object);
 
 }
 
@@ -108,8 +99,20 @@ sub create_record
 {
     my $self = shift;
     my $object = shift;
+    my $write_string = "gene\t" ;
 
-    my @values = $self->{translator}->batch_fetch($object, $self->fields());
+    my @gene_values = $self->{translator}->batch_fetch($feature_object, 
+                                                       Bio::EnsEMBL::IO::Object::Genbank->fields('gene'));
+    $write_string = $write_string.@gene_values[0] ; #location to go here
+    $write_string = $write_string."\n\t/=".@gene_values[1] ;
+    $write_string = $write_string."\n\t/locus_tag=".@gene_values[2] ;
+    $write_string = $write_string."\n\t/note=".@gene_values[3] ;
+
+    #TODO add the items for mRNA/microRNA
+
+    #TODO add the items for CDS
+
+    return $write_string ;
 }
 
 

@@ -62,20 +62,3 @@ sub fields
 
 
 
-=head2 strand_convert
-
-    Description: Performs the strand conversion
-
-=cut
-
-sub strand_convert
-{
-    my $self = shift;
-    my $value = shift;
-    my $strand = shift;
-    if( $strand == 1 )
-    {
-      return $value ;
-    }
-    return "complement(".$value.")";
-}
