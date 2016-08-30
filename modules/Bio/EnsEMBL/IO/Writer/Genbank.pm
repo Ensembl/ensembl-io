@@ -110,8 +110,6 @@ sub create_record
     my $object = shift;
 
     my @values = $self->{translator}->batch_fetch($object, $self->fields());
-
-
 }
 
 

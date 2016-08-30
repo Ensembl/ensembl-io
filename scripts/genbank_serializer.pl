@@ -29,7 +29,7 @@ Bio::EnsEMBL::Registry->load_registry_from_db(
 my $adaptor = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Slice" );
 my $ga = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Gene" );
 
-my $translator = Bio::EnsEMBL::IO::Translator::EnsFeature->new();
+my $translator = Bio::EnsEMBL::IO::Translator::GenePlus->new();
 my $serializer = Bio::EnsEMBL::IO::Writer::Genbank->new($translator);
 $serializer->open('/tmp/test.genbank.dat');
 
