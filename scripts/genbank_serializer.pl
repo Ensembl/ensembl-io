@@ -31,7 +31,7 @@ my $ga = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Gene" );
 
 my $translator = Bio::EnsEMBL::IO::Translator::EnsFeature->new();
 my $serializer = Bio::EnsEMBL::IO::Writer::Genbank->new($translator);
-$serializer->open('test.genbank.dat');
+$serializer->open('/tmp/test.genbank.dat');
 
 # Fetch chromosome 1
 my $features = [$adaptor->fetch_by_region('chromosome', 1)];
@@ -41,9 +41,8 @@ my $features = [$adaptor->fetch_by_region('chromosome', 1)];
 # chr1 restriction off the fetch_by_region()
 while(my $chromosome = shift @{$features})
 {
+    #TODO: Header for this section
 
-    # Write the chromosome
-    $serializer->write($chromosome);
 
     # Cycle through and print chromosomes, depends on DB ordering, not likely
     # good for production
@@ -52,4 +51,11 @@ while(my $chromosome = shift @{$features})
     {
       $serializer->write($gene);
     }
+
+    #TODO: Footer for this section
+
+    # Write the chromosome
+#    $serializer->write($chromosome);
+
+
 }
