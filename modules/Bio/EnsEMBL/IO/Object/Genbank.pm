@@ -53,7 +53,6 @@ my %writable_object_fields = (
 sub section_header_fields
 {
     my $self = shift;
-
     return [qw(LOCUS DEFINITION ACCESSION VERSION KEYWORDS SOURCE COMMENT REFERENCE FEATURES)];
 }
 
@@ -69,6 +68,7 @@ sub section_header_fields
 sub section_body_fields
 {
     my $self = shift;
+    my $key = shift;
     return %writable_object_field{$key} ;
 }
 
@@ -90,14 +90,20 @@ sub section_footer_fields
 
 
 
-=head2 strand_conversion
+=head2 strand_convert
 
-    Description: Access the strand conversion mappings
+    Description: Performs the strand conversion
 
 =cut
 
 sub strand_convert
 {
     my $self = shift;
-    return \%strand_mapping;
+    my $value = shift;
+    my $strand = shift;
+    if( $strand == 1 )
+    {
+      return $value ;
+    }
+    return "complement(".$value.")";
 }
