@@ -28,54 +28,44 @@ Bio::EnsEMBL::IO::Object::Genbank - Generic object for holding Genbank based rec
 
 =cut
 
-package Bio::EnsEMBL::IO::Object::Genbank;
+package Bio::EnsEMBL::IO::Object::GenbankMetadata;
 
 use strict;
 use warnings;
 use Carp;
 
 
-my %writable_object_fields = (
-    gene => [ "location", "gene", "locus_tag","note" ],
-    mRNA => [ "location", "gene", "note" ],
-    misc_RNA => [ "location", "gene", "note", "db_xref" ],
-    CDS => [ "location", "gene", "protein_id", "note", "db_xref", "translation" ]
-);
 
 
+=head2 section_header_fields
 
-
-=head2 fields
-
-    Description: Access the fields for a Genbank type record.
-    Parameter: The type of object which needs to be printed
-    Returntype: Array of header fields
+    Description: Access the fields for a Genbank type record
+    Returntype : Array of header fields. Currently the last of the these is the header for the body section.
 
 =cut
 
-sub fields
+sub section_header_fields
 {
     my $self = shift;
-    my $key = shift;
-    return %writable_object_field{$key} ;
+    return [qw(LOCUS DEFINITION ACCESSION VERSION KEYWORDS SOURCE COMMENT REFERENCE FEATURES)];
 }
 
 
 
-=head2 strand_convert
 
-    Description: Performs the strand conversion
+=head2 section_footer_fields
+
+    Description: Access the fields for a Genbank type record
+    Returntype : Array of footer fields
 
 =cut
 
-sub strand_convert
+sub section_footer_fields
 {
     my $self = shift;
-    my $value = shift;
-    my $strand = shift;
-    if( $strand == 1 )
-    {
-      return $value ;
-    }
-    return "complement(".$value.")";
+    return ["BASE COUNT","ORIGIN"];
 }
+
+
+
+
