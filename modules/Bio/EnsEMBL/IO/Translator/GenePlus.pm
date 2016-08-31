@@ -46,6 +46,7 @@ use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
 my %ens_field_callbacks = (gene_start => '$self->can(\'gene_start\')',
                            gene_end  => '$self->can(\'gene_end\')',
+                           gene_strand  => '$self->can(\'gene_strand\')',
                            );
 
 =head2 new
@@ -87,6 +88,15 @@ sub gene_end
     my $feature_hash_ref = shift;
     my %feature_hash = %{ $feature_hash_ref } ;
     return $self->end( $feature_hash{'gene'} );
+}
+
+sub gene_strand
+{
+    my $self = shift;
+    my $feature_hash_ref = shift;
+    my %feature_hash = %{ $feature_hash_ref } ;
+    my $g = $feature_hash{'gene'} ;
+    return $g->strand() ;
 }
 
 

@@ -101,11 +101,20 @@ sub create_record
     my $feature_hash_ref = shift;
     my %feature_hash = %{ $feature_hash_ref } ;
 
-    my $write_string = "gene\t";
+    my $spacer = "    " ;
+    my $write_string = $spacer."gene".$spacer ;
 
-    my @gene_values = $self->{translator}->batch_fields($feature_hash_ref, [qw(gene_start gene_end)] ) ;
-#                                                       Bio::EnsEMBL::IO::Object::Genbank->fields('gene'));
-    $write_string = "location=".$write_string.$gene_values[0].",".$write_string.$gene_values[1]."\n" ; 
+    my @gene_values = $self->{translator}->batch_fields($feature_hash_ref, 
+                                                        [qw(gene_start gene_end gene_strand)] ) ;
+    my $gene_strand = $gene_values[2] ;
+    if( $gene_strand == 1 )
+    {
+      $write_string =  $write_string."location=".$gene_values[0]."..".$gene_values[1]."\n" ;
+    }
+    else
+    {
+      $write_string = $write_string."location=complement(".$gene_values[0]."..".$gene_values[1].")\n" ;
+    }
 #    $write_string = $write_string."\n\t/=".$gene_values[1] ;
 #    $write_string = $write_string."\n\t/locus_tag=".$gene_values[2] ;
 #    $write_string = $write_string."\n\t/note=".$gene_values[3] ;
