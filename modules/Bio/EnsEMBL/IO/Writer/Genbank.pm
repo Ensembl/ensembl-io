@@ -98,15 +98,15 @@ sub write
 sub create_record
 {
     my $self = shift;
-    my $object = shift;
-    my $write_string = "gene\t" ;
+    my $feature_object = shift;
+    my $write_string = "gene\t";
 
     my @gene_values = $self->{translator}->batch_fetch($feature_object, 
                                                        Bio::EnsEMBL::IO::Object::Genbank->fields('gene'));
-    $write_string = $write_string.@gene_values[0] ; #location to go here
-    $write_string = $write_string."\n\t/=".@gene_values[1] ;
-    $write_string = $write_string."\n\t/locus_tag=".@gene_values[2] ;
-    $write_string = $write_string."\n\t/note=".@gene_values[3] ;
+    $write_string = $write_string.$gene_values[0] ; #location to go here
+    $write_string = $write_string."\n\t/=".$gene_values[1] ;
+    $write_string = $write_string."\n\t/locus_tag=".$gene_values[2] ;
+    $write_string = $write_string."\n\t/note=".$gene_values[3] ;
 
     #TODO add the items for mRNA/microRNA
 

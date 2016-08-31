@@ -57,7 +57,7 @@ sub fields
 {
     my $self = shift;
     my $key = shift;
-    return %writable_object_field{$key} ;
+    return %writable_object_fields{$key} ;
 }
 
 

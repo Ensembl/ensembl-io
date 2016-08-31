@@ -51,10 +51,11 @@ while(my $chromosome = shift @{$features})
     {
       my $transcript = undef ;
       my $translation = undef ;
-      my %gene_plus_object{'gene'} = $gene ;
-      %gene_plus_object{'transcript'} = $transcript ;
-      %gene_plus_object{'translation'} = $translation ;
-      $serializer->write($gene_plus_object);
+      my %gene_plus_object ;
+      $gene_plus_object{'gene'} = $gene ;
+      $gene_plus_object{'transcript'} = $transcript ;
+      $gene_plus_object{'translation'} = $translation ;
+      $serializer->write(%gene_plus_object);
     }
 
 
