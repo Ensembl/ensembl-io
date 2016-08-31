@@ -22,7 +22,7 @@ use Bio::EnsEMBL::IO::Writer::Genbank;
 Bio::EnsEMBL::Registry->load_registry_from_db(
     -host => 'ensembldb.ensembl.org',
     -user => 'anonymous',
-    -db_version => '84'
+    -db_version => '85'
     );
 
 # Create your slice adaptor to search for chromosomes
