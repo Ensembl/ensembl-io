@@ -57,7 +57,7 @@ my %ens_field_callbacks = (seqname => '$self->can(\'seqname\')',
 
 =head2 new
 
-    Returntype   : Bio::EnsEMBL::IO::Translator::EnsFeature
+    Returntype   : Bio::EnsEMBL::IO::Translator::GenePlus
 
 =cut
 

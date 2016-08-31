@@ -15,7 +15,7 @@ use warnings;
 use Data::Dumper;
 
 use Bio::EnsEMBL::Registry;
-use Bio::EnsEMBL::IO::Translator::EnsFeature;
+use Bio::EnsEMBL::IO::Translator::GenePlus;
 use Bio::EnsEMBL::IO::Writer::Genbank;
 
 # Connect to the Ensembl Registry to access the databases
@@ -33,8 +33,11 @@ my $translator = Bio::EnsEMBL::IO::Translator::GenePlus->new();
 my $serializer = Bio::EnsEMBL::IO::Writer::Genbank->new($translator);
 $serializer->open('/tmp/test.genbank.dat');
 
+print("Opened output file\n") ;
+
 # Fetch chromosome 1
 my $features = [$adaptor->fetch_by_region('chromosome', 1)];
+print("Features fetched\n") ;
 
 
 # Designed to go through multiple chromosomes if you take the
@@ -64,3 +67,7 @@ while(my $chromosome = shift @{$features})
 
 
 }
+
+print("Completed, closing file\n") ;
+$serializer->close() ;
+
