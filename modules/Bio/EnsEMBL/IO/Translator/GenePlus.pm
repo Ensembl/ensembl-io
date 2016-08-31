@@ -77,7 +77,7 @@ sub gene_start
     my $self = shift;
     my $feature_hash_ref = shift;
     my %feature_hash = %{ $feature_hash_ref } ;
-    return $self->start( %feature_hash{'gene'} );
+    return $self->start( $feature_hash{'gene'} );
 }
 
 
@@ -86,7 +86,7 @@ sub gene_end
     my $self = shift;
     my $feature_hash_ref = shift;
     my %feature_hash = %{ $feature_hash_ref } ;
-    return $self->end( %feature_hash{'gene'} );
+    return $self->end( $feature_hash{'gene'} );
 }
 
 

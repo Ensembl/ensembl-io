@@ -99,7 +99,8 @@ sub create_record
 {
     my $self = shift;
     my $feature_hash_ref = shift;
-    my $feature_hash = %{ $feature_hash_ref } ;
+    my %feature_hash = %{ $feature_hash_ref } ;
+
     my $write_string = "gene\t";
 
     my @gene_values = $self->{translator}->batch_fields($feature_hash_ref, [qw(gene_start gene_end)] ) ;
