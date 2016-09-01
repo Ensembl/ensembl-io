@@ -22,9 +22,11 @@ Bio::EnsEMBL::IO::Translator::GenePlus - Translator for an Ensembl Gene together
 
   use Bio::EnsEMBL::IO::Translator::GenePlus;
 
+
+
   my $translator = Bio::EnsEMBL::IO::Translator::GenePlus->new();
   my @values = $translator->batch_fields($object, @fields);
-  my $seqname = $translator->seqname($object);
+  my $seqname = $translator->display_id($object);
 
 =head1 Description
 
@@ -50,6 +52,9 @@ my %ens_field_callbacks = (gene_start => '$self->can(\'gene_start\')',
                            gene_stable_id_version => '$self->can(\'gene_stable_id_version\')',
                            gene_description => '$self->can(\'gene_description\')',
                            gene_display_id => '$self->can(\'gene_display_id\')',
+                           biotype =>  '$self->can(\'biotype\')',
+                           transcript_stable_id_version =>  '$self->can(\'transcript_stable_id_version\')',
+                           exon_locations =>  '$self->can(\'exon_locations\')',
                            );
 
 =head2 new
@@ -75,6 +80,24 @@ sub new
     return $self;
 }
 
+sub biotype
+{
+    my $self = shift;
+    my $feature_hash_ref = shift;
+    my %feature_hash = %{ $feature_hash_ref } ;
+    my $t = $feature_hash{'transcript'} ;
+    return $t->biotype ;
+}
+
+sub exon_locations
+{
+    my $self = shift;
+    my $feature_hash_ref = shift;
+    my %feature_hash = %{ $feature_hash_ref } ;
+    my $t = $feature_hash{'transcript'} ;
+    #TODO complete exon_locations
+    return undef ;
+}
 
 sub gene_start
 {
@@ -128,6 +151,17 @@ sub gene_display_id
     my $g = $feature_hash{'gene'} ;
     return $g->display_xref->display_id ;
 }
+
+
+sub transcript_stable_id_version
+{
+    my $self = shift;
+    my $feature_hash_ref = shift;
+    my %feature_hash = %{ $feature_hash_ref } ;
+    my $t = $feature_hash{'transcript'} ;
+    return $t->stable_id_version ;
+}
+
 
 
 sub start

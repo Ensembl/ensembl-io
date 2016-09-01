@@ -52,8 +52,8 @@ while(my $chromosome = shift @{$features})
     my $genes = $ga->fetch_all_by_Slice($chromosome);
     while(my $gene = shift @{$genes})
     {
-      my $transcript = undef ;
-      my $translation = undef ;
+      my $transcript = $gene->canonical_transcript ;
+      my $translation = $transcript->translation ;
       my %gene_plus_hash ;
       $gene_plus_hash{'gene'} = $gene ;
       $gene_plus_hash{'transcript'} = $transcript ;
@@ -70,4 +70,3 @@ while(my $chromosome = shift @{$features})
 
 print("Completed, closing file\n") ;
 $serializer->close() ;
-
