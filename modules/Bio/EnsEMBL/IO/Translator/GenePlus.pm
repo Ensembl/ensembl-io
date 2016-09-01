@@ -48,6 +48,7 @@ my %ens_field_callbacks = (gene_start => '$self->can(\'gene_start\')',
                            gene_end  => '$self->can(\'gene_end\')',
                            gene_strand  => '$self->can(\'gene_strand\')',
                            gene_stable_id_version => '$self->can(\'gene_stable_id_version\')',
+                           gene_description => '$self->can(\'gene_description\')',
                            );
 
 =head2 new
@@ -56,7 +57,8 @@ my %ens_field_callbacks = (gene_start => '$self->can(\'gene_start\')',
 
 =cut
 
-sub new {
+sub new
+{
     my ($class) = @_;
 
     my $self = $class->SUPER::new();
@@ -70,7 +72,6 @@ sub new {
     $self->{'mapper'} = Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($oa);
 
     return $self;
-
 }
 
 
@@ -107,7 +108,15 @@ sub gene_stable_id_version
     my %feature_hash = %{ $feature_hash_ref } ;
     my $g = $feature_hash{'gene'} ;
     return $g->stable_id_version ;
+}
 
+sub gene_description
+{
+    my $self = shift;
+    my $feature_hash_ref = shift;
+    my %feature_hash = %{ $feature_hash_ref } ;
+    my $g = $feature_hash{'gene'} ;
+    return $g->description ;
 }
 
 
@@ -115,7 +124,6 @@ sub start
 {
     my $self = shift;
     my $object = shift;
-
     return $object->start();
 }
 
@@ -128,23 +136,20 @@ sub end
     my $end = $object->end();
 
     # the start coordinate of the feature, here shifted to chromosomal coordinates
-    # Start and end must be in ascending order for GXF. Circular genomes require the length of 
-    # the circuit to be added on.    
-    if( $object->start() > $object->end() ) 
+    # Start and end must be in ascending order for GXF. Circular genomes require the length of
+    # the circuit to be added on.
+    if( $object->start() > $object->end() )
     {
-      if ($object->slice() && $object->slice()->is_circular() ) 
+      if ($object->slice() && $object->slice()->is_circular() )
       {
         $end = $end + $object->seq_region_length;
       }
       # non-circular, but end still before start
-      else 
+      else
       {
-	    $end = $object->start();
+	      $end = $object->start();
       }
     }
 
     return $end;
 }
-
-
-

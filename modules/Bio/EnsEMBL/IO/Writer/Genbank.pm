@@ -104,8 +104,8 @@ sub create_record
     my $spacer = "    " ;
     my $write_string = $spacer."gene".$spacer ;
 
-    my @gene_values = $self->{translator}->batch_fields($feature_hash_ref, 
-                        [qw(gene_start gene_end gene_strand gene_stable_id_version)] ) ;
+    my @gene_values = $self->{translator}->batch_fields($feature_hash_ref,
+                        [qw(gene_start gene_end gene_strand gene_stable_id_version gene_description)] ) ;
     my $gene_strand = $gene_values[2] ;
     if( $gene_strand == 1 )
     {
@@ -117,8 +117,11 @@ sub create_record
     }
 
     $write_string = $write_string.$spacer."    ".$spacer."/gene=".$gene_values[3]."\n" ;
-#    $write_string = $write_string."\n\t/locus_tag=".$gene_values[2] ;
-#    $write_string = $write_string."\n\t/note=".$gene_values[3] ;
+#    $write_string = $write_string.$spacer."    ".$spacer."/locus_tag=".$gene_values[4]."\n" ;
+    if( $gene_values[4] )
+    {
+      $write_string = $write_string.$spacer."    ".$spacer."/note=".$gene_values[4]."\n" ;
+    }
 
     #TODO add the items for mRNA/microRNA
 
