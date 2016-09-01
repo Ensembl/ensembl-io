@@ -119,11 +119,11 @@ sub create_record
     $write_string = $write_string.$spacer."    ".$spacer."/gene=".$gene_values[3]."\n" ;
     if( $gene_values[4] )
     {
-      $write_string = $write_string.$spacer."    ".$spacer."/locus_tag=".$gene_values[4]."\n" ;
+      $write_string = $write_string.$spacer."    ".$spacer."/locus_tag=\"".$gene_values[4]."\"\n" ;
     }
     if( $gene_values[5] )
     {
-      $write_string = $write_string.$spacer."    ".$spacer."/note=".$gene_values[5]."\n" ;
+      $write_string = $write_string.$spacer."    ".$spacer."/note=\"".$gene_values[5]."\"\n" ;
     }
 
     #TODO add the items for mRNA/microRNA
