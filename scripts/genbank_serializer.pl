@@ -53,11 +53,9 @@ while(my $chromosome = shift @{$features})
     while(my $gene = shift @{$genes})
     {
       my $transcript = $gene->canonical_transcript ;
-      my $translation = $transcript->translation ;
       my %gene_plus_hash ;
       $gene_plus_hash{'gene'} = $gene ;
       $gene_plus_hash{'transcript'} = $transcript ;
-      $gene_plus_hash{'translation'} = $translation ;
       $serializer->write(\%gene_plus_hash);
     }
 

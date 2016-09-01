@@ -54,6 +54,7 @@ my %ens_field_callbacks = (gene_start => '$self->can(\'gene_start\')',
                            gene_display_id => '$self->can(\'gene_display_id\')',
                            biotype =>  '$self->can(\'biotype\')',
                            transcript_stable_id_version =>  '$self->can(\'transcript_stable_id_version\')',
+                           protein_id =>  '$self->can(\'protein_id\')',
                            exon_locations =>  '$self->can(\'exon_locations\')',
                            );
 
@@ -87,6 +88,38 @@ sub biotype
     my %feature_hash = %{ $feature_hash_ref } ;
     my $t = $feature_hash{'transcript'} ;
     return $t->biotype ;
+}
+
+sub protein_id
+{
+    my $self = shift;
+    my $feature_hash_ref = shift;
+    my %feature_hash = %{ $feature_hash_ref } ;
+    my $t = $feature_hash{'transcript'} ;
+    if ( $t->translation() )
+    {
+
+    }
+    else
+    {
+      return undef ;
+    }
+}
+
+sub translation
+{
+    my $self = shift;
+    my $feature_hash_ref = shift;
+    my %feature_hash = %{ $feature_hash_ref } ;
+    my $t = $feature_hash{'transcript'} ;
+    if ( $t->translation() )
+    {
+      return = $t->translate()->seq();
+    }
+    else
+    {
+      return undef ;
+    }
 }
 
 sub exon_locations
