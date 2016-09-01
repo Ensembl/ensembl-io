@@ -49,6 +49,7 @@ my %ens_field_callbacks = (gene_start => '$self->can(\'gene_start\')',
                            gene_strand  => '$self->can(\'gene_strand\')',
                            gene_stable_id_version => '$self->can(\'gene_stable_id_version\')',
                            gene_description => '$self->can(\'gene_description\')',
+                           gene_display_id => '$self->can(\'gene_display_id\')',
                            );
 
 =head2 new
@@ -117,6 +118,15 @@ sub gene_description
     my %feature_hash = %{ $feature_hash_ref } ;
     my $g = $feature_hash{'gene'} ;
     return $g->description ;
+}
+
+sub gene_display_id
+{
+    my $self = shift;
+    my $feature_hash_ref = shift;
+    my %feature_hash = %{ $feature_hash_ref } ;
+    my $g = $feature_hash{'gene'} ;
+    return $g->display_xref->display_id ;
 }
 
 
