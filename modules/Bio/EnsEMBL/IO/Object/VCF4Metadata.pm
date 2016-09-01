@@ -121,7 +121,13 @@ sub info {
     my $class = shift;
     my $arg   = shift;
 
-    return bless {type => 'directive', directive => 'INFO', value => [$INFO{$arg}]}, $class;
+    if ($arg && $INFO{$arg}) {
+      return bless {type => 'directive', directive => 'INFO', value => [$INFO{$arg}]}, $class;
+    }
+    else {
+      warn "Info type '$arg' is not found in the list of the predefined INFO values (".join(',',keys(%INFO)).").\n";
+      return bless {type => 'directive', directive => 'INFO', value => []}, $class;
+    }
 }
 
 =head2 format
@@ -153,6 +159,11 @@ sub header {
     my $class = shift;
     my $args  = shift;
 
+    if (ref($args) ne 'ARRAY' || !$args) {
+      warn "No individuals/samples list defined for the VCF header!\n";
+      $args = [];
+    }
+
     my @header_cols = (scalar(@$args) > 0) ? @HEADER_FORMAT : @HEADER;
 
     return bless {type => 'header', header => join("\t", @header_cols), value => $args}, $class;
@@ -166,10 +177,11 @@ sub create_record {
   my $line;
 
   if($self->{type} eq 'directive') {
-	  $line = "##".$self->{directive}."=" . join(',', @{$self->{value}}) . "\n";
+    return if (scalar(@{$self->{value}}) == 0);
+	  $line = "##" . $self->{directive} . "=" . join(',', @{$self->{value}}) . "\n";
   } elsif($self->{type} eq 'header') {
     my $header_sep = (scalar(@{$self->{value}}) > 0) ? "\t" : '';
-	  $line = "#".$self->{header}."$header_sep" . join("\t", @{$self->{value}}) . "\n";	
+	  $line = "#" . $self->{header} . "$header_sep" . join("\t", @{$self->{value}}) . "\n";	
   }
 
   return $line;

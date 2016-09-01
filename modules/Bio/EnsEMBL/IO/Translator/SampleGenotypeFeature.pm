@@ -39,8 +39,7 @@ my %field_callbacks = ('chrom'  => 'chrom',
                        'alt'    => 'alt',
                        'qual'   => 'qual',
                        'filter' => 'filter',
-                       'info'   => 'info',
-                       'format' => 'format'
+                       'info'   => 'info'
                       );
                       
 my %info_methods = ('AA' => 'ancestral_allele',
@@ -63,14 +62,20 @@ sub new {
     my ($class, $info_list, $formats_list, $samples_list) = @_;
   
     my $self = $class->SUPER::new();
+
+    $samples_list = [] if (!$samples_list);
+    $self->{'samples_list'} = $samples_list;
+
+    if (scalar(@$samples_list) > 0) {
+      $field_callbacks{'format'} = 'format';
+    }
+    else {
+      warn "There is no individuals/samples list provided!\n";
+    }
     
     # Once we have the instance, add our customized callbacks
     # to the translator
     $self->add_callbacks(\%field_callbacks);
-
-    if ($samples_list && scalar(@$samples_list) > 0) {
-      $self->{'samples_list'} = $samples_list;
-    }
     
     $self->{'info_list'}    = $info_list;
     $self->{'formats_list'} = $formats_list;
@@ -90,7 +95,7 @@ sub set_samples_list {
 sub get_samples_list {
   my $self = shift;
   
-  return ($self->{'samples_list'} && scalar(@{$self->{'samples_list'}}) > 0) ? $self->{'samples_list'} : [];
+  return $self->{'samples_list'};
 }
 
 sub samples_genotypes {
@@ -98,8 +103,6 @@ sub samples_genotypes {
   my $object = shift;
   
   my $samples_list = $self->get_samples_list();
-  
-  die "Error! You need to define a list of samples as argument.\n" if (scalar(@$samples_list) < 1);
   
   # Transform the alleles in 0 | 1 | 2..., e.g. 0 if it matches the reference, 1 if it matches the alt 1, ...
   my @alleles = split(/\//,$self->alleles($object));

@@ -21,7 +21,7 @@ Bio::EnsEMBL::Registry->load_registry_from_db(
     -host => 'ensembldb.ensembl.org',
     -user => 'anonymous',
     -db_version => $db_version
-    );
+);
 
 # Create your slice adaptor to search for chromosomes
 my $adaptor = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Slice" );
@@ -40,6 +40,9 @@ $serializer->open('/tmp/test.vcf');
 
 # Fetch in chromosome 1
 my $slice = $adaptor->fetch_by_region('chromosome', 1,230710000,230711000);
+# Smaller region
+#my $slice = $adaptor->fetch_by_region('chromosome', 1,230710045,230710048);
+
 my $features = $vfa->fetch_all_by_Slice($slice);
 
 

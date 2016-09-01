@@ -65,7 +65,7 @@ sub new {
   my $self = $class->SUPER::new($translator);
 
   $self->fields(Bio::EnsEMBL::IO::Object::VCF4->fields());
-
+  
   # Cheat and make a VCF4Metadata object in a really quick and lighttweight manner.
   # We need one hanging around for the fwd-ref writer call
   #$self->{directive} = bless { type => 'directive' }, 'Bio::EnsEMBL::IO::Object::VCF4Metadata';
@@ -86,39 +86,47 @@ sub new {
 sub create_record {
   my $self = shift;
   my $object = shift;
+  my $translator = shift;
 
-  my $fields = $self->fields();
-  my @values = $self->translator->batch_fields($object, $fields);
+  # Special use case for VCF files without sample/individual data:
+  # no need to have the 'FORMAT' column
+  my @fields = @{$self->fields()};
+  if (scalar(@{$self->{'translator'}{'samples_list'}}) == 0) {
+    @fields = grep { $_ ne 'format' } @fields;
+  }
+
+  my @values = $translator->batch_fields($object, \@fields);
 
   #### Create check for Ref and Alt ####
   my $ref_col_id;
   my $alt_col_id;
-  for (my $i=0; $i < @$fields; $i++) {
-    if ($fields->[$i] =~ /^REF$/i) {
+  for (my $i=0; $i < @fields; $i++) {
+    if ($fields[$i] =~ /^REF$/i) {
       $ref_col_id = $i;
     }
-    elsif ($fields->[$i] =~ /^ALT$/i) {
+    elsif ($fields[$i] =~ /^ALT$/i) {
       $alt_col_id = $i;
     }
   }
-  
+
   return unless $values[$ref_col_id] && $values[$ref_col_id] =~ /^[ATGCN]+$/i;
   return unless $values[$alt_col_id] && $values[$alt_col_id] =~ /^[ATGCN\*]+$/i;
 
   # Sample genotypes
-  my $s_gen = $self->translator->samples_genotypes($object);
-  foreach my $sample (@{$self->{'translator'}{'samples_list'}}) {
-    my $genotype;
-    if ($s_gen->{$sample}) {
-      my $phase_sep = ($s_gen->{$sample}{'phased'} == 1) ? '|' : '/';
-      $genotype = join($phase_sep, @{$s_gen->{$sample}{'genotype'}});
+  if (scalar(@{$self->{'translator'}{'samples_list'}}) > 0) {
+    my $s_gen = $translator->samples_genotypes($object);
+    foreach my $sample (@{$self->{'translator'}{'samples_list'}}) {
+      my $genotype;
+      if ($s_gen->{$sample}) {
+        my $phase_sep = ($s_gen->{$sample}{'phased'} == 1) ? '|' : '/';
+        $genotype = join($phase_sep, @{$s_gen->{$sample}{'genotype'}});
+      }
+      else {
+        $genotype = '.';
+      }
+      push(@values, $genotype);
     }
-    else {
-      $genotype = '.';
-    }
-    push(@values, $genotype);
   }
-  
 
   # Special case to handle attributes field and it's ordering
   #  my $attr = pop @values;
@@ -126,9 +134,7 @@ sub create_record {
   # using the VCF4 style '; ' delimiter and push back on to the values
   #  $attr = $self->concatenate_fields($attr, '; ');
   #  push @values, $attr;
-
   return $self->concatenate_fields(\@values), "\n";
-  
 }
 
 =head2 combine_fields
@@ -146,10 +152,10 @@ sub combine_fields {
 
   my $order = $self->attributes_order();
   if($order) {
-	my %seen;
-	@seen{@{$order}} = ();
-	my @attrs = (@{$order}, grep{!exists $seen{$_}} sort keys %{$values});
-	$order = \@attrs;
+    my %seen;
+    @seen{@{$order}} = ();
+    my @attrs = (@{$order}, grep{!exists $seen{$_}} sort keys %{$values});
+    $order = \@attrs;
   }
 
   return $self->SUPER::combine_fields($values, $order);
