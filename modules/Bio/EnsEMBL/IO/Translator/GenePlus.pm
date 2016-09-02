@@ -114,7 +114,7 @@ sub translation
     my $t = $feature_hash{'transcript'} ;
     if ( $t->translation() )
     {
-      return = $t->translate()->seq();
+      return $t->translate()->seq() ;
     }
     else
     {
