@@ -152,7 +152,7 @@ sub create_record
       $write_string = $write_string.$super_spacer."/protein_id=\"".$protein_stable_id_version."\"\n" ;
       $write_string = $write_string.$super_spacer."/note=\"transcript_id=".$transcript_stable_id_version."\"\n" ;
       #TODO dbxrefs
-      $write_string = $write_string.$super_spacer."/note=\"translation=".$translation."\"\n" ;
+      $write_string = $write_string.$super_spacer."translation=\"".$translation."\"\n" ;
     }
     else
     {
