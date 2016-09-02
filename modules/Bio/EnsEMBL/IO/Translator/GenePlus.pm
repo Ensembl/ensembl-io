@@ -188,7 +188,11 @@ sub gene_display_id
     my $feature_hash_ref = shift;
     my %feature_hash = %{ $feature_hash_ref } ;
     my $g = $feature_hash{'gene'} ;
-    return $g->display_xref->display_id ;
+    if( $g->display_xref )
+    {
+      return $g->display_xref->display_id ;
+    }
+    return undef ;
 }
 
 
