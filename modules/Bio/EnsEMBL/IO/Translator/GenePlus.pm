@@ -146,7 +146,6 @@ sub gene_start
     return $self->start( $feature_hash{'gene'} );
 }
 
-
 sub gene_end
 {
     my $self = shift;
@@ -195,7 +194,6 @@ sub gene_display_id
     return undef ;
 }
 
-
 sub transcript_stable_id_version
 {
     my $self = shift;
@@ -205,15 +203,12 @@ sub transcript_stable_id_version
     return $t->stable_id_version ;
 }
 
-
-
 sub start
 {
     my $self = shift;
     my $object = shift;
     return $object->start();
 }
-
 
 sub end
 {

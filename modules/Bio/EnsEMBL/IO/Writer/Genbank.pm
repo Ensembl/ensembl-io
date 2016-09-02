@@ -177,17 +177,17 @@ sub make_exon_location_string()
   my $location_string = "" ;
   if( $num_exon_locations != 2 )
   {
-    $location_string = "join(" ;
+    $location_string = "join(\n" ;
   }
 
   if( $strand == 1 )
   {
     for( my $i=0 ; $i<$num_exon_locations ; $i+=2 )
     {
-      $location_string = $location_string.$exon_location_array[$i]."..".$exon_location_array[$i+1] ;
+      $location_string = $location_string.$super_spacer.$exon_location_array[$i]."..".$exon_location_array[$i+1] ;
       if($i<($num_exon_locations - 2) )
       {
-        $location_string = $location_string."," ;
+        $location_string = $location_string.",\n" ;
       }
     }
   }
@@ -195,17 +195,17 @@ sub make_exon_location_string()
   {
     for( my $i=$num_exon_locations-1 ; $i>0 ; $i-=2 )
     {
-      $location_string = $location_string."complement(".$exon_location_array[$i-1]."..".$exon_location_array[$i] ;
-      if( $i>0 )
+      $location_string = $location_string.$super_spacer."complement(".$exon_location_array[$i-1]."..".$exon_location_array[$i].")" ;
+      if( $i>1 )
       {
-        $location_string = $location_string."),\n" ;
+        $location_string = $location_string.",\n" ;
       }
     }
   }
 
   if( $num_exon_locations != 2 )
   {
-    $location_string = $location_string.$super_spacer.")" ;
+    $location_string = $location_string."\n".$super_spacer.")" ;
   }
   return $location_string ;
 }
