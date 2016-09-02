@@ -26,8 +26,8 @@ Bio::EnsEMBL::Registry->load_registry_from_db(
     );
 
 # Create your slice adaptor to search for chromosomes
-my $adaptor = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Slice" );
-my $ga = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Gene" );
+my $adaptor = Bio::EnsEMBL::Registry->get_adaptor( "bushbaby", "core", "Slice" );
+my $ga = Bio::EnsEMBL::Registry->get_adaptor( "bushbaby", "core", "Gene" );
 
 my $translator = Bio::EnsEMBL::IO::Translator::GenePlus->new();
 my $serializer = Bio::EnsEMBL::IO::Writer::Genbank->new($translator);
@@ -36,7 +36,7 @@ $serializer->open('/tmp/test.genbank.dat');
 print("Opened output file\n") ;
 
 # Fetch chromosome 1
-my $features = [$adaptor->fetch_by_region('chromosome', 1)];
+my $features = [$adaptor->fetch_by_region('scaffold', 'GL873520.1')];
 print("Features fetched\n") ;
 
 
