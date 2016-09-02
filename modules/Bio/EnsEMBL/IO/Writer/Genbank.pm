@@ -134,16 +134,16 @@ sub create_record
     my $biotype = $rna_values[0] ;
     my $transcript_stable_id_version = $rna_values[1] ;
     my $protein_stable_id_version = $rna_values[2] ;
-    my @exon_locations = $rna_values[3] ;
+    my $exon_locations = make_exon_location_string($rna_values[3], $gene_strand) ;
     my $translation = $rna_values[4] ;
 
     if( $biotype eq 'protein_coding' )
     {
-      $write_string = $write_string.$spacer."mRNA (TODO with exons)".$gene_location."\n" ;
+      $write_string = $write_string.$spacer."mRNA".$spacer.$exon_locations."\n" ;
       $write_string = $write_string.$spacer."    ".$spacer."/gene=\"".$gene_stable_id_version."\"\n" ;
       $write_string = $write_string.$spacer."    ".$spacer."/note=\"transcript_id=".$transcript_stable_id_version."\"\n" ;
 
-      $write_string = $write_string.$spacer."CDS (TODO with exons)".$gene_location."\n" ;
+      $write_string = $write_string.$spacer."CDS ".$spacer.$exon_locations."\n" ;
       $write_string = $write_string.$spacer."    ".$spacer."/gene=\"".$gene_stable_id_version."\"\n" ;
       $write_string = $write_string.$spacer."    ".$spacer."/protein_id=\"".$protein_stable_id_version."\"\n" ;
       $write_string = $write_string.$spacer."    ".$spacer."/note=\"transcript_id=".$transcript_stable_id_version."\"\n" ;
@@ -152,7 +152,7 @@ sub create_record
     }
     else
     {
-      $write_string = $write_string.$spacer."misc_RNA    (TODO with exons)".$gene_location."\n" ;
+      $write_string = $write_string.$spacer."misc_RNA    ".$gene_location."\n" ;
       $write_string = $write_string.$spacer."    ".$spacer."/gene=\"".$gene_stable_id_version."\"\n" ;
       #TODO dbxrefs
       $write_string = $write_string.$spacer."    ".$spacer."/note=\"".$biotype."\"\n" ;
@@ -162,6 +162,49 @@ sub create_record
     return $write_string ;
 }
 
+sub make_exon_location_string()
+{
+  my $exon_location_array_ref = shift ;
+  my $strand = shift ;
+
+  my @exon_location_array = @$exon_location_array_ref ;
+  my $num_exon_locations = scalar(@exon_location_array) ;
+
+  my $location_string = "" ;
+  if( $num_exon_locations != 2 )
+  {
+    $location_string = "join(" ;
+  }
+
+  if( $strand == 1 )
+  {
+    for( my $i=0 ; $i<$num_exon_locations ; $i+=2 )
+    {
+      $location_string = $location_string.$exon_location_array[$i]."..".$exon_location_array[$i+1] ;
+      if($i<($num_exon_locations - 2) )
+      {
+        $location_string = $location_string."," ;
+      }
+    }
+  }
+  else
+  {
+    for( my $i=$num_exon_locations-1 ; $i>0 ; $i-=2 )
+    {
+      $location_string = $location_string."complement(".$exon_location_array[$i-1]."..".$exon_location_array[$i] ;
+      if( $i>0 )
+      {
+        $location_string = $location_string."),\n" ;
+      }
+    }
+  }
+
+  if( $num_exon_locations != 2 )
+  {
+    $location_string = $location_string.")" ;
+  }
+  return $location_string ;
+}
 
 
 1;

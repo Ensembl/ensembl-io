@@ -128,8 +128,14 @@ sub exon_locations
     my $feature_hash_ref = shift;
     my %feature_hash = %{ $feature_hash_ref } ;
     my $t = $feature_hash{'transcript'} ;
-    #TODO complete exon_locations
-    return undef ;
+    my @exon_location_array ;
+    my @exons = @{ $t->get_all_Exons() } ;
+    foreach my $e (@exons)
+    {
+      push(@exon_location_array,$e->start) ;
+      push(@exon_location_array,$e->end) ;
+    }
+    return \@exon_location_array ;
 }
 
 sub gene_start
