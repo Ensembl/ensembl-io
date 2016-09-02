@@ -185,7 +185,7 @@ sub make_exon_location_string()
     for( my $i=0 ; $i<$num_exon_locations ; $i+=2 )
     {
       $location_string = $location_string.$super_spacer.$exon_location_array[$i]."..".$exon_location_array[$i+1] ;
-      if($i<($num_exon_locations - 2) )
+      if($i<($num_exon_locations-2) )
       {
         $location_string = $location_string.",\n" ;
       }
@@ -193,10 +193,10 @@ sub make_exon_location_string()
   }
   else
   {
-    for( my $i=$num_exon_locations-1 ; $i>0 ; $i-=2 )
+    for( my $i=0 ; $i<$num_exon_locations ; $i+=2 )
     {
-      $location_string = $location_string.$super_spacer."complement(".$exon_location_array[$i-1]."..".$exon_location_array[$i].")" ;
-      if( $i>1 )
+      $location_string = $location_string.$super_spacer."complement(".$exon_location_array[$i]."..".$exon_location_array[$i+1].")" ;
+      if( $i<($num_exon_locations-2) )
       {
         $location_string = $location_string.",\n" ;
       }
