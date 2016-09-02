@@ -130,24 +130,29 @@ sub create_record
 
     #write out other sections
     my @rna_values = $self->{translator}->batch_fields($feature_hash_ref,
-                        [qw(biotype transcript_stable_id_version protein_id exon_locations)] ) ;
+                        [qw(biotype transcript_stable_id_version protein_stable_id_version exon_locations translation)] ) ;
     my $biotype = $rna_values[0] ;
     my $transcript_stable_id_version = $rna_values[1] ;
     my $protein_stable_id_version = $rna_values[2] ;
     my @exon_locations = $rna_values[3] ;
+    my $translation = $rna_values[4] ;
+
     if( $biotype eq 'protein_coding' )
     {
-      $write_string = $write_string.$spacer."mRNA (TBD with exons)".$gene_location."\n" ;
+      $write_string = $write_string.$spacer."mRNA (TODO with exons)".$gene_location."\n" ;
       $write_string = $write_string.$spacer."    ".$spacer."/gene=\"".$gene_stable_id_version."\"\n" ;
       $write_string = $write_string.$spacer."    ".$spacer."/note=\"transcript_id=".$transcript_stable_id_version."\"\n" ;
 
-      #TODO add the items for CDS
-      my @cds_values = $self->{translator}->batch_fields($feature_hash_ref,
-                        [qw()] ) ;
+      $write_string = $write_string.$spacer."CDS (TODO with exons)".$gene_location."\n" ;
+      $write_string = $write_string.$spacer."    ".$spacer."/gene=\"".$gene_stable_id_version."\"\n" ;
+      $write_string = $write_string.$spacer."    ".$spacer."/protein_id=\"".$protein_stable_id_version."\"\n" ;
+      $write_string = $write_string.$spacer."    ".$spacer."/note=\"transcript_id=".$transcript_stable_id_version."\"\n" ;
+      #TODO dbxrefs
+      $write_string = $write_string.$spacer."    ".$spacer."/note=\"translation=".$translation."\"\n" ;
     }
     else
     {
-      $write_string = $write_string.$spacer."misc_RNA    (TBD with exons)".$gene_location."\n" ;
+      $write_string = $write_string.$spacer."misc_RNA    (TODO with exons)".$gene_location."\n" ;
       $write_string = $write_string.$spacer."    ".$spacer."/gene=\"".$gene_stable_id_version."\"\n" ;
       #TODO dbxrefs
       $write_string = $write_string.$spacer."    ".$spacer."/note=\"".$biotype."\"\n" ;
