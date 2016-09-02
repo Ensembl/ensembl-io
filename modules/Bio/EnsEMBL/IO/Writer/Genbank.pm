@@ -49,6 +49,10 @@ use Carp;
 use Bio::EnsEMBL::IO::Object::Genbank;
 
 
+my $spacer = "    " ;
+my $super_spacer = $spacer."    ".$spacer ;
+
+
 =head2 new
 
     Description: Constructor for a genback writer
@@ -101,8 +105,8 @@ sub create_record
     my $feature_hash_ref = shift;
     my %feature_hash = %{ $feature_hash_ref } ;
 
-    my $spacer = "    " ;
     my $write_string = $spacer."gene".$spacer ;
+
 
     my @gene_values = $self->{translator}->batch_fields($feature_hash_ref,
                         [qw(gene_start gene_end gene_strand gene_stable_id_version gene_display_id gene_description)] ) ;
@@ -118,14 +122,14 @@ sub create_record
       $gene_location = "complement(".$gene_values[0]."..".$gene_values[1].")" ;
     }
     $write_string =  $write_string.$gene_location."\n" ;
-    $write_string = $write_string.$spacer."    ".$spacer."/gene=".$gene_stable_id_version."\n" ;
+    $write_string = $write_string.$super_spacer."/gene=".$gene_stable_id_version."\n" ;
     if( $gene_values[4] )
     {
-      $write_string = $write_string.$spacer."    ".$spacer."/locus_tag=\"".$gene_values[4]."\"\n" ;
+      $write_string = $write_string.$super_spacer."/locus_tag=\"".$gene_values[4]."\"\n" ;
     }
     if( $gene_values[5] )
     {
-      $write_string = $write_string.$spacer."    ".$spacer."/note=\"".$gene_values[5]."\"\n" ;
+      $write_string = $write_string.$super_spacer."/note=\"".$gene_values[5]."\"\n" ;
     }
 
     #write out other sections
@@ -140,23 +144,23 @@ sub create_record
     if( $biotype eq 'protein_coding' )
     {
       $write_string = $write_string.$spacer."mRNA".$spacer.$exon_locations."\n" ;
-      $write_string = $write_string.$spacer."    ".$spacer."/gene=\"".$gene_stable_id_version."\"\n" ;
-      $write_string = $write_string.$spacer."    ".$spacer."/note=\"transcript_id=".$transcript_stable_id_version."\"\n" ;
+      $write_string = $write_string.$super_spacer."/gene=\"".$gene_stable_id_version."\"\n" ;
+      $write_string = $write_string.$super_spacer."/note=\"transcript_id=".$transcript_stable_id_version."\"\n" ;
 
       $write_string = $write_string.$spacer."CDS ".$spacer.$exon_locations."\n" ;
-      $write_string = $write_string.$spacer."    ".$spacer."/gene=\"".$gene_stable_id_version."\"\n" ;
-      $write_string = $write_string.$spacer."    ".$spacer."/protein_id=\"".$protein_stable_id_version."\"\n" ;
-      $write_string = $write_string.$spacer."    ".$spacer."/note=\"transcript_id=".$transcript_stable_id_version."\"\n" ;
+      $write_string = $write_string.$super_spacer."/gene=\"".$gene_stable_id_version."\"\n" ;
+      $write_string = $write_string.$super_spacer."/protein_id=\"".$protein_stable_id_version."\"\n" ;
+      $write_string = $write_string.$super_spacer."/note=\"transcript_id=".$transcript_stable_id_version."\"\n" ;
       #TODO dbxrefs
-      $write_string = $write_string.$spacer."    ".$spacer."/note=\"translation=".$translation."\"\n" ;
+      $write_string = $write_string.$super_spacer."/note=\"translation=".$translation."\"\n" ;
     }
     else
     {
       $write_string = $write_string.$spacer."misc_RNA    ".$gene_location."\n" ;
-      $write_string = $write_string.$spacer."    ".$spacer."/gene=\"".$gene_stable_id_version."\"\n" ;
+      $write_string = $write_string.$super_spacer."/gene=\"".$gene_stable_id_version."\"\n" ;
       #TODO dbxrefs
-      $write_string = $write_string.$spacer."    ".$spacer."/note=\"".$biotype."\"\n" ;
-      $write_string = $write_string.$spacer."    ".$spacer."/note=\"transcript_id=".$transcript_stable_id_version."\"\n" ;
+      $write_string = $write_string.$super_spacer."/note=\"".$biotype."\"\n" ;
+      $write_string = $write_string.$super_spacer."/note=\"transcript_id=".$transcript_stable_id_version."\"\n" ;
     }
 
     return $write_string ;
@@ -201,7 +205,7 @@ sub make_exon_location_string()
 
   if( $num_exon_locations != 2 )
   {
-    $location_string = $location_string.")" ;
+    $location_string = $location_string.$super_spacer.")" ;
   }
   return $location_string ;
 }
