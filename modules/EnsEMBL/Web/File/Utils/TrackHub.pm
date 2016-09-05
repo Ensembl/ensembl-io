@@ -220,7 +220,7 @@ sub get_track_info {
   # Make sure the track hierarchy is ok before trying to make the tree
   foreach (values %tracks) {
     if ($_->{'parent'} && !$tracks{$_->{'parent'}}) {
-      return $tree->append($tree->create_node(
+      return $tree->root->append($tree->create_node(
                                         'error_missing_parent', 
                                         {'error' => "Parent track $_->{'parent'} is missing", 
                                          'file'  => $args->{'file'} }
@@ -230,7 +230,7 @@ sub get_track_info {
 
   $self->make_tree($tree, \%tracks);
   $self->fix_tree($tree);
-  $self->sort_tree($tree);
+  $self->sort_tree($tree->root);
 
   ## Update cache
   if ($cache) {
@@ -262,7 +262,7 @@ sub make_tree {
         $redo{$_->{'track'}} = $_;
       }
     } else {
-      $tree->append($tree->create_node($_->{'track'}, $_));
+      $tree->root->append($tree->create_node($_->{'track'}, $_));
     }
   }
   
@@ -275,7 +275,7 @@ sub fix_tree {
 ### @return Void
   my ($self, $tree) = @_;
   
-  foreach my $node (@{$tree->child_nodes}) {
+  foreach my $node (@{$tree->root->child_nodes}) {
     my $data       = $node->data;
     my @views      = grep $_->data->{'view'}, @{$node->child_nodes};
     my $dimensions = $data->{'dimensions'};
@@ -318,7 +318,7 @@ sub fix_tree {
 
 sub sort_tree {
 ### Sort tracks on priority when it exists, followed by shortLabel
-### @param node EnsEMBL::Web::Tree
+### @param node EnsEMBL::Web::TreeNode
 ### @return Void
   my ($self, $node) = @_;
   my @children = @{$node->child_nodes};
