@@ -134,12 +134,13 @@ sub create_record
 
     #write out other sections
     my @rna_values = $self->{translator}->batch_fields($feature_hash_ref,
-                        [qw(biotype transcript_stable_id_version protein_stable_id_version exon_locations translation)] ) ;
+                        [qw(biotype transcript_stable_id_version protein_stable_id_version exon_locations translation xrefs)] ) ;
     my $biotype = $rna_values[0] ;
     my $transcript_stable_id_version = $rna_values[1] ;
     my $protein_stable_id_version = $rna_values[2] ;
     my $exon_locations = make_exon_location_string($rna_values[3], $gene_strand) ;
     my $translation = $rna_values[4] ;
+    my @xrefs = @{ $rna_values[5] } ;
 
     if( $biotype eq 'protein_coding' )
     {
@@ -151,7 +152,10 @@ sub create_record
       $write_string = $write_string.$super_spacer."/gene=\"".$gene_stable_id_version."\"\n" ;
       $write_string = $write_string.$super_spacer."/protein_id=\"".$protein_stable_id_version."\"\n" ;
       $write_string = $write_string.$super_spacer."/note=\"transcript_id=".$transcript_stable_id_version."\"\n" ;
-      #TODO dbxrefs
+      for my $x (@xrefs)
+      {
+        $write_string = $write_string.$super_spacer."/db_xref=\"".$x->display_name()."\"\n" ;
+      }
       $write_string = $write_string.$super_spacer."translation=\"".$translation."\"\n" ;
     }
     else

@@ -56,6 +56,7 @@ my %ens_field_callbacks = (gene_start => '$self->can(\'gene_start\')',
                            transcript_stable_id_version =>  '$self->can(\'transcript_stable_id_version\')',
                            protein_stable_id_version =>  '$self->can(\'protein_stable_id_version\')',
                            exon_locations =>  '$self->can(\'exon_locations\')',
+                           xrefs =>  '$self->can(\'xrefs\')',
                            );
 
 =head2 new
@@ -136,6 +137,15 @@ sub exon_locations
       push(@exon_location_array,$e->end) ;
     }
     return \@exon_location_array ;
+}
+
+sub xrefs
+{
+    my $self = shift;
+    my $feature_hash_ref = shift;
+    my %feature_hash = %{ $feature_hash_ref } ;
+    my $t = $feature_hash{'transcript'} ;
+    return $t->get_all_xrefs() ;
 }
 
 sub gene_start
