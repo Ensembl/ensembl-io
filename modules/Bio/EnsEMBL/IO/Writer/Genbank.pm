@@ -154,7 +154,7 @@ sub create_record
       $write_string = $write_string.$super_spacer."/note=\"transcript_id=".$transcript_stable_id_version."\"\n" ;
       for my $x (@xrefs)
       {
-        $write_string = $write_string.$super_spacer."/db_xref=\"".$x->display_name()."\"\n" ;
+        $write_string = $write_string.$super_spacer."/db_xref=\"".$x->db_display_name.":".$x->primary_id."\"\n" ;
       }
       $write_string = $write_string.$super_spacer."translation=\"".$translation."\"\n" ;
     }
@@ -162,7 +162,10 @@ sub create_record
     {
       $write_string = $write_string.$spacer."misc_RNA    ".$gene_location."\n" ;
       $write_string = $write_string.$super_spacer."/gene=\"".$gene_stable_id_version."\"\n" ;
-      #TODO dbxrefs
+      for my $x (@xrefs)
+      {
+        $write_string = $write_string.$super_spacer."/db_xref=\"".$x->db_display_name.":".$x->primary_id."\"\n" ;
+      }
       $write_string = $write_string.$super_spacer."/note=\"".$biotype."\"\n" ;
       $write_string = $write_string.$super_spacer."/note=\"transcript_id=".$transcript_stable_id_version."\"\n" ;
     }
