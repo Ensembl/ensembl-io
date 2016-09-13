@@ -117,10 +117,22 @@ sub read_block {
     my $fh = $self->{'filehandle'};
     return 0 unless $fh;
 
-    if (eof($fh)) {
+    if (eof($fh) || $self->{'_reached_eof'}) {
         $self->{'waiting_block'} = undef;
+        delete $self->{'_reached_eof'};
+        delete $self->{'_read_fh_ok'};
     } else {
-        $self->{'waiting_block'} = <$fh> || confess ("Error reading file handle: $!");   
+        $self->{'waiting_block'} = <$fh>;
+
+        if($self->{'waiting_block'}) {
+            $self->{'_read_fh_ok'} = 1;
+        } else {
+            if($self->{'_read_fh_ok'}) {
+                $self->{'_reached_eof'} = 1;
+            } else {
+                confess ("Error reading file handle: $!");
+            }
+        }
     }    
 
     $self->{'waiting_block'} =~ s/\r\n/\n/ if $self->{'waiting_block'};
