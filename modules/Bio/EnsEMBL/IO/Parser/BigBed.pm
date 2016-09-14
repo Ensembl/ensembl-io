@@ -43,6 +43,7 @@ sub init {
   my ($self, $fh) = @_;
 
   ## Define default column positions, because AutoSQL
+  $self->{'default_names'} = [qw(chrom chromStart chromEnd name score strand thickStart thickEnd itemRgb blockCount blockSizes chromStarts)];
   $self->{'alt_names'} = {
                           'item_colour' => 'itemRgb',
                           'colour'      => 'itemRgb',
@@ -58,7 +59,14 @@ sub init {
     my @table;
     my $cols = $autoSQL->columnList;
     while ($cols) {
-      my $real_name = $self->{'alt_names'}{$cols->name} || $cols->name;
+      my $real_name;
+      ## Check for incomplete AutoSQL
+      if (($cols->name =~ /^field\d+$/ || $cols->comment eq 'Undocumented field') && $i < scalar @{$self->{'default_names'}}) { 
+        $real_name = $self->{'default_names'}[$i];
+      }
+      else {
+        $real_name = $self->{'alt_names'}{$cols->name} || $cols->name;
+      }
       $column_map->{$real_name} = $i;
       $i++;
       $cols = $cols->next;
