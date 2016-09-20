@@ -22,11 +22,30 @@ use warnings;
 
 use Test::More;
 use Test::Differences;
+use FindBin qw( $Bin );
 
-use Bio::EnsEMBL::IO::Translator::GenePlus;
-use Bio::EnsEMBL::IO::Writer::Genbank;
-use Bio::EnsEMBL::IO::Object::Genbank;
+BEGIN { use_ok 'Bio::EnsEMBL::IO::Translator::GenePlus'; }
+BEGIN { use_ok 'Bio::EnsEMBL::IO::Object::Genbank'; }
+BEGIN { use_ok 'Bio::EnsEMBL::IO::Writer::Genbank'; }
 
+#make a test object to write out
+my $gene ;
+my $transcript ;
+
+my %gene_plus_hash ;
+$gene_plus_hash{'gene'} = $gene ;
+$gene_plus_hash{'transcript'} = $transcript ;
+
+
+#write it out
+my $translator = Bio::EnsEMBL::IO::Translator::GenePlus->new();
+my $serializer = Bio::EnsEMBL::IO::Writer::Genbank->new($translator);
+my $testfile = $Bin.'tmp_test.genbank.dat' ;
+$serializer->open( $testfile );
+$serializer->write(\%gene_plus_hash);
+
+
+#test the results
 
 
 done_testing();
