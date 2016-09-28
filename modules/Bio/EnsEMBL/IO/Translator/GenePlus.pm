@@ -43,7 +43,6 @@ use strict;
 use warnings;
 use Carp;
 use URI::Escape;
-use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
 use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
 my %ens_field_callbacks = (gene_start => '$self->can(\'gene_start\')',
@@ -76,8 +75,6 @@ sub new
     $self->add_callbacks(\%ens_field_callbacks);
 
     $self->{default_source} = '.';
-    my $oa = Bio::EnsEMBL::Registry->get_adaptor('multi', 'ontology', 'OntologyTerm');
-    $self->{'mapper'} = Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($oa);
 
     return $self;
 }
