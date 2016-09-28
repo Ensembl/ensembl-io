@@ -23,6 +23,8 @@ use warnings;
 use Test::More;
 use Test::Differences;
 use FindBin qw( $Bin );
+use File::Temp qw/ tempfile tempdir /;
+use File::Slurp ;
 
 BEGIN { use_ok 'Bio::EnsEMBL::IO::Translator::GenePlus'; }
 BEGIN { use_ok 'Bio::EnsEMBL::IO::Object::Genbank'; }
@@ -32,17 +34,30 @@ BEGIN { use_ok 'Bio::EnsEMBL::IO::Writer::Genbank'; }
 my $gene ;
 my $transcript ;
 
-my %gene_plus_hash ;
-$gene_plus_hash{'gene'} = $gene ;
-$gene_plus_hash{'transcript'} = $transcript ;
+my @data_files = ("gene_plus_hash_0.dat", "gene_plus_hash_1.dat", "gene_plus_hash_2.dat") ;
 
-
-#write it out
+#write the objects out
 my $translator = Bio::EnsEMBL::IO::Translator::GenePlus->new();
 my $serializer = Bio::EnsEMBL::IO::Writer::Genbank->new($translator);
 my $testfile = $Bin.'tmp_test.genbank.dat' ;
-$serializer->open( $testfile );
-$serializer->write(\%gene_plus_hash);
+$serializer->open( $testfile ) ;
+
+foreach my $d (@data_files)
+{
+  # Read structure back in again
+  my $input_file = $Bin."/input/".$d ;
+  my %gene_plus_hash;
+  {
+    local $/=undef ;  # slurp mode
+    open my $in, '<', $input_file  or die "input file $input_file not opened" ;
+    my $object = <$in> ;
+    close $in;
+    %gene_plus_hash = %{ eval $object };
+  }
+
+  $serializer->write(\%gene_plus_hash);
+}
+$serializer->close() ;
 
 
 #test the results
