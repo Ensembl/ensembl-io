@@ -17,7 +17,7 @@ use Data::Dumper;
 use Bio::EnsEMBL::Registry;
 use Bio::EnsEMBL::IO::Translator::GenePlus;
 use Bio::EnsEMBL::IO::Writer::Genbank;
-use Data::Dumper;
+use Storable;
 
 # Connect to the Ensembl Registry to access the databases
 Bio::EnsEMBL::Registry->load_registry_from_db(
@@ -35,6 +35,8 @@ my $serializer = Bio::EnsEMBL::IO::Writer::Genbank->new($translator);
 $serializer->open('/tmp/test.genbank.dat');
 print("Opened output file\n") ;
 
+$Storable::Deparse = 1 ;
+$Storable::Eval = 1 ;
 $Data::Dumper::Purity = 1;
 my $dump_objects_required = 3 ;
 my $dump_objects_count = 0 ;
@@ -66,9 +68,7 @@ while(my $chromosome = shift @{$features})
       if( $dump_objects_count < $dump_objects_required )
       {
         my $dump_file_name = "gene_plus_hash_".$dump_objects_count.".dat" ;
-        open(my $DUMP_FILE, ">", $dump_file_name ) ;
-        print $DUMP_FILE Dumper(\%gene_plus_hash);
-        close($DUMP_FILE) ;
+        store \%gene_plus_hash, $dump_file_name ;
         $dump_objects_count++ ;
       }
     }

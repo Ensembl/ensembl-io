@@ -24,7 +24,10 @@ use Test::More;
 use Test::Differences;
 use FindBin qw( $Bin );
 use File::Temp qw/ tempfile tempdir /;
-use File::Slurp ;
+use Storable ;
+
+$Storable::Deparse = 1 ;
+$Storable::Eval = 1 ;
 
 BEGIN { use_ok 'Bio::EnsEMBL::IO::Translator::GenePlus'; }
 BEGIN { use_ok 'Bio::EnsEMBL::IO::Object::Genbank'; }
@@ -46,16 +49,8 @@ foreach my $d (@data_files)
 {
   # Read structure back in again
   my $input_file = $Bin."/input/".$d ;
-  my %gene_plus_hash;
-  {
-    local $/=undef ;  # slurp mode
-    open my $in, '<', $input_file  or die "input file $input_file not opened" ;
-    my $object = <$in> ;
-    close $in;
-    %gene_plus_hash = %{ eval $object };
-  }
-
-  $serializer->write(\%gene_plus_hash);
+  my $gene_plus_hashref = retrieve $input_file ;
+  $serializer->write( $gene_plus_hashref ) ;
 }
 $serializer->close() ;
 
