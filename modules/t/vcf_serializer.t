@@ -40,10 +40,10 @@ my $cs = Bio::EnsEMBL::CoordSystem->new(-NAME    => 'chromosome',
                                         -VERSION => 'GRCh38',
                                         -RANK    => 1,
                                         ); 
-my $slice = Bio::EnsEMBL::Slice->new( -coord_system => $cs,
+my $slice = Bio::EnsEMBL::Slice->new( -coord_system     => $cs,
                                       -seq_region_name  => $chr,
-                                      -start            => 230710045,
-                                      -end              => 230710048,
+                                      -start            => 1,
+                                      -end              => 248956422,
                                       -strand           => 1,
                                       );
 

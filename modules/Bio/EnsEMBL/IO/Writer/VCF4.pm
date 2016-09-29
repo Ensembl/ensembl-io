@@ -122,7 +122,7 @@ sub create_record {
         $genotype = join($phase_sep, @{$s_gen->{$sample}{'genotype'}});
       }
       else {
-        $genotype = '.';
+        $genotype = './.';
       }
       push(@values, $genotype);
     }

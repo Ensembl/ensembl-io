@@ -45,6 +45,7 @@ my $slice = $adaptor->fetch_by_region('chromosome', 1,230710000,230711000);
 
 my $features = $vfa->fetch_all_by_Slice($slice);
 
+print STDOUT "Number of features found: ".scalar(@$features)."\n";
 
 ###
 #

@@ -111,8 +111,9 @@ sub samples_genotypes {
     $gen_al{$alleles[$i]} = $i;
   }
 
-  my %s_gen = map { $_->sample->name => { 'genotype' => $self->genotype_vcf(\%gen_al,$_->genotype), 
-                                          'phased'   => ($_->phased) ? $_->phased : 0
+  my %s_gen = map { $_->sample->name => { 
+                                         'genotype' => $self->genotype_vcf(\%gen_al,$_->genotype), 
+                                         'phased'   => ($_->phased) ? $_->phased : 0 
                                         }
                   } @{$object->variation->get_all_SampleGenotypes()};
   
@@ -242,9 +243,13 @@ sub get_alleles {
 
   if (scalar keys %allele_lengths > 1) {
     my $prev_base = 'N';
-    #### TODO ####
-    # Replace the 'N' by the real nucleotide (need access to Core DB or FASTA file ?)
-    ##############
+    my $chrom = $self->chrom($object);
+    my $pos = $self->pos($object);
+
+    my $slice_adaptor = $self->slice_adaptor($object);
+    my $slice = $slice_adaptor->fetch_by_toplevel_location("$chrom:$pos-$pos");
+    $prev_base = $slice->seq if defined($slice);
+
     for my $i(0..$#alleles) {
       $alleles[$i] = $prev_base.$alleles[$i];
     }
@@ -266,6 +271,16 @@ sub get_previous_base_position {
 
   # Use the previous base coordinate except for insertion (when ref == '').
   return (scalar keys %allele_lengths > 1 && $alleles[0] ne '') ? 1 : 0;
+}
+
+sub slice_adaptor {
+  my $self = shift;
+  my $object = shift;
+
+  if (!$self->{'slice_adaptor'}) {
+    $self->{'slice_adaptor'} = $object->slice->adaptor
+  }
+  return $self->{'slice_adaptor'};
 }
 
 #### INFO METHODS ####
