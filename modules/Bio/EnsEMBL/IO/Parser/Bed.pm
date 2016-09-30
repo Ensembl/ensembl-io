@@ -453,14 +453,15 @@ sub get_blockStarts {
 
 =head2 get_raw_id
 
-    Description: Getter for id field, which is always the penultimate column
+    Description: Getter for id field
     Returntype : String 
 
 =cut
 
 sub get_raw_id {
   my $self = shift;
-  return $self->{'record'}[-2];
+  my $index = $self->{'column_map'}{'id'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_id
@@ -477,14 +478,15 @@ sub get_id {
 
 =head2 get_raw_description
 
-    Description: Getter for description field, which is always the last column
+    Description: Getter for description field
     Returntype : String 
 
 =cut
 
 sub get_raw_description {
   my $self = shift;
-  return $self->{'record'}[-1];
+  my $index = $self->{'column_map'}{'id'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_description
