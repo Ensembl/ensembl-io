@@ -24,38 +24,85 @@ use Test::More;
 use Test::Differences;
 use FindBin qw( $Bin );
 use File::Temp qw/ tempfile tempdir /;
-use Storable ;
+use Bio::EnsEMBL::Registry;
 
-$Storable::Deparse = 1 ;
-$Storable::Eval = 1 ;
+
 
 BEGIN { use_ok 'Bio::EnsEMBL::IO::Translator::GenePlus'; }
 BEGIN { use_ok 'Bio::EnsEMBL::IO::Object::Genbank'; }
 BEGIN { use_ok 'Bio::EnsEMBL::IO::Writer::Genbank'; }
 
+
+# Connect to the Ensembl Registry to access the database
+Bio::EnsEMBL::Registry->load_registry_from_db(
+    -host => 'ensembldb.ensembl.org',
+    -user => 'anonymous',
+    -db_version => '85'
+    );
+
+# Create your slice adaptor to search for chromosomes
+#
+# Currently this was setup to be bushbaby to match what was done before, but these will be
+# updated in the future to use a specific human release. Cases required to be tested are listed
+# below.
+my $adaptor = Bio::EnsEMBL::Registry->get_adaptor( "bushbaby", "core", "Slice" );
+my $ga = Bio::EnsEMBL::Registry->get_adaptor( "bushbaby", "core", "Gene" );
+
 #make a test object to write out
 my $gene ;
 my $transcript ;
 
-my @data_files = ("gene_plus_hash_0.dat", "gene_plus_hash_1.dat", "gene_plus_hash_2.dat") ;
-
-#write the objects out
+#setup objects
 my $translator = Bio::EnsEMBL::IO::Translator::GenePlus->new();
 my $serializer = Bio::EnsEMBL::IO::Writer::Genbank->new($translator);
-my $testfile = $Bin.'tmp_test.genbank.dat' ;
+
+#setup output file
+my $dir = File::Temp->newdir();
+my $testfile = $dir."/test.genbank" ;
+$testfile = $Bin."/test.genbank" ;
+printf("testfile opened at $testfile\n") ;
 $serializer->open( $testfile ) ;
 
-foreach my $d (@data_files)
+my $num_written_objects = 0 ;
+my $num_required_objects = 3 ;
+
+my $features = [$adaptor->fetch_by_region('scaffold', 'GL873520.1')];
+my $chromosome = shift @{$features} ;
+my $genes = $ga->fetch_all_by_Slice($chromosome);
+
+while( my $gene = shift @{$genes} )
 {
-  # Read structure back in again
-  my $input_file = $Bin."/input/".$d ;
-  my $gene_plus_hashref = retrieve $input_file ;
-  $serializer->write( $gene_plus_hashref ) ;
+  $num_written_objects++ ;
+  printf( "Writing object $num_written_objects \n" ) ;
+  my $transcript = $gene->canonical_transcript ;
+  my %gene_plus_hash ;
+  $gene_plus_hash{'gene'} = $gene ;
+  $gene_plus_hash{'transcript'} = $transcript ;
+  $serializer->write(\%gene_plus_hash);
+  if( $num_written_objects > $num_required_objects )
+  {
+    goto WRITING_DONE ;
+  }
 }
+
+
+WRITING_DONE:
 $serializer->close() ;
 
+#
+# Read the created file, test the results
+#
+open TESTFILE $testfile ;
 
-#test the results
+# Cases we want to test are
+# 1. gene with canonical transcript forward strand
+# 2. gene with canonical transcript reverse strand
+# 3. gene with no translation
+#
+# Within these there will be various fields to test are written correctly
+#
 
+
+close TESTFILE ;
 
 done_testing();

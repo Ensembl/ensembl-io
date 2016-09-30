@@ -12,12 +12,22 @@ $|++;
 
 use strict;
 use warnings;
-use Data::Dumper;
+
 
 use Bio::EnsEMBL::Registry;
 use Bio::EnsEMBL::IO::Translator::GenePlus;
 use Bio::EnsEMBL::IO::Writer::Genbank;
+
+#write options to dump data structures so they can be used as test objects
 use Storable;
+use Data::Dumper;
+
+$Storable::Deparse = 1 ;
+$Storable::Eval = 1 ;
+$Data::Dumper::Purity = 1;
+my $dump_objects_required = 0 ;
+my $dump_objects_count = 0 ;
+
 
 # Connect to the Ensembl Registry to access the databases
 Bio::EnsEMBL::Registry->load_registry_from_db(
@@ -35,11 +45,6 @@ my $serializer = Bio::EnsEMBL::IO::Writer::Genbank->new($translator);
 $serializer->open('/tmp/test.genbank.dat');
 print("Opened output file\n") ;
 
-$Storable::Deparse = 1 ;
-$Storable::Eval = 1 ;
-$Data::Dumper::Purity = 1;
-my $dump_objects_required = 3 ;
-my $dump_objects_count = 0 ;
 
 # Fetch chromosome 1
 my $features = [$adaptor->fetch_by_region('scaffold', 'GL873520.1')];
@@ -64,7 +69,7 @@ while(my $chromosome = shift @{$features})
       $gene_plus_hash{'transcript'} = $transcript ;
       $serializer->write(\%gene_plus_hash);
 
-      #Allow dumping of objects, which can then be read in by
+      #Allow dumping of objects, which can then be read in by test files
       if( $dump_objects_count < $dump_objects_required )
       {
         my $dump_file_name = "gene_plus_hash_".$dump_objects_count.".dat" ;
