@@ -46,9 +46,6 @@ use strict;
 use warnings;
 use Carp;
 
-use Bio::EnsEMBL::IO::Object::Genbank;
-
-
 my $spacer = "    " ;
 my $super_spacer = $spacer."    ".$spacer ;
 

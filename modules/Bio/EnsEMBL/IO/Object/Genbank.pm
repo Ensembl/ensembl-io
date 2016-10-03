@@ -59,6 +59,3 @@ sub fields
     my $key = shift;
     return %writable_object_fields{$key} ;
 }
-
-
-

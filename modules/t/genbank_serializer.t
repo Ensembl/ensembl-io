@@ -27,7 +27,6 @@ use File::Temp qw/ tempfile tempdir /;
 use Bio::EnsEMBL::Registry;
 
 BEGIN { use_ok 'Bio::EnsEMBL::IO::Translator::GenePlus'; }
-BEGIN { use_ok 'Bio::EnsEMBL::IO::Object::Genbank'; }
 BEGIN { use_ok 'Bio::EnsEMBL::IO::Writer::Genbank'; }
 
 # Connect to the Ensembl Registry to access the database
