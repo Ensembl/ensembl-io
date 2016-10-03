@@ -22,7 +22,6 @@ use warnings;
 
 use Test::More;
 use Test::Differences;
-use Test::Files;
 use FindBin qw( $Bin );
 use File::Temp qw/ tempfile tempdir /;
 use Bio::EnsEMBL::Registry;
@@ -98,7 +97,16 @@ $serializer->close() ;
 #
 # As these will be determined more precisely in the future for now the test will use a high level file comparison.
 my $acceptance_file = "acceptance/genbank_serializer.acceptance.dat" ;
-compare_ok($testfile, $acceptance_file, "genbank file matches acceptance file");
+open TEST_FILE, $testfile ;
+open ACCEPTANCE_FILE, $acceptance_file ;
+
+my $line = 0 ;
+while( my $expected=<ACCEPTANCE_FILE> )
+{
+  $line++ ;
+  my $got = <TEST_FILE> ;
+  cmp_ok($got, 'eq', $expected, "File compare line ".$line ) ;
+}
 
 
 done_testing();
