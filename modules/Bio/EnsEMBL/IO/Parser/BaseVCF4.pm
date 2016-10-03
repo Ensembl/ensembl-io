@@ -221,9 +221,11 @@ sub get_raw_start {
 sub get_start {
     my $self = shift;
     my $start = $self->get_raw_start();
+    return unless defined $start;
 
     # Like indels, SVs have the base before included for reference
-    if ($self->get_raw_info =~ /SVTYPE/ || join(",", @{$self->get_alternatives}) =~ /\<|\[|\]|\>/) {
+    my $alternatives = join(",", @{$self->get_alternatives});
+    if (($self->get_raw_info && $self->get_raw_info =~ /SVTYPE/) || ($alternatives && $alternatives =~ /\<|\[|\]|\>/)) {
       $start ++;
     }
     else {
@@ -278,10 +280,12 @@ sub get_end {
       $end = $info->{END};
     }
     elsif(defined($info->{SVLEN})) {
+      return unless $self->get_start;
       my $svlen = (split(',',$info->{SVLEN}))[0];
       $end = $self->get_start + abs($svlen)-1;
     }
     else {
+      return unless $self->get_start;
       $end = $self->get_start + length($self->get_raw_reference) - 1;
     }
     return $end;
