@@ -26,12 +26,9 @@ use FindBin qw( $Bin );
 use File::Temp qw/ tempfile tempdir /;
 use Bio::EnsEMBL::Registry;
 
-
-
 BEGIN { use_ok 'Bio::EnsEMBL::IO::Translator::GenePlus'; }
 BEGIN { use_ok 'Bio::EnsEMBL::IO::Object::Genbank'; }
 BEGIN { use_ok 'Bio::EnsEMBL::IO::Writer::Genbank'; }
-
 
 # Connect to the Ensembl Registry to access the database
 Bio::EnsEMBL::Registry->load_registry_from_db(
@@ -89,11 +86,16 @@ while( my $gene = shift @{$genes} )
 WRITING_DONE:
 $serializer->close() ;
 
-
 # Cases we want to test are
 # 1. gene with canonical transcript forward strand
 # 2. gene with canonical transcript reverse strand
 # 3. gene with no translation
+# 4. gene with no translation, reverse strand
+#
+# And amongst these we want a single/multiple exon, single/multiple db xrefs
+#  protein ids, check that transcript ids match up for 1,2 in the gene and CDS fields
+#
+# Plus file and per section header tests will be wanted down the line so we will need to dump for multiple regions
 #
 # As these will be determined more precisely in the future for now the test will use a high level file comparison.
 my $acceptance_file = "acceptance/genbank_serializer.acceptance.dat" ;
@@ -107,6 +109,5 @@ while( my $expected=<ACCEPTANCE_FILE> )
   my $got = <TEST_FILE> ;
   cmp_ok($got, 'eq', $expected, "File compare line ".$line ) ;
 }
-
 
 done_testing();
