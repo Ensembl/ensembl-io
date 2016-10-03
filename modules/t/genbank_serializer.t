@@ -22,6 +22,7 @@ use warnings;
 
 use Test::More;
 use Test::Differences;
+use Test::Files;
 use FindBin qw( $Bin );
 use File::Temp qw/ tempfile tempdir /;
 use Bio::EnsEMBL::Registry;
@@ -89,20 +90,15 @@ while( my $gene = shift @{$genes} )
 WRITING_DONE:
 $serializer->close() ;
 
-#
-# Read the created file, test the results
-#
-open TESTFILE $testfile ;
 
 # Cases we want to test are
 # 1. gene with canonical transcript forward strand
 # 2. gene with canonical transcript reverse strand
 # 3. gene with no translation
 #
-# Within these there will be various fields to test are written correctly
-#
+# As these will be determined more precisely in the future for now the test will use a high level file comparison.
+my $acceptance_file = "acceptance/genbank_serializer.acceptance.dat" ;
+compare_ok($testfile, $acceptance_file, "genbank file matches acceptance file");
 
-
-close TESTFILE ;
 
 done_testing();

@@ -1,0 +1,124 @@
+    gene    complement(8064..8776)
+            /gene=ENSOGAG00000025313.1
+            /note="Uncharacterized protein  [Source:UniProtKB/TrEMBL;Acc:H0XIE5]"
+    mRNA    join(
+            complement(8501..8776),
+            complement(8064..8399)
+            )
+            /gene="ENSOGAG00000025313.1"
+            /note="transcript_id=ENSOGAT00000031748.1"
+    CDS     join(
+            complement(8501..8776),
+            complement(8064..8399)
+            )
+            /gene="ENSOGAG00000025313.1"
+            /protein_id="ENSOGAP00000015885.1"
+            /note="transcript_id=ENSOGAT00000031748.1"
+            /db_xref="RefSeq peptide predicted:XP_003780819"
+            /db_xref="RefSeq peptide predicted:XP_003780820"
+            /db_xref="UniProtKB/TrEMBL:H0XIE5"
+            /db_xref="European Nucleotide Archive:AAQR03000001"
+            /db_xref="GO:GO:0005634"
+            /db_xref="GO:GO:0005737"
+            /db_xref="GO:GO:0051276"
+            /db_xref="UniParc:UPI0002383584"
+            translation="MSTLIFVDKENGEPATHMAPKDGLKLKSRHSIKSLDGSSQVSTPHVSKKFDALQALPKAARKASGTVNRTTEKSIKTNGLLKQKQLNFSAKKKVTEKTTKAKSSVPTADDSYPEIEKFFPFNPLDFESFDPPEEHQIADLPLNGVPLMILDEERNFENLLKLGPPSPMKMISSPWESNPLQSPSNILSTLDVELPPVCYDIDT"
+    gene    complement(11712..19563)
+            /gene=ENSOGAG00000028767.1
+            /note="Uncharacterized protein  [Source:UniProtKB/TrEMBL;Acc:H0XNV2]"
+    mRNA    join(
+            complement(19153..19563),
+            complement(18422..18517),
+            complement(14952..15182),
+            complement(13853..13875),
+            complement(13241..13338),
+            complement(11712..12205)
+            )
+            /gene="ENSOGAG00000028767.1"
+            /note="transcript_id=ENSOGAT00000028615.1"
+    CDS     join(
+            complement(19153..19563),
+            complement(18422..18517),
+            complement(14952..15182),
+            complement(13853..13875),
+            complement(13241..13338),
+            complement(11712..12205)
+            )
+            /gene="ENSOGAG00000028767.1"
+            /protein_id="ENSOGAP00000017793.1"
+            /note="transcript_id=ENSOGAT00000028615.1"
+            /db_xref="RefSeq mRNA predicted:XM_003780773"
+            /db_xref="RefSeq peptide predicted:XP_003780821"
+            /db_xref="UniProtKB/TrEMBL:H0XNV2"
+            /db_xref="European Nucleotide Archive:AAQR03000001"
+            /db_xref="GO:GO:0005515"
+            /db_xref="GO:GO:0005622"
+            /db_xref="GO:GO:0008270"
+            /db_xref="GO:GO:0046872"
+            /db_xref="UniParc:UPI0002383587"
+            translation="MDLDILQVFQREITCAICLNYFIDPVTIGCGHSFCRPCLYLSWEGAPNPTQCPECREPSQQRKFKTNIVLKNLVSLARKTSLWQFLSSEEQMCGTHKEKKKMFCEVDRSLLCLFCSNSQEHGAHRHCPIERAAEDQQDKLEKQMRSLWDKIQENKRNLKEEQIMVNHWMEYTLLVRKMTRTEYAELHPVLYKEEEKHLEELERESWNILEQLKRSVAQINQKQKQLKEMHKELQGLCHKPDEELLQDSRDLLMRSESVQLHMPRPVRPELSVRAITGLMDRYSRYRVEISFHKEVSNHNIRLFDDLRNFTFRSHSQDASSNCDKSNYFAAWGNQVFTTGKYYWELDVDDSWDWALGVCRDSWIHSLGTMLVSGDMFLLACVRQDNQYTLWTTSPSIPQFVEKPLGRVGVYVDLENGSVSFVNVAKRSLIWKYRGGSLSFPVRPFCITGHK"
+    gene    54488..61219
+            /gene=ENSOGAG00000029074.1
+            /note="Uncharacterized protein  [Source:UniProtKB/TrEMBL;Acc:H0Y124]"
+    mRNA    join(
+            54488..54691,
+            54694..54894,
+            55809..55904,
+            59705..59932,
+            60615..60637,
+            61201..61219
+            )
+            /gene="ENSOGAG00000029074.1"
+            /note="transcript_id=ENSOGAT00000025069.1"
+    CDS     join(
+            54488..54691,
+            54694..54894,
+            55809..55904,
+            59705..59932,
+            60615..60637,
+            61201..61219
+            )
+            /gene="ENSOGAG00000029074.1"
+            /protein_id="ENSOGAP00000022067.1"
+            /note="transcript_id=ENSOGAT00000025069.1"
+            /db_xref="UniProtKB/TrEMBL:H0Y124"
+            /db_xref="European Nucleotide Archive:AAQR03000003"
+            /db_xref="GO:GO:0005515"
+            /db_xref="GO:GO:0005622"
+            /db_xref="GO:GO:0008270"
+            /db_xref="GO:GO:0046872"
+            /db_xref="UniParc:UPI000238358A"
+            translation="MDLDILQVFQREITCAICLNYFIDPVTIGCGHSFCRPCLYLSWEGALTSAHCPECREPSSRGSSKPILLKNLVFIARKASLWQFLSSEEQMCRIHKEKKMFCEVDRSLLCLFCSNAQEHGAHRHCPIEGAAEDQRDKLEKQMRSLWDKIQENKRNLIEQRIVINQWTDYVHLVRKRIRTKYREVHPVLYEEEEHLEKLRKEGQDILQKLRRRVAKMHEKRKQLKEMCKELMDMCHKPEEELLQDMGDLLMSCTCPHL"
+    gene    89768..135650
+            /gene=ENSOGAG00000026634.1
+            /locus_tag="ENDOD1"
+            /note="endonuclease domain containing 1 [Source:HGNC Symbol;Acc:HGNC:29129]"
+    mRNA    join(
+            89768..90067,
+            134448..135650
+            )
+            /gene="ENSOGAG00000026634.1"
+            /note="transcript_id=ENSOGAT00000027433.1"
+    CDS     join(
+            89768..90067,
+            134448..135650
+            )
+            /gene="ENSOGAG00000026634.1"
+            /protein_id="ENSOGAP00000016985.1"
+            /note="transcript_id=ENSOGAT00000027433.1"
+            /db_xref="RefSeq peptide predicted:XP_003781369"
+            /db_xref="UniProtKB/TrEMBL:H0XLJ5"
+            /db_xref="European Nucleotide Archive:AAQR03000003"
+            /db_xref="European Nucleotide Archive:AAQR03000004"
+            /db_xref="European Nucleotide Archive:AAQR03000005"
+            /db_xref="European Nucleotide Archive:AAQR03000006"
+            /db_xref="European Nucleotide Archive:AAQR03000007"
+            /db_xref="GO:GO:0003676"
+            /db_xref="GO:GO:0008152"
+            /db_xref="Projected GO:GO:0016020"
+            /db_xref="GO:GO:0016787"
+            /db_xref="GO:GO:0046872"
+            /db_xref="Projected GO:GO:0070062"
+            /db_xref="Projected HGNC transcript name:ENDOD1-201"
+            /db_xref="UniParc:UPI000238358B"
+            translation="MGTAGWLALGGLLALAGRLEGRLVGEGEAAFGECDKFFYAETPPAGLMADSHVKICQRSEGAERFATLYSTRDRIPVYSAFRAAPPAPGAAEQRWLVEPQIDDPKSTLEEGVNEAEAITSVNNLGSKQALNTDYLDSDYQRGQLYPFPLSGDFQMTTFALTNSAPMTQSFQERWYMNLNSLMDQALTPQCGNGEDLYIITGTVPSDHRVKDRVTVPKFVWLAACCAVPGGGWAMGFIKHTRDSDVIEDVMVKDLEKLLPFNPQLFYNNCGETEQDTEKMKKILEMVNKVQDEERAVQSQERSTPLSSTRSKRSVLLPPEASERSSSFLGSLMGFIATPFIKIFQLIYCLVVAILKSIVYFLWFVTKQVINGIESCLYHLGSATISYFGAIGEELVSIPWKVLKVMAKVIRAVLRILCCLLKAVCHVLSIPVQVLVEVATFPVYTMGAIPIVCKDIAMGLGGIVSLLVDTTFGTMGGLLQFVFSACKRFGSKVTFDNSGEL"
