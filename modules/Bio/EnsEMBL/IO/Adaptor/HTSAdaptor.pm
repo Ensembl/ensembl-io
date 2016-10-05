@@ -110,41 +110,37 @@ sub snp_code {
 sub munge_chr_id {
   my ($self, $chr_id) = @_;
 
-  my $ret_id;
-
-  my $htsfile = $self->htsfile_open;
+  my $htsfile = Bio::DB::HTSfile->open($self->url);
   warn "Failed to open BAM/CRAM file " . $self->url unless $htsfile;
   return undef unless $htsfile;
 
   my $header = $htsfile->header_read;
 
-  my $ret_id = $chr_id;
-
-  # Check we get values back for seq region. Maybe need to add 'chr' or Chr
-
-  # Note there is a bug in samtools version 0.1.18 which means we can't just
-  # use the chr_id as the region, we have to specify a range. The range I
-  # use is 1-1 which is hopefully valid for all seq regions
-  my @coords = $header->parse_region("$chr_id:1-1");
+  # Check we get values back for seq region. May need to add 'chr' or 'Chr'
+  my @coords = $header->parse_region("$chr_id");
   if (@coords) {
+    $htsfile->close() ;
     return "$chr_id";
   }
 
   if (!@coords) {
-    @coords = $header->parse_region("chr$chr_id:1-1");
+    @coords = $header->parse_region("chr$chr_id");
     if (@coords) {
+      $htsfile->close() ;
       return "chr$chr_id";
     }
   }
 
   if (!@coords) {
-    @coords = $header->parse_region("Chr$chr_id:1-1");
+    @coords = $header->parse_region("Chr$chr_id");
     if (@coords) {
+      $htsfile->close() ;
       return "Chr$chr_id";
     }
   }
 
   warn " *** could not parse_region for BAM/CRAM with $chr_id in file " . $self->url ."\n";
+  $htsfile->close() ;
   return undef;
 }
 
