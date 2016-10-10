@@ -336,7 +336,12 @@ sub validate_record {
   foreach my $key (@{$field_order}) {
     my $method    = "get_raw_$key";
     my $value     = $self->$method;
-    next if ($field_info->{$key}{'optional'} && $value eq '.');
+    ## Have we come to the end of the record?
+    last if ($field_info->{$key}{'optional'} 
+            && ! defined $value
+            && scalar @{$self->{'record'}} < scalar @$field_order);
+    ## Skip other optional fields
+    next if ($field_info->{$key}{'optional'} && $value eq ($field_info->{$key}{'placeholder'} || '.'));
     my $type      = $field_info->{$key}{'validate_as'};
     my $match     = $field_info->{$key}{'match'};
     $valid        = $format->validate_as($type, $value, $match);
