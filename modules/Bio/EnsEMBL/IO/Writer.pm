@@ -91,14 +91,14 @@ sub close {
 =cut
 
 sub translator {
-    my $self = shift;
+  my $self = shift;
 
-    if(@_) {
-	my $translator = shift;
-	$self->{translator} = $translator;
-    }
+  if (@_) {
+	  my $translator = shift;
+	  $self->{translator} = $translator;
+  }
 
-    return $self->{translator};
+  return $self->{translator};
 }
 
 =head2 write
