@@ -80,8 +80,8 @@ sub translator {
 
     my $translator = $self->SUPER::translator(@_);
     
-    if( @_ &&  $translator->can('strand_conversion') ) {
-	$translator->strand_conversion(Bio::EnsEMBL::IO::Object::GTF->strand_conversion());
+    if( $translator &&  $translator->can('strand_conversion') ) {
+	    $translator->strand_conversion(Bio::EnsEMBL::IO::Object::GTF->strand_conversion());
     }
 
     return $translator;
