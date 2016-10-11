@@ -52,7 +52,7 @@ sub new {
 
     my $self = $class->SUPER::new();
 
-    $self->translator($translator);
+    $self->translator($translator) if $translator;
 
     return $self;
 }
