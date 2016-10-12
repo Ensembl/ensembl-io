@@ -96,7 +96,8 @@ sub write {
 sub create_record {
     my $self = shift;
     my $object = shift;
-    my $translator = shift;
+    my $translator = shift || $self->translator;
+    return unless $translator;
 
     # Maybe... but this would involve looping through the fields twice,
     # perhaps save this for formats like fasta
@@ -116,12 +117,12 @@ sub fields {
     my $self = shift;
 
     if(@_) {
-	my $arg = shift;
-	if(ref $arg eq 'ARRAY') {
-	    $self->{fields} = $arg;
-	}
+	    my $arg = shift;
+	    if(ref $arg eq 'ARRAY') {
+	      $self->{fields} = $arg;
+	    }
     } else {
-	return $self->{'fields'} || [];
+	    return $self->{'fields'} || [];
     }
 }
 
@@ -152,25 +153,25 @@ sub combine_fields {
     my @keys;
     
     if($order) {
-	@keys = @{$order};
+	    @keys = @{$order};
     } else {
-	@keys = keys %$values;
+	    @keys = keys %$values;
     }
 
     foreach my $field (@keys) {
-	next if( !defined($values->{$field}) );
+	    next if( !defined($values->{$field}) );
 
-	if(ref($values->{$field}) eq 'ARRAY') {
-	    if($multi_delimiter) {
-		push @values, ($inc_field ? "$field$separator" : '') . join($multi_delimiter, map {qq($valuequotes$_$valuequotes)} @{$values->{$field}});
+	    if(ref($values->{$field}) eq 'ARRAY') {
+	      if($multi_delimiter) {
+		      push @values, ($inc_field ? "$field$separator" : '') . join($multi_delimiter, map {qq($valuequotes$_$valuequotes)} @{$values->{$field}});
+	      } else {
+		      foreach my $v (@{$values->{$field}}) {
+		        push @values, ($inc_field ? "$field$separator" : '') . qq($valuequotes$v$valuequotes);
+		      }
+	      }
 	    } else {
-		foreach my $v (@{$values->{$field}}) {
-		    push @values, ($inc_field ? "$field$separator" : '') . qq($valuequotes$v$valuequotes);
-		}
+	      push @values, ($inc_field ? "$field$separator" : '') . $valuequotes . $values->{$field} . $valuequotes;
 	    }
-	} else {
-	    push @values, ($inc_field ? "$field$separator" : '') . $valuequotes . $values->{$field} . $valuequotes;
-	}
     }
 
     return join $delimiter, @values;
@@ -191,7 +192,7 @@ sub concatenate_fields {
     my $values = shift;
     my $delimiter = shift || "\t";
 
-    return join( $delimiter, map { (defined($_) && ref $_ eq 'HASH') ? $self->combine_fields($_) : $_ } @{$values} );
+    return @{$values} ? join( $delimiter, map { (defined($_) && ref $_ eq 'HASH') ? $self->combine_fields($_) : $_ } @{$values} ) : '';
 #    return join $delimiter, @{$values};
 }
 
