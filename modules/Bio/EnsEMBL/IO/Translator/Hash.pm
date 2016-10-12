@@ -20,6 +20,9 @@ limitations under the License.
 
 Translator::Hash - generic class for accessing the simple data structures used by the new drawing code 
 
+Note that if the method needs to return something other than a string, it is necessary
+to define a method in this module
+
 =cut
 
 package Bio::EnsEMBL::IO::Translator::Hash;
@@ -31,33 +34,59 @@ use Carp;
 
 use base qw/Bio::EnsEMBL::IO::Translator/;
 
-=head2 get_start
 
-    Description: Wrapper around internal call to feature start
-    Returntype : Integer
+=head2 get_field
 
-=cut
-
-sub get_start {
-  my ($self, $feature) = @_;
-  return $feature->{'start'};
-}
-
-=head2 get_end
-
-    Description: Wrapper around internal call to feature end
-    Returntype : Integer
+    Description: Fetch a field from the feature. Use the 
+                  local method if available, otherwise
+                  just get the corresponding key from 
+                  the data hash
+    Args[1]    : Feature to fetch fields from
+    Args[2]    : Field name
+    Returntype : String, hashref or undef
 
 =cut
 
-sub get_end {
-  my ($self, $feature) = @_;
-  return $feature->{'end'};
+sub get_field {
+    my $self    = shift;
+    my $feature = shift;
+    my $field   = shift;
+    #warn "@@@ GETTING FIELD $field FROM FEATURE";
+
+    # If we have the requested method, use it
+    my $method = 'get_'.$field;
+    my $value;
+    if ($self->can($method)) {
+      #warn ">>> USING METHOD $method";
+      $value = $self->$method($feature);
+    }
+    else {
+      #warn "### USING HASH KEY";
+      $value = $feature->{$field};
+    }
+    $value ||= '.';
+    #warn "... VALUE $value";
+
+    return $value;
 }
+
+
+=head2 seqname
+
+    Description: Wrapper around hash key 
+    Returntype : String
+
+=cut
+
+sub get_seqname {
+  my ($self, $feature) = @_;
+  return $feature->{'chr'};
+}
+
 
 =head2 get_name
 
-    Description: Wrapper around internal call to feature name
+    Description: Wrapper around hash key 
     Returntype : String
 
 =cut
@@ -67,29 +96,19 @@ sub get_name {
   return $feature->{'label'};
 }
 
-=head2 get_score
+=head2 get_attributes
 
-    Description: Wrapper around internal call to feature name
-    Returntype : String
-
-=cut
-
-sub get_score {
-  my ($self, $feature) = @_;
-  return $feature->{'score'};
-}
-
-=head2 get_strand
-
-    Description: Wrapper around internal call to feature strand
-    Returntype : String
+    Description: Wrapper around hash key 
+    Returntype : Hashref
 
 =cut
 
-sub get_strand {
+sub get_attributes {
   my ($self, $feature) = @_;
-  return $feature->{'strand'};
+  return $feature->{'attributes'} || {};
 }
+
+
 
 =head2 get_thickStart
 
@@ -166,7 +185,7 @@ sub get_blockStarts {
 
 =cut
 
-sub get_blockStarts {
+sub get_blockSizes {
   my ($self, $feature) = @_;
   return '.' unless $feature->{'structure'};
 
