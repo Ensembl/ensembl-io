@@ -405,12 +405,17 @@ sub so_term {
     
     my $so_term = eval { $self->so_mapper()->to_name($object); };
     if($@) {
-	throw sprintf "Unable to map feature %s to SO term.\n$@", $object->display_id;
+      if ($self->no_exception) {
+        throw sprintf "Unable to map feature %s to SO term.\n$@", $object->display_id;
+      }
+      else {
+        return '';
+      }
     }
 
     if ($so_term eq 'protein_coding_gene') { 
     # Special treatment for protein_coding_gene, as more commonly expected term is 'gene'
-	$so_term = 'gene';
+      $so_term = 'gene';
     }
 
     return $so_term;

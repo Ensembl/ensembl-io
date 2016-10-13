@@ -66,14 +66,19 @@ my %field_callbacks;
 =cut
 
 sub new {
-  my ($class) = @_;
+  my ($class, $args) = @_;
   
-  my $self = {};
+  my $self = $args || {};
 
   bless $self, $class;
 
   return $self;
 
+}
+
+sub no_exception {
+  my $self = shift;
+  return $self->{'no_exception'};
 }
 
 =head2 get_field
