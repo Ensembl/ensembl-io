@@ -62,6 +62,9 @@ my %field_callbacks;
 =head2 new
 
     Returntype   : Bio::EnsEMBL::IO::Translator
+    Args[1]      : (optional) hashref - current valid key-value pairs:
+                      no_exception => 1 (should be checked for wherever an exception could be thrown,
+                                         and alternative web-friendly behaviour offered)
 
 =cut
 
