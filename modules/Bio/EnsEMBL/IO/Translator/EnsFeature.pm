@@ -65,9 +65,9 @@ my %ens_field_callbacks = (seqname => 'seqname',
 =cut
 
 sub new {
-    my ($class) = @_;
+    my ($class, $args) = @_;
   
-    my $self = $class->SUPER::new();
+    my $self = $class->SUPER::new($args);
 
     # Once we have the instance, add our customized callbacks
     # to the translator
@@ -406,10 +406,13 @@ sub so_term {
     my $so_term = eval { $self->so_mapper()->to_name($object); };
     if($@) {
       if ($self->no_exception) {
-        throw sprintf "Unable to map feature %s to SO term.\n$@", $object->display_id;
+        ## Quick'n'dirty method for objects with no ontology
+        my @namespace = split('::', ref($object));
+        (my $type = $namespace[-1]) =~ s/Feature$//;
+        return lc $type;
       }
       else {
-        return '';
+        throw sprintf "Unable to map feature %s to SO term.\n$@", $object->display_id;
       }
     }
 
