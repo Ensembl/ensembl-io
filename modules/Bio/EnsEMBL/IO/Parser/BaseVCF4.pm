@@ -837,7 +837,7 @@ sub get_samples_info {
   if(defined($key)) {
     my %tmp = map {$formats->[$_] => $_} (0..$#{$formats});
     $format_index = $tmp{$key};
-    confess("ERROR: Key '$key' not found in format string ".join("|", @$formats)) unless defined($format_index);
+    return {} unless defined($format_index);
   }
 
   foreach my $tmp_sample_data (@{$self->get_raw_samples_info($sample_ids)}) {
