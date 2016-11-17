@@ -25,8 +25,13 @@ is($parser->get_taxon_id,'9606',"Testing get_taxon_id");
 is($parser->get_raw_dblinks,'BioProject: PRJNA30353',"Testing get_raw_dblinks");
 ok($parser->is_circular, "Testing is_circular");
 ok($parser->get_length == length($parser->get_sequence), "Testing length of the sequence");
-# is(scalar(@{$parser->get_features}), 106, "Testing number of features");
-# This test doesn't seem to have ever passed. FEATURES block parsing is broken.
+
+my @features = @{ $parser->get_features };
+cmp_ok(scalar @features,'==', 105, "Testing number of features");
+my $feature = $features[2];
+is($feature->{gene}->[0],'TRNF','Check correct gene extracted from feature block');
+is_deeply($feature->{db_xref}, ['GeneID:4558','HGNC:7481','MIM:590070'], 'Xrefs extracted from feature are correct');
+
 
 ok ($parser->close(), "Closing file");
 
