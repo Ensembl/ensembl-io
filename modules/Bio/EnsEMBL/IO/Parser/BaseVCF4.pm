@@ -68,6 +68,9 @@ sub read_metadata {
                     'SAMPLE'   => 1,
                     'PEDIGREE' => 1 );
 
+  chomp $line;
+  push @{$self->{_raw_metadata}}, $line;
+
   if ($line =~ /^##\s*(\w+)=(.+)$/) {
     my $m_type = $1;
     my $m_data = $2;
