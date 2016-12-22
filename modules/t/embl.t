@@ -10,6 +10,8 @@ my $test_file = "modules/t/input/data.embl";
 my $parser = Bio::EnsEMBL::IO::Parser::EMBL->open($test_file);
 
 $parser->next;
+
+is($parser->get_id(), 'X56734', 'ID from first record');
 my $accessions = $parser->get_accessions();
 is_deeply($accessions,[qw(X56734 S46826)],'Accessions from first record');
 
@@ -30,6 +32,7 @@ my $seq = 'aaacaaaccaaatatggattttattgtagccatatttgctctgtttgttattagctcattcacaattac
 is($parser->get_sequence(),$seq,'Sequence correctly cleaned up');
 
 $parser->next;
+is($parser->get_id(), 'BRAF_HUMAN', 'ID from second record');
 $accessions = $parser->get_accessions();
 note(join ' ',@$accessions);
 cmp_deeply($accessions,[qw(P15056 A4D1T4 B6HY61 B6HY62 B6HY63 B6HY64 B6HY65 B6HY66 Q13878 Q3MIN6 Q9UDP8 Q9Y6T3)],'Accessions from second multiline record');
