@@ -141,7 +141,7 @@ sub pos {
   # Get the alleles to check if we need to change the position
   # For indel/insertion/deletion/unbalanced variants, we need to
   # get the ref base (and position) before the variation
-  $pos = $pos - 1 if ($self->get_previous_base_position($object));
+  $pos = $pos - 1 if ($self->get_previous_base_position($object) && $pos > 1);
 
   return $pos;
 }

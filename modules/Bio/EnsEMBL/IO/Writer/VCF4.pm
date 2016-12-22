@@ -98,10 +98,14 @@ sub create_record {
   my @values = $translator->batch_fields($object, \@fields);
 
   #### Create check for Ref and Alt ####
+  my $id_col_id;
   my $ref_col_id;
   my $alt_col_id;
   for (my $i=0; $i < @fields; $i++) {
-    if ($fields[$i] =~ /^REF$/i) {
+    if ($fields[$i] =~ /^ID$/i) {
+      $id_col_id = $i;
+    }
+    elsif ($fields[$i] =~ /^REF$/i) {
       $ref_col_id = $i;
     }
     elsif ($fields[$i] =~ /^ALT$/i) {
@@ -109,8 +113,27 @@ sub create_record {
     }
   }
 
-  return unless $values[$ref_col_id] && $values[$ref_col_id] =~ /^[ATGCN]+$/i;
-  return unless $values[$alt_col_id] && $values[$alt_col_id] =~ /^[ATGCN\*]+$/i;
+  # Reference
+  unless ($values[$ref_col_id] && $values[$ref_col_id] =~ /^[ATGCN]+$/i) {
+    if (!$values[$ref_col_id]) {
+      warn("Can't find reference allele for $values[$id_col_id].\n");
+    }
+    elsif ($values[$ref_col_id] !~ /^[ATGCN]+$/i) {
+      warn("Reference allele '$values[$ref_col_id]' for $values[$id_col_id] is not compatible with VCF specifications.\n");
+    }
+    return;
+  }
+  
+  # Alternative
+  unless ($values[$alt_col_id] && ($values[$alt_col_id] =~ /^([ATGCN\*]+\,?)+$/i || $values[$alt_col_id] =~ /^(<(\w+\:?)+>\,?)+$/i)) {
+    if (!$values[$alt_col_id]) {
+      warn("Can't find alternative allele for $values[$id_col_id].\n");
+    }
+    elsif ($values[$alt_col_id] !~ /^([ATGCN\*]+\,?)+$/i && $values[$alt_col_id] !~ /^(<(\w+\:?)+>\,?)+$/i) {
+      warn("Alternative allele '$values[$alt_col_id]' for $values[$id_col_id] is not compatible with VCF specifications.\n");
+    }
+    return;
+  }
 
   # Sample genotypes
   if (scalar(@{$self->{'translator'}{'samples_list'}}) > 0) {
