@@ -57,7 +57,12 @@ sub read_record {
     my $self = shift;
     # purge previous record
     foreach (keys (%{$self->{record}})) {$self->{record}->{$_} = []}
-    my $field_type = '';
+
+    # this is necessary if we want to intercept the record ID
+    my $field_type = substr($self->{current_block}, 0, 2);
+    push @{$self->{record}->{$field_type}}, $self->{current_block};
+    
+    $field_type = '';
     until ($field_type eq 'SQ' || $self->is_at_end_of_record) {
         if (!$field_type || $field_type eq 'XX' || $self->is_metadata || $field_type eq 'SQ') {
             $self->next_block;
@@ -96,6 +101,16 @@ sub read_metadata {
 sub get_sequence {
     my $self = shift;
     return $self->{record}->{sequence};
+}
+
+=head2 get_id
+    Description: Get the ID without extra qualifiers in the record
+    Returntype : String
+=cut
+
+sub get_id {
+    my $self = shift;
+    return (split /\s/, $self->get_stuff('ID')->[0])[0];
 }
 
 =head2 get_accessions
