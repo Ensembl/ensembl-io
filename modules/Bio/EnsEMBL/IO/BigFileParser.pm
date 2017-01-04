@@ -251,6 +251,52 @@ sub fetch_summary_array {
     return $fh->$method("$seq_id", $start-1, $end, bbiSumMean, $bins);
 }
 
+=head2 fetch_summary_array_extended
+
+    Description: fetches data hashes from the requested region, containing the mean, min and max for each bin 
+    Returntype : ArrayRef
+
+=cut
+
+sub fetch_summary_array_extended {
+    my ($self, $chr_id, $start, $end, $bins) = @_;
+
+    my $fh = $self->open_file;
+    warn "Failed to open file ".$self->url unless $fh;
+    return unless $fh;
+
+    ## Get the internal chromosome name
+    my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
+    return unless $seq_id;
+
+    ## Get whole chromosome if not defined
+    unless ($start && $end) {
+      $start = 1;
+      $end   = $self->cache->{'chr_sizes'}{$chr_id};
+    }
+
+    my $method = $self->type.'SummaryArrayExtended';
+    my $stats = $fh->$method("$seq_id", $start-1, $end, $bins);
+    my $scores = [];
+    my $max;
+    
+    foreach (@$stats) {
+      my $bin_min = sprintf('%.2f', $_->{'minVal'});
+      my $bin_max = sprintf('%.2f', $_->{'maxVal'});
+      my $mean    = $_->{'validCount'}
+                          ? sprintf('%.2f', ($_->{'sumData'} / $_->{'validCount'}))
+                          : 0;
+
+      push @$scores, {'mean' => $mean,
+                      'min' => $bin_min,
+                      'max' => $bin_max,
+                      };
+      $max = $mean if $max < $mean;
+    }
+    return ($scores, $max);
+}
+
+
 =head2 fetch_rows
 
     Description: fetches rows for a requested region
