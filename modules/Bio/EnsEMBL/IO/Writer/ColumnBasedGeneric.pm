@@ -75,11 +75,11 @@ sub write {
     # you need to translate a feature in to a metadata record (ie. GFF3
     # chromosome list), create a metadata specific translator for that
     if($object->isa('Bio::EnsEMBL::IO::Object::Metadata')) {
-	print { $self->{writer_handle} } $object->create_record();
+	    print { $self->{writer_handle} } $object->create_record();
     } else {
-	# Use the default translator if we haven't been given one
-	$translator ||= $self->translator();
-	print { $self->{writer_handle} } $self->create_record($object, $translator);
+	    # Use the default translator if we haven't been given one
+	    $translator ||= $self->translator();
+	    print { $self->{writer_handle} } $self->create_record($object, $translator);
     }
 
 }
