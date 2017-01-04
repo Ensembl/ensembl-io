@@ -58,31 +58,31 @@ sub new {
     # to do this, the list of accessors creeps larger an a different
     # set of fields is passed in during a subsequent instantiation
     foreach my $field (@$fields) {
-	no strict "refs"; 
-	# We don't want to redefine functions everytime
-	# a new instance is created
-	unless(defined *{$field}) {
-	    *$field = sub :lvalue {
-		my $me = shift;
-		$me->{$field} = shift if @_;
-		$me->{$field};
-	    };
-	}
+	    no strict "refs"; 
+	    # We don't want to redefine functions everytime
+	    # a new instance is created
+	    unless(defined *{$field}) {
+	      *$field = sub :lvalue {
+		                            my $me = shift;
+		                            $me->{$field} = shift if @_;
+		                            $me->{$field};
+	                            };
+	    }
 
-	unless(defined *{"get_$field"}) {
-	    *{"get_$field"} = sub {
-		my $me = shift;
-		$me->{$field};
-	    };
-	}
+	    unless(defined *{"get_$field"}) {
+	      *{"get_$field"} = sub {
+		                            my $me = shift;
+		                            $me->{$field};
+	                            };
+	    }
 
-	unless(defined *{"munge_$field"}) {
-	    *{"munge_$field"} = sub {
-		my $me = shift;
-		my $value = shift;
-		$me->{$field} = $value;
-	    };
-	}
+	    unless(defined *{"munge_$field"}) {
+	      *{"munge_$field"} = sub {
+		                              my $me = shift;
+		                              my $value = shift;
+		                              $me->{$field} = $value;
+	                              };
+	    }
     }
 
     bless $self, $class;
@@ -113,8 +113,8 @@ sub batch_fields {
 
     # Cycle through fields and fetch values
     foreach my $field (@{$fields}) {
-	my $value = $object->$field();
-	push @values, $value;
+	    my $value = $object->$field();
+	    push @values, $value;
     }
 
     return @values;
@@ -136,7 +136,7 @@ sub set_fields {
     my $values = shift;
 
     foreach my $key (keys %{$values}) {
-	$self->$key( $values->{$key} );
+	    $self->$key( $values->{$key} );
     }
 }
 
@@ -150,12 +150,12 @@ sub fields {
     my $self = shift;
 
     if(@_) {
-	my $arg = shift;
-	if(ref $arg eq 'ARRAY') {
-	    $self->{fields} = $arg;
-	}
+	    my $arg = shift;
+	    if(ref $arg eq 'ARRAY') {
+	      $self->{fields} = $arg;
+	    }
     } else {
-	return $self->{'fields'} || [];
+	    return $self->{'fields'} || [];
     }
 }
 
@@ -171,7 +171,7 @@ sub length {
     my $self = shift;
 
     if($self->can('start') && $self->can('end')) {
-	return abs($self->end - $self->start);
+	    return abs($self->end - $self->start);
     }
 }
 
