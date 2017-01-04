@@ -99,14 +99,17 @@ sub open {
     my $list = $fh->chromList;
     my $head = $list->head;
     my $chromosomes = {};
+    my $chr_sizes   = {};
     do {
       if ($head->name && $head->size) {
         (my $chr = $head->name) =~ s/^chr//;
         $chromosomes->{$chr} = $head->name;
+        $chr_sizes->{$chr} = $head->size;
       }
     } while ($head && ($head = $head->next));
     #use Data::Dumper; warn Dumper($chromosomes);
     $self->{cache}{chromosomes} = $chromosomes;
+    $self->{cache}{chr_sizes}   = $chr_sizes;
 
     ## Do any additional pre-processing
     $self->init($fh); 
@@ -237,6 +240,12 @@ sub fetch_summary_array {
     ## Get the internal chromosome name
     my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
     return unless $seq_id;
+
+    ## Get whole chromosome if not defined
+    unless ($start && $end) {
+      $start = 1;
+      $end   = $self->cache->{'chr_sizes'}{$chr_id};
+    }
 
     my $method = $self->type.'SummaryArray';
     return $fh->$method("$seq_id", $start-1, $end, bbiSumMean, $bins);
