@@ -291,7 +291,7 @@ sub fetch_summary_array_extended {
                       'min' => $bin_min,
                       'max' => $bin_max,
                       };
-      $max = $mean if $max < $mean;
+      $max = $mean if (!defined($max) || $max < $mean);
     }
     return ($scores, $max);
 }
