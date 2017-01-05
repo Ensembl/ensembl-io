@@ -79,9 +79,28 @@ sub new {
 
 }
 
+=head2 
+  
+    Description : Getter for no_exception parameter 
+    Returntype  : Boolean
+
+=cut
+
 sub no_exception {
   my $self = shift;
   return $self->{'no_exception'};
+}
+
+=head2 
+  
+    Description : Getter for optional SpeciesDefs object, used to output feature colours from web
+    Returntype  : EnsEMBL::Web::SpeciesDefs
+
+=cut
+
+sub species_defs {
+  my $self = shift;
+  return $self->{'species_defs'};
 }
 
 =head2 get_field
@@ -107,7 +126,7 @@ sub get_field {
 	      $value = $field_callbacks{$field}($object);
 	    } else {
 	      my $callback = $field_callbacks{$field};
-	      $value = $self->$callback($object);
+	      $value = $self->can($callback) ? $self->$callback($object) : undef;
 	    }
 	    return $value;
     }
