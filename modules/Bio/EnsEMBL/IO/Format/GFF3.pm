@@ -36,7 +36,7 @@ sub new {
   my $self = {
               'name'            => 'GFF3',
               'extensions'      => ['gff', 'gff3'],
-              'delimiter'       => '\t',
+              'delimiters'      => ["\t"],
               'empty_column'    => '.',
               'can_multitrack'  => 1,
               'can_metadata'    => -1,
