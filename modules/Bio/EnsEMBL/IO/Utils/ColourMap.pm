@@ -20,7 +20,7 @@ limitations under the License.
 package Bio::EnsEMBL::IO::Utils::ColourMap;
 use strict;
 
-use EnsEMBL::Draw::Utils::NamedColours;
+use Bio::EnsEMBL::IO::Utils::NamedColours;
 
 use List::Util qw(min max);
 
