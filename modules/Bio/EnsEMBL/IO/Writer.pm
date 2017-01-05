@@ -84,8 +84,8 @@ sub close {
 
     Type: Setter/getter
     Description: Setter/getter for the translator, the translator is
-                 what converts objects in to the requested format
-                 based on the subclassing of Writer
+                 what fetches information from Ensembl objects
+                 appropriate for the file format being written
     Returntype : Translator object
 
 =cut
@@ -99,6 +99,26 @@ sub translator {
   }
 
   return $self->{translator};
+}
+
+=head2 format
+
+    Type: Setter/getter
+    Description: Setter/getter for the format, which contains
+                 the definition for a file format
+    Returntype : Format object
+
+=cut
+
+sub format {
+  my $self = shift;
+
+  if (@_) {
+	  my $format = shift;
+	  $self->{format} = $format;
+  }
+
+  return $self->{format};
 }
 
 =head2 write
