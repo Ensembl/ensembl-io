@@ -29,67 +29,95 @@ use warnings;
 
 use Carp;
 
-use base qw/Bio::EnsEMBL::IO::Translator::Feature/;
+use base qw/Bio::EnsEMBL::IO::Translator::Gene/;
 
-=head2 get_itemRgb
+my %trans_field_callbacks = (
+                              'thickStart'  => 'thickStart',
+                              'thickEnd'    => 'thickEnd',
+                              'blockCount'  => 'blockCount',
+                              'blockStarts' => 'blockStarts',
+                              'blockSizes'  => 'blockSizes',
+                              );
+
+=head2 new
+
+    Returntype   : Bio::EnsEMBL::IO::Translator::Transcript
+
+=cut
+
+sub new {
+    my ($class, $args) = @_;
+
+    my $self = $class->SUPER::new($args);
+
+    # Once we have the instance, add our customized callbacks
+    # to the translator
+    $self->add_callbacks(\%trans_field_callbacks);
+
+    return $self;
+
+}
+
+
+=head2 itemRgb
 
     Description:
     Returntype : String
 
 =cut
 
-sub get_itemRgb {
+sub itemRgb {
   my ($self, $transcript) = @_;
-  return '0,0,0' unless $self->species_defs;
+  return '0,0,0' unless $self->colourmap;
   my $colours = $self->species_defs->colour('transcript');
   my $colour = $colours->{$transcript->biotype}{'default'};
-  return $colour ? '('.join(',',$self->rgb_by_name($colour)).')' : undef;
+  return $colour ? join(',',$self->colourmap->rgb_by_name($colour)) : undef;
 }
 
-=head2 get_thickStart
+=head2 thickStart
 
-    Description: Placeholder - needed so that column counts are correct
-    Returntype : Zero
+    Description: Gets coding start of transcript, for BED format 
+    Returntype : Integer
 
 =cut
 
-sub get_thickStart {
+sub thickStart {
   my ($self, $transcript) = @_;
   return $transcript->coding_region_start;
 }
 
-=head2 get_thickEnd
+=head2 thickEnd
 
-    Description: Placeholder - needed so that column counts are correct
-    Returntype : Zero
+    Description: Gets coding end of transcript, for BED format 
+    Returntype : Integer
 
 =cut
 
-sub get_thickEnd {
+sub thickEnd {
   my ($self, $transcript) = @_;
   return $transcript->coding_region_end;
 }
 
-=head2 get_blockCount
+=head2 blockCount
 
-    Description: Placeholder - needed so that column counts are correct
-    Returntype : Zero
+    Description: Gets the number of exons, for BED format 
+    Returntype : Integer
 
 =cut
 
-sub get_blockCount {
+sub blockCount {
   my ($self, $transcript) = @_;
   return scalar(@{$transcript->get_all_Exons});
 }
 
-=head2 get_blockSizes
+=head2 blockSizes
 
-    Description: Placeholder - needed so that column counts are correct
-    Returntype : Zero
+    Description: Gets the lengths of all exons, for BED format
+    Returntype : String
 
 =cut
 
-sub get_blockSizes {
+sub blockSizes {
   my ($self, $transcript) = @_;
   my @sizes;
   foreach my $exon (@{$transcript->get_all_Exons}) {
@@ -99,14 +127,14 @@ sub get_blockSizes {
   return join(',', @sizes);
 }
 
-=head2 get_blockStart
+=head2 blockStarts
 
-    Description: Placeholder - needed so that column counts are correct
-    Returntype : Zero
+    Description: Gets the start coordinates of all exons, for BED format
+    Returntype : String
 
 =cut
 
-sub get_blockStarts {
+sub blockStarts {
   my ($self, $transcript) = @_;
   my @starts;
   foreach my $exon (@{$transcript->get_all_Exons}) {
