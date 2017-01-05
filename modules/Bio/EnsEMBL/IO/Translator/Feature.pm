@@ -47,15 +47,16 @@ use URI::Escape;
 use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
 use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
-my %ens_field_callbacks = (seqname => 'seqname',
-                           source  => 'source',
-                           type  => 'type',
-                           start  => 'start',
-                           end  => 'end',
-                           score  => 'score',
-                           strand  => 'strand',
-                           phase  => 'phase',
-                           attributes  => 'attributes'
+my %ens_field_callbacks = (seqname   => 'seqname',
+                           start      => 'start',
+                           end        => 'end',
+                           strand     => 'strand',
+                           name       => 'name',
+                           source     => 'source',
+                           type       => 'type',
+                           score      => 'score',
+                           phase      => 'phase',
+                           attributes => 'attributes'
                            );
 
 =head2 new
@@ -79,6 +80,11 @@ sub new {
 
 }
 
+=head2 seqname
+    Description: Wrapper around API call to seq region name
+    Returntype : String
+=cut
+
 sub seqname {
     my $self = shift;
     my $object = shift;
@@ -86,42 +92,10 @@ sub seqname {
     return $object->seq_region_name() ? $object->seq_region_name() : '?';
 }
 
-sub source {
-    my $self = shift;
-    my $object = shift;
-
-    my $source;
-    if( ref($object)->isa('Bio::EnsEMBL::Slice') ) {
-	    $source = $object->source || $object->coord_system->version
-    } elsif( ref($object)->isa('Bio::EnsEMBL::Gene') ||
-	    ref($object)->isa('Bio::EnsEMBL::Transcript') ||
-	    ref($object)->isa('Bio::EnsEMBL::PredictionTranscript') ) {
-	    $source = $object->source();
-    } elsif( ref($object)->isa('Bio::EnsEMBL::ExonTranscript') ||
-	     ref($object)->isa('Bio::EnsEMBL::CDS') ||
-	     ref($object)->isa('Bio::EnsEMBL::UTR') ) {
-	    $source = $object->transcript()->source();
-    }
-
-    if( ! defined $source ) {
-	    if ( ref($object)->isa('Bio::EnsEMBL::Feature') &&
-	      defined($object->analysis) && $object->analysis->gff_source() ) {
-	      $source = $object->analysis->gff_source();
-	    } else {
-	      $source = '.';
-	    }
-    }
-
-    return $source;
-}
-
-sub type {
-    my $self = shift;
-    my $object = shift;
-
-    return $self->so_term($object);
-
-}
+=head2 start
+    Description: Wrapper around API call to feature start
+    Returntype : Integer
+=cut
 
 sub start {
     my $self = shift;
@@ -129,6 +103,12 @@ sub start {
 
     return $object->seq_region_start();
 }
+
+=head2 end
+    Description: Wrapper around API call to feature end
+    Returntype : Integer
+=cut
+
 
 sub end {
     my $self = shift;
@@ -150,6 +130,50 @@ sub end {
     }
 
     return $end;
+}
+
+=head2 source
+    Description: Get the source of an analysis or other track
+    Returntype : Integer
+=cut
+
+sub source {
+    my $self = shift;
+    my $object = shift;
+
+    my $source;
+    if (ref($object)->isa('Bio::EnsEMBL::Slice') ) {
+	    $source = $object->source || $object->coord_system->version
+    } 
+    elsif (ref($object)->isa('Bio::EnsEMBL::ExonTranscript') ||
+	          ref($object)->isa('Bio::EnsEMBL::CDS') ||
+	          ref($object)->isa('Bio::EnsEMBL::UTR') ) {
+	    $source = $object->transcript()->source();
+    } 
+    elsif (ref($object)->isa('Bio::EnsEMBL::Feature') &&
+	          defined($object->analysis) && $object->analysis->gff_source() ) {
+	    $source = $object->analysis->gff_source();
+    }
+
+    return $source;
+}
+
+sub type {
+    my $self = shift;
+    my $object = shift;
+
+    return $self->so_term($object);
+
+}
+
+=head2 name
+    Description: Wrapper around API call to feature name
+    Returntype : String
+=cut
+
+sub name {
+  my ($self, $feature) = @_;
+  return $feature->can('stable_id') ? $feature->stable_id : 'Feature';
 }
 
 sub score {
