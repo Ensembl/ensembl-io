@@ -115,6 +115,18 @@ sub delimiter {
   return $self->{'delimiter'};
 }
 
+=head2 empty_column
+
+    Description : getter for value used in empty columns 
+    Returntype  : String
+
+=cut
+
+sub empty_column {
+  my $self = shift;
+  return $self->{'empty_column'} || '';
+}
+
 =head2 can_multitrack 
 
     Description : getter for multitrack flag
