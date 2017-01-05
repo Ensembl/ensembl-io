@@ -102,14 +102,14 @@ sub get_field {
 
     # If we have the requested field, return it
     if(defined( $field_callbacks{$field} )) {
-	my $value;
-	if( ref($field_callbacks{$field}) eq 'CODE' ) {
-	    $value = $field_callbacks{$field}($object);
-	} else {
-	    my $callback = $field_callbacks{$field};
-	    $value = $self->$callback($object);
-	}
-	return $value;
+	    my $value;
+	    if( ref($field_callbacks{$field}) eq 'CODE' ) {
+	      $value = $field_callbacks{$field}($object);
+	    } else {
+	      my $callback = $field_callbacks{$field};
+	      $value = $self->$callback($object);
+	    }
+	    return $value;
     }
 
     # If the field doesn't exist, return undef
@@ -135,8 +135,8 @@ sub batch_fields {
 
     # Cycle through fields and fetch values
     foreach my $field (@{$fields}) {
-	my $value = $self->get_field($object, $field);
-	push @values, $value;
+	    my $value = $self->get_field($object, $field);
+	    push @values, $value;
     }
     
     return @values;
@@ -169,9 +169,9 @@ sub fetch_callback {
     my $self = shift;
     my $field = shift;
 
-     # If we have the requested field, return it
+    # If we have the requested field, return it
     if(defined( $field_callbacks{$field} )) {
-	return $field_callbacks{$field};
+	    return $field_callbacks{$field};
     }
 
     # If the field doesn't exist, return undef
