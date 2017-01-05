@@ -455,45 +455,4 @@ sub validate {
 }
 
 
-=head2 create_record
-
-    Description: Creates a single line of a BED file from an API object 
-    Returntype : String
-
-=cut
-
-sub create_record {
-  my ($self, $translator, $object) = @_;
-  my @values;
-
-  ## Add the fields in order
-  my $start = $self->munge_start($translator->get_start($object)) || '.';
-  my $end = $translator->get_end($object) || '.';
-  push @values, $self->munge_seqname($translator->get_seqname($object)) || '.'; 
-  push @values, $start;
-  push @values, $end;
-  if ($self->get_metadata_value('type') =~ /bedgraph/i) {
-    push @values, '.'; 
-  }
-  else {
-    push @values, $translator->get_name($object) || '.'; 
-    push @values, $translator->get_score($object) eq '.' ? 0 : $translator->get_score($object);
-    push @values, $self->munge_strand($translator->get_strand($object)) || '.'; 
-    push @values, $translator->get_thickStart($object) ? $self->munge_start($translator->get_thickStart($object)) : $start;
-    push @values, $translator->get_thickEnd($object) ? $translator->get_thickEnd($object) : $end;
-    push @values, $translator->get_itemRgb($object) || '.'; 
-    if ($translator->get_blockCount($object)) {
-        push @values, $translator->get_blockCount($object);
-        push @values, $translator->get_blockSizes($object);
-        my @blockStart;
-        foreach my $block_start (split(',', $translator->get_blockStarts($object))) {
-            push(@blockStart, $self->munge_start($block_start-$start));
-        }
-        push @values, join(',', @blockStart);
-    }
-  }
-  return $self->concatenate_fields(@values);
-}
-
-
 1;
