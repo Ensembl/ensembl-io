@@ -132,7 +132,7 @@ sub fields {
                  GXF), combine the pieces of the field using a delimiter
     Args[1]    : Hashref, values to be combined
     Args[2]    : String, Delimiter between values (optional, default ';')
-    Args[3]    : Bool, Include the name of the field when combining balues (optional, default true)
+    Args[3]    : Bool, Include the name of the field when combining values (optional, default true)
     Args[4]    : String, Separator between label and value (optional, default '=')
     Args[5]    : String, Character(s) to quote values with (optional, default '')
     Returntype : String of concatenated fields
@@ -182,7 +182,6 @@ sub combine_fields {
     Description: Put values together to create the final record, may need to
                  be overridden for non-GXF column based formats
     Args[1]    : Arrayref, Values to combine in to string
-    Args[2]    : String, Delimiter between joined values (optional)
     Returntype : String
 
 =cut
@@ -190,10 +189,26 @@ sub combine_fields {
 sub concatenate_fields {
     my $self = shift;
     my $values = shift;
-    my $delimiter = shift || "\t";
+    my $format = $self->format; 
+    my @new_values;
 
-    return @{$values} ? join( $delimiter, map { (defined($_) && ref $_ eq 'HASH') ? $self->combine_fields($_) : $_ } @{$values} ) : '';
-#    return join $delimiter, @{$values};
+    my $delimiter = $format->delimiter || "\t";
+
+    foreach (@{$values||[]}) {
+      if (defined($_)) {
+        if (ref $_ eq 'HASH') {
+          push @new_values, $self->combine_fields($_); 
+        }
+        else {
+          push @new_values, $_;
+        }
+      }
+      else {
+        push @new_values, $format->empty_column;
+      }
+    }
+
+    return join $delimiter, @new_values;
 }
 
 1;
