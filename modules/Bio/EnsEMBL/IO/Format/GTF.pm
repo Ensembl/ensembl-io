@@ -36,7 +36,8 @@ sub new {
   my $self = {
               'name'            => 'GTF',
               'extensions'      => ['gtf'],
-              'delimiters'      => ["\t"],
+              'delimiter'       => "\t",
+              'delimiter_regex' => '\t',
               'empty_column'    => '.',
               'can_multitrack'  => 1,
               'can_metadata'    => -1,

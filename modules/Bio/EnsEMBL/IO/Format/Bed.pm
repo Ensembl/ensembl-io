@@ -40,7 +40,8 @@ sub new {
   my $self = {
           'name'            => 'Bed',
           'extensions'      => ['bed'],
-          'delimiters'      => ["\t", "\s"],
+          'delimiter'       => "\t",
+          'delimiter_regex' => '\t|\s+',
           'empty_column'    => '.',
           'can_multitrack'  => 1,
           'can_metadata'    => -1,

@@ -103,29 +103,28 @@ sub extensions {
   return $self->{'extensions'} || [];
 }
 
-=head2 delimiters
+=head2 delimiter
 
-    Description : getter for delimiter(s) (if format has any)
+    Description : getter for default delimiter (if format has one)
     Returntype  : String
 
 =cut
 
-sub delimiters {
+sub delimiter {
   my $self = shift;
-  return $self->{'delimiters'};
+  return $self->{'delimiter'};
 }
 
-=head2 default_delimiter
+=head2 delimiter_regex
 
-    Description : getter for first delimiter (in case format has more than one)
+    Description : Regex for validating delimiter(s) 
     Returntype  : String
 
 =cut
 
-sub default_delimiter {
+sub delimiter_regex {
   my $self = shift;
-  ## Some formats have alternative delimiters, but for writing we only need one 
-  return $self->{'delimiters'}[0];
+  return $self->{'delimiter_regex'};
 }
 
 =head2 empty_column

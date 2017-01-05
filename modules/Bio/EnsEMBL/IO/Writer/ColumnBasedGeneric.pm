@@ -192,7 +192,7 @@ sub concatenate_fields {
     my $format = $self->format; 
     my @new_values;
 
-    my $delimiter = $format->default_delimiter || "\t";
+    my $delimiter = $format->delimiter || "\t";
 
     foreach (@{$values||[]}) {
       if (defined($_)) {
