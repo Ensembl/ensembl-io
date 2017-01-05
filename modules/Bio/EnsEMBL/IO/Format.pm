@@ -253,6 +253,27 @@ sub get_value_for_field {
   return $info->{$value};
 }
 
+=head2 get_accessors
+
+    Description : get array of Ensembl accessor names instead of the official field names
+    Returntype  : Arrayref
+
+=cut
+
+sub get_accessors {
+  my $self = shift;
+  my $info  = $self->get_field_info;
+  my $order = $self->get_field_order;
+  my $accessors = [];
+
+  foreach (@$order) {
+    my $name = $info->{$_}{'accessor'} || $_;
+    push @$accessors, $name;
+  }
+
+  return $accessors;
+}
+
 ########## VALIDATION METHODS #################
 
 =head2 validate_as
