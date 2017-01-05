@@ -455,6 +455,9 @@ sub _default_source {
     return $self->{default_source};
 }
 
+
+##### SHOULD THIS BE IN THE TRANSLATOR? SURELY IT IS A FORMAT THING?
+
 =head2 strand_conversion
 
     Description: Sets hash giving the strand conversion for this
