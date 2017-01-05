@@ -404,6 +404,20 @@ sub validate_as_strand_plusminus {
   return $value =~ /^\+|-$/ ? 1 : 0;
 }
 
+=head2 validate_as_phase
+
+    Description : Validator for fields that should contain a coding phase, i.e. 0, 1 or 2 
+    Args        : Value - value to be checked
+    Returntype  : Boolean
+
+=cut
+
+sub validate_as_phase {
+  my ($self, $value) = @_;
+  return $value =~ /^0|1|2$/ ? 1 : 0;
+}
+
+
 =head2 validate_as_rgb_string
 
     Description : Validator for fields that should contain an RGB colour as a comma-separated string 
