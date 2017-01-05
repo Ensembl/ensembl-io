@@ -414,7 +414,7 @@ sub validate_as_strand_integer {
 }
 
 =head2 validate_as_strand_plusminus
-    Description : Validator for fields that should contain a strand as + or -
+    Description : Validator for fields that should contain a strand as one of  + - ?
     Args        : Type - validation type
                 : Value - value to be checked
     Returntype  : Boolean
@@ -422,7 +422,7 @@ sub validate_as_strand_integer {
 
 sub validate_as_strand_plusminus {
   my ($self, $value) = @_;
-  return $value =~ /^\+|-$/ ? 1 : 0;
+  return $value =~ /^\+|-|\?|\.$/ ? 1 : 0;
 }
 
 =head2 validate_as_phase
