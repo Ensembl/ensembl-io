@@ -41,6 +41,7 @@ sub new {
           'name'            => 'Bed',
           'extensions'      => ['bed'],
           'delimiter'       => '\t|\s',
+          'empty_column'    => '.',
           'can_multitrack'  => 1,
           'can_metadata'    => -1,
           'metadata_info'   => {
