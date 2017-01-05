@@ -80,14 +80,17 @@ sub new {
                                 'chrom' => {
                                                 'validate_as' => 'string',
                                                 'optional'    => 0,  
+                                                'accessor'    => 'seqname',
                                                 },
                                 'chromStart' => {
                                                 'validate_as' => 'integer',
                                                 'optional'    => 0,  
+                                                'accessor'    => 'start',
                                                 },
                                 'chromEnd' => {
                                                 'validate_as' => 'integer',
                                                 'optional'    => 0,  
+                                                'accessor'    => 'end',
                                                 },
                                 'name' => {
                                                 'validate_as' => 'string',
