@@ -81,15 +81,12 @@ sub get_name {
 
 =head2 get_score
 
-    Description: Wrapper around API call to feature name
+    Description: Stub - most features don't have a score
     Returntype : String
 
 =cut
 
-sub get_score {
-  my ($self, $feature) = @_;
-  return '.';
-}
+sub get_score {}
 
 =head2 get_strand
 
@@ -101,66 +98,6 @@ sub get_score {
 sub get_strand {
   my ($self, $feature) = @_;
   return $feature->strand;
-}
-
-=head2 get_thickStart
-
-    Description: Placeholder - needed so that column counts are correct 
-    Returntype : Zero
-
-=cut
-
-sub get_thickStart {
-  my ($self, $vf) = @_;
-  return '0'
-}
-
-=head2 get_thickEnd
-
-    Description: Placeholder - needed so that column counts are correct 
-    Returntype : Zero
-
-=cut
-
-sub get_thickEnd {
-  my ($self, $vf) = @_;
-  return '0'
-}
-
-=head2 get_blockCount
-
-    Description: Placeholder - needed so that column counts are correct
-    Returntype : Zero
-
-=cut
-
-sub get_blockCount {
-  my ($self, $vf) = @_;
-  return '0'
-}
-
-=head2 get_blockSizes
-
-    Description: Placeholder - needed so that column counts are correct
-    Returntype : Zero
-
-=cut
-
-sub get_blockSizes {
-  my ($self, $vf) = @_;
-  return '0'
-}
-
-=head2 get_blockStart
-
-    Description: Placeholder - needed so that column counts are correct
-    Returntype : Zero
-
-=cut
-
-sub get_blockStart {
-  my ($self, $vf) = @_;
-  return '0'
 }
 
 1;
