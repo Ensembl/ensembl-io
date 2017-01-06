@@ -86,7 +86,7 @@ sub new {
                                 'chromStart' => {
                                                 'validate_as' => 'integer',
                                                 'optional'    => 0,  
-                                                'accessor'    => 'start',
+                                                'accessor'    => 'bedstart',
                                                 },
                                 'chromEnd' => {
                                                 'validate_as' => 'integer',

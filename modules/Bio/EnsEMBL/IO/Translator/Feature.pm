@@ -55,6 +55,7 @@ my %ens_field_callbacks = (seqname   => 'seqname',
                            source     => 'source',
                            type       => 'type',
                            score      => 'score',
+                           bedstart   => 'bedstart',
                            itemRgb    => 'itemRgb',
                            phase      => 'phase',
                            attributes => 'attributes'
@@ -103,6 +104,18 @@ sub start {
     my $object = shift;
 
     return $object->seq_region_start();
+}
+
+=head2 bedstart
+    Description: Subtract 1 from Ensembl start, for BED semi-open coordinates 
+    Returntype : Integer
+=cut
+
+sub bedstart {
+    my $self = shift;
+    my $object = shift;
+
+    return $object->seq_region_start() - 1;
 }
 
 =head2 end
