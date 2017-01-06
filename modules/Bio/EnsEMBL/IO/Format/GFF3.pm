@@ -39,8 +39,8 @@ sub new {
               'delimiter'       => "\t",
               'delimiter_regex' => '\t',
               'empty_column'    => '.',
-              'can_multitrack'  => 1,
-              'can_metadata'    => -1,
+              'can_multitrack'  => 0,
+              'can_metadata'    => 1,
               'metadata_info'   => {
                                     'name' => {
                                                 'optional'    => 1,
@@ -67,7 +67,7 @@ sub new {
                                                 'optional'    => 0,
                                                 },
                                 'type' => {
-                                            'validate_as' => 'gtf_feature',
+                                            'validate_as' => 'string',
                                             'optional'    => 0,
                                             },
                                 'start' => {
@@ -91,44 +91,15 @@ sub new {
                                               'validate_as' => 'phase',
                                               'optional'    => 0,
                                               },
-                                'attribute' => {
-                                                'validate_as' => 'gtf_attribute',
-                                                'optional'    => 1,
+                                'attributes' => {
+                                                'validate_as' => 'string',
+                                                'optional'    => 0,
                                                 },
                                   },
-            'field_order'   => [qw(seqname source feature start end score strand frame attribute)],
+            'field_order'   => [qw(seqname source type start end score strand phase attributes)],
           };
 
   bless $self, $class;
 };
-
-=head2 validate_as_gtf_feature 
-
-    Description : Validator for GFF3 'feature' column 
-    Args        : Value - value to be checked
-    Returntype  : Boolean
-
-=cut
-
-sub validate_as_gtf_feature {
-  my ($self, $value) = @_;
-  
-  return $value =~ /CDS|start_codon|stop_codon|5UTR|3UTR|inter|inter_CNS|intron_CNS|exon/ ? 1 : 0;
-}
-
-=head2 validate_as_gtf_attribute 
-
-    Description : Validator for GFF3 'attribute' column 
-    Args        : Value - value to be checked
-    Returntype  : Boolean
-
-=cut
-
-sub validate_as_gtf_feature {
-  my ($self, $value) = @_;
-  
-  return ($value =~ /gene_id/ && $value =~ /transcript_id) ? 1 : 0;
-}
-
 
 1;
