@@ -93,6 +93,7 @@ sub new {
                                   'attribute' => {
                                                   'validate_as' => 'string',
                                                   'optional'    => 1,
+                                                  'accessor'    => 'gtf_attributes',
                                                 },
                                     },
             'field_order'   => [qw(seqname source feature start end score strand frame attribute)],
