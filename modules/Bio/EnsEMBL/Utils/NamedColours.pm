@@ -17,7 +17,7 @@ limitations under the License.
 
 =cut
 
-package Bio::EnsEMBL::IO::Utils::NamedColours;
+package Bio::EnsEMBL::Utils::NamedColours;
 use strict;
 
 ## Simple package to return the Unix named colours

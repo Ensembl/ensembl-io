@@ -17,10 +17,10 @@ limitations under the License.
 
 =cut
 
-package Bio::EnsEMBL::IO::Utils::ColourMap;
+package Bio::EnsEMBL::Utils::ColourMap;
 use strict;
 
-use Bio::EnsEMBL::IO::Utils::NamedColours;
+use Bio::EnsEMBL::Utils::NamedColours;
 
 use List::Util qw(min max);
 
@@ -32,7 +32,7 @@ sub new {
 
   $errors = {};
 
-  my $self = Bio::EnsEMBL::IO::Utils::NamedColours::named_colours;
+  my $self = Bio::EnsEMBL::Utils::NamedColours::named_colours;
 
   bless $self, $class;
 
