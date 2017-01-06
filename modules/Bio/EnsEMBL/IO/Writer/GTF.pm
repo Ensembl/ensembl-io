@@ -46,7 +46,7 @@ use strict;
 use warnings;
 use Carp;
 
-use Bio::EnsEMBL::IO::Object::GTF;
+use Bio::EnsEMBL::IO::Format::GTF;
 
 =head2 new
 
@@ -60,31 +60,12 @@ sub new {
     my $class = shift;
 
     my $self = $class->SUPER::new(@_);
-
-    $self->fields( Bio::EnsEMBL::IO::Object::GTF->fields() );
+    my $format = Bio::EnsEMBL::IO::Format::GTF->new;
+    $self->format($format);
+    ## Backwards compatibility
+    $self->fields($format->get_accessors);
 
     return $self;
-}
-
-=head2 translator
-
-    Description: Setter/getter for a translator, with the added feature
-                 that the translator's strand_conversion is set if available.
-    Args[1]    : Translator object
-    Returntype : Translator object
-
-=cut
-
-sub translator {
-    my $self = shift;
-
-    my $translator = $self->SUPER::translator(@_);
-    
-    if( $translator &&  $translator->can('strand_conversion') ) {
-	    $translator->strand_conversion(Bio::EnsEMBL::IO::Object::GTF->strand_conversion());
-    }
-
-    return $translator;
 }
 
 =head2 combine_fields
