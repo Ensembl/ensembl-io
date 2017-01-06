@@ -50,19 +50,20 @@ use Scalar::Util qw/blessed/;
 use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
 use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
-my %ens_field_callbacks = (seqname   => 'seqname',
-                           start      => 'start',
-                           end        => 'end',
-                           strand     => 'strand',
-                           name       => 'name',
-                           source     => 'source',
-                           feature    => 'feature',
-                           type       => 'type',
-                           score      => 'score',
-                           bedstart   => 'bedstart',
-                           itemRgb    => 'itemRgb',
-                           phase      => 'phase',
-                           attributes => 'attributes'
+my %ens_field_callbacks = (seqname        => 'seqname',
+                           start          => 'start',
+                           end            => 'end',
+                           strand         => 'strand',
+                           name           => 'name',
+                           source         => 'source',
+                           feature        => 'feature',
+                           type           => 'type',
+                           score          => 'score',
+                           bedstart       => 'bedstart',
+                           itemRgb        => 'itemRgb',
+                           phase          => 'phase',
+                           attributes     => 'attributes',
+                           gtf_attributes => 'gtf_attributes',
                            );
 
 =head2 new
@@ -451,11 +452,12 @@ sub add_attr {
     my $attr = shift;
     my $value = shift;
 
-    if(defined($attrs->{$attr})) {
+    if (defined($attrs->{$attr})) {
 	    if( ref($attrs->{$attr}) eq 'ARRAY' ) {
-	      push @{$attrs->{$attr}}, $value;
+        my $duplicate = grep {$_ eq $value} @{$attrs->{$attr}};
+	      push @{$attrs->{$attr}}, $value unless $duplicate;
 	    } else {
-	      $attrs->{$attr} = [ $attrs->{$attr}, $value ];
+	      $attrs->{$attr} = [ $attrs->{$attr}, $value ] unless ($attrs->{$attr} eq $value);
 	    }
     } else {
 	    $attrs->{$attr} = $value;
