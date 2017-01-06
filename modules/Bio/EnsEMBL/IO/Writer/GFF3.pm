@@ -46,8 +46,8 @@ use strict;
 use warnings;
 use Carp;
 
-use Bio::EnsEMBL::IO::Object::GFF3;
-use Bio::EnsEMBL::IO::Object::GXFMetadata;
+use Bio::EnsEMBL::IO::Format::GFF3;
+#use Bio::EnsEMBL::IO::Object::GXFMetadata;
 
 my @default_order = qw(ID Parent Name Alias Target Gap Derives_from Note Dbxref Ontology_term Is_circular);
 
@@ -65,40 +65,13 @@ sub new {
 
     my $self = $class->SUPER::new($translator);
 
-    $self->fields( Bio::EnsEMBL::IO::Object::GFF3->fields() );
-
-    if( $translator->can('strand_conversion') ) {
-	$translator->strand_conversion(Bio::EnsEMBL::IO::Object::GFF3->strand_conversion());
-    }
-
-    # Cheat and make a GXFMetadata object in a really quick and lighttweight manner.
-    # We need one hanging around for the fwd-ref writer call
-    $self->{fwd_ref} = bless { type => 'fwd-ref-delimeter' }, 'Bio::EnsEMBL::IO::Object::GXFMetadata';
+    my $format = Bio::EnsEMBL::IO::Format::GFF3->new;
+    $self->format($format);
+    ## Backwards compatibility
+    $self->fields($format->get_accessors);
 
     return $self;
 }
-
-=head2 fwd_ref_delimeter
-
-    Description: Shortcut to write a forward reference delimeter in the GFF3 format,
-                 ie. ###
-
-=cut
-
-sub fwd_ref_delimeter {
-    my $self = shift;
-
-    $self->write( $self->{fwd_ref} );
-}
-
-=head2 combine_fields
-
-    Description: For fields that are composite fields (ie. attributes in
-                 GFF3), combine the pieces of the field using the correct
-                 delimiters for GFF3
-    Returntype : String of concatenated fields
-
-=cut
 
 sub combine_fields {
     my $self = shift;
@@ -106,10 +79,10 @@ sub combine_fields {
 
     my $order = $self->attributes_order();
     if($order) {
-	my %seen;
-	@seen{@{$order}} = ();
-	my @attrs = (@{$order}, grep{!exists $seen{$_}} sort keys %{$values});
-	$order = \@attrs;
+	    my %seen;
+	    @seen{@{$order}} = ();
+	    my @attrs = (@{$order}, grep{!exists $seen{$_}} sort keys %{$values});
+	    $order = \@attrs;
     }
 
     return $self->SUPER::combine_fields($values, $order);
@@ -120,7 +93,7 @@ sub attributes_order {
     my $order = shift;
 
     if($order) {
-	@default_order = @{$order};
+	    @default_order = @{$order};
     }
 
     return \@default_order;
