@@ -68,7 +68,8 @@ sub new {
 
 sub thickStart {
   my ($self, $transcript) = @_;
-  return $transcript->slice->seq_region_start + $transcript->coding_region_start - 1;
+  ## Note - delete an extra bp for semi-open coordinates
+  return $transcript->slice->seq_region_start + $transcript->coding_region_start - 2;
 }
 
 =head2 thickEnd
@@ -106,7 +107,7 @@ sub blockSizes {
   my ($self, $transcript) = @_;
   my @sizes;
   foreach my $exon (@{$transcript->get_all_Exons}) {
-      push(@sizes, $exon->length);
+    push(@sizes, $exon->length);
   }
   @sizes = reverse(@sizes) if ($transcript->strand == -1);
   return join(',', @sizes);
@@ -122,8 +123,9 @@ sub blockSizes {
 sub blockStarts {
   my ($self, $transcript) = @_;
   my @starts;
+
   foreach my $exon (@{$transcript->get_all_Exons}) {
-      push(@starts, $exon->start);
+    push(@starts, $exon->start - $transcript->start);
   }
   @starts = reverse(@starts) if ($transcript->strand == -1);
   return join(',', @starts);
