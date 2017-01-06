@@ -42,8 +42,11 @@ use base qw/Bio::EnsEMBL::IO::Translator/;
 
 use strict;
 use warnings;
+
 use Carp;
 use URI::Escape;
+use Scalar::Util qw/blessed/;
+
 use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
 use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
@@ -53,6 +56,7 @@ my %ens_field_callbacks = (seqname   => 'seqname',
                            strand     => 'strand',
                            name       => 'name',
                            source     => 'source',
+                           feature    => 'feature',
                            type       => 'type',
                            score      => 'score',
                            bedstart   => 'bedstart',
@@ -171,6 +175,24 @@ sub source {
 
     return $source;
 }
+
+=head2 feature
+    Description: Object type for GFF2/GTF 
+    Returntype : String
+=cut
+
+sub feature {
+    my $self = shift;
+    my $object = shift;
+
+    my @class = split('::', blessed $object);
+    return $class[-1];
+}
+
+=head2 type
+    Description: Object type for GFF3 - must be an ontology term 
+    Returntype : String
+=cut
 
 sub type {
     my $self = shift;
