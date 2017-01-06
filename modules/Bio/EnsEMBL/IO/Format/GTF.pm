@@ -56,78 +56,50 @@ sub new {
                                                     'validate_as' => 'integer',
                                                   },
                                     },
-            'field_info'    => {
-                                'seqname' => {
+              'field_info'    => {
+                                  'seqname' => {
                                                 'validate_as' => 'string',
                                                 'optional'    => 0,
                                                 },
-                                'source' => {
+                                  'source' => {
                                                 'validate_as' => 'string',
                                                 'optional'    => 0,
                                                 },
-                                'feature' => {
-                                                'validate_as' => 'gtf_feature',
+                                  'feature' => {
+                                                'validate_as' => 'string',
                                                 'optional'    => 0,
                                                 },
-                               'start' => {
-                                            'validate_as' => 'integer',
-                                            'optional'    => 0,
-                                           },
-                                'end' => {
-                                            'validate_as' => 'integer',
-                                            'optional'    => 0,
-                                          },
-                                'score' => {
-                                            'validate_as' => 'floating_point',
-                                            'optional'    => 1,
-                                            },
+                                  'start' => {
+                                              'validate_as' => 'integer',
+                                              'optional'    => 0,
+                                              },
+                                  'end' => {
+                                              'validate_as' => 'integer',
+                                              'optional'    => 0,
+                                              },
+                                  'score' => {
+                                              'validate_as' => 'floating_point',
+                                              'optional'    => 1,
+                                              },
 
-                                'strand' => {
+                                  'strand' => {
                                               'validate_as' => 'strand_plusminus',
                                               'optional'    => 1,
                                               },
-                                'frame' => {
+                                  'frame' => {
                                               'validate_as' => 'phase',
                                               'optional'    => 1,
                                               },
-                                'attribute' => {
-                                                'validate_as' => 'gtf_attribute',
-                                                'optional'    => 1,
+                                  'attribute' => {
+                                                  'validate_as' => 'string',
+                                                  'optional'    => 1,
                                                 },
-                                  },
+                                    },
             'field_order'   => [qw(seqname source feature start end score strand frame attribute)],
           };
 
   bless $self, $class;
 };
-
-=head2 validate_as_gtf_feature 
-
-    Description : Validator for GTF 'feature' column 
-    Args        : Value - value to be checked
-    Returntype  : Boolean
-
-=cut
-
-sub validate_as_gtf_feature {
-  my ($self, $value) = @_;
-  
-  return $value =~ /CDS|start_codon|stop_codon|5UTR|3UTR|inter|inter_CNS|intron_CNS|exon/ ? 1 : 0;
-}
-
-=head2 validate_as_gtf_attribute 
-
-    Description : Validator for GTF 'attribute' column 
-    Args        : Value - value to be checked
-    Returntype  : Boolean
-
-=cut
-
-sub validate_as_gtf_feature {
-  my ($self, $value) = @_;
-  
-  return ($value =~ /gene_id/ && $value =~ /transcript_id) ? 1 : 0;
-}
 
 
 1;
