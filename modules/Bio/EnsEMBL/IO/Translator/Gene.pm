@@ -29,49 +29,7 @@ use warnings;
 
 use Carp;
 
-use Bio::EnsEMBL::IO::Utils::ColourMap;
-
 use base qw/Bio::EnsEMBL::IO::Translator::Feature/;
-
-my %gene_field_callbacks = (itemRgb => 'itemRgb');
-
-=head2 new
-
-    Returntype   : Bio::EnsEMBL::IO::Translator::Gene
-
-=cut
-
-sub new {
-    my ($class, $args) = @_;
-
-    ## Might we want to output web colours?
-    if ($args->{'species_defs'}) {
-      $args->{'colourmap'} = Bio::EnsEMBL::IO::Utils::ColourMap->new($args->{'species_defs'});
-    }
-
-    my $self = $class->SUPER::new($args);
-
-    # Once we have the instance, add our customized callbacks
-    # to the translator
-    $self->add_callbacks(\%gene_field_callbacks);
-
-    return $self;
-
-}
-
-
-=head2 colourmap
-
-    Description : Accessor for optional colour-mapping object
-    Returntype  : Bio::EnsEMBL::IO::Utils::ColourMap;
-
-=cut
-
-sub colourmap {
-  my $self = shift;
-  return $self->{'colourmap'};
-}
-
 
 =head2 name
     Description: Wrapper around API call to feature name
@@ -96,21 +54,6 @@ sub source {
     my $object = shift;
 
     return $object->source();
-}
-
-=head2 itemRgb
-
-    Description:
-    Returntype : String
-
-=cut
-
-sub itemRgb {
-  my ($self, $gene) = @_;
-  return '.' unless $self->colourmap;
-  my $colours = $self->species_defs->colour('gene');
-  my $colour = $colours->{$gene->biotype}{'default'};
-  return $colour ? join(',',$self->colourmap->rgb_by_name($colour)) : undef;
 }
 
 1;

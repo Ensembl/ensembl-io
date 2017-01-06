@@ -55,6 +55,7 @@ my %ens_field_callbacks = (seqname   => 'seqname',
                            source     => 'source',
                            type       => 'type',
                            score      => 'score',
+                           itemRgb    => 'itemRgb',
                            phase      => 'phase',
                            attributes => 'attributes'
                            );
@@ -193,6 +194,19 @@ sub strand {
     } else {
 	    return ( $self->{_strand_conversion}->{ $object->{strand} } ? $self->{_strand_conversion}->{ $object->strand() } : $object->strand() );
     }
+}
+
+=head2 itemRgb
+
+    Description:
+    Returntype : String
+
+=cut
+
+sub itemRgb {
+  my ($self, $feature) = @_;
+  my $colour = $feature->{'colour'} || $self->default_colour;
+  return join(',', $self->colourmap->rgb_by_name($colour));
 }
 
 sub phase {

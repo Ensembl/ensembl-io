@@ -57,6 +57,8 @@ use strict;
 use warnings;
 use Carp;
 
+use Bio::EnsEMBL::Utils::ColourMap;
+
 my %field_callbacks;
 
 =head2 new
@@ -65,6 +67,7 @@ my %field_callbacks;
     Args[1]      : (optional) hashref - current valid key-value pairs:
                       no_exception => 1 (should be checked for wherever an exception could be thrown,
                                          and alternative web-friendly behaviour offered)
+                      species_defs => EnsEMBL::Web::SpeciesDefs (can be used by webcode to specify feature colours)
 
 =cut
 
@@ -73,6 +76,11 @@ sub new {
   
   my $self = $args || {};
 
+  ## Note that colourmap can be used without SpeciesDefs,
+  ## to do basic colour conversion between hex, RGB and named colours
+  $self->{'colourmap'} = Bio::EnsEMBL::Utils::ColourMap->new($args->{'species_defs'});
+  $self->{'default_colour'} = 'black';
+             
   bless $self, $class;
 
   return $self;
@@ -89,6 +97,33 @@ sub new {
 sub no_exception {
   my $self = shift;
   return $self->{'no_exception'};
+}
+
+=head2 
+  
+    Description : Getter for ColourMap object, used for colour manipulation
+    Returntype  : Bio::EnsEMBL::Utils::ColourMap
+
+=cut
+
+sub colourmap {
+  my $self = shift;
+  return $self->{'colourmap'};
+}
+
+=head2 
+  
+    Description : Getter/setter for default colour
+    Returntype  : String
+
+=cut
+
+sub default_colour {
+  my ($self, $colour) = @_;
+  if ($colour) {
+    $self->{'default_colour'} = $colour;
+  }
+  return $self->{'default_colour'};
 }
 
 =head2 

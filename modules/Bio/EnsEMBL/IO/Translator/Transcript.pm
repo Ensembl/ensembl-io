@@ -59,43 +59,28 @@ sub new {
 }
 
 
-=head2 itemRgb
-
-    Description:
-    Returntype : String
-
-=cut
-
-sub itemRgb {
-  my ($self, $transcript) = @_;
-  return '0,0,0' unless $self->colourmap;
-  my $colours = $self->species_defs->colour('transcript');
-  my $colour = $colours->{$transcript->biotype}{'default'};
-  return $colour ? join(',',$self->colourmap->rgb_by_name($colour)) : undef;
-}
-
 =head2 thickStart
 
-    Description: Gets coding start of transcript, for BED format 
+    Description: Gets coding start of transcript in absolute coordinates, for BED format 
     Returntype : Integer
 
 =cut
 
 sub thickStart {
   my ($self, $transcript) = @_;
-  return $transcript->coding_region_start;
+  return $transcript->slice->seq_region_start + $transcript->coding_region_start - 1;
 }
 
 =head2 thickEnd
 
-    Description: Gets coding end of transcript, for BED format 
+    Description: Gets coding end of transcript in absolute coordinates, for BED format 
     Returntype : Integer
 
 =cut
 
 sub thickEnd {
   my ($self, $transcript) = @_;
-  return $transcript->coding_region_end;
+  return $transcript->slice->seq_region_start + $transcript->coding_region_end - 1;
 }
 
 =head2 blockCount
