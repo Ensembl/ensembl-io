@@ -164,7 +164,6 @@ sub type {
     my $object = shift;
 
     return $self->so_term($object);
-
 }
 
 =head2 name
@@ -174,7 +173,8 @@ sub type {
 
 sub name {
   my ($self, $feature) = @_;
-  return $feature->can('stable_id') ? $feature->stable_id : 'Feature';
+  return $feature->{'id'} ? $feature->{'id'}
+                          : $feature->can('stable_id') ? $feature->stable_id : 'Feature';
 }
 
 sub score {
