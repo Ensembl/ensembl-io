@@ -45,17 +45,17 @@ use Carp;
 use URI::Escape;
 use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
-my %ens_field_callbacks = (gene_start => '$self->can(\'gene_start\')',
-                           gene_end  => '$self->can(\'gene_end\')',
-                           gene_strand  => '$self->can(\'gene_strand\')',
-                           gene_stable_id_version => '$self->can(\'gene_stable_id_version\')',
-                           gene_description => '$self->can(\'gene_description\')',
-                           gene_display_id => '$self->can(\'gene_display_id\')',
-                           biotype =>  '$self->can(\'biotype\')',
-                           transcript_stable_id_version =>  '$self->can(\'transcript_stable_id_version\')',
-                           protein_stable_id_version =>  '$self->can(\'protein_stable_id_version\')',
-                           exon_locations =>  '$self->can(\'exon_locations\')',
-                           xrefs =>  '$self->can(\'xrefs\')',
+my %ens_field_callbacks = (gene_start => 'gene_start',
+                           gene_end  => 'gene_end',
+                           gene_strand  => 'gene_strand',
+                           gene_stable_id_version => 'gene_stable_id_version',
+                           gene_description => 'gene_description',
+                           gene_display_id => 'gene_display_id',
+                           biotype =>  'biotype',
+                           transcript_stable_id_version =>  'transcript_stable_id_version',
+                           protein_stable_id_version =>  'protein_stable_id_version',
+                           exon_locations =>  'exon_locations',
+                           xrefs =>  'xrefs',
                            );
 
 =head2 new
