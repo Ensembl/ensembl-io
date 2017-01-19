@@ -113,6 +113,9 @@ sub read_record {
             $field =~ s/[\d\s]+//g;
             $self->{'record'}->{'_seq'} = $field;
         }
+        elsif ($field_type eq 'FEATURES') {
+            $self->{record}->{_raw_features} = $self->_get_raw_multiline;
+        }
         elsif (defined $field_type) {
             $self->{'record'}->{'_raw_'.lc($field_type)} = $field.$self->_get_multiline;
         }
@@ -141,6 +144,24 @@ sub _get_multiline {
     }
     # We replace multiple spaces/tabulation to be 1 space
     $field =~ s/\s\s+/ /g;
+    return $field;
+}
+
+=head2 _get_raw_multiline
+
+    Description: Feature blocks can have significant whitespace and newlines. This method returns the
+                 whole multiline section as a it appears in the file
+    Returntype : String (with linefeeds)
+
+=cut
+
+sub _get_raw_multiline {
+    my $self = shift;
+    my $field = '';
+    while (defined $self->{'waiting_block'} && $self->{'waiting_block'} !~ /^\S/) {
+        $self->next_block;
+        $field .= $self->{'current_block'};
+    }
     return $field;
 }
 
@@ -414,80 +435,62 @@ sub get_raw_comment
 
 =head2 get_features
 
-    Description: Return an array of hashes representing the features of the GenBank file
-                 Each subfeature has its own key except db_xref which is an array
-                 the key __fragment is coded:
-                  0 not a fragment
-                  1 incomplete on 5' end
-                  2 incomplete on 3' end
-                  3 incomplete on both end
+    Description: Return an array of features as hashes. Feature type is given the 'header' key
+                 All keys barring header and the position string are arrayrefs to allow for
+                 a multiplicity of keys. Multi-line strings have been concatenated into a single line.
+                 The "position" coordinates are with reference to get_sequence()
+
+                 Example keys include: gene, gene_synonym, db_xref, product and many more as per Genbank spec
+    Example    : @features = @{ $parser->get_features};
+                 foreach my $feat (@features) {
+                    if ($feat->{header} eq 'gene') {
+                        print $feat->{position}.':'.$feat->{gene}."\n"
+                    }
+                 }
     Returntype : Array reference
 
 =cut
 
 sub get_features {
     my $self = shift;
+    my @features;
+    my %feature;
+    my $line_buffer;
+    if (!exists $self->{record}->{_features}) {
+        foreach my $line (split /\n/, $self->{record}->{_raw_features}) {
+            if ($line =~ /^\s{5}(\w+)/) {
+                push @features,$self->_finish_feature(\%feature, $line_buffer) if %feature;
+                undef %feature;
+                $line_buffer = '';
+                my ($header,$position) = $line =~ /^\s{5}(\w+)\s+(.+)/;
+                # Note that position can be complement() and or join(coord1,coord2)
+                %feature = ( header => $header, position => $position);
+            } else {
+                $line =~ s/^\s+//;
+                chomp $line;
+                $line_buffer .= $line;
+            }
 
-    if (!exists $self->{'record'}->{'_features'}) {
-        my $tmp = substr($self->{'record'}->{'_raw_features'}, 20);
-        $tmp =~ s/"\s+(\w)/"\/$1/g;
-        my $index = -1;
-        my @features = split(' /', $tmp);
-        for (my $i = 0; $i < @features; $i++) {
-            if ($features[$i] =~ /^\s*([^= ]+)\s+(\S.*)\s*/) {
-                $index++; 
-                push(@{$self->{'record'}->{'_features'}}, { '__name' => $1}); 
-                $self->_calculate_coordinates($index, $2);
-            }
-            else {
-                my ($key, $value) = $features[$i] =~ /(\w+)="*([^"]+)"*/;
-                    if ($key eq 'db_xref') {
-                        $value =~ /(\w+):(.*)/;
-                        push(@{$self->{'record'}->{'_features'}->[$index]->{'__db_xref'}}, {$1 => $2});
-                    }
-                    else {
-                        $value =~ s/\s\s+//g;
-                        $self->{'record'}->{'_features'}->[$index]->{'__'.$key} = $value;
-                    }
-            }
         }
+        push @features,$self->_finish_feature(\%feature, $line_buffer); # Commit last feature from buffer
+        $self->{record}->{_features} = \@features;
     }
-    return $self->{'record'}->{'_features'};
+    return $self->{record}->{_features};
 }
 
-=head2 _calculate_coordinates
+sub _finish_feature {
+    my $self = shift;
+    my $feature = shift;
+    my $line_buffer = shift;
 
-    Description: Transform the GenBank coordinates into readable coordinate
-    Returntype : Void
-
-=cut
-
-sub _calculate_coordinates {
-    my ($self, $index, $positions) = @_;
-
-    $self->{'record'}->{'_features'}->[$index]->{'__fragment'} = 0;
-    # Simple forward coordinates:
-    # gene            577..647
-    # < and > indicates that the feature is incomplete on the 5' or/and 3' end respetively
-    if ($positions =~ /^<?(\d+)\.\.>?(\d+)/) {
-        $self->{'record'}->{'_features'}->[$index]->{'__start'} = $1;
-        $self->{'record'}->{'_features'}->[$index]->{'__end'} = $2;
-        $self->{'record'}->{'_features'}->[$index]->{'__strand'} = 1;
-        $self->{'record'}->{'_features'}->[$index]->{'__fragment'} += 1 if ($positions =~ /</);
-        $self->{'record'}->{'_features'}->[$index]->{'__fragment'} += 2 if ($positions =~ />/);
+    my @sections = split '/',$line_buffer;
+    foreach my $section (@sections) {
+        my ($key,$value) = split '=',$section;
+        $value =~ s/"//g if $value;
+        push @{ $feature->{$key} },$value if ($key && $value);
     }
-    # Simple reverse coordinates
-    # gene            complement(4329..4400)
-    elsif ($positions =~ /^complement\(<?(\d+)\.\.>?(\d+)/) {
-        $self->{'record'}->{'_features'}->[$index]->{'__start'} = $1;
-        $self->{'record'}->{'_features'}->[$index]->{'__end'} = $2;
-        $self->{'record'}->{'_features'}->[$index]->{'__strand'} = -1;
-        $self->{'record'}->{'_features'}->[$index]->{'__fragment'} += 1 if ($positions =~ /</);
-        $self->{'record'}->{'_features'}->[$index]->{'__fragment'} += 2 if ($positions =~ />/);
-    }
-    else {
-        $self->{'record'}->{'_features'}->[$index]->{'__positions'} = $positions;
-    }
+    my %final_copy = %$feature;
+    return \%final_copy;
 }
 
 1;
