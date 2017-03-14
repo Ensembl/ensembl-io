@@ -44,7 +44,7 @@ before_install:
 install:
     - export CWD=$PWD
     - export DEPS=$HOME/dependencies
-    - export KENT_SRC="$DEPS/kent/src"
+    - export KENT_SRC="$DEPS/kent-335_base/src"
     - export HTSLIB_DIR=$DEPS/htslib
     - export MACHTYPE=$(uname -m)
     - export CFLAGS="-fPIC"

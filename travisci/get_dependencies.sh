@@ -12,7 +12,7 @@ if [ ! -d htslib ]; then
 fi
 
 echo 'Getting jksrc'
-if [ ! -f jksrc.zip ]; then
-  wget http://hgdownload.cse.ucsc.edu/admin/jksrc.zip
-  unzip -q jksrc.zip
+if [ ! -f v335_base.tar.gz ]; then
+  wget https://github.com/ucscGenomeBrowser/kent/archive/v335_base.tar.gz
+  tar xzf v335_base.tar.gz
 fi
