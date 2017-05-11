@@ -24,7 +24,7 @@ use Bio::EnsEMBL::Gene;
 use Bio::EnsEMBL::Transcript;
 use IO::String;
 
-use Bio::EnsEMBL::IO::Translator::EnsFeature;
+use Bio::EnsEMBL::IO::Translator::Gene;
 use Bio::EnsEMBL::IO::Writer::GTF;
 use Bio::EnsEMBL::IO::Object::GXFMetadata;
 
@@ -53,22 +53,21 @@ foreach (@gene_data) {
     -START      => $_->[1],
     -END        => $_->[2],
     -STRAND     => $_->[3],
-    -SLICE      => $slice,
-  );
+    -SLICE      => $slice);
 }
 
 my $gtf_string = <<GTF;
 ##gtf-file yes
 #!genome-build ensembl GRCh37
-6	ensembl	protein_coding	266085333	266097311	.	-	.	gene_id "ENSG00000093134"; ID "gene:ENSG00000093134"; biotype "protein_coding"
-6	ensembl	protein_coding	266115221	266116497	.	+	.	gene_id "ENSG00000234484"; ID "gene:ENSG00000234484"; biotype "protein_coding"
-6	ensembl	protein_coding	266106416	266126005	.	-	.	gene_id "ENSG00000112303"; ID "gene:ENSG00000112303"; biotype "protein_coding"
+6	ensembl	gene	266085333	266097311	.	-	.	gene_id "ENSG00000093134"; gene_biotype "protein_coding"; gene_source "ensembl"
+6	ensembl	gene	266115221	266116497	.	+	.	gene_id "ENSG00000234484"; gene_biotype "protein_coding"; gene_source "ensembl"
+6	ensembl	gene	266106416	266126005	.	-	.	gene_id "ENSG00000112303"; gene_biotype "protein_coding"; gene_source "ensembl"
 GTF
 
 # Create a string file handle to write to
 my $fh = IO::String->new();
 
-my $translator = Bio::EnsEMBL::IO::Translator::EnsFeature->new();
+my $translator = Bio::EnsEMBL::IO::Translator::Gene->new();
 my $serializer = Bio::EnsEMBL::IO::Writer::GTF->new($translator);
 
 # The default 'type' callback uses a so adaptor, this is obviously
