@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PERL5LIB=$PWD/bioperl-live-bioperl-release-1-2-3:$PWD/ensembl-test/modules:$PWD/ensembl/modules:$PWD/ensembl-variation/modules:$PWD/modules:$DEPS/Bio-HTS/blib/lib/:$DEPS/Bio-HTS/blib/arch:$PERL5LIB
+export PERL5LIB=$PWD/bioperl-live-bioperl-release-1-2-3:$PWD/ensembl-test/modules:$PWD/ensembl/modules:$PWD/modules:$DEPS/Bio-HTS/blib/lib/:$DEPS/Bio-HTS/blib/arch:$PERL5LIB
 
 
 # if [ "$DB" = 'mysql' ]; then
@@ -15,7 +15,7 @@ export PERL5LIB=$PWD/bioperl-live-bioperl-release-1-2-3:$PWD/ensembl-test/module
 
 echo "Running test suite"
 if [ "$COVERALLS" = 'true' ]; then
-  PERL5OPT='-MDevel::Cover=+ignore,bioperl,+ignore,ensembl-test,ensembl,+ignore,ensembl-variation' perl $PWD/ensembl-test/scripts/runtests.pl -verbose modules/t $SKIP_TESTS
+  PERL5OPT='-MDevel::Cover=+ignore,bioperl,+ignore,ensembl-test,ensembl' perl $PWD/ensembl-test/scripts/runtests.pl -verbose modules/t $SKIP_TESTS
 else
   perl $PWD/ensembl-test/scripts/runtests.pl modules/t $SKIP_TESTS
 fi
