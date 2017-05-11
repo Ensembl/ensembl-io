@@ -58,13 +58,18 @@ use Bio::EnsEMBL::IO::Format::GTF;
 
 sub new {
     my $class = shift;
-
-    my $self = $class->SUPER::new(@_);
-    my $format = Bio::EnsEMBL::IO::Format::GTF->new;
+    my $translator = shift;
+    
+    my $self = $class->SUPER::new($translator);
+    my $format = Bio::EnsEMBL::IO::Format::GTF->new();
     $self->format($format);
     ## Backwards compatibility
     $self->fields($format->get_accessors);
 
+    if( $translator->can('strand_conversion') ) {
+      $translator->strand_conversion(Bio::EnsEMBL::IO::Format::GTF->strand_conversion());
+    }
+    
     return $self;
 }
 
