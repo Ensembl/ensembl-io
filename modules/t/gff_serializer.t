@@ -24,7 +24,7 @@ use Bio::EnsEMBL::Gene;
 use Bio::EnsEMBL::Transcript;
 use IO::String;
 
-use Bio::EnsEMBL::IO::Translator::EnsFeature;
+use Bio::EnsEMBL::IO::Translator::Gene;
 use Bio::EnsEMBL::IO::Writer::GFF3;
 use Bio::EnsEMBL::IO::Object::GXFMetadata;
 
@@ -68,7 +68,7 @@ GFF
 # Create a string file handle to write to
 my $fh = IO::String->new();
 
-my $translator = Bio::EnsEMBL::IO::Translator::EnsFeature->new();
+my $translator = Bio::EnsEMBL::IO::Translator::Gene->new();
 my $serializer = Bio::EnsEMBL::IO::Writer::GFF3->new($translator);
 
 # The default 'type' callback uses a so adaptor, this is obviously
