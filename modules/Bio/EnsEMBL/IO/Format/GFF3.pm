@@ -30,6 +30,8 @@ use warnings;
 
 use parent qw(Bio::EnsEMBL::IO::Format);
 
+my %strand_mapping = (1 => '+', -1 => '-');
+
 sub new {
   my $class = shift;
 
@@ -101,5 +103,17 @@ sub new {
 
   bless $self, $class;
 };
+
+=head2 strand_conversion
+
+    Description: Access the strand conversion mappings
+
+=cut
+
+sub strand_conversion {
+  my $self = shift;
+  
+  return \%strand_mapping;
+}
 
 1;

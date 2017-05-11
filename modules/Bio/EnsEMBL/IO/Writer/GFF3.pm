@@ -70,6 +70,10 @@ sub new {
     ## Backwards compatibility
     $self->fields($format->get_accessors);
 
+    if( $translator->can('strand_conversion') ) {
+      $translator->strand_conversion(Bio::EnsEMBL::IO::Format::GFF3->strand_conversion());
+    }
+    
     return $self;
 }
 
