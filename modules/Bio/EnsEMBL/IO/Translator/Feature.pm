@@ -187,7 +187,7 @@ sub feature {
     my $object = shift;
 
     my @class = split('::', blessed $object);
-    return $class[-1];
+    return lc $class[-1];
 }
 
 =head2 type
