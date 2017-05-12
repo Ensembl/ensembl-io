@@ -110,10 +110,10 @@ sub new {
 	    $self->{directive} = $1;
 	    $self->{value} = \@rest;
     } elsif($type =~ /^#(\S+)/) {
-      my $indiv_col_start = length(@HEADER_FORMAT)-1;
+      my $indiv_col_start = scalar(@HEADER_FORMAT)-1;
       my %column_header = map { $_ => 1 } @rest;
       if (!$column_header{$FORMAT_HEADER}) {
-        $indiv_col_start = length(@HEADER)-1;
+        $indiv_col_start = scalar(@HEADER)-1;
       }
       my @indiv = splice @rest, $indiv_col_start;
 	    $self->{type} = 'header';
