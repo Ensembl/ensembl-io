@@ -285,7 +285,7 @@ sub _open_as {
       if ($@) {
       }
       else {
-        my $object = $class->$method(@other_args);
+        my $object = eval { $class->$method(@other_args); }; 
         return $object;
       }
     }
