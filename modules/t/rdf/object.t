@@ -17,12 +17,36 @@ use warnings;
 
 use Test::More;
 use Test::Differences;
+use Test::Exception;
 
 use IO::String;
 
 use_ok 'Bio::EnsEMBL::IO::Object::RDF';
 
-my $namespaces = Bio::EnsEMBL::IO::Object::RDF->namespaces();
+my %prefix = (
+	      blastprodom => "http://purl.uniprot.org/prodom/",
+	      dataset     => 'http://rdf.ebi.ac.uk/dataset/ensembl/',
+	      dc          => 'http://purl.org/dc/elements/1.1/');
+
+my $namespaces = Bio::EnsEMBL::IO::Object::RDF->namespaces(%prefix);
 isa_ok($namespaces, 'Bio::EnsEMBL::IO::Object::RDF');
+
+my $namespaces_record =
+  "\@prefix blastprodom: <http://purl.uniprot.org/prodom/> .\n" .
+  "\@prefix dataset: <http://rdf.ebi.ac.uk/dataset/ensembl/> .\n" .
+  "\@prefix dc: <http://purl.org/dc/elements/1.1/> .";
+eq_or_diff($namespaces->create_record(), $namespaces_record, "Namespaces record match");
+
+throws_ok { Bio::EnsEMBL::IO::Object::RDF->species() } qr/Undefined species/, "Throws with no arguments";
+my $species = Bio::EnsEMBL::IO::Object::RDF->species(taxon_id => 9606,
+						     scientific_name => 'Homo sapiens',
+						     common_name => 'Human');
+
+my $species_record =
+  "taxon:9606 rdfs:subClassOf obo:OBI_0100026 .\n" .
+  "taxon:9606 rdfs:label \"Homo sapiens\" .\n" .
+  "taxon:9606 skos:altLabel \"Human\" .\n" .
+  "taxon:9606 dc:identifier \"9606\" .";
+eq_or_diff($species->create_record(), $species_record, "Species record match");
 
 done_testing();
