@@ -48,7 +48,7 @@ my $xrefs_writer = Bio::EnsEMBL::IO::Writer::RDFXRefs->new($feature_trans);
 $feature_writer->open($fh);
 $xrefs_writer->open($xrefs_fh);
 
-# write namespaces (both main and xrefs), take default prefixes from Bio::EnsEMBL::Utils::RDF
+# write namespaces (both main and xrefs), no prefix args (default to take prefixes from Bio::EnsEMBL::Utils::RDF)
 my $namespaces = Bio::EnsEMBL::IO::Object::RDF->namespaces();
 $feature_writer->write($namespaces);
 $xrefs_writer->write($namespaces);
