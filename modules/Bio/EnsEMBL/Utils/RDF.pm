@@ -36,8 +36,8 @@ package Bio::EnsEMBL::Utils::RDF;
 
 use Modern::Perl;
 use parent 'Exporter';
-our @EXPORT_OK = qw(u triple escape clean_for_uri taxon_triple prefix name_spaces compatible_name_spaces);
-our %EXPORT_TAGS = (all => [qw(u triple escape clean_for_uri taxon_triple prefix name_spaces compatible_name_spaces)],
+our @EXPORT_OK = qw(u triple escape clean_for_uri taxon_triple prefix name_spaces compatible_name_spaces seq_region_uri);
+our %EXPORT_TAGS = (all => [qw(u triple escape clean_for_uri taxon_triple prefix name_spaces compatible_name_spaces seq_region_uri)],
                     query => [qw(prefix compatible_name_spaces escape clean_for_uri)]);
 
 use Carp;
