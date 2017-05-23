@@ -44,7 +44,7 @@ use Carp;
 use URI::Escape;
 
 # common prefixes used
-my %prefix = (
+our %prefix = (
   blastprodom => "http://purl.uniprot.org/prodom/",
   dataset     => 'http://rdf.ebi.ac.uk/dataset/ensembl/',
   dc          => 'http://purl.org/dc/elements/1.1/',
