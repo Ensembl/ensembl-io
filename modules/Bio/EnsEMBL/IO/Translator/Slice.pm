@@ -35,7 +35,7 @@ use warnings;
 
 use Carp;
 
-use Bio::EnsEMBL::Utils::RDF;
+use Bio::EnsEMBL::Utils::RDF qw/seq_region_uri/;
 use Bio::EnsEMBL::Utils::RDF::Mapper;
 use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
 
@@ -44,7 +44,8 @@ my %field_callbacks = (version         => 'version',
 		       taxon_id        => 'taxon_id',
 		       scientific_name => 'scientific_name',
 		       name            => 'name',
-		       coord_system    => 'coord_system',
+		       cs_name         => 'coord_system_name',
+		       cs_version      => 'coord_system_version',
 		       uri             => 'uri'
 		      );
 
@@ -57,7 +58,7 @@ my %field_callbacks = (version         => 'version',
 sub new {
   my ($class, %args) = @_;
   
-  my @required_args = qw/release production_name meta_adaptor/;
+  my @required_args = qw/version production_name meta_adaptor/;
   my @missing_args;
   map { push @missing_args, $args{$_} unless exists $args{$_} } @required_args;
   confess "Missing arguments required by Bio::EnsEMBL::IO::Translator::Feature: " . join(',', @missing_args)
@@ -127,35 +128,45 @@ sub scientific_name {
 sub name {
   my ($self, $object) = @_;
   
-  return $object->{name};
+  return $object->name();
 }
 
-=head2 coord_system
-
-    Description: Wrapper around slice coord_system method
-    Returntype : An Ensembl coord system object
+=head2 coord_system_name
 
 =cut
 
-sub coord_system {
+sub coord_system_name {
   my ($self, $object) = @_;
   
-  return $object->coord_system();
+  return $object->coord_system->name();
+}
+
+=head2 coord_system_version
+
+=cut
+
+sub coord_system_version {
+  my ($self, $object) = @_;
+  
+  return $object->coord_system->version();
 }
 
 =head2 uri
 
     Description: 
-    Returntype : ArrayRef
+    Returntype : Array
 
 =cut
-
-# TODO: implement seq_region_uri in Bio::EnsEMBL::Utils::RDF
 
 sub uri {
   my ($self, $object) = @_;
 
-  return seq_feature_uri($self->id($object), $self->type($object));
+  my $version = $self->version;
+  my $production_name = $self->production_name;
+  my $cs_version = $self->coord_system_version($object);
+  my $region_name = $self->name($object);
+  
+  return seq_region_uri($version, $production_name, $cs_version, $region_name);
 }
 
 1;
