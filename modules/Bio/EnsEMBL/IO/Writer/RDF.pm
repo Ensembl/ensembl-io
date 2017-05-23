@@ -60,7 +60,7 @@ sub new {
     Description: Write a record to the output, it will use the given
                  translator to interrogate the object for the needed fields
     Args[1]    : Object to write out
-    Args[2]    : Optional, alternative translator to use for this record
+    Args[2]    : an alternative translator to use for this record
 
 =cut
 
@@ -69,7 +69,12 @@ sub write {
     my $object = shift;
     my $translator = shift;
 
-    print { $self->{writer_handle} } $self->create_record($object, $translator);
+    if($object->isa('Bio::EnsEMBL::IO::Object::RDF')) {
+      print { $self->{writer_handle} } $object->create_record();
+    } else {
+      print { $self->{writer_handle} } $self->create_record($object, $translator);
+    }
+    
 }
 
 =head2 create_record
