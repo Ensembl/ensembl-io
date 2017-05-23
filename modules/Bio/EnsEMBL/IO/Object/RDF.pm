@@ -29,7 +29,7 @@ use strict;
 use warnings;
 use Carp;
 
-use Bio::EnsEMBL::Utils::RDF;
+use Bio::EnsEMBL::Utils::RDF qw/u triple/;
 
 sub new {
   my ($class) = @_;
@@ -45,10 +45,8 @@ sub new {
 =cut
 
 sub namespaces {
-  my $class = shift;
-  my %prefix = shift;
-
-  %prefix ||= %Bio::EnsEMBL::Utils::RDF::prefix;
+  my ($class, %prefix) = @_;
+  %prefix = %Bio::EnsEMBL::Utils::RDF::prefix unless %prefix;
     
   return bless { type => 'namespaces', prefix => \%prefix }, $class;
 }
@@ -75,7 +73,7 @@ sub create_record {
   if($self->{type} eq 'namespaces') {
     return unless scalar keys %{$self->{prefix}};
     
-    $line = join("\n", map { sprintf "\@prefix %s: %s .", $_, u($self->{prefix}{$_}) } keys %{$self->{prefix}});
+    $line = join("\n", map { sprintf "\@prefix %s: %s .", $_, u($self->{prefix}{$_}) } sort keys %{$self->{prefix}});
   } elsif($self->{type} eq 'species') {
     my $taxon_id = $self->{taxon_id};
     my $scientific_name = $self->{scientific_name};
@@ -93,3 +91,5 @@ sub create_record {
 
   return $line;
 }
+
+1;
