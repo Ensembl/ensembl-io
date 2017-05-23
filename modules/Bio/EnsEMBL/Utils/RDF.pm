@@ -107,7 +107,7 @@ sub u {
 
 sub triple {
     my ($subject,$predicate,$object) = @_;    
-    return sprintf "%s %s %s .\n",$subject,$predicate,$object;
+    return sprintf "%s %s %s .",$subject,$predicate,$object;
 }
 
 sub escape {
@@ -157,6 +157,37 @@ sub feature_uri {
   my $namespace = prefix($prefix);
   $id = uri_escape($id);
   return prefix($prefix) . uri_escape($id);
+}
+
+# Generate a version specific portion of a URL that includes, species, assembly version and region name
+# e.g. The URI for human chromosome 1 in assembly GRCh37 would be http://rdf.ebi.ac.uk/resource/ensembl/83/homo_sapiens/GRCh37/1
+# and the unversioned equivalent weould be http://rdf.ebi.ac.uk/resource/ensembl/homo_sapiens/GRCh37/1
+
+sub seq_region_uri {
+  my ($self, $version, $production_name, $cs_version, $region_name, $start, $end, $strand) = @_;
+  
+  my ($version_uri,$unversioned_uri);
+  if (defined $cs_version) {
+    $version_uri = sprintf "%s%s/%s/%s/%s", prefix('ensembl'), $version, $production_name, $cs_version, $region_name;
+    $unversioned_uri = sprintf "%s%s/%s/%s", prefix('ensembl'), $production_name, $cs_version, $region_name;
+  } else {
+    $version_uri = sprintf "%s%s/%s/%s", prefix('ensembl'),$version, $production_name, $region_name;
+    $unversioned_uri = sprintf "%s%s/%s", prefix('ensembl'), $production_name, $region_name;
+  }
+  if (defined $strand) {
+    if (defined $start && defined $end) {
+      $version_uri .= ":$start-$end:$strand";
+      $unversioned_uri .= ":$start-$end:$strand";
+    } elsif (defined $end) {
+      $version_uri .= ":$end:$strand";
+      $unversioned_uri .= ":$end:$strand";
+    } elsif (defined $start) {
+      $version_uri .= ":$start:$strand";
+      $unversioned_uri .= ":$start:$strand";
+    }
+  }
+  
+  return ( u($version_uri), u($unversioned_uri));
 }
 
 # These namespaces are useful for turtle 1.0 serialisation, but not SPARQL. For SPARQL, use compatible_name_spaces()
