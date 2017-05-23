@@ -36,11 +36,9 @@ use strict;
 use warnings;
 use Carp;
 
-=head2 new
+use Bio::EnsEMBL::Utils::RDF qw/u prefix/;
 
-    Description: Constructor for a column based generic writer
-    Args[1]    : Translator object for the type of object being written 
-                 (ie. for Ensembl Features, etc)
+=head2 new
 
 =cut
 
@@ -70,9 +68,9 @@ sub write {
     my $translator = shift;
 
     if($object->isa('Bio::EnsEMBL::IO::Object::RDF')) {
-      print { $self->{writer_handle} } $object->create_record();
+      print { $self->{writer_handle} } $object->create_record(), "\n";
     } else {
-      print { $self->{writer_handle} } $self->create_record($object, $translator);
+      print { $self->{writer_handle} } $self->create_record($object, $translator), "\n";
     }
     
 }
@@ -87,124 +85,55 @@ sub write {
 =cut
 
 sub create_record {
-    my $self = shift;
-    my $object = shift;
+  my $self = shift;
+  my $object = shift;
 
-    # Use the default translator if we haven't been given one
-    my $translator = shift || $self->translator;
-    return unless $translator;
+  # Use the default translator if we haven't been given one
+  my $translator = shift || $self->translator;
+  return unless $translator;
 
+  return $self->_create_seq_region_record($object, $translator)
+    if $object->isa('Bio::EnsEMBL::Slice');
     
-    # Maybe... but this would involve looping through the fields twice,
-    # perhaps save this for formats like fasta
-    my @values = $translator->batch_fields($object, $self->fields());
-
-    return $self->concatenate_fields(\@values), "\n";
-    
+  return $self->_create_bulk_fetcher_feature_record($object, $translator);
 }
 
-=head2 fields
+sub _create_seq_region_record {
+  my ($class, $object, $translator) = @_;
 
-    Description: Accessor/mutator for fields in record type
+  my ($version, $region_name, $cs_name, $cs_version, $scientific_name) =
+    $translator->batch_fields($object, [qw/version name cs_name cs_version scientific_name/]);
+  my ($version_uri, $non_version_uri) = $translator->uri($object);
 
-=cut
+  my $record;
+  
+  # we also create a non versioned URI that is a superclass e.g. 
+  $record = sprintf "%s\n", triple($version_uri, 'rdfs:subClassOf', $non_version_uri);
+  
+  if ($cs_name eq 'chromosome') { 
+    $record .= sprintf "%s\n", triple($non_version_uri, 'rdfs:subClassOf', 'obo:SO_0000340');
+    # Find SO term for patches and region in general?
+  } else {
+    $record .= sprintf "%s\n%s\n",
+      triple($non_version_uri, 'rdfs:subClassOf', 'term:'.$cs_name),
+      triple('term:'.$cs_name, 'rdfs:subClassOf', 'term:EnsemblRegion');
+  }
+  $record .= sprintf "%s\n%s\n%s\n%s\n%s",
+    triple($non_version_uri, 'rdfs:label', qq("$scientific_name $cs_name $region_name")),
+    triple($version_uri, 'rdfs:label', qq("$scientific_name $region_name ($cs_version)")),
+    triple($version_uri, 'dc:identifier', qq("$region_name")),
+    triple($version_uri, 'term:inEnsemblSchemaNumber', qq("$version")),
+    triple($version_uri, 'term:inEnsemblAssembly', qq("$cs_version"));
 
-sub fields {
-    my $self = shift;
-
-    if(@_) {
-	    my $arg = shift;
-	    if(ref $arg eq 'ARRAY') {
-	      $self->{fields} = $arg;
-	    }
-    } else {
-	    return $self->{'fields'} || [];
-    }
+  return $record;
 }
 
-=head2 combine_fields
+sub _create_bulk_fetcher_feature_record {
+  my ($class, $object, $translator) = @_;
 
-    Description: For fields that are composite fields (ie. attributes in
-                 GXF), combine the pieces of the field using a delimiter
-    Args[1]    : Hashref, values to be combined
-    Args[2]    : String, Delimiter between values (optional, default ';')
-    Args[3]    : Bool, Include the name of the field when combining values (optional, default true)
-    Args[4]    : String, Separator between label and value (optional, default '=')
-    Args[5]    : String, Character(s) to quote values with (optional, default '')
-    Returntype : String of concatenated fields
+  my $record;
 
-=cut
-
-sub combine_fields {
-    my $self = shift;
-    my $values = shift;
-    my $order = shift || undef;
-    my $delimiter = shift || ';';
-    my $inc_field = shift || 1;
-    my $separator = shift || '=';
-    my $valuequotes = shift || '';
-    my $multi_delimiter = shift || undef;
-
-    my @values;
-    my @keys;
-    
-    if($order) {
-	    @keys = @{$order};
-    } else {
-	    @keys = keys %$values;
-    }
-
-    foreach my $field (@keys) {
-	    next if( !defined($values->{$field}) );
-
-	    if(ref($values->{$field}) eq 'ARRAY') {
-	      if($multi_delimiter) {
-		      push @values, ($inc_field ? "$field$separator" : '') . join($multi_delimiter, map {qq($valuequotes$_$valuequotes)} @{$values->{$field}});
-	      } else {
-		      foreach my $v (@{$values->{$field}}) {
-		        push @values, ($inc_field ? "$field$separator" : '') . qq($valuequotes$v$valuequotes);
-		      }
-	      }
-	    } else {
-	      push @values, ($inc_field ? "$field$separator" : '') . $valuequotes . $values->{$field} . $valuequotes;
-	    }
-    }
-
-    return join $delimiter, @values;
-}
-
-=head2 concatenate_fields
-
-    Description: Put values together to create the final record, may need to
-                 be overridden for non-GXF column based formats
-    Args[1]    : Arrayref, Values to combine in to string
-    Returntype : String
-
-=cut
-
-sub concatenate_fields {
-    my $self = shift;
-    my $values = shift;
-    my $format = $self->format; 
-    my @new_values;
-
-    my $delimiter = defined $format?$format->delimiter:"\t";
-
-    foreach (@{$values||[]}) {
-      if (defined($_)) {
-        if (ref $_ eq 'HASH') {
-          push @new_values, $self->combine_fields($_); 
-        }
-        else {
-          push @new_values, $_;
-        }
-      }
-      else {
-        push @new_values, $format->empty_column;
-      }
-    }
-
-    return join $delimiter, @new_values;
+  return $record;
 }
 
 1;
