@@ -190,15 +190,6 @@ sub seq_region_uri {
   return ( u($version_uri), u($unversioned_uri));
 }
 
-# These namespaces are useful for turtle 1.0 serialisation, but not SPARQL. For SPARQL, use compatible_name_spaces()
-sub name_spaces {
-  return join "\n",map { sprintf '@prefix %s: %s .',$_,u($prefix{$_}) } keys %prefix;  
-}
-
-sub compatible_name_spaces {
-  return join "\n",map { sprintf 'PREFIX %s: %s',$_,u($prefix{$_}) } keys %prefix;  
-}
-
 # bnodes must only be unique within a single document, hence a single run of this module is sufficient for the state.
 my $b_node_count = 0;
 sub new_bnode {
