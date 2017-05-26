@@ -79,7 +79,7 @@ my %field_callbacks = (version         => 'version',
 sub new {
   my ($class, %args) = @_;
   
-  my @required_args = qw/version production_name xref_mapping_file ontology_adaptor meta_adaptor/;
+  my @required_args = qw/xref_mapping_file ontology_adaptor meta_adaptor/;
   my @missing_args;
   map { push @missing_args, $_ unless exists $args{$_} } @required_args;
   confess "Missing arguments required by Bio::EnsEMBL::IO::Translator::BulkFetcherFeature" . join(',', @missing_args)
@@ -114,12 +114,12 @@ sub version {
   my ($self, $version) = @_;
   
   $self->{version} = $version if $version;
-  return $self->{version};
+  return $self->meta_adaptor->list_value_by_key('schema_version')->[0];
 }
 
 sub production_name {
   my $self = shift;
-  return $self->{production_name};
+  return $self->meta_adaptor->list_value_by_key('species.production_name')->[0];
 }
 
 sub ontology_cache {

@@ -33,10 +33,9 @@ my $multi = Bio::EnsEMBL::Test::MultiTestDB->new(undef, "$Bin/..");
 my $meta_adaptor = $multi->get_DBAdaptor('core')->get_MetaContainer();
 
 my $translator =
-  Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(version           => 89,
-							production_name   => 'homo_sapiens',
-							xref_mapping_file => "$Bin/xref_LOD_mapping.json",
+  Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(xref_mapping_file => "$Bin/xref_LOD_mapping.json",
 							ontology_adaptor  => $ontology_adaptor,
 							meta_adaptor      => $meta_adaptor);
+
 
 done_testing();
