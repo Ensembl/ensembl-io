@@ -95,8 +95,8 @@ sub new {
   croak "Bio::EnsEMBL::IO::Translator::Feature requires an ontology adaptor"
     unless $args{ontology_adaptor}->isa('Bio::EnsEMBL::DBSQL::OntologyTermAdaptor');
 
-  croak "Bio::EnsEMBL::IO::Translator::Slice requires a meta adaptor"
-    unless $args{meta_adaptor}->isa('Bio::EnsEMBL::DBSQL::MetaContainer');
+  croak "Bio::EnsEMBL::IO::Translator::BulkFetcherFeature requires a meta adaptor"
+    unless $args{meta_adaptor} and $args{meta_adaptor}->isa('Bio::EnsEMBL::DBSQL::MetaContainer');
   
   $args{ontology_cache} = {};
   $args{mapping} = $xref_mapping;
