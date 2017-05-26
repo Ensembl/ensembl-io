@@ -103,7 +103,9 @@ sub new {
   $args{biotype_mapper} = $biotype_mapper;
   
   my $self = $class->SUPER::new(\%args);
-
+  $self->version($self->meta_adaptor->list_value_by_key('schema_version')->[0]);
+  $self->production_name($self->meta_adaptor->list_value_by_key('species.production_name')->[0]);
+  
   # once we have the instance, add our customized callbacks to the translator
   $self->add_callbacks(\%field_callbacks);
 
@@ -114,12 +116,14 @@ sub version {
   my ($self, $version) = @_;
   
   $self->{version} = $version if $version;
-  return $self->meta_adaptor->list_value_by_key('schema_version')->[0];
+  return $self->{version};
 }
 
 sub production_name {
-  my $self = shift;
-  return $self->meta_adaptor->list_value_by_key('species.production_name')->[0];
+  my ($self, $prod_name) = @_;
+
+  $self->{production_name} = $prod_name if $prod_name;
+  return $self->{production_name};
 }
 
 sub ontology_cache {
