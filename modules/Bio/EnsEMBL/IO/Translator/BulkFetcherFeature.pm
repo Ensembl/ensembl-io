@@ -81,8 +81,8 @@ sub new {
   
   my @required_args = qw/version production_name xref_mapping_file ontology_adaptor meta_adaptor/;
   my @missing_args;
-  map { push @missing_args, $args{$_} unless exists $args{$_} } @required_args;
-  confess "Missing arguments required by Bio::EnsEMBL::IO::Translator::Feature: " . join(',', @missing_args)
+  map { push @missing_args, $_ unless exists $args{$_} } @required_args;
+  confess "Missing arguments required by Bio::EnsEMBL::IO::Translator::BulkFetcherFeature" . join(',', @missing_args)
     if scalar @missing_args;
 
   # this connects Ensembl to Identifiers.org amongst other things
