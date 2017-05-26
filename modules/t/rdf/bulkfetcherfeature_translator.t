@@ -31,11 +31,17 @@ my $ontology_adaptor =
 
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new(undef, "$Bin/..");
 my $meta_adaptor = $multi->get_DBAdaptor('core')->get_MetaContainer();
-
+my ($version, $production_name) =
+  (
+   $meta_adaptor->list_value_by_key('schema_version')->[0],
+   $meta_adaptor->list_value_by_key('species.production_name')->[0]
+  );
 my $translator =
   Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(xref_mapping_file => "$Bin/xref_LOD_mapping.json",
 							ontology_adaptor  => $ontology_adaptor,
 							meta_adaptor      => $meta_adaptor);
 
+ok($translator->version == $version, 'version');
+ok($translator->production_name == $production_name, 'production name');
 
 done_testing();
