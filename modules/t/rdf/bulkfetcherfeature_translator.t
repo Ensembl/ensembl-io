@@ -23,7 +23,6 @@ use Test::Exception;
 use JSON;
 
 use Bio::EnsEMBL::Test::MultiTestDB;
-use Bio::EnsEMBL::IO::Translator::BulkFetcherFeature;
 
 use_ok 'Bio::EnsEMBL::IO::Translator::BulkFetcherFeature';
 
@@ -86,6 +85,7 @@ cmp_deeply($translator->homologues($gene)->[1],
 	   { stable_id => 'ENSGGOG00000023239',
 	     genome => 'gorilla_gorilla',
 	     description => 'ortholog_one2one' }, 'homolog');
+is($translator->uri($gene), "http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000127720", 'gene URI');
 
 # compare transcript
 my $transcripts = $translator->transcripts($gene);
@@ -122,6 +122,7 @@ cmp_deeply($translator->xrefs($transcript)->[13],
 	    'description' => '',
 	    'dbname' => 'RefSeq_mRNA'
 	   }, 'transcript xref');
+is($translator->uri($transcript), "http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306", 'transcript URI');
 
 # compare exon
 is(scalar @{$translator->exons($transcript)}, 12, 'number of transcript exons');
@@ -141,6 +142,7 @@ my %exon_attrs =
 foreach my $attr (keys %exon_attrs) {
   is($translator->$attr($exon), $exon_attrs{$attr}, "exon $attr");
 }
+is($translator->uri($exon), "http://rdf.ebi.ac.uk/resource/ensembl.exon/ENSE00003483236", 'exon URI');
 
 # compare translation, its xrefs and protein features
 is(scalar @{$translator->translations($transcript)}, 1, 'number of translations');
@@ -157,6 +159,7 @@ cmp_deeply($translator->xrefs($translation)->[17],
 	    description => 'Methyltransferase-like protein 25 ',
 	    dbname => 'Uniprot/SWISSPROT'
 	   }, 'translation xref');
+is($translator->uri($translation), "http://rdf.ebi.ac.uk/resource/ensembl.protein/ENSP00000248306", 'translation URI');
 my $protein_features = $translator->protein_features($translation);
 is(scalar @{$protein_features}, 7, 'number of protein features');
 cmp_deeply($protein_features->[4],
