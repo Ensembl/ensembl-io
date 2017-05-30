@@ -50,7 +50,11 @@ ok($translator->production_name eq $production_name, 'production name');
 # read in a sample gene structure fetched by the bulk fetcher
 my $gene = from_json(slurp_file("$Bin/gene.json"));
 
+#
 # test various accessors
+#
+# compare gene
+#
 my %gene_attrs =
   (
    type => 'gene',
@@ -83,12 +87,88 @@ cmp_deeply($translator->homologues($gene)->[1],
 	     genome => 'gorilla_gorilla',
 	     description => 'ortholog_one2one' }, 'homolog');
 
+# compare transcript
 my $transcripts = $translator->transcripts($gene);
 is(scalar @{$transcripts}, 11, 'number of transcripts');
-my $transcript = $transcripts->[];
-my %trascript_attr =
+my $transcript = $transcripts->[0];
+my %transcript_attrs =
   (
+   id => 'ENST00000248306',
+   type => 'transcript',
+   name => 'METTL25-201',
+   description => undef,
+   seq_region_name => 12,
+   coord_system_name => 'chromosome',
+   coord_system_version => 'GRCh38',
+   start => 82358497,
+   end   => 82479236,
+   strand => 1,
+   biotype => 'protein_coding',
+   taxon_id => 9606,
+   provenance => 'INFERRED_FROM_TRANSCRIPT'
+			     
   );
+foreach my $attr (keys %transcript_attrs) {
+  is($translator->$attr($transcript), $transcript_attrs{$attr}, "transcript $attr");
+}
+cmp_deeply($translator->synonyms($transcript), [], 'transcript synonyms');
+is(scalar @{$translator->xrefs($transcript)}, 19, 'number of transcript xrefs');
+cmp_deeply($translator->xrefs($transcript)->[13],
+	   {
+	    'display_id' => 'NM_001319675.1',
+	    'primary_id' => 'NM_001319675',
+	    'info_type' => 'DIRECT',
+	    'info_text' => 'Generated via otherfeatures',
+	    'description' => '',
+	    'dbname' => 'RefSeq_mRNA'
+	   }, 'transcript xref');
+
+# compare exon
+is(scalar @{$translator->exons($transcript)}, 12, 'number of transcript exons');
+my $exon = $translator->exons($transcript)->[3];
+my %exon_attrs =
+  (
+   end => 82476718,
+   seq_region_name => '12',
+   coord_system_name => 'chromosome',
+   coord_system_version => 'GRCh38',
+   strand => '1',
+   id => 'ENSE00003483236',
+   type => 'exon',
+   rank => 10,
+   start => 82476644
+  );
+foreach my $attr (keys %exon_attrs) {
+  is($translator->$attr($exon), $exon_attrs{$attr}, "exon $attr");
+}
+
+# compare translation, its xrefs and protein features
+is(scalar @{$translator->translations($transcript)}, 1, 'number of translations');
+my $translation = $translator->translations($transcript)->[0];
+is($translator->id($translation), 'ENSP00000248306', 'translation id');
+is($translator->type($translation), 'translation', 'translation type');
+is(scalar @{$translator->xrefs($translation)}, 18, 'number of translation xrefs');
+cmp_deeply($translator->xrefs($translation)->[17],
+	   {
+	    display_id => 'Q8N6Q8',
+	    primary_id => 'Q8N6Q8',
+	    info_type => 'DIRECT',
+	    info_text => 'Generated via direct',
+	    description => 'Methyltransferase-like protein 25 ',
+	    dbname => 'Uniprot/SWISSPROT'
+	   }, 'translation xref');
+my $protein_features = $translator->protein_features($translation);
+is(scalar @{$protein_features}, 7, 'number of protein features');
+cmp_deeply($protein_features->[4],
+	   {
+	    name => 'PTHR12496:SF0',
+	    translation_id => 'ENSP00000248306',
+	    description => undef,
+	    interpro_ac => undef,
+	    dbname => 'PANTHER',
+	    end => 265,
+	    start => 1
+	   }, 'protein feature attributes');
 
 sub slurp_file {
   my $file = shift;
