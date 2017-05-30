@@ -68,7 +68,8 @@ my %gene_attrs =
    strand => 1,
    biotype => 'protein_coding',
    taxon_id => 9606,
-   provenance => 'ANNOTATED'
+   provenance => 'ANNOTATED',
+   so_term => 'SO:0001217'
   );
 foreach my $attr (keys %gene_attrs) {
   is($translator->$attr($gene), $gene_attrs{$attr}, "gene $attr");
@@ -105,8 +106,8 @@ my %transcript_attrs =
    strand => 1,
    biotype => 'protein_coding',
    taxon_id => 9606,
-   provenance => 'INFERRED_FROM_TRANSCRIPT'
-			     
+   provenance => 'INFERRED_FROM_TRANSCRIPT',
+   so_term => 'SO:0000234'
   );
 foreach my $attr (keys %transcript_attrs) {
   is($translator->$attr($transcript), $transcript_attrs{$attr}, "transcript $attr");
@@ -137,7 +138,8 @@ my %exon_attrs =
    id => 'ENSE00003483236',
    type => 'exon',
    rank => 10,
-   start => 82476644
+   start => 82476644,
+   so_term => undef
   );
 foreach my $attr (keys %exon_attrs) {
   is($translator->$attr($exon), $exon_attrs{$attr}, "exon $attr");
