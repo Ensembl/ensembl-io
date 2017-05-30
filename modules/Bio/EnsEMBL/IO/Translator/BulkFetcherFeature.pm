@@ -486,13 +486,15 @@ sub so_term {
 sub _ontology_id {
   my ($self, $term) = @_;
   my $ontology_cache = $self->ontology_cache;
-  return $self->{$ontology_cache->{$term}} if exists $self->{$ontology_cache->{$term}};
+  return $self->{$ontology_cache->{$term}} if $term and exists $self->{$ontology_cache->{$term}};
 
   my ($typeterm) = @{ $self->ontology_adaptor->fetch_all_by_name( $term, 'SO' ) };
     
   unless ($typeterm) {
-    warn "Can't find SO term for biotype $term\n";
-    $self->{$ontology_cache->{$term}} = undef; 
+    if($term) {
+      warn "Can't find SO term for biotype '$term'";
+      $self->{$ontology_cache->{$term}} = undef;  
+    }
     return;
   }
     
