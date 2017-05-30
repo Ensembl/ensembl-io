@@ -36,7 +36,7 @@ use warnings;
 
 use Carp;
 
-use Bio::EnsEMBL::Utils::RDF;
+use Bio::EnsEMBL::Utils::RDF qw/feature_uri/;
 use Bio::EnsEMBL::Utils::RDF::Mapper;
 use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
 
