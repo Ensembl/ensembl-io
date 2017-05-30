@@ -154,8 +154,6 @@ sub feature_uri {
   confess "Cannot map feature type '$type' to a prefix"
     unless $prefix;
   
-  my $namespace = prefix($prefix);
-  $id = uri_escape($id);
   return prefix($prefix) . uri_escape($id);
 }
 
@@ -164,7 +162,7 @@ sub feature_uri {
 # and the unversioned equivalent weould be http://rdf.ebi.ac.uk/resource/ensembl/homo_sapiens/GRCh37/1
 
 sub seq_region_uri {
-  my ($self, $version, $production_name, $cs_version, $region_name, $start, $end, $strand) = @_;
+  my ($version, $production_name, $cs_version, $region_name, $start, $end, $strand) = @_;
   
   my ($version_uri,$unversioned_uri);
   if (defined $cs_version) {
@@ -188,14 +186,6 @@ sub seq_region_uri {
   }
   
   return ( u($version_uri), u($unversioned_uri));
-}
-
-# bnodes must only be unique within a single document, hence a single run of this module is sufficient for the state.
-my $b_node_count = 0;
-sub new_bnode {
-  my $self = shift;
-  $b_node_count++;
-  return '_'.$b_node_count;
 }
 
 1;
