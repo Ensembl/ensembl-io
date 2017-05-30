@@ -36,8 +36,6 @@ use warnings;
 use Carp;
 
 use Bio::EnsEMBL::Utils::RDF qw/seq_region_uri/;
-use Bio::EnsEMBL::Utils::RDF::Mapper;
-use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
 
 my %field_callbacks = (version         => 'version',
 		       production_name => 'production_name',
