@@ -206,7 +206,7 @@ sub _bulk_fetcher_feature_record {
       
       $self->_bulk_fetcher_feature_record($exon, $translator, $record);
       
-      my $rank = $translator->rank($object);
+      my $rank = $translator->rank($exon);
       ${$record} .= sprintf "%s\n%s\n%s\n%s\n",
 	triple(u($feature_uri), 'sio:SIO_000974',  u($feature_uri.'#Exon_'.$rank)),
 	triple(u($feature_uri.'#Exon_'.$rank),  'rdf:type', 'sio:SIO_001261'),
