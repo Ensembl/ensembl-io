@@ -36,7 +36,8 @@ use strict;
 use warnings;
 use Carp;
 
-use Bio::EnsEMBL::Utils::RDF qw/u prefix/;
+use URI::Escape;
+use Bio::EnsEMBL::Utils::RDF qw/u escape prefix triple taxon_triple clean_for_uri seq_region_uri feature_uri/;
 
 =head2 new
 
@@ -63,16 +64,15 @@ sub new {
 =cut
 
 sub write {
-    my $self = shift;
-    my $object = shift;
-    my $translator = shift;
+  my $self = shift;
+  my $object = shift;
+  my $translator = shift;
 
-    if($object->isa('Bio::EnsEMBL::IO::Object::RDF')) {
-      print { $self->{writer_handle} } $object->create_record(), "\n";
-    } else {
-      print { $self->{writer_handle} } $self->create_record($object, $translator), "\n";
-    }
-    
+  if (ref($object) =~ /HASH/ || $object->isa('Bio::EnsEMBL::Slice')) {
+    print { $self->{writer_handle} } $self->create_record($object, $translator), "\n";
+  } elsif ($object->isa('Bio::EnsEMBL::IO::Object::RDF')) {
+    print { $self->{writer_handle} } $object->create_record(), "\n";
+  } 
 }
 
 =head2 create_record
@@ -92,12 +92,14 @@ sub create_record {
   my $translator = shift || $self->translator;
   return unless $translator;
 
+  if (ref($object) =~ /HASH/) {
+    my $record;
+    $self->_bulk_fetcher_feature_record($object, $translator, \$record);
+    return $record;
+  }
+  
   return $self->_seq_region_record($object, $translator)
     if $object->isa('Bio::EnsEMBL::Slice');
-
-  my $record;
-  $self->_bulk_fetcher_feature_record($object, $translator, \$record);
-  return $record;
 }
 
 sub _seq_region_record {
@@ -241,7 +243,7 @@ sub _add_faldo_location {
   
   my ($feature_uri, $region_name, $cs_name, $cs_version, $start, $end, $strand) =
     $translator->batch_fields($object, [qw/uri seq_region_name cs_name cs_version start end strand/]);
-  my ($schema_version, $production_name) = ($translator->release, $translator->production_name);
+  my ($schema_version, $production_name) = ($translator->version, $translator->production_name);
 
   my $prefix = prefix('ensembl');
   unless (defined $schema_version && defined $region_name && defined $cs_name) {
@@ -254,9 +256,9 @@ sub _add_faldo_location {
   
   my $begin = ($strand >= 0) ? $start : $end;
   my $stop = ($strand >= 0) ? $end : $start;
-  my $location = seq_region_uri($schema_version, $production_name, $cs_version, $region_name, $start, $end, $strand);
-  my $beginUri = seq_region_uri($schema_version, $production_name, $cs_version, $region_name, $begin, undef, $strand);
-  my $endUri = seq_region_uri($schema_version, $production_name, $cs_version, $region_name, undef, $stop, $strand);
+  my ($location) = seq_region_uri($schema_version, $production_name, $cs_version, $region_name, $start, $end, $strand);
+  my ($beginUri) = seq_region_uri($schema_version, $production_name, $cs_version, $region_name, $begin, undef, $strand);
+  my ($endUri) = seq_region_uri($schema_version, $production_name, $cs_version, $region_name, undef, $stop, $strand);
   
   ${$record} .= sprintf "%s\n%s\n%s\n%s\n%s\n%s\n",
     triple(u($feature_uri), 'faldo:location', $location),
