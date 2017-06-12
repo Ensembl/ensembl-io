@@ -72,7 +72,7 @@ sub fetch_variations {
 
       ## Eagle fix - tabix will want to write the downloaded index file to 
       ## the current working directory. By default this is '/'
-      chdir($SiteDefs::ENSEMBL_TMP_DIR);
+      chdir($SiteDefs::ENSEMBL_USERDATA_DIR.'/temporary/vcf_tabix/');
 
       my $vcf = Vcf->new(%args);
 
