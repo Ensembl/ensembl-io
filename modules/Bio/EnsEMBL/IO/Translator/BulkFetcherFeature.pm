@@ -168,10 +168,10 @@ sub id_org_short {
 sub type {
   my ($self, $object) = @_;
 
-  exists $object->{type} and defined $object->{type}
+  exists $object->{ensembl_object_type} and defined $object->{ensembl_object_type}
     or croak "Undefined type for feature ", $self->id($object);
 
-  return $object->{type};
+  return $object->{ensembl_object_type};
 }
 
 =head2 id
