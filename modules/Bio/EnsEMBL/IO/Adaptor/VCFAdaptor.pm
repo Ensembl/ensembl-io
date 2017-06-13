@@ -20,6 +20,9 @@ limitations under the License.
 package Bio::EnsEMBL::IO::Adaptor::VCFAdaptor;
 use strict;
 
+use EnsEMBL::Web::Utils::FormatText qw(date_format);
+use File::Path qw(make_path);
+
 use Vcf;
 my $DEBUG = 0;
 
@@ -64,15 +67,19 @@ sub fetch_variations {
   if (!$self->{_cache}->{features} || (ref $self->{_cache}->{features} eq 'ARRAY' && !@{$self->{_cache}->{features}})){
     my @features;
     delete $self->{_cache}->{features};
+
+    ## Eagle fix - tabix will want to write the downloaded index file to 
+    ## the current working directory. By default this is '/'
+    my $time = date_format(time(), '%y-%m-%d'); 
+    my $path = $SiteDefs::ENSEMBL_USERDATA_DIR."/temporary/vcf_tabix/$time/";
+    make_path($path);
+    chdir($path);
+
     foreach my $chr_name ($chr,"chr$chr") { # maybe UCSC-type names?
       my %args = ( 
         region => "$chr_name:$s-$e",
         file => $self->url
       );
-
-      ## Eagle fix - tabix will want to write the downloaded index file to 
-      ## the current working directory. By default this is '/'
-      chdir($SiteDefs::ENSEMBL_USERDATA_DIR.'/temporary/vcf_tabix/');
 
       my $vcf = Vcf->new(%args);
 
