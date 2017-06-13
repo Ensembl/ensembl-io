@@ -42,10 +42,11 @@ my $snpCode = {
 };
 
 sub new {
-  my ($class, $url) = @_;
+  my ($class, $url, $hub) = @_;
   my $self = bless {
     _cache => {},
     _url => $url,
+    _hub => $hub,
   }, $class;
       
   return $self;
@@ -53,6 +54,7 @@ sub new {
 
 sub url { return $_[0]->{'_url'} };
 
+sub hub { return $_[0]->{'_hub'} };
 
 sub snp_code {
     my ($self, $allele) = @_;
@@ -73,12 +75,13 @@ sub fetch_variations {
     my $time = date_format(time(), '%y-%m-%d'); 
     my $path = $SiteDefs::ENSEMBL_USERDATA_DIR."/temporary/vcf_tabix/$time/";
     make_path($path);
-    chdir($path);
 
     foreach my $chr_name ($chr,"chr$chr") { # maybe UCSC-type names?
       my %args = ( 
-        region => "$chr_name:$s-$e",
-        file => $self->url
+        region  => "$chr_name:$s-$e",
+        file    => $self->url,
+        tabix   => $self->hub->species_defs->TABIX,
+        tmp_dir => $path,
       );
 
       my $vcf = Vcf->new(%args);
