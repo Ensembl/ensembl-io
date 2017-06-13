@@ -198,9 +198,10 @@ $feature_writer->write(Bio::EnsEMBL::IO::Object::RDF->species(taxon_id => $taxon
 
 map { $feature_writer->write($_, $slice_trans) } @slices;
 map { $feature_writer->write($_, $feature_trans) } @features;
-# # map { $xrefs_writer->write($_) } @features;
 
 eq_or_diff(${$fh->string_ref()}, $rdf_string, "serializer output matches expected RDF");
+
+$feature_writer->close();
 
 done_testing();
 
