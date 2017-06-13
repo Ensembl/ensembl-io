@@ -43,6 +43,7 @@ use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
 my %field_callbacks = (version         => 'version',
 		       production_name => 'production_name',
 		       id_org_short    => 'id_org_short',
+		       lod_uri         => 'lod_uri',
 		       type            => 'type',
 		       id              => 'id',
 		       name            => 'name',
@@ -156,6 +157,13 @@ sub id_org_short {
   defined $db or croak "Undefined db";
   
   return $self->ensembl_mapper->identifier_org_short($db);
+}
+
+sub lod_uri {
+  my ($self, $db) = @_;
+  defined $db or croak "Undefined db";
+
+  return $self->ensembl_mapper->LOD_uri($db);
 }
 
 =head2 type
@@ -378,7 +386,7 @@ sub provenance {
 sub xrefs {
   my ($self, $object) = @_;
   
-  return $object->{xrefs};
+  return $object->{xrefs} || [];
 }
 
 =head2 dbname
