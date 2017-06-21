@@ -82,7 +82,7 @@ sub create_record {
     # return global triples about the organism  
     $line = sprintf "%s\n%s\n%s\n%s",
       triple('taxon:'.$taxon_id, 'rdfs:subClassOf', 'obo:OBI_0100026'),
-      triple('taxon:'.$taxon_id, 'rdfs:label', qq("$scientific_name")),
+      triple('taxon:'.$taxon_id, 'skos:prefLabel', qq("$scientific_name")),
       triple('taxon:'.$taxon_id, 'skos:altLabel', qq("$common_name")),
       triple('taxon:'.$taxon_id, 'dc:identifier', qq("$taxon_id"));
   } else {
