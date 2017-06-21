@@ -58,6 +58,7 @@ install:
     - cpanm Bio::DB::HTS
     - cpanm -n Devel::Cover::Report::Coveralls
     - cpanm -n DBD::SQLite
+    - cpanm JSON
 #    - cp travisci/MultiTestDB.conf.travisci.mysql  modules/t/MultiTestDB.conf.mysql
 #    - cp travisci/MultiTestDB.conf.travisci.SQLite modules/t/MultiTestDB.conf.SQLite
 
