@@ -71,7 +71,7 @@ my $rdf_string = <<"RDF";
 \@prefix dataset: <http://rdf.ebi.ac.uk/dataset/ensembl/> .
 \@prefix dc: <http://purl.org/dc/elements/1.1/> .
 taxon:9606 rdfs:subClassOf obo:OBI_0100026 .
-taxon:9606 rdfs:label \"Homo sapiens\" .
+taxon:9606 skos:prefLabel \"Homo sapiens\" .
 taxon:9606 skos:altLabel \"Human\" .
 taxon:9606 dc:identifier \"9606\" .
 <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> rdfs:subClassOf <http://rdf.ebi.ac.uk/resource/ensembl/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> .

@@ -44,7 +44,7 @@ my $species = Bio::EnsEMBL::IO::Object::RDF->species(taxon_id => 9606,
 
 my $species_record =
   "taxon:9606 rdfs:subClassOf obo:OBI_0100026 .\n" .
-  "taxon:9606 rdfs:label \"Homo sapiens\" .\n" .
+  "taxon:9606 skos:prefLabel \"Homo sapiens\" .\n" .
   "taxon:9606 skos:altLabel \"Human\" .\n" .
   "taxon:9606 dc:identifier \"9606\" .";
 eq_or_diff($species->create_record(), $species_record, "Species record match");
