@@ -56,14 +56,24 @@ sub namespaces {
 =cut
 
 sub species {
-    my $class = shift;
-    my %args = @_;
-    exists $args{taxon_id} or croak "Undefined species taxon_id";
-    exists $args{scientific_name} or croak "Undefined species scientific name";
-    exists $args{common_name} or croak "Undefined species common name";
-    
-    return bless { type => 'species', %args }, $class;
-  }
+  my $class = shift;
+  my %args = @_;
+  exists $args{taxon_id} or croak "Undefined species taxon_id";
+  exists $args{scientific_name} or croak "Undefined species scientific name";
+  exists $args{common_name} or croak "Undefined species common name";
+  
+  return bless { type => 'species', %args }, $class;
+}
+
+sub dataset {
+  my $class = shift;
+  my %args = @_;
+  exists $args{version} or croak "Undefined version";
+  exists $args{project} or croak "Undefined project";
+  exists $args{production_name} or croak "Undefined production name";
+
+  return bless { type => 'dataset', %args}, $class;
+}
 
 sub create_record {
   my $self = shift;
@@ -85,6 +95,13 @@ sub create_record {
       triple('taxon:'.$taxon_id, 'skos:prefLabel', qq("$scientific_name")),
       triple('taxon:'.$taxon_id, 'skos:altLabel', qq("$common_name")),
       triple('taxon:'.$taxon_id, 'dc:identifier', qq("$taxon_id"));
+  } elsif ($self->{type} eq 'dataset') {
+    my ($version, $project, $production_name) =
+      ($self->{version}, $self->{project}, $self->{production_name});
+    my $version_graph_uri = sprintf "http://rdf.ebi.ac.uk/dataset/%s/%d", $project, $version;
+    my $graph_uri = $version_graph_uri . "/" . $production_name;
+    
+    $line = triple(u($graph_uri), '<http://rdfs.org/ns/void#subset>', u($version_graph_uri)); 
   } else {
     croak "Unrecognised RDF object type";
   }
