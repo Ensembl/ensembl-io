@@ -165,7 +165,10 @@ taxon:9606 dc:identifier \"9606\" .
 <http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306> obo:SO_transcribed_from <http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000127720> .
 <http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000127720> sio:SIO_000558 ensembl:ENSPTRG00000005267 .
 
+<http://rdf.ebi.ac.uk/dataset/ensembl/89/homo_sapiens> <http://rdfs.org/ns/void#subset> <http://rdf.ebi.ac.uk/dataset/ensembl/89> .
 RDF
+
+# 
 
 # translators for slices and (bulk fetcher derived) features
 my $slice_trans = Bio::EnsEMBL::IO::Translator::Slice->new(meta_adaptor => $meta_adaptor);
@@ -188,7 +191,6 @@ $feature_writer->open($fh);
 $feature_writer->write(Bio::EnsEMBL::IO::Object::RDF->namespaces(blastprodom => "http://purl.uniprot.org/prodom/",
 								 dataset     => 'http://rdf.ebi.ac.uk/dataset/ensembl/',
 								 dc          => 'http://purl.org/dc/elements/1.1/'));
-# $xrefs_writer->write($namespaces);
 
 # write species info
 my ($taxon_id, $scientific_name, $common_name) = (9606, 'Homo sapiens', 'Human');
@@ -198,6 +200,9 @@ $feature_writer->write(Bio::EnsEMBL::IO::Object::RDF->species(taxon_id => $taxon
 
 map { $feature_writer->write($_, $slice_trans) } @slices;
 map { $feature_writer->write($_, $feature_trans) } @features;
+
+# finally write connecting triple to master RDF file
+$feature_writer->write(Bio::EnsEMBL::IO::Object::RDF->dataset(version => 89, project => 'ensembl', production_name => 'homo_sapiens'));
 
 eq_or_diff(${$fh->string_ref()}, $rdf_string, "serializer output matches expected RDF");
 

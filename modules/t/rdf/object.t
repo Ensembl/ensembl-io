@@ -49,4 +49,14 @@ my $species_record =
   "taxon:9606 dc:identifier \"9606\" .";
 eq_or_diff($species->create_record(), $species_record, "Species record match");
 
+throws_ok { Bio::EnsEMBL::IO::Object::RDF->dataset(version => 89, production_name => 'homo_sapiens') }
+  qr/Undefined/, "Throws with missing arguments";
+my $dataset = Bio::EnsEMBL::IO::Object::RDF->dataset(version => 89,
+						     project => 'ensembl',
+						     production_name => 'homo_sapiens');
+
+my $dataset_record =
+  "<http://rdf.ebi.ac.uk/dataset/ensembl/89/homo_sapiens> <http://rdfs.org/ns/void#subset> <http://rdf.ebi.ac.uk/dataset/ensembl/89> .";
+eq_or_diff($dataset->create_record(), $dataset_record, "Dataset record match");
+
 done_testing();
