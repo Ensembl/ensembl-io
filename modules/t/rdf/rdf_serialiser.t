@@ -193,10 +193,9 @@ $feature_writer->write(Bio::EnsEMBL::IO::Object::RDF->namespaces(blastprodom => 
 								 dc          => 'http://purl.org/dc/elements/1.1/'));
 
 # write species info
-my ($taxon_id, $scientific_name, $common_name) = (9606, 'Homo sapiens', 'Human');
-$feature_writer->write(Bio::EnsEMBL::IO::Object::RDF->species(taxon_id => $taxon_id,
-							      scientific_name => $scientific_name,
-							      common_name => $common_name));
+$feature_writer->write(Bio::EnsEMBL::IO::Object::RDF->species(taxon_id => $meta_adaptor->get_taxonomy_id,
+							      scientific_name => $meta_adaptor->get_scientific_name,
+							      common_name => $meta_adaptor->get_common_name));
 
 map { $feature_writer->write($_, $slice_trans) } @slices;
 map { $feature_writer->write($_, $feature_trans) } @features;
