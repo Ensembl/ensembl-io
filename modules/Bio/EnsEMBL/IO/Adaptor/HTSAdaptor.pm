@@ -75,12 +75,15 @@ sub snp_code {
 # files. This method returns a possibly modified chr_id after
 # checking whats in the bam file
 sub munge_chr_id {
-  my ($self, $hts_obj, $chr_id) = @_;
+  my ($self, $chr_id, $hts_obj) = @_;
 
-  my $htsfile = $hts_obj && $hts_obj->hts_file;
-  warn "Failed to open BAM/CRAM file " . $self->url unless $htsfile;
-  return undef unless $htsfile;
-
+  unless ( $chr_id && $hts_obj ) {
+    unless ( $hts_obj && $hts_obj->hts_file ) {
+      warn "Failed to open BAM/CRAM file " . $self->url;
+    }
+    return;
+  }
+  
   my $header = $hts_obj->header;
 
   # Check we get values back for seq region. May need to add 'chr' or 'Chr'
@@ -119,7 +122,7 @@ sub fetch_paired_alignments {
   my $header = $hts_obj->header;
 
   # Maybe need to add 'chr'
-  my $seq_id = $self->munge_chr_id($hts_obj, $chr_id);
+  my $seq_id = $self->munge_chr_id($chr_id, $hts_obj);
   return [] if !defined($seq_id);
 
   my @coords = $header->parse_region("$seq_id:$start-$end");
@@ -166,7 +169,7 @@ sub fetch_alignments_filtered {
   my $header = $hts_obj->header;
 
   # Maybe need to add 'chr'
-  my $seq_id = $self->munge_chr_id($hts_obj, $chr_id);
+  my $seq_id = $self->munge_chr_id($chr_id, $hts_obj);
   return [] if !defined($seq_id);
 
   my @coords = $header->parse_region("$seq_id:$start-$end");
@@ -223,7 +226,7 @@ sub fetch_coverage {
   my $header = $hts_obj->header;
 
   #  Maybe need to add 'chr'
-  my $seq_id = $self->munge_chr_id($hts_obj, $chr_id);
+  my $seq_id = $self->munge_chr_id($chr_id, $hts_obj);
   return [] if !defined($seq_id);
 
   my @coords = $header->parse_region("$seq_id:$start-$end");
@@ -313,7 +316,7 @@ sub fetch_consensus {
   };
 
   # Maybe need to add 'chr'
-  my $seq_id = $self->munge_chr_id($hts_obj, $chr_id);
+  my $seq_id = $self->munge_chr_id($chr_id, $hts_obj);
   return [] if !defined($seq_id);
 
   $hts_obj->fast_pileup("${seq_id}:${start}-${end}", $consensus_caller);
