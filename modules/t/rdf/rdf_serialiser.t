@@ -75,13 +75,13 @@ taxon:9606 rdfs:subClassOf obo:OBI_0100026 .
 taxon:9606 skos:prefLabel \"Homo sapiens\" .
 taxon:9606 skos:altLabel \"Human\" .
 taxon:9606 dc:identifier \"9606\" .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> rdfs:subClassOf <http://rdf.ebi.ac.uk/resource/ensembl/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> rdfs:subClassOf <http://rdf.ebi.ac.uk/resource/ensembl/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> .
 <http://rdf.ebi.ac.uk/resource/ensembl/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> rdfs:subClassOf obo:SO_0000340 .
 <http://rdf.ebi.ac.uk/resource/ensembl/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> rdfs:label \"Homo sapiens chromosome chromosome:GRCh38:1:1:248956422:1\" .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> rdfs:label \"Homo sapiens chromosome:GRCh38:1:1:248956422:1 (GRCh38)\" .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> dc:identifier \"chromosome:GRCh38:1:1:248956422:1\" .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> term:inEnsemblSchemaNumber \"89\" .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> term:inEnsemblAssembly \"GRCh38\" .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> rdfs:label \"Homo sapiens chromosome:GRCh38:1:1:248956422:1 (GRCh38)\" .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> dc:identifier \"chromosome:GRCh38:1:1:248956422:1\" .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> term:inEnsemblSchemaNumber \"$version\" .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1> term:inEnsemblAssembly \"GRCh38\" .
 <http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000127720> rdf:type obo:SO_0001217 .
 <http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000127720> rdf:type term:protein_coding .
 <http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000127720> rdfs:label \"METTL25\" .
@@ -91,20 +91,20 @@ taxon:9606 dc:identifier \"9606\" .
 <http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000127720> rdfs:seeAlso <http://identifiers.org/ensembl/ENSG00000127720> .
 <http://identifiers.org/ensembl/ENSG00000127720> rdf:type identifiers:ensembl .
 <http://identifiers.org/ensembl/ENSG00000127720> sio:SIO_000671 [a ident_type:ensembl; sio:SIO_000300 \"ENSG00000127720\"] .
-<http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000127720> faldo:location <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82479236:1> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82479236:1> rdfs:label \"chromosome 12:82358497-82479236:1\" .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82479236:1> rdf:type faldo:Region .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82479236:1> faldo:begin <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82479236:1> faldo:end <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82479236:1> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82479236:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> rdf:type faldo:ExactPosition .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> rdf:type faldo:ForwardStrandPosition .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> faldo:position 82358497 .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82479236:1> rdf:type faldo:ExactPosition .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82479236:1> rdf:type faldo:ForwardStrandPosition .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82479236:1> faldo:position 82479236 .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82479236:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12> .
+<http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000127720> faldo:location <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82479236:1> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82479236:1> rdfs:label \"chromosome 12:82358497-82479236:1\" .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82479236:1> rdf:type faldo:Region .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82479236:1> faldo:begin <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82479236:1> faldo:end <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82479236:1> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82479236:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> rdf:type faldo:ExactPosition .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> rdf:type faldo:ForwardStrandPosition .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> faldo:position 82358497 .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82479236:1> rdf:type faldo:ExactPosition .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82479236:1> rdf:type faldo:ForwardStrandPosition .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82479236:1> faldo:position 82479236 .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82479236:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12> .
 <http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000127720> skos:altlabel \"C12orf26\" .
 <http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000127720> skos:altlabel \"FLJ22789\" .
 <http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306> rdf:type obo:SO_0000234 .
@@ -115,20 +115,20 @@ taxon:9606 dc:identifier \"9606\" .
 <http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306> rdfs:seeAlso <http://identifiers.org/ensembl/ENST00000248306> .
 <http://identifiers.org/ensembl/ENST00000248306> rdf:type identifiers:ensembl .
 <http://identifiers.org/ensembl/ENST00000248306> sio:SIO_000671 [a ident_type:ensembl; sio:SIO_000300 \"ENST00000248306\"] .
-<http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306> faldo:location <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82479236:1> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82479236:1> rdfs:label \"chromosome 12:82358497-82479236:1\" .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82479236:1> rdf:type faldo:Region .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82479236:1> faldo:begin <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82479236:1> faldo:end <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82479236:1> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82479236:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> rdf:type faldo:ExactPosition .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> rdf:type faldo:ForwardStrandPosition .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> faldo:position 82358497 .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82479236:1> rdf:type faldo:ExactPosition .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82479236:1> rdf:type faldo:ForwardStrandPosition .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82479236:1> faldo:position 82479236 .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82479236:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12> .
+<http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306> faldo:location <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82479236:1> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82479236:1> rdfs:label \"chromosome 12:82358497-82479236:1\" .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82479236:1> rdf:type faldo:Region .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82479236:1> faldo:begin <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82479236:1> faldo:end <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82479236:1> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82479236:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> rdf:type faldo:ExactPosition .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> rdf:type faldo:ForwardStrandPosition .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> faldo:position 82358497 .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82479236:1> rdf:type faldo:ExactPosition .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82479236:1> rdf:type faldo:ForwardStrandPosition .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82479236:1> faldo:position 82479236 .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82479236:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12> .
 <http://rdf.ebi.ac.uk/resource/ensembl.exon/ENSE00000910621> rdf:type obo:SO_0000147 .
 <http://rdf.ebi.ac.uk/resource/ensembl.exon/ENSE00000910621> rdfs:label \"ENSE00000910621\" .
 <http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306> obo:SO_has_part <http://rdf.ebi.ac.uk/resource/ensembl.exon/ENSE00000910621> .
@@ -137,20 +137,20 @@ taxon:9606 dc:identifier \"9606\" .
 <http://rdf.ebi.ac.uk/resource/ensembl.exon/ENSE00000910621> rdfs:seeAlso <http://identifiers.org/ensembl/ENSE00000910621> .
 <http://identifiers.org/ensembl/ENSE00000910621> rdf:type identifiers:ensembl .
 <http://identifiers.org/ensembl/ENSE00000910621> sio:SIO_000671 [a ident_type:ensembl; sio:SIO_000300 \"ENSE00000910621\"] .
-<http://rdf.ebi.ac.uk/resource/ensembl.exon/ENSE00000910621> faldo:location <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82358824:1> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82358824:1> rdfs:label \"chromosome 12:82358497-82358824:1\" .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82358824:1> rdf:type faldo:Region .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82358824:1> faldo:begin <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82358824:1> faldo:end <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358824:1> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497-82358824:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> rdf:type faldo:ExactPosition .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> rdf:type faldo:ForwardStrandPosition .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> faldo:position 82358497 .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358497:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12> .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358824:1> rdf:type faldo:ExactPosition .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358824:1> rdf:type faldo:ForwardStrandPosition .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358824:1> faldo:position 82358824 .
-<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12:82358824:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/12> .
+<http://rdf.ebi.ac.uk/resource/ensembl.exon/ENSE00000910621> faldo:location <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82358824:1> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82358824:1> rdfs:label \"chromosome 12:82358497-82358824:1\" .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82358824:1> rdf:type faldo:Region .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82358824:1> faldo:begin <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82358824:1> faldo:end <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358824:1> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497-82358824:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> rdf:type faldo:ExactPosition .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> rdf:type faldo:ForwardStrandPosition .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> faldo:position 82358497 .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358497:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12> .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358824:1> rdf:type faldo:ExactPosition .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358824:1> rdf:type faldo:ForwardStrandPosition .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358824:1> faldo:position 82358824 .
+<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12:82358824:1> faldo:reference <http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/12> .
 <http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306> sio:SIO_000974 <http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306#Exon_1> .
 <http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306#Exon_1> rdf:type sio:SIO_001261 .
 <http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306#Exon_1> sio:SIO_000628 <http://rdf.ebi.ac.uk/resource/ensembl.exon/ENSE00000910621> .
@@ -166,7 +166,7 @@ taxon:9606 dc:identifier \"9606\" .
 <http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306> obo:SO_transcribed_from <http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000127720> .
 <http://rdf.ebi.ac.uk/resource/ensembl/ENSG00000127720> sio:SIO_000558 ensembl:ENSPTRG00000005267 .
 
-<http://rdf.ebi.ac.uk/dataset/ensembl/89/homo_sapiens> <http://rdfs.org/ns/void#subset> <http://rdf.ebi.ac.uk/dataset/ensembl/89> .
+<http://rdf.ebi.ac.uk/dataset/ensembl/$version/homo_sapiens> <http://rdfs.org/ns/void#subset> <http://rdf.ebi.ac.uk/dataset/ensembl/$version> .
 RDF
 
 # 

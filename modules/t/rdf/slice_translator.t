@@ -60,7 +60,7 @@ is($translator->name($slice), "chromosome:GRCh38:1:1:248956422:1", 'slice name')
 is($translator->coord_system_name($slice), "chromosome", 'coord system name');
 is($translator->coord_system_version($slice), 'GRCh38', 'coord system version');
 my ($version_uri, $unversioned_uri) = $translator->uri($slice);
-is($version_uri, "<http://rdf.ebi.ac.uk/resource/ensembl/89/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1>", "slice versioned URI");
+is($version_uri, "<http://rdf.ebi.ac.uk/resource/ensembl/$version/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1>", "slice versioned URI");
 is($unversioned_uri, "<http://rdf.ebi.ac.uk/resource/ensembl/homo_sapiens/GRCh38/chromosome:GRCh38:1:1:248956422:1>", "slice unversioned URI");
 
 done_testing();
