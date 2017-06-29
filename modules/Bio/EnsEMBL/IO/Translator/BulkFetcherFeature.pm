@@ -80,7 +80,7 @@ my %field_callbacks = (version         => 'version',
 sub new {
   my ($class, %args) = @_;
   
-  my @required_args = qw/xref_mapping_file ontology_adaptor meta_adaptor/;
+  my @required_args = qw/version xref_mapping_file ontology_adaptor meta_adaptor/;
   my @missing_args;
   map { push @missing_args, $_ unless exists $args{$_} } @required_args;
   confess "Missing arguments required by Bio::EnsEMBL::IO::Translator::BulkFetcherFeature" . join(',', @missing_args)
@@ -104,7 +104,7 @@ sub new {
   $args{biotype_mapper} = $biotype_mapper;
   
   my $self = $class->SUPER::new(\%args);
-  $self->version($self->meta_adaptor->list_value_by_key('schema_version')->[0]);
+  $self->version($args{version});
   $self->production_name($self->meta_adaptor->list_value_by_key('species.production_name')->[0]);
   
   # once we have the instance, add our customized callbacks to the translator

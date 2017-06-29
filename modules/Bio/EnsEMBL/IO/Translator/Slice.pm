@@ -56,7 +56,7 @@ my %field_callbacks = (version         => 'version',
 sub new {
   my ($class, %args) = @_;
   
-  my @required_args = qw/meta_adaptor/;
+  my @required_args = qw/version meta_adaptor/;
   my @missing_args;
   map { push @missing_args, $args{$_} unless exists $args{$_} } @required_args;
   confess "Missing arguments required by Bio::EnsEMBL::IO::Translator::Slice: " . join(',', @missing_args)
@@ -66,7 +66,7 @@ sub new {
     unless $args{meta_adaptor}->isa('Bio::EnsEMBL::DBSQL::MetaContainer');
 
   my $self = $class->SUPER::new(\%args);
-  $self->version($self->meta_adaptor->list_value_by_key('schema_version')->[0]);
+  $self->version($args{version});
   $self->production_name($self->meta_adaptor->list_value_by_key('species.production_name')->[0]);
   
   # once we have the instance, add our customized callbacks to the translator
