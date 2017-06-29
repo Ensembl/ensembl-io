@@ -37,7 +37,7 @@ my ($version, $production_name) =
   );
 
 my $translator =
-  Bio::EnsEMBL::IO::Translator::Slice->new(meta_adaptor => $meta_adaptor);
+  Bio::EnsEMBL::IO::Translator::Slice->new(version => $version, meta_adaptor => $meta_adaptor);
 
 ok($translator->version == $version, 'version');
 ok($translator->production_name eq $production_name, 'production name');

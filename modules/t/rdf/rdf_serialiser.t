@@ -39,6 +39,7 @@ my $ontology_adaptor =
 
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new(undef, "$Bin/..");
 my $meta_adaptor = $multi->get_DBAdaptor('core')->get_MetaContainer();
+my $version = $meta_adaptor->list_value_by_key('schema_version')->[0];
 
 # create some slices and features as a subset of a BulkFetcher dump
 my @slices = (Bio::EnsEMBL::Slice->new(-coord_system     => Bio::EnsEMBL::CoordSystem->new(-NAME    => 'chromosome',
@@ -171,10 +172,11 @@ RDF
 # 
 
 # translators for slices and (bulk fetcher derived) features
-my $slice_trans = Bio::EnsEMBL::IO::Translator::Slice->new(meta_adaptor => $meta_adaptor);
+my $slice_trans = Bio::EnsEMBL::IO::Translator::Slice->new(version => $version, meta_adaptor => $meta_adaptor);
 
 my $feature_trans =
-  Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(xref_mapping_file => "$Bin/xref_LOD_mapping.json",
+  Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(version => $version,
+							xref_mapping_file => "$Bin/xref_LOD_mapping.json",
 							ontology_adaptor  => $ontology_adaptor,
 							meta_adaptor      => $meta_adaptor);
 
@@ -201,7 +203,7 @@ map { $feature_writer->write($_, $slice_trans) } @slices;
 map { $feature_writer->write($_, $feature_trans) } @features;
 
 # finally write connecting triple to master RDF file
-$feature_writer->write(Bio::EnsEMBL::IO::Object::RDF->dataset(version => 89, project => 'ensembl', production_name => 'homo_sapiens'));
+$feature_writer->write(Bio::EnsEMBL::IO::Object::RDF->dataset(version => $version, project => 'ensembl', production_name => 'homo_sapiens'));
 
 eq_or_diff(${$fh->string_ref()}, $rdf_string, "serializer output matches expected RDF");
 

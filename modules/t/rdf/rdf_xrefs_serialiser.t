@@ -35,6 +35,7 @@ my $ontology_adaptor =
 
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new(undef, "$Bin/..");
 my $meta_adaptor = $multi->get_DBAdaptor('core')->get_MetaContainer();
+my $version = $meta_adaptor->list_value_by_key('schema_version')->[0];
 
 # create some features as a subset of a BulkFetcher dump
 
@@ -82,7 +83,8 @@ my $rdf_string = <<"RDF";
 RDF
 
 my $feature_trans =
-  Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(xref_mapping_file => "$Bin/xref_LOD_mapping.json",
+  Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(version => $version,
+							xref_mapping_file => "$Bin/xref_LOD_mapping.json",
 							ontology_adaptor  => $ontology_adaptor,
 							meta_adaptor      => $meta_adaptor);
 

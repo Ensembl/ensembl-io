@@ -39,7 +39,8 @@ my ($version, $production_name) =
   );
 
 my $translator =
-  Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(xref_mapping_file => "$Bin/xref_LOD_mapping.json",
+  Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(version => $version,
+							xref_mapping_file => "$Bin/xref_LOD_mapping.json",
 							ontology_adaptor  => $ontology_adaptor,
 							meta_adaptor      => $meta_adaptor);
 
