@@ -59,9 +59,9 @@ foreach (@gene_data) {
 my $gtf_string = <<GTF;
 ##gtf-file yes
 #!genome-build ensembl GRCh37
-6	ensembl	gene	266085333	266097311	.	-	.	gene_id "ENSG00000093134"; gene_biotype "protein_coding"; gene_source "ensembl"
-6	ensembl	gene	266115221	266116497	.	+	.	gene_id "ENSG00000234484"; gene_biotype "protein_coding"; gene_source "ensembl"
-6	ensembl	gene	266106416	266126005	.	-	.	gene_id "ENSG00000112303"; gene_biotype "protein_coding"; gene_source "ensembl"
+6	ensembl	gene	266085333	266097311	.	-	.	gene_version "1"; gene_id "ENSG00000093134"; gene_biotype "protein_coding"; gene_source "ensembl"
+6	ensembl	gene	266115221	266116497	.	+	.	gene_version "1"; gene_id "ENSG00000234484"; gene_biotype "protein_coding"; gene_source "ensembl"
+6	ensembl	gene	266106416	266126005	.	-	.	gene_version "1"; gene_id "ENSG00000112303"; gene_biotype "protein_coding"; gene_source "ensembl"
 GTF
 
 # Create a string file handle to write to

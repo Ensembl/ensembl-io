@@ -1,0 +1,150 @@
+$VAR1 = {
+          'homologues' => [
+                            {
+                              'stable_id' => 'ENSPTRG00000005267',
+                              'description' => 'ortholog_one2one',
+                              'genome' => 'pan_troglodytes'
+                            }
+                          ],
+          'name' => 'METTL25',
+          'seq_region_synonyms' => [
+                                     {
+                                       'db' => 'INSDC',
+                                       'id' => 'CM000674.2'
+                                     },
+                                     {
+                                       'db' => 'UCSC',
+                                       'id' => 'chr12'
+                                     },
+                                     {
+                                       'db' => 'RefSeq_genomic',
+                                       'id' => 'NC_000012.12'
+                                     }
+                                   ],
+          'description' => 'methyltransferase like 25 [Source:HGNC Symbol;Acc:HGNC:26228]',
+          'biotype' => 'protein_coding',
+          'end' => '82479236',
+          'seq_region_name' => '12',
+          'synonyms' => [
+                          'C12orf26',
+                          'FLJ22789'
+                        ],
+          'coord_system' => {
+                              'version' => 'GRCh38',
+                              'name' => 'chromosome'
+                            },
+          'strand' => '1',
+          'type' => 'gene',
+          'id' => 'ENSG00000127720',
+          'transcripts' => [
+                             {
+                               'gene_id' => 'ENSG00000127720',
+                               'name' => 'METTL25-201',
+                               'seq_region_synonyms' => [
+                                                          {
+                                                            'db' => 'INSDC',
+                                                            'id' => 'CM000674.2'
+                                                          },
+                                                          {
+                                                            'db' => 'UCSC',
+                                                            'id' => 'chr12'
+                                                          },
+                                                          {
+                                                            'db' => 'RefSeq_genomic',
+                                                            'id' => 'NC_000012.12'
+                                                          }
+                                                        ],
+                               'description' => undef,
+                               'end' => '82479236',
+                               'biotype' => 'protein_coding',
+                               'seq_region_name' => '12',
+                               'translations' => [
+                                                   {
+                                                     'protein_features' => [
+                                                                             {
+                                                                               'name' => '3.40.50.150',
+                                                                               'translation_id' => 'ENSP00000248306',
+                                                                               'description' => 'S-adenosyl-L-methionine-dependent methyltransferase',
+                                                                               'start' => '161',
+                                                                               'end' => '220',
+                                                                               'dbname' => 'Gene3D',
+                                                                               'interpro_ac' => 'IPR029063'
+                                                                             }
+                                                                           ],
+                                                     'type' => 'translation',
+                                                     'id' => 'ENSP00000248306',
+                                                     'transcript_id' => 'ENST00000248306',
+                                                     'xrefs' => [
+                                                                  {
+                                                                    'display_id' => 'UPI000013CC3E',
+                                                                    'primary_id' => 'UPI000013CC3E',
+                                                                    'info_text' => '',
+                                                                    'info_type' => 'CHECKSUM',
+                                                                    'description' => undef,
+                                                                    'dbname' => 'UniParc'
+                                                                  }
+                                                                ]
+                                                   }
+                                                 ],
+                               'coord_system' => {
+                                                   'version' => 'GRCh38',
+                                                   'name' => 'chromosome'
+                                                 },
+                               'strand' => '1',
+                               'exons' => [
+                                            {
+                                              'end' => '82358824',
+                                              'seq_region_name' => '12',
+                                              'trans_id' => 'ENST00000248306',
+                                              'coord_system' => {
+                                                                  'version' => 'GRCh38',
+                                                                  'name' => 'chromosome'
+                                                                },
+                                              'strand' => '1',
+                                              'id' => 'ENSE00000910621',
+                                              'type' => 'exon',
+                                              'rank' => '1',
+                                              'start' => '82358497'
+                                            },
+                                            {
+                                              'end' => '82399394',
+                                              'seq_region_name' => '12',
+                                              'trans_id' => 'ENST00000248306',
+                                              'coord_system' => {
+                                                                  'version' => 'GRCh38',
+                                                                  'name' => 'chromosome'
+                                                                },
+                                              'strand' => '1',
+                                              'id' => 'ENSE00003463804',
+                                              'type' => 'exon',
+                                              'rank' => '4',
+                                              'start' => '82398795'
+                                            }
+                                          ],
+                               'type' => 'transcript',
+                               'id' => 'ENST00000248306',
+                               'xrefs' => [
+                                            {
+                                              'display_id' => 'uc001szq.4',
+                                              'primary_id' => 'uc001szq.4',
+                                              'info_text' => '',
+                                              'info_type' => 'COORDINATE_OVERLAP',
+                                              'description' => undef,
+                                              'dbname' => 'UCSC'
+                                            }
+                                          ],
+                               'start' => '82358497'
+                             }
+                           ],
+          'xrefs' => [
+                       {
+                         'display_id' => 'Hs.506222',
+                         'primary_id' => 'Hs.506222',
+                         'info_text' => '',
+                         'info_type' => 'SEQUENCE_MATCH',
+                         'description' => 'Methyltransferase like 25',
+                         'dbname' => 'UniGene'
+                       }
+                     ],
+          'start' => '82358497'
+        };

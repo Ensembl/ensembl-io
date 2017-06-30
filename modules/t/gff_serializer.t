@@ -60,9 +60,9 @@ foreach (@gene_data) {
 my $gff_string = <<GFF;
 ##gff-version 3
 #!genome-build ensembl GRCh37
-6	ensembl	protein_coding	266085333	266097311	.	-	.	ID=gene:ENSG00000093134;biotype=protein_coding;gene_id=ENSG00000093134
-6	ensembl	protein_coding	266115221	266116497	.	+	.	ID=gene:ENSG00000234484;biotype=protein_coding;gene_id=ENSG00000234484
-6	ensembl	protein_coding	266106416	266126005	.	-	.	ID=gene:ENSG00000112303;biotype=protein_coding;gene_id=ENSG00000112303
+6	ensembl	protein_coding	266085333	266097311	.	-	.	ID=gene:ENSG00000093134;biotype=protein_coding;gene_id=ENSG00000093134;version=1
+6	ensembl	protein_coding	266115221	266116497	.	+	.	ID=gene:ENSG00000234484;biotype=protein_coding;gene_id=ENSG00000234484;version=1
+6	ensembl	protein_coding	266106416	266126005	.	-	.	ID=gene:ENSG00000112303;biotype=protein_coding;gene_id=ENSG00000112303;version=1
 GFF
 
 # Create a string file handle to write to
