@@ -39,9 +39,25 @@ use strict;
 use warnings;
 use Carp;
 
+use Bio::EnsEMBL::IO::Format::VCF4;
+
 use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
 my $version = 4.2;
+
+=head2 add_format
+
+    Description : Add a format object and configure the parser
+    Returntype  : none
+
+=cut
+
+sub add_format {
+  my $self = shift;
+  my $class = "Bio::EnsEMBL::IO::Format::VCF4";
+  my $format = $class->new();
+  $self->format($format);
+}
 
 sub next {
   my $self = shift;
