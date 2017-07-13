@@ -51,8 +51,16 @@ sub open {
 
   confess "ERROR: Input file is not bgzipped, cannot use tabix\n" unless $filename =~ /\.gz$/;
 
+  my %params = (filename => $filename);
+  ## Tabix will want to write the downloaded index file to 
+  ## the current working directory. By default this is '/'
+  if ($self->{'params'}{'tmp_dir'}) {
+    $params{'tmp_dir'}      = $self->{'params'}{'tmp_dir'};
+    $params{'use_tmp_dir'}  = 1; 
+  }
+
   $self->{record}     = undef;
-  $self->{tabix_file} = Bio::DB::HTS::Tabix->new(filename => $filename);
+  $self->{tabix_file} = Bio::DB::HTS::Tabix->new(%params);
   $self->{iterator}   = undef;
   $self->{delimiter}  = "\t";
 
