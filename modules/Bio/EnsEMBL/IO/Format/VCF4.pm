@@ -36,7 +36,7 @@ sub new {
   my $self = {
           'name'            => 'VCF4',
           'extensions'      => ['vcf'],
-          'delimiter'       => '\\t|\\s',
+          'delimiter'       => '\\t',
           'can_multitrack'  => 1,
           'can_metadata'    => -1,
           'metadata_info'   => {
