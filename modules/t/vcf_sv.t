@@ -113,6 +113,10 @@ ok($parser->get_inner_end == 18665194, 'get_inner_end');
 ok($parser->get_end == 18665204, 'get_end');
 ok($parser->get_outer_end == 18665214, 'get_outer_end');
 
+note "> Testing format validation";
+$parser->reset();
+ok ($parser->validate(), "Validating vcf format");
+
 ok ($parser->close(), "Closing file");
 
 done_testing();

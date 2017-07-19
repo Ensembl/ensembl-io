@@ -121,6 +121,10 @@ ok($parser->get_metadata_by_pragma('fileDate') eq '20090805', 'getMetadataByPrag
 ok($parser->get_vcf_version eq 'VCFv4.2', 'getVCFversion');
 ok($parser->get_metadata_description('INFO', 'AA') eq 'Ancestral Allele', 'getMetaDescription'); 
 
+note "> Testing format validation";
+$parser->reset();
+ok ($parser->validate(), "Validating vcf format");
+    
 ok ($parser->close(), "Closing file");
 
 done_testing();
