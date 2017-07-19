@@ -65,39 +65,6 @@ sub hts_open
   return $self->{_cache}->{_htsobj_handle};
 }
 
-sub htsfile_open {
-  my $self = shift;
-
-  if (!$self->{_cache}->{_htsfile_handle}) {
-    if (Bio::DB::HTSfile->can('set_udc_defaults')) {
-      Bio::DB::HTSfile->set_udc_defaults;
-    }
-    $self->{_cache}->{_htsfile_handle} = Bio::DB::HTSfile->open($self->url);
-  }
-  return $self->{_cache}->{_htsfile_handle};
-}
-
-sub htsfile_close {
-  my $self = shift;
-
-  if ($self->{_cache}->{_htsfile_handle}) {
-    $self->{_cache}->{_htsfile_handle}->close();
-  }
-  return;
-}
-
-sub htsfile_index {
-  my $self = shift;
-
-  if (!$self->{_cache}->{_htsfile_index}) {
-    if (Bio::DB::HTSfile->can('set_udc_defaults')) {
-      Bio::DB::HTSfile->set_udc_defaults;
-    }
-    $self->{_cache}->{_htsfile_index} = Bio::DB::HTSfile->index($self->{_cache}->{_htsobj_handle});
-  }
-  return $self->{_cache}->{_htsfile_index};
-}
-
 sub snp_code {
     my ($self, $allele) = @_;
 
@@ -108,25 +75,26 @@ sub snp_code {
 # files. This method returns a possibly modified chr_id after
 # checking whats in the bam file
 sub munge_chr_id {
-  my ($self, $chr_id) = @_;
+  my ($self, $chr_id, $hts_obj) = @_;
 
-  my $htsfile = Bio::DB::HTSfile->open($self->url);
-  warn "Failed to open BAM/CRAM file " . $self->url unless $htsfile;
-  return undef unless $htsfile;
-
-  my $header = $htsfile->header_read;
+  unless ( $chr_id && $hts_obj ) {
+    unless ( $hts_obj && $hts_obj->hts_file ) {
+      warn "Failed to open BAM/CRAM file " . $self->url;
+    }
+    return;
+  }
+  
+  my $header = $hts_obj->header;
 
   # Check we get values back for seq region. May need to add 'chr' or 'Chr'
   my @coords = $header->parse_region("$chr_id");
   if (@coords) {
-    $htsfile->close() ;
     return "$chr_id";
   }
 
   if (!@coords) {
     @coords = $header->parse_region("chr$chr_id");
     if (@coords) {
-      $htsfile->close() ;
       return "chr$chr_id";
     }
   }
@@ -134,13 +102,11 @@ sub munge_chr_id {
   if (!@coords) {
     @coords = $header->parse_region("Chr$chr_id");
     if (@coords) {
-      $htsfile->close() ;
       return "Chr$chr_id";
     }
   }
 
   warn " *** could not parse_region for BAM/CRAM with $chr_id in file " . $self->url ."\n";
-  $htsfile->close() ;
   return undef;
 }
 
@@ -153,10 +119,10 @@ sub fetch_paired_alignments {
 
   my @features;
 
-  my $header = $hts_obj->hts_file->header_read;
+  my $header = $hts_obj->header;
 
   # Maybe need to add 'chr'
-  my $seq_id = $self->munge_chr_id($chr_id);
+  my $seq_id = $self->munge_chr_id($chr_id, $hts_obj);
   return [] if !defined($seq_id);
 
   my @coords = $header->parse_region("$seq_id:$start-$end");
@@ -181,11 +147,11 @@ sub fetch_paired_alignments {
 sub fetch_alignments_filtered {
   my ($self, $chr_id, $start, $end, $filter) = @_;
 
-  my $htsobj = $self->hts_open;
-  warn "Failed to open file " . $self->url unless $htsobj;
-  return [] unless $htsobj;
+  my $hts_obj = $self->hts_open;
+  warn "Failed to open file " . $self->url unless $hts_obj;
+  return [] unless $hts_obj;
 
-  my $index = $self->htsfile_index;
+  my $index = $hts_obj->hts_index;
   warn "Failed to open index for " . $self->url unless $index;
   return [] unless $index;
 
@@ -200,10 +166,10 @@ sub fetch_alignments_filtered {
     }
   };
 
-  my $header = $htsobj->header;
+  my $header = $hts_obj->header;
 
   # Maybe need to add 'chr'
-  my $seq_id = $self->munge_chr_id($chr_id);
+  my $seq_id = $self->munge_chr_id($chr_id, $hts_obj);
   return [] if !defined($seq_id);
 
   my @coords = $header->parse_region("$seq_id:$start-$end");
@@ -212,7 +178,7 @@ sub fetch_alignments_filtered {
     return [];
   }
 
-  $index->fetch($htsobj->hts_file, @coords, $callback);
+  $index->fetch($hts_obj->hts_file, @coords, $callback);
 
   if ($DEBUG)
   {
@@ -250,17 +216,17 @@ sub fetch_coverage {
   warn "Failed to make HTS object from file " . $self->url unless $hts_obj;
   return [] unless $hts_obj;
 
-  my $index = $self->htsfile_index;
+  my $index = $hts_obj->hts_index;
   warn "Failed to open BAM index for " . $self->url unless $index;
   return [] unless $index;
 
   # filter out unmapped mates - the ones that don't have location set
   $filter ||= sub {my $a = shift; return 0 unless $a->start; return 1};
 
-  my $header = $hts_obj->hts_file->header_read;
+  my $header = $hts_obj->header;
 
   #  Maybe need to add 'chr'
-  my $seq_id = $self->munge_chr_id($chr_id);
+  my $seq_id = $self->munge_chr_id($chr_id, $hts_obj);
   return [] if !defined($seq_id);
 
   my @coords = $header->parse_region("$seq_id:$start-$end");
@@ -291,8 +257,8 @@ sub fetch_consensus {
     warn "*** consensus: $chr_id, $start, $end , $T_QSCORE\n";
   }
 
-  my $bam = $self->hts_open;
-  return [] unless $bam;
+  my $hts_obj = $self->hts_open;
+  return [] unless $hts_obj;
 
   my @consensus;    # this will be list of basepair
 
@@ -312,7 +278,7 @@ sub fetch_consensus {
     if (($pos < $start) || ($pos > $end)) {
       return;
     }
-#    my $refbase = $bam->segment($seqid, $pos, $pos)->dna;
+#    my $refbase = $hts_obj->segment($seqid, $pos, $pos)->dna;
 
     my ($total, $different);
     my $qhash;
@@ -350,10 +316,10 @@ sub fetch_consensus {
   };
 
   # Maybe need to add 'chr'
-  my $seq_id = $self->munge_chr_id($chr_id);
+  my $seq_id = $self->munge_chr_id($chr_id, $hts_obj);
   return [] if !defined($seq_id);
 
-  $bam->fast_pileup("${seq_id}:${start}-${end}", $consensus_caller);
+  $hts_obj->fast_pileup("${seq_id}:${start}-${end}", $consensus_caller);
 
   return \@consensus;
 }
