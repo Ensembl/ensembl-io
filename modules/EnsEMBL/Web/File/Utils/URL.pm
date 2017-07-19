@@ -457,7 +457,7 @@ sub _proxy {
 
   my $proxy = $args->{'proxy'};
   if (!$proxy && $args->{'hub'}) {
-    $proxy = $args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY;
+    $proxy = $args->{'hub'}->web_proxy;
   }
   return $proxy;
 }
