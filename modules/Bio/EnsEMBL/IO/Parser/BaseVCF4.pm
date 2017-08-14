@@ -125,8 +125,10 @@ sub read_metadata {
       foreach my $meta (split(',',$m_data)) {
 
         my ($key,$value) = split('=',$meta);
-        $value =~ s/"//g;
-        $value =~ s/!#!/,/g; # Revert the fix for the character ","
+        if(defined($value)) {
+          $value =~ s/"//g;
+          $value =~ s/!#!/,/g; # Revert the fix for the character ","
+        }
         $metadata{$key}=$value;
       }
 
