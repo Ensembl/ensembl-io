@@ -115,7 +115,7 @@ sub _bulk_fetcher_feature_record {
   foreach my $xref (@{$translator->xrefs($object)}) {
     my $label = $xref->{display_id};
     my $db_name = $xref->{dbname};
-    my $id = uri_escape($xref->{primary_id});
+    my $id = $xref->{primary_id};
     my $desc = $xref->{description};
     
     # replace generic link with more specific one from Xref record. NONE is boring though.
@@ -128,7 +128,7 @@ sub _bulk_fetcher_feature_record {
     my $id_org_abbrev = $translator->id_org_short($db_name);
     my $id_org_uri;
     if ($id_org_abbrev) {
-      $id_org_uri = prefix('identifiers').$id_org_abbrev.'/'.uri_escape($id);
+      $id_org_uri = prefix('identifiers').$id_org_abbrev.'/'.$id;
       ${$record} .= sprintf "%s\n%s\n%s\n",
 	triple(u($feature_uri), 'rdfs:seeAlso', u( $id_org_uri )),
 	triple(u($id_org_uri), 'rdf:type', 'identifiers:'.$id_org_abbrev),
