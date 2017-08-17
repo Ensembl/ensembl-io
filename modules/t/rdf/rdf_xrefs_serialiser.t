@@ -49,6 +49,26 @@ splice @{$gene->{transcripts}}, 1; # 1 transcript
 splice @{$gene->{transcripts}[0]{exons}}, 1; # 1 exon
 splice @{$gene->{transcripts}[0]{translations}}, 1; # 1 translation
 splice @{$gene->{transcripts}[0]{xrefs}}, 1; # 1 xref per transcript
+# [ENSCORESW-2372]: re-add GO xref to transcript
+push @{$gene->{transcripts}[0]{xrefs}},
+  {
+   'display_id' => 'GO:0032259',
+   'primary_id' => 'GO:0032259',
+   'associated_xrefs' => [],
+   'linkage_types' => [
+		       {
+			'source' => {
+				     'display_id' => 'Q8N6Q8',
+				     'primary_id' => 'Q8N6Q8',
+				     'description' => 'Methyltransferase-like protein 25 ',
+				     'dbname' => 'Uniprot/SWISSPROT'
+				    },
+			'evidence' => 'IEA'
+		       }
+		      ],
+   'description' => 'methylation',
+   'dbname' => 'GO'
+  };
 splice @{$gene->{transcripts}[0]{translations}[0]{protein_features}}, 1; # 1 protein feature per translation
 splice @{$gene->{transcripts}[0]{translations}[0]{xrefs}}, 1; # 1 xref per translation
 
@@ -72,6 +92,15 @@ my $rdf_string = <<"RDF";
 <http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306> term:COORDINATE_OVERLAP <http://rdf.ebi.ac.uk/resource/ensembl/UCSC/uc001szq.4> .
 <http://rdf.ebi.ac.uk/resource/ensembl/UCSC/uc001szq.4> dc:identifier \"uc001szq.4\" .
 <http://rdf.ebi.ac.uk/resource/ensembl/UCSC/uc001szq.4> rdfs:label \"uc001szq.4\" .
+<http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306> rdfs:seeAlso <http://identifiers.org/go/GO:0032259> .
+<http://identifiers.org/go/GO:0032259> rdf:type identifiers:go .
+<http://identifiers.org/go/GO:0032259> sio:SIO_000671 [a ident_type:go; sio:SIO_000300 \"GO:0032259\"] .
+<http://identifiers.org/go/GO:0032259> owl:sameAs <http://purl.obolibrary.org/obo/GO_0032259> .
+<http://identifiers.org/go/GO:0032259> rdf:type <http://rdf.ebi.ac.uk/terms/ensembl/EnsemblDBEntry> .
+<http://rdf.ebi.ac.uk/resource/ensembl.transcript/ENST00000248306> term:INFERRED_FROM_TRANSCRIPT <http://identifiers.org/go/GO:0032259> .
+<http://identifiers.org/go/GO:0032259> dc:identifier \"GO:0032259\" .
+<http://identifiers.org/go/GO:0032259> rdfs:label \"GO:0032259\" .
+<http://identifiers.org/go/GO:0032259> dc:description \"methylation\" .
 <http://rdf.ebi.ac.uk/resource/ensembl.protein/ENSP00000248306> rdfs:seeAlso <http://identifiers.org/uniparc/UPI000013CC3E> .
 <http://identifiers.org/uniparc/UPI000013CC3E> rdf:type identifiers:uniparc .
 <http://identifiers.org/uniparc/UPI000013CC3E> sio:SIO_000671 [a ident_type:uniparc; sio:SIO_000300 \"UPI000013CC3E\"] .
