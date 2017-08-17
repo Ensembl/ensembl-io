@@ -110,8 +110,8 @@ sub _bulk_fetcher_feature_record {
   return if $feature_type eq 'exon';
 
   my $provenance = $translator->provenance($object);
-  my $relation = "term:$provenance";
-
+  my $relation;
+  
   foreach my $xref (@{$translator->xrefs($object)}) {
     my $label = $xref->{display_id};
     my $db_name = $xref->{dbname};
@@ -119,9 +119,10 @@ sub _bulk_fetcher_feature_record {
     my $desc = $xref->{description};
     
     # replace generic link with more specific one from Xref record. NONE is boring though.
+    $relation = "term:$provenance";
     $relation = 'term:'.$xref->{info_type}
       if exists $xref->{info_type} and defined $xref->{info_type} and $xref->{info_type} ne 'NONE';
-
+    
     # implement the SIO identifier type description see https://github.com/dbcls/bh14/wiki/Identifiers.org-working-document
     my $lod = $translator->lod_uri($db_name); # linked open data uris.    
     # Identifiers.org mappings
@@ -133,6 +134,12 @@ sub _bulk_fetcher_feature_record {
 	triple(u($feature_uri), 'rdfs:seeAlso', u( $id_org_uri )),
 	triple(u($id_org_uri), 'rdf:type', 'identifiers:'.$id_org_abbrev),
 	triple(u($id_org_uri),'sio:SIO_000671',"[a ident_type:$id_org_abbrev; sio:SIO_000300 \"$id\"]");
+      if ($id =~ /^GO/) {
+	my $obo_id = $id;
+	$obo_id =~ tr/:/_/;
+	${$record} .= sprintf "%s\n",
+	  triple(u($id_org_uri), 'owl:sameAs', u(prefix('obo').$obo_id));
+      }
     }
 
     # Next make an "ensembl" style xref, either to a known LOD namespace, the identifiers.org URI, or else a generated Ensembl one
