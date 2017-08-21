@@ -115,6 +115,7 @@ ok($parser->get_outer_end == 18665214, 'get_outer_end');
 
 note "> Testing format validation";
 $parser->reset();
+$parser->shift_block();
 ok ($parser->validate(), "Validating vcf format");
 
 ok ($parser->close(), "Closing file");
