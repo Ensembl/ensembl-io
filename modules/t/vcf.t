@@ -123,6 +123,7 @@ ok($parser->get_metadata_description('INFO', 'AA') eq 'Ancestral Allele', 'getMe
 
 note "> Testing format validation";
 $parser->reset();
+$parser->shift_block;
 ok ($parser->validate(), "Validating vcf format");
     
 ok ($parser->close(), "Closing file");
