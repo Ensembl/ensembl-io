@@ -266,7 +266,6 @@ sub validate {
   my $format = $self->format;
 
   if ($format) {
-    $self->shift_block;
     while ($self->next) {
 
       ## Validate metadata
