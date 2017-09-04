@@ -24,14 +24,15 @@ use JSON;
 use IO::String;
 
 use Bio::EnsEMBL::Test::MultiTestDB;
+
+use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
+
 use Bio::EnsEMBL::IO::Translator::BulkFetcherFeature;
 use Bio::EnsEMBL::IO::Object::RDF;
 
 use_ok 'Bio::EnsEMBL::IO::Writer::RDF::XRefs';
 
 my $omulti = Bio::EnsEMBL::Test::MultiTestDB->new('ontology', "$Bin/..");
-my $ontology_adaptor =
-  $omulti->get_DBAdaptor('ontology')->get_OntologyTermAdaptor();
 
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new(undef, "$Bin/..");
 my $meta_adaptor = $multi->get_DBAdaptor('core')->get_MetaContainer();
@@ -114,7 +115,7 @@ RDF
 my $feature_trans =
   Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(version => $version,
 							xref_mapping_file => "$Bin/xref_LOD_mapping.json",
-							ontology_adaptor  => $ontology_adaptor,
+							biotype_mapper    => Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($omulti->get_DBAdaptor('ontology')->get_OntologyTermAdaptor()),
 							meta_adaptor      => $meta_adaptor);
 
 my $xrefs_writer = Bio::EnsEMBL::IO::Writer::RDF::XRefs->new($feature_trans);
