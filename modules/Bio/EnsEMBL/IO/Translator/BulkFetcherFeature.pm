@@ -38,7 +38,6 @@ use Carp;
 
 use Bio::EnsEMBL::Utils::RDF qw/feature_uri/;
 use Bio::EnsEMBL::Utils::RDF::Mapper;
-use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
 
 my %field_callbacks = (version         => 'version',
 		       production_name => 'production_name',
@@ -80,7 +79,7 @@ my %field_callbacks = (version         => 'version',
 sub new {
   my ($class, %args) = @_;
   
-  my @required_args = qw/version xref_mapping_file ontology_adaptor meta_adaptor/;
+  my @required_args = qw/version xref_mapping_file biotype_mapper meta_adaptor/;
   my @missing_args;
   map { push @missing_args, $_ unless exists $args{$_} } @required_args;
   confess "Missing arguments required by Bio::EnsEMBL::IO::Translator::BulkFetcherFeature" . join(',', @missing_args)
@@ -89,19 +88,14 @@ sub new {
   # this connects Ensembl to Identifiers.org amongst other things
   my $xref_mapping = Bio::EnsEMBL::Utils::RDF::Mapper->new($args{xref_mapping_file});
   
-  my $biotype_mapper = Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($args{ontology_adaptor});
-  croak "Bio::EnsEMBL::IO::Translator::Feature requires a Bio::EnsEMBL::Utils::SequenceOntologyMapper"
-    unless $biotype_mapper->isa('Bio::EnsEMBL::Utils::SequenceOntologyMapper');
-
-  croak "Bio::EnsEMBL::IO::Translator::Feature requires an ontology adaptor"
-    unless $args{ontology_adaptor}->isa('Bio::EnsEMBL::DBSQL::OntologyTermAdaptor');
+  croak "Bio::EnsEMBL::IO::Translator::Feature requires a sequence ontology mapper"
+    unless $args{biotype_mapper}->isa('Bio::EnsEMBL::Utils::SequenceOntologyMapper');
 
   croak "Bio::EnsEMBL::IO::Translator::BulkFetcherFeature requires a meta adaptor"
     unless $args{meta_adaptor} and $args{meta_adaptor}->isa('Bio::EnsEMBL::DBSQL::MetaContainer');
   
   $args{ontology_cache} = {};
   $args{mapping} = $xref_mapping;
-  $args{biotype_mapper} = $biotype_mapper;
   
   my $self = $class->SUPER::new(\%args);
   $self->version($args{version});
