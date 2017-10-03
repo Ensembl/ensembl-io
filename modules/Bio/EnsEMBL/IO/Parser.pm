@@ -61,6 +61,7 @@ sub new {
 	    waiting_block     => undef,
 	    record            => undef,
 	    metadata          => {},
+      errors            => {},
 	    params            => \%param_hash,
     	metadata_changed  => 0,
       strand_conversion => {'+' => '1', '.' => '0', '-' => '-1'},
@@ -74,6 +75,18 @@ sub new {
     bless $self, $class;
    
     return $self;
+}
+
+=head2 errors
+
+    Description : Accessor for any errors recorded during parsing
+    Returntype  : Hashref
+
+=cut
+
+sub errors {
+  my $self = shift;
+  return $self->{'errors'} || {};
 }
 
 =head2 shift_block

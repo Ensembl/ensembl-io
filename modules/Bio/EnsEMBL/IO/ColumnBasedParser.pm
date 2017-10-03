@@ -259,7 +259,6 @@ sub read_record {
 
 sub validate {
   my $self = shift;
-  my $valid = 0;
   my $count = 0;
   my $record_limit = 1; ## For now, just check first record
 
@@ -270,33 +269,34 @@ sub validate {
 
       ## Validate metadata
       next if $self->{'current_block'} !~ /\w/;
-      $valid = $self->validate_metadata;
-      if ($valid == 0) {
+      $self->validate_metadata;
+      if (keys %{$self->errors}) {
         ## Bail out if we hit an invalid record
         $self->reset;
-        return 0;
+        return $self->errors;
       }
 
       ## Now do record
       $self->set_column_count(scalar @{$self->{'record'}});
-      $valid = $self->validate_record;
+      $self->validate_record;
       $count++;
-      if ($valid == 0) {
+      my $errors = $self->errors;
+      if (keys %$errors) {
         ## Bail out if we hit an invalid record
         $self->reset;
-        return 0;
+        return $errors;
       }
       elsif ($count == $record_limit) {
         $self->reset;
-        return $valid;
+        return {};
       }
     }
   }
   else {
-    $valid = $self->_validate_basic;
+    $self->_validate_basic;
   }
 
-  return $valid;
+  return $self->errors;
 }
 
 =head2 validate_metadata
@@ -306,14 +306,13 @@ sub validate {
 sub validate_metadata {
   my $self = shift;
   ## Metadata is optional, so default is for it to be valid
-  my $valid = 1;
 
   my $metadata; # = $self->metadata;
   if ($metadata) {
     ## TODO - implement validation! 
   }
 
-  return $valid;
+  return undef;
 }
 
 =head2 validate_record
@@ -326,11 +325,10 @@ sub validate_metadata {
 sub validate_record {
   my $self = shift;
   my $format = $self->format;
-  return 0 unless $format;
+  return unless $format;
 
   my $field_info  = $format->get_field_info || {};
   my $field_order = $format->get_field_order || [];
-  my $valid       = 0;
 
   foreach my $key (@{$field_order}) {
     my $method    = "get_raw_$key";
@@ -343,12 +341,8 @@ sub validate_record {
     next if ($field_info->{$key}{'optional'} && $value eq ($field_info->{$key}{'placeholder'} || '.'));
     my $type      = $field_info->{$key}{'validate_as'};
     my $match     = $field_info->{$key}{'match'};
-    $valid        = $format->validate_as($type, $value, $match);
-    #warn ">>> VALIDATED $key AS $type WITH VALUE $value: VALID = $valid";
-    return 0 if $valid == 0;
+    $format->validate_as($self->errors, $key, $type, $value, $match);
   }
-
-  return 1;
 }
 
 =head2 _validate_basic 
@@ -360,7 +354,6 @@ sub validate_record {
 
 sub _validate_basic {
   my $self = shift;
-  my $valid = 0;
 
   while ($self->next) {
 
@@ -372,34 +365,33 @@ sub _validate_basic {
     ## Check we have the minimum number of columns for this format
     my $col_count = scalar(@{$self->{'record'}});
 
-    if ($col_count >= $self->get_minimum_column_count
-          && $col_count <= $self->get_maximum_column_count) {
-      $valid = 1;
+    if ($col_count < $self->get_minimum_column_count) {
+      $self->{errors}{'columns'} = sprintf 'This format should have at least %s columns', $self->get_minimum_column_count;
+      last;
     }
-    else {
-      $valid = 0;
+    elsif ($col_count > $self->get_maximum_column_count) {
+      $self->{errors}{'columns'} = sprintf 'This format should have no more than %s columns', $self->get_maximum_column_count;
       last;
     }
 
-    if ($self->get_start && $self->get_start =~ /^\d+$/ && $self->get_start > 0 
-          && $self->get_end && $self->get_end =~ /^\d+$/) {
-      $valid = 1;
+    my ($start, $end) = ($self->get_start, $self->get_end);
+    if (!$start || $start !~ /^\d+$/ || $start < 0) {
+      $self->{errors}{'start'} = "Start coordinate $start is absent or invalid";
+      last;
     }
-    else {
-      $valid = 0;
+    if (!$end || $end !~ /^\d+$/) {
+      $self->{errors}{'end'} = "End coordinate $end is absent or invalid";
       last;
     }
 
     ## Additional format-specific validation
     if ($self->can('_validate')) {
-      $valid = $self->_validate($col_count) ? 1 : 0;
+      $self->_validate($col_count);
     }
 
     last;
   }
   $self->reset;
-
-  return $valid;
 }
 
 #---------- OUTPUT METHODS --------------

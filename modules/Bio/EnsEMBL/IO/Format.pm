@@ -246,7 +246,8 @@ sub get_value_for_field {
 =head2 validate_as
 
     Description : wrapper around more specific validators, for easy processing
-    Args        : Type - validation type
+    Args        : Errors - hash of existing errors
+                : Type - validation type
                 : Value - value to be checked
                 : Match (optional) - a specific value or range to be compared against
     Returntype  : Boolean
@@ -254,13 +255,13 @@ sub get_value_for_field {
 =cut
 
 sub validate_as {
-  my ($self, $type, $value, $match) = @_;
-  return 0 unless ($type && defined($value));
+  my ($self, $errors, $key, $type, $value, $match) = @_;
+  return unless ($type && defined($value));
   my $method = 'validate_as_'.$type;
   if ($self->can($method)) {
-    return $self->$method($value, $match);
+    my $error = $self->$method($value, $match);
+    $errors->{$key} = $error if $error;    
   }
-  return 0;
 }
 
 =head2 validate_as_boolean 
@@ -273,7 +274,7 @@ sub validate_as {
 
 sub validate_as_boolean {
   my ($self, $value) = @_;
-  return ($value == 0 || $value == 1) ? 1 : 0;
+  return ($value == 0 || $value == 1) ? undef : "Value $value is not boolean";;
 }
 
 =head2 validate_as_string 
@@ -288,12 +289,14 @@ sub validate_as_boolean {
 
 sub validate_as_string {
   my ($self, $value, $match) = @_;
+  my $error;
   if ($match) {
-    return $value eq $match ? 1 : 0;
+    $error = "String $value does not match $match" unless $value eq $match;
   }
   else {
-    return $value =~ /[[:print:]]+/ ? 1 : 0;
+    $error = "Value $value is not a string" unless $value =~ /[[:print:]]+/;
   }
+  return $error;
 }
 
 =head2 validate_as_integer 
@@ -306,7 +309,7 @@ sub validate_as_string {
 
 sub validate_as_integer {
   my ($self, $value) = @_;
-  return $value =~ /^-?\d+$/ ? 1 : 0;
+  return $value =~ /^-?\d+$/ ? undef : "Value $value is not an integer";;
 }
 
 =head2 validate_as_floating_point 
@@ -319,7 +322,7 @@ sub validate_as_integer {
 
 sub validate_as_floating_point {
   my ($self, $value) = @_;
-  return $value =~ /^-?\d+\.?\d*$/ ? 1 : 0;
+  return $value =~ /^-?\d+\.?\d*$/ ? undef : "Value $value is not a floating point number";
 }
 
 =head2 validate_as_range
@@ -333,9 +336,9 @@ sub validate_as_floating_point {
 
 sub validate_as_range {
   my ($self, $value, $match) = @_;
-  return 0 unless ($match && ref $match eq 'ARRAY');
+  return undef unless ($match && ref $match eq 'ARRAY');
   my ($min, $max) = @$match;
-  return ($value <= $max && $value >= $min) ? 1 : 0;
+  return ($value <= $max && $value >= $min) ? undef : "Value $value is not in the range $min - $max";
 }
 
 =head2 validate_as_comma_separated
@@ -349,7 +352,7 @@ sub validate_as_range {
 
 sub validate_as_comma_separated {
   my ($self, $value) = @_;
-  return $value =~ /^(\w+,?)+$/ ? 1 : 0;
+  return $value =~ /^(\w+,?)+$/ ? undef : "Value $value is not comma-separated";
 }
 
 =head2 validate_as_case_insensitive 
@@ -363,8 +366,8 @@ sub validate_as_comma_separated {
 
 sub validate_as_case_insensitive {
   my ($self, $value, $match) = @_;
-  return 0 unless $match;
-  return $value =~ /$match/i ? 1 : 0;
+  return undef unless $match;
+  return $value =~ /$match/i ? undef : "Value $value does not match $match";
 }
 
 =head2 validate_as_strand_integer
@@ -377,7 +380,7 @@ sub validate_as_case_insensitive {
 
 sub validate_as_strand_integer {
   my ($self, $value) = @_;
-  return $value =~ /^0|1|-1$/ ? 1 : 0;
+  return $value =~ /^0|1|-1$/ ? undef : "Value $value is not an integer-formatted strand";
 }
 
 =head2 validate_as_strand_plusminus
@@ -389,7 +392,7 @@ sub validate_as_strand_integer {
 
 sub validate_as_strand_plusminus {
   my ($self, $value) = @_;
-  return $value =~ /^\+|-$/ ? 1 : 0;
+  return $value =~ /^\+|-$/ ? undef : "Value $value is not a plus/minus strand";
 }
 
 =head2 validate_as_rgb_string
@@ -404,9 +407,9 @@ sub validate_as_rgb_string {
   my ($self, $value) = @_;
 
   ## Technically 0 is not a valid colour, but it's used instead of '.' in some UCSC examples
-  return 1 if $value == 0;
+  return undef if $value eq '0';
 
-  return $value =~ /^(\d){1,3},(\d){1,3},(\d){1,3}$/ ? 1 : 0;
+  return $value =~ /^(\d){1,3},(\d){1,3},(\d){1,3}$/ ? undef : "Value $value is not an RGB string";
 }
 
 =head2 validate_as_colour 
@@ -420,22 +423,22 @@ sub validate_as_colour {
   my ($self, $value) = @_;
 
   ## Technically 0 is not a valid colour, but it's used instead of '.' in some UCSC examples
-  return 1 if $value == 0;
+  return undef if $value eq 0;
 
   ## Try RGB first, as that's most usual
-  my $valid = $self->validate_as_rgb_string($value);
+  my $error = $self->validate_as_rgb_string($value);
 
   ## If not, how about web-friendly hex colours, e.g. #ffcc00?
-  unless ($valid) {
-    $valid = 1 if ($value =~ /^#?[A-Fa-f0-9]{3}/ || $value =~ /^#?[A-Fa-f0-9]{6}/);
+  if ($error) {
+    $error = undef if ($value =~ /^#?[A-Fa-f0-9]{3}/ || $value =~ /^#?[A-Fa-f0-9]{6}/);
   }
   ## Fall back to checking Unix named colours
-  unless ($valid) {
+  if ($error) {
     my $lookup = Bio::EnsEMBL::IO::NamedColours::named_colours;
-    $valid = 1 if $lookup->{$value};
+    $error = $lookup->{$value} ? undef : "Value $value is not a named colour";
   }
 
-  return $valid;
+  return $error;
 }
 
 =head2 validate_as_sequence
@@ -448,7 +451,7 @@ sub validate_as_colour {
 
 sub validate_as_sequence {
   my ($self, $value) = @_;
-  return $value =~ /^[ACDEFGHIKLMNPQRSTUVWY]+$/i ? 1 : 0;
+  return $value =~ /^[ACDEFGHIKLMNPQRSTUVWY]+$/i ? undef : "Value $value is not nucleic acid or protein sequence";;
 }
 
 =head2 validate_as_dna_sequence
@@ -461,7 +464,7 @@ sub validate_as_sequence {
 
 sub validate_as_dna_sequence {
   my ($self, $value) = @_;
-  return $value =~ /^[ACGTN]+$/i ? 1 : 0;
+  return $value =~ /^[ACGTN]+$/i ? undef : "Value $value is not DNA sequence";
 }
 
 1;
