@@ -35,14 +35,10 @@ use Bio::EnsEMBL::IO::Object::RDF;
 use_ok 'Bio::EnsEMBL::IO::Writer::RDF';
 
 my $omulti = Bio::EnsEMBL::Test::MultiTestDB->new('ontology', "$Bin/..");
-my $biotype_mapper =
-  Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($omulti->get_DBAdaptor('ontology')->get_OntologyTermAdaptor());
-ok($biotype_mapper, "got biotype mapper");
-
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new(undef, "$Bin/..");
-my $meta_adaptor = $multi->get_DBAdaptor('core')->get_MetaContainer();
 my $adaptor = $multi->get_DBAdaptor('core');
-my $version = $adaptor->get_MetaContainer()->list_value_by_key('schema_version')->[0];
+my $meta_adaptor = $adaptor->get_MetaContainer();
+my $version = $meta_adaptor->list_value_by_key('schema_version')->[0];
 
 # create some slices and features as a subset of a BulkFetcher dump
 my @slices = (Bio::EnsEMBL::Slice->new(-coord_system     => Bio::EnsEMBL::CoordSystem->new(-NAME    => 'chromosome',
@@ -175,13 +171,13 @@ RDF
 # 
 
 # translators for slices and (bulk fetcher derived) features
-my $slice_trans = Bio::EnsEMBL::IO::Translator::Slice->new(version => $version, meta_adaptor => $adaptor->get_MetaContainer());
+my $slice_trans = Bio::EnsEMBL::IO::Translator::Slice->new(version => $version, meta_adaptor => $meta_adaptor);
 
 my $feature_trans =
   Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(version => $version,
 							xref_mapping_file => "$Bin/xref_LOD_mapping.json",
-							biotype_mapper    => $biotype_mapper,
-							meta_adaptor      => $adaptor->get_MetaContainer());
+							biotype_mapper    => Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($omulti->get_DBAdaptor('ontology')->get_OntologyTermAdaptor()),
+							adaptor           => $adaptor);
 
 my $feature_writer = Bio::EnsEMBL::IO::Writer::RDF->new(); # do not pass translator, pass it when writing since we need the slice and feature translators
 

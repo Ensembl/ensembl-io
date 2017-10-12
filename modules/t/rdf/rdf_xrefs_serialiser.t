@@ -35,8 +35,8 @@ use_ok 'Bio::EnsEMBL::IO::Writer::RDF::XRefs';
 my $omulti = Bio::EnsEMBL::Test::MultiTestDB->new('ontology', "$Bin/..");
 
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new(undef, "$Bin/..");
-my $meta_adaptor = $multi->get_DBAdaptor('core')->get_MetaContainer();
-my $version = $meta_adaptor->list_value_by_key('schema_version')->[0];
+my $adaptor = $multi->get_DBAdaptor('core');
+my $version = $adaptor->get_MetaContainer()->list_value_by_key('schema_version')->[0];
 
 # create some features as a subset of a BulkFetcher dump
 
@@ -116,7 +116,7 @@ my $feature_trans =
   Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(version => $version,
 							xref_mapping_file => "$Bin/xref_LOD_mapping.json",
 							biotype_mapper    => Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($omulti->get_DBAdaptor('ontology')->get_OntologyTermAdaptor()),
-							meta_adaptor      => $meta_adaptor);
+							adaptor      => $adaptor);
 
 my $xrefs_writer = Bio::EnsEMBL::IO::Writer::RDF::XRefs->new($feature_trans);
 

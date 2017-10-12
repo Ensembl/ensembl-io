@@ -23,6 +23,7 @@ use Test::Exception;
 use JSON;
 
 use Bio::EnsEMBL::Test::MultiTestDB;
+use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
 
 use_ok 'Bio::EnsEMBL::IO::Translator::BulkFetcherFeature';
 
@@ -31,7 +32,8 @@ my $ontology_adaptor =
   $omulti->get_DBAdaptor('ontology')->get_OntologyTermAdaptor();
 
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new(undef, "$Bin/..");
-my $meta_adaptor = $multi->get_DBAdaptor('core')->get_MetaContainer();
+my $adaptor = $multi->get_DBAdaptor('core');
+my $meta_adaptor = $adaptor->get_MetaContainer();
 my ($version, $production_name) =
   (
    $meta_adaptor->list_value_by_key('schema_version')->[0],
@@ -41,8 +43,8 @@ my ($version, $production_name) =
 my $translator =
   Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(version => $version,
 							xref_mapping_file => "$Bin/xref_LOD_mapping.json",
-							ontology_adaptor  => $ontology_adaptor,
-							meta_adaptor      => $meta_adaptor);
+							biotype_mapper    => Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($omulti->get_DBAdaptor('ontology')->get_OntologyTermAdaptor()),
+							adaptor           => $adaptor);
 
 ok($translator->version == $version, 'version');
 ok($translator->production_name eq $production_name, 'production name');
