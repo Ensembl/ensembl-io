@@ -79,7 +79,7 @@ my %field_callbacks = (version         => 'version',
 sub new {
   my ($class, %args) = @_;
   
-  my @required_args = qw/version xref_mapping_file biotype_mapper meta_adaptor/;
+  my @required_args = qw/version xref_mapping_file biotype_mapper adaptor/;
   my @missing_args;
   map { push @missing_args, $_ unless exists $args{$_} } @required_args;
   confess "Missing arguments required by Bio::EnsEMBL::IO::Translator::BulkFetcherFeature" . join(',', @missing_args)
@@ -91,9 +91,19 @@ sub new {
   croak "Bio::EnsEMBL::IO::Translator::Feature requires a sequence ontology mapper"
     unless $args{biotype_mapper}->isa('Bio::EnsEMBL::Utils::SequenceOntologyMapper');
 
-  croak "Bio::EnsEMBL::IO::Translator::BulkFetcherFeature requires a meta adaptor"
-    unless $args{meta_adaptor} and $args{meta_adaptor}->isa('Bio::EnsEMBL::DBSQL::MetaContainer');
+  croak "Bio::EnsEMBL::IO::Translator::BulkFetcherFeature requires a DBAdaptor"
+    unless $args{adaptor} and $args{adaptor}->isa('Bio::EnsEMBL::DBSQL::DBAdaptor');
+  $args{meta_adaptor} = $args{adaptor}->get_MetaContainer();
+  croak "Unable to get a meta adaptor"
+    unless $args{meta_adaptor}->isa('Bio::EnsEMBL::DBSQL::MetaContainer');
+
+  # now get a transcript adaptor to be able to fetch CDS for a transcript
+  $args{transcript_adaptor} = $args{adaptor}->get_TranscriptAdaptor();
+  croak "Unable to get a transcript adaptor"
+    unless $args{transcript_adaptor}->isa('Bio::EnsEMBL::DBSQL::TranscriptAdaptor');
   
+  delete $args{adaptor};
+    
   $args{ontology_cache} = {};
   $args{mapping} = $xref_mapping;
   
@@ -134,6 +144,11 @@ sub ontology_adaptor {
 sub meta_adaptor {
   my $self = shift;
   return $self->{meta_adaptor};
+}
+
+sub transcript_adaptor {
+  my $self = shift;
+  return $self->{transcript_adaptor};
 }
 
 sub ensembl_mapper {
@@ -425,6 +440,25 @@ sub exons {
 
   return $object->{exons} || [];
 }
+
+=head2 cds 
+
+=cut
+
+sub cds {
+  my ($self, $object) = @_;
+
+  my $type = $self->type($object);
+  croak "Cannot get CDS from non-transcript: type is ", $self->type($object)
+    unless $type eq 'transcript';
+
+  my $transcript = $self->{transcript_adaptor}->fetch_by_stable_id($self->id($object));
+  croak "Couldn't get Ensembl transcript"
+    unless $transcript and $transcript->isa('Bio::EnsEMBL::Transcript');
+  
+  return $transcript->get_all_CDS() || [];
+}
+
 
 =head2 translations
 
