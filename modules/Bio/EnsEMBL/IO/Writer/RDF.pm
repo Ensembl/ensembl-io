@@ -213,6 +213,11 @@ sub _bulk_fetcher_feature_record {
 	triple(u($feature_uri.'#Exon_'.$rank), 'sio:SIO_000628', u($exon_uri)),
 	triple(u($feature_uri.'#Exon_'.$rank), 'sio:SIO_000300', $rank);
     }
+    # # connect transcript to CDS
+    # foreach my $cds (@{$translator->cds($object)}) {
+    #  
+    #  ${$record} .= sprintf "%s\n", $self->_seq_region_record($cds, $translator)
+    # }
 
     # connect transcript to translations
     foreach my $translation (@{$translator->translations($object)}) {
