@@ -53,6 +53,7 @@ my %FREEZE_EXCLUDE = (
   filehandle => 1,
   iterator => 1,
   waiting_block => 1,
+  tabix_file => 1,
 );
 
 =head2 add_format
