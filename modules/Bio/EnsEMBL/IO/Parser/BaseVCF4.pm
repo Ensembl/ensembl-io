@@ -38,7 +38,6 @@ package Bio::EnsEMBL::IO::Parser::BaseVCF4;
 use strict;
 use warnings;
 use Carp;
-use Bio::EnsEMBL::Utils::Exception qw(warning throw);
 use Storable qw(freeze thaw);
 
 use Bio::EnsEMBL::IO::Format::VCF4;
