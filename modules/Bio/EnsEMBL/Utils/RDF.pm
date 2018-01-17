@@ -67,6 +67,7 @@ our %prefix = (
   oa          => "http://www.w3.org/ns/oa#",
   oban        => 'http://purl.org/oban/',
   obo         => 'http://purl.obolibrary.org/obo/',
+  owl         => 'http://www.w3.org/2002/07/owl#',	       
   panther     => "http://purl.uniprot.org/panther/",
   pav         => 'http://purl.org/pav/',
   pfam        => "http://purl.uniprot.org/pfam/",
