@@ -92,12 +92,15 @@ sub read_record {
             $self->{'record'}->{'_raw_accession'} = $field;
         }
         elsif ($field_type eq 'VERSION') {
-            if ($field =~ /\S+\.(\d+)\s+GI:(\d+)/) {
+            if ($field =~ /\S+\.(\d+)/) {
                 $self->{'record'}->{'_version'} = $1;
                 $self->{'record'}->{'_genebank_id'} = $2;
             }
             else {
                 $self->{'record'}->{'_version'} = $field;
+            }
+            if ($field =~ /GI:(\d+)/) {
+              $self->{'record'}->{'_genebank_id'} = $1;
             }
         }
         elsif ($field_type eq 'COMMENT' || $field_type eq 'REFERENCE') {
@@ -245,7 +248,7 @@ sub get_accession {
 sub get_sequence_name {
     my $self = shift;
 
-    return $self->{'record'}->{'_accession'}.'.'.$self->{'record'}->{'_version'};
+    return $self->get_accession.'.'.$self->{'record'}->{'_version'};
 }
 
 =head2 get_genbank_id
