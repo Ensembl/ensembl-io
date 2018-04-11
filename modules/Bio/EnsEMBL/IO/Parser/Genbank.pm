@@ -94,7 +94,6 @@ sub read_record {
         elsif ($field_type eq 'VERSION') {
             if ($field =~ /\S+\.(\d+)/) {
                 $self->{'record'}->{'_version'} = $1;
-                $self->{'record'}->{'_genebank_id'} = $2;
             }
             else {
                 $self->{'record'}->{'_version'} = $field;
