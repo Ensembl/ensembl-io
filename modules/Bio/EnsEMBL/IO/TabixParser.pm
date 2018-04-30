@@ -2,7 +2,8 @@
 
 =head1 LICENSE
 
-  Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+  Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+  Copyright [2016-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -46,29 +47,46 @@ sub open {
   my ($caller, $filename, @other_args) = @_;
   my $class = ref($caller) || $caller;
 
-  my $delimiter = "\t";
   my $self = $class->SUPER::new(@other_args);
 
   confess "ERROR: Input file is not bgzipped, cannot use tabix\n" unless $filename =~ /\.gz$/;
 
+  my %params = (filename => $filename);
+  ## Tabix will want to write the downloaded index file to 
+  ## the current working directory. By default this is '/'
+  if ($self->{'params'}{'tmp_dir'}) {
+    $params{'tmp_dir'}      = $self->{'params'}{'tmp_dir'};
+    $params{'use_tmp_dir'}  = 1; 
+  }
+
   $self->{record}     = undef;
-  $self->{tabix_file} = Bio::DB::HTS::Tabix->new(filename => $filename);
+  $self->{tabix_file} = Bio::DB::HTS::Tabix->new(%params);
   $self->{iterator}   = undef;
+  $self->{delimiter}  = "\t";
+
+  ## Add format object if available
+  if ($self->can('add_format')) {
+    $self->seek($self->{tabix_file}->seqnames->[0], 1, 1e8);
+    $self->add_format;
+  }
 
   return $self;
 }
 
 sub seek {
   my ($self, $chrom, $start, $end) = @_;
-  if (defined $self->{iterator})
-  {
-    $self->{iterator}->close();
-  }
+
+  # [ENSCORESW-2690].
+  # Under some, not yet determined, circumnstances, the iterator is assigned
+  # to an empty hash ref, hence we cannot just check if it's defined as it
+  # wouldn't be possible to call the close method for not a tabix iterator
+  $self->{iterator}->close()
+    if UNIVERSAL::isa($self->{iterator}, 'Bio::DB::HTS::Tabix::Iterator');
 
   ## Check for both possible versions of chromosome name
   foreach ($chrom, "chr$chrom")
   {
-    $self->{iterator} = $self->{tabix_file}->query("$chrom:$start-$end") ;
+    $self->{iterator} = $self->{tabix_file}->query("$_:$start-$end") ;
     last if $self->{iterator};
   }
 
