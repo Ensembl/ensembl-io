@@ -49,6 +49,7 @@ sub open {
   my ($caller, $filename, @other_args) = @_;
   my $class = ref($caller) || $caller;
 
+  my $delimiter = "\t";
   my $self = $class->SUPER::open($filename, @other_args);
 
   my $tabix_data = $self->{tabix_file}->header;
@@ -56,6 +57,7 @@ sub open {
     $self->Bio::EnsEMBL::IO::Parser::BaseVCF4::read_metadata($line);
   }
 
+  $self->{delimiter} = "\t";
   return $self;
 }
 
