@@ -66,6 +66,9 @@ sub is_metadata {
 sub read_record {
     my $self = shift;
     
+    while (!$self->is_at_beginning_of_record) {
+      $self->next_block;
+    }
     while (!$self->is_at_end_of_record) {
         my ($field_type, $field) = $self->{'current_block'} =~ /^(\w+)\s+(.*)/;
         unless (defined($field_type)) { croak ("Genbank record parsing going badly.\n".$self->{current_block}."\n".$self->{filename}) };
