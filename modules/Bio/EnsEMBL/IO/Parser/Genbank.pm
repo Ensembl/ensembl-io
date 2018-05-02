@@ -470,7 +470,7 @@ sub get_features {
                 push @features,$self->_finish_feature(\%feature, $line_buffer) if %feature;
                 undef %feature;
                 $line_buffer = '';
-                my ($header,$position) = $line =~ /^\s{5}(\w+)\s+(.+)/;
+                my ($header,$position) = $line =~ /^\s{5}(\S+)\s+(.+)/;
                 # Note that position can be complement() and or join(coord1,coord2)
                 %feature = ( header => $header, position => $position);
             } else {
