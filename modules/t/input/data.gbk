@@ -1300,3 +1300,76 @@ ORIGIN
     16561 atcacgatg
 //
 
+LOCUS       NM_001100954             558 bp    mRNA    linear   VRT 06-AUG-2017
+DEFINITION  Danio rerio si:dkey-111e8.5 (si:dkey-111e8.5), mRNA.
+ACCESSION   NM_001100954 XM_690278
+VERSION     NM_001100954.1
+KEYWORDS    RefSeq.
+SOURCE      Danio rerio (zebrafish)
+  ORGANISM  Danio rerio
+            Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Euteleostomi;
+            Actinopterygii; Neopterygii; Teleostei; Ostariophysi;
+            Cypriniformes; Cyprinidae; Danio.
+REFERENCE   1  (bases 1 to 558)
+  AUTHORS   Pasquier J, Cabau C, Nguyen T, Jouanno E, Severac D, Braasch I,
+            Journot L, Pontarotti P, Klopp C, Postlethwait JH, Guiguen Y and
+            Bobe J.
+  TITLE     Gene evolution and gene expression after whole genome duplication
+            in fish: the PhyloFish database
+  JOURNAL   BMC Genomics 17, 368 (2016)
+   PUBMED   27189481
+  REMARK    Publication Status: Online-Only
+COMMENT     PREDICTED REFSEQ: This record has not been reviewed and the
+            function is unknown. The reference sequence was derived from
+            BX640520.13.
+            On Mar 7, 2008 this sequence version replaced XM_690278.2.
+
+            ##Evidence-Data-START##
+            CDS exon combination :: GDQH01007158.1, GDQQ01020927.1
+                                    [ECO:0000331]
+            RNAseq introns       :: mixed/partial sample support SAMEA2168446,
+                                    SAMEA2168447 [ECO:0000350]
+            ##Evidence-Data-END##
+PRIMARY     REFSEQ_SPAN         PRIMARY_IDENTIFIER PRIMARY_SPAN        COMP
+            1-13                BX640520.13        784-796
+            14-223              BX640520.13        2305-2514
+            224-408             BX640520.13        2637-2821
+            409-493             BX640520.13        3013-3097
+            494-558             BX640520.13        3192-3256
+FEATURES             Location/Qualifiers
+     source          1..558
+                     /organism="Danio rerio"
+                     /mol_type="mRNA"
+                     /strain="Tuebingen"
+                     /db_xref="taxon:7955"
+                     /chromosome="5"
+                     /map="5"
+     gene            1..558
+                     /gene="si:dkey-111e8.5"
+                     /note="si:dkey-111e8.5"
+                     /db_xref="GeneID:566993"
+                     /db_xref="ZFIN:ZDB-GENE-060526-192"
+     CDS             1..558
+                     /gene="si:dkey-111e8.5"
+                     /codon_start=1
+                     /product="uncharacterized protein LOC566993"
+                     /protein_id="NP_001094424.1"
+                     /db_xref="GeneID:566993"
+                     /db_xref="ZFIN:ZDB-GENE-060526-192"
+                     /translation="MLEKIYYKVMTPKNVEQTALEFEENLKKNIKYVKLKNVERGKKT
+                     REKPSDVHLAFCPVVSRTGTDIDATLKKIKDDTPTILVVLHHTFDTEVVVSNSSTFVA
+                     RENMLVVDCLFYEGKGLLACKKNKEAYKEAAKWLKNRKEAVGNSSRKQDTSSPDVRSS
+                     RNDHNRDERKKPDASKKKKKTCVIL"
+ORIGIN
+        1 atgttggaaa aaatttatta caaagtcatg acacctaaaa atgttgaaca aactgctcta
+       61 gaattcgagg aaaatctaaa aaagaatata aaatatgtta aattaaaaaa tgtggagagg
+      121 ggaaaaaaaa caagagaaaa gcccagtgat gttcacctgg ctttctgtcc ggtagtttct
+      181 cgcactggaa ctgacattga tgcgacactc aagaaaatta aagacgatac accgaccatt
+      241 ttagtggtgc ttcatcacac atttgacact gaggttgttg tgtcaaatag cagtacattt
+      301 gtggcaaggg agaatatgct tgttgttgac tgtctgttct acgagggtaa aggattgctt
+      361 gcctgtaaaa aaaataagga ggcttataaa gaagctgcaa agtggctaaa aaaccgaaag
+      421 gaagctgttg gcaattcaag ccgcaagcag gacacatcct ccccagatgt ccggtctagt
+      481 agaaatgatc ataatagaga tgaacgcaaa aaacctgatg cctccaagaa aaaaaagaaa
+      541 acttgtgtta ttctctga
+//
+
