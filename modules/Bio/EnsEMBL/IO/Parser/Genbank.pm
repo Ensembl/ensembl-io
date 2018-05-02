@@ -101,6 +101,9 @@ sub read_record {
             if ($field =~ /GI:(\d+)/) {
               $self->{'record'}->{'_genebank_id'} = $1;
             }
+            else {
+              $self->{'record'}->{'_genebank_id'} = undef;
+            }
         }
         elsif ($field_type eq 'COMMENT' || $field_type eq 'REFERENCE') {
             # REFERENCE is not used by the genebuild team so it can be "removed"
