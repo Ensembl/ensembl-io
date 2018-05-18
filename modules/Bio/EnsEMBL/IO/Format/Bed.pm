@@ -40,7 +40,9 @@ sub new {
   my $self = {
           'name'            => 'Bed',
           'extensions'      => ['bed'],
-          'delimiter'       => '\t|\s',
+          'delimiter'       => "\t",
+          'delimiter_regex' => '\t|\s+',
+          'empty_column'    => '.',
           'can_multitrack'  => 1,
           'can_metadata'    => -1,
           'metadata_info'   => {
@@ -79,14 +81,17 @@ sub new {
                                 'chrom' => {
                                                 'validate_as' => 'string',
                                                 'optional'    => 0,  
+                                                'accessor'    => 'seqname',
                                                 },
                                 'chromStart' => {
                                                 'validate_as' => 'integer',
                                                 'optional'    => 0,  
+                                                'accessor'    => 'bedstart',
                                                 },
                                 'chromEnd' => {
                                                 'validate_as' => 'integer',
                                                 'optional'    => 0,  
+                                                'accessor'    => 'end',
                                                 },
                                 'name' => {
                                                 'validate_as' => 'string',
