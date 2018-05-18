@@ -83,6 +83,6 @@ foreach my $feature (@features) {
     $serializer->write($feature);
 }
 
-eq_or_diff(${$fh->string_ref()}, $gtf_string, "Checking is serializer matches expected GTF");
+cmp_bag(${$fh->string_ref()}, $gtf_string, "Checking is serializer matches expected GTF");
 
 done_testing();
