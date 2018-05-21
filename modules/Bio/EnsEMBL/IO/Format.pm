@@ -490,7 +490,7 @@ sub validate_as_colour {
   }
   ## Fall back to checking Unix named colours
   unless ($valid) {
-    my $lookup = Bio::EnsEMBL::Utils::NamedColours::named_colours;
+    my $lookup = named_colours();
     $valid = 1 if $lookup->{$value};
   }
 
