@@ -50,7 +50,7 @@ package Bio::EnsEMBL::IO::Format;
 use strict;
 use warnings;
 
-use Bio::EnsEMBL::IO::NamedColours;
+use Bio::EnsEMBL::IO::NamedColours qw(named_colours);
 
 =head2 new
 
@@ -491,8 +491,7 @@ sub validate_as_colour {
   }
   ## Fall back to checking Unix named colours
   unless ($valid) {
-    my $lookup = named_colours();
-    $valid = 1 if $lookup->{$value};
+    $valid = 1 if &named_colours->{$value};
   }
 
   return $valid;
