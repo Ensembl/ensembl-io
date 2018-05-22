@@ -18,8 +18,9 @@ use warnings;
 
 use Test::More;
 use Bio::EnsEMBL::IO::Parser::VCF4;
+use FindBin;
 
-my $test_file = "modules/t/input/data.vcf";
+my $test_file = $FindBin::Bin . '/input/data.vcf';
 
 my ($test_sample, $sample_info, $ind_info); 
 

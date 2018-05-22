@@ -19,8 +19,9 @@ use warnings;
 use Test::More;
 
 use Bio::EnsEMBL::IO::Parser::Psl;
+use FindBin;
 
-my $test_file = "modules/t/input/data.psl";
+my $test_file = $FindBin::Bin . '/input/data.psl';
 
 my $parser = Bio::EnsEMBL::IO::Parser::Psl->open($test_file);
 ok ($parser->next(), "Loading first record");

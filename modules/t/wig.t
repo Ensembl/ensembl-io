@@ -17,10 +17,11 @@ use strict;
 use warnings;
 
 use Test::More;
+use FindBin;
 
 use Bio::EnsEMBL::IO::Parser::Wig;
 
-my $test_file = "modules/t/input/data.wig";
+my $test_file = $FindBin::Bin . '/input/data.wig';
 
 my $parser = Bio::EnsEMBL::IO::Parser::Wig->open($test_file);
 ok ($parser->next(), "Loading first record");

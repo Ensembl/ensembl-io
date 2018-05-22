@@ -19,8 +19,9 @@ use warnings;
 use Test::More;
 
 use Bio::EnsEMBL::IO::Parser::Bed;
+use FindBin;
 
-my $test_file = "modules/t/input/data.bed";
+my $test_file = $FindBin::Bin . '/input/data.bed';
 
 my $parser = Bio::EnsEMBL::IO::Parser::Bed->open($test_file);
 ok ($parser->next(), "Loading first record");
