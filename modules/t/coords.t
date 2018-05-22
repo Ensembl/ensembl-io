@@ -19,8 +19,9 @@ use warnings;
 use Test::More;
 
 use Bio::EnsEMBL::IO::Parser::Coords;
+use FindBin;
 
-my $test_file = "modules/t/input/coords.txt";
+my $test_file = $FindBin::Bin . '/input/coords.txt';
 
 my $parser = Bio::EnsEMBL::IO::Parser::Coords->open($test_file);
 ok ($parser->next(), "Loading first record");

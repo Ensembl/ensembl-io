@@ -19,9 +19,10 @@ use warnings;
 use Test::More;
 
 use Bio::EnsEMBL::IO::Parser::GFF3;
+use FindBin;
 
-my $test_file = "modules/t/input/data.gff3";
-my $test_with_fasta_file = "modules/t/input/data_with_fasta.gff3";
+my $test_file = $FindBin::Bin . '/input/data.gff3';
+my $test_with_fasta_file = $FindBin::Bin . '/input/data_with_fasta.gff3';
 
 my $parser = Bio::EnsEMBL::IO::Parser::GFF3->open($test_file);
 ## First record
