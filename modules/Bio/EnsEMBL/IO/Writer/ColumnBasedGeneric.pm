@@ -155,7 +155,7 @@ sub combine_fields {
     if($order) {
 	    @keys = @{$order};
     } else {
-	    @keys = keys %$values;
+	    @keys = sort keys %$values;
     }
 
     foreach my $field (@keys) {
