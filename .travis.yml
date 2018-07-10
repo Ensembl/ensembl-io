@@ -14,10 +14,10 @@ perl:
 #  - "5.12"
 #  - "5.10"
 
-# env:
-#  - COVERALLS=true  DB=mysql
-  # - COVERALLS=false DB=mysql
-#  - COVERALLS=false DB=sqlite
+env:
+  - COVERALLS=true  DB=mysql
+  - COVERALLS=false DB=mysql
+  - COVERALLS=false DB=sqlite
 
 addons:
   apt:
