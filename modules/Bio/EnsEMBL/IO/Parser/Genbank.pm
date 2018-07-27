@@ -66,6 +66,9 @@ sub is_metadata {
 sub read_record {
     my $self = shift;
     
+    while (!$self->is_at_beginning_of_record) {
+      $self->next_block;
+    }
     while (!$self->is_at_end_of_record) {
         my ($field_type, $field) = $self->{'current_block'} =~ /^(\w+)\s+(.*)/;
         unless (defined($field_type)) { croak ("Genbank record parsing going badly.\n".$self->{current_block}."\n".$self->{filename}) };
@@ -92,12 +95,17 @@ sub read_record {
             $self->{'record'}->{'_raw_accession'} = $field;
         }
         elsif ($field_type eq 'VERSION') {
-            if ($field =~ /\S+\.(\d+)\s+GI:(\d+)/) {
+            if ($field =~ /\S+\.(\d+)/) {
                 $self->{'record'}->{'_version'} = $1;
-                $self->{'record'}->{'_genebank_id'} = $2;
             }
             else {
                 $self->{'record'}->{'_version'} = $field;
+            }
+            if ($field =~ /GI:(\d+)/) {
+              $self->{'record'}->{'_genebank_id'} = $1;
+            }
+            else {
+              $self->{'record'}->{'_genebank_id'} = undef;
             }
         }
         elsif ($field_type eq 'COMMENT' || $field_type eq 'REFERENCE') {
@@ -245,7 +253,7 @@ sub get_accession {
 sub get_sequence_name {
     my $self = shift;
 
-    return $self->{'record'}->{'_accession'}.'.'.$self->{'record'}->{'_version'};
+    return $self->get_accession.'.'.$self->{'record'}->{'_version'};
 }
 
 =head2 get_genbank_id
@@ -462,7 +470,7 @@ sub get_features {
                 push @features,$self->_finish_feature(\%feature, $line_buffer) if %feature;
                 undef %feature;
                 $line_buffer = '';
-                my ($header,$position) = $line =~ /^\s{5}(\w+)\s+(.+)/;
+                my ($header,$position) = $line =~ /^\s{5}(\S+)\s+(.+)/;
                 # Note that position can be complement() and or join(coord1,coord2)
                 %feature = ( header => $header, position => $position);
             } else {
