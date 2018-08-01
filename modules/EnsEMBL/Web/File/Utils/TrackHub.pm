@@ -157,8 +157,8 @@ sub get_hub {
           $response = read_file($file, $file_args); 
 
           if ($response->{'error'} || !$response->{'content'}) {
-            my $error = @{$response->{'error'}} || "trackDB file empty for genome $genome";
-            push @errors, "$genome ($file): $error";
+            my $error = $response->{'error'}[0] || "trackDB file empty for genome $genome";
+            push @errors, $error;
             $tree->append($tree->create_node("error_$genome", { error => $error, file => $file }));
           }
           else {
