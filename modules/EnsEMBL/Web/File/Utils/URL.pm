@@ -255,7 +255,7 @@ sub read_file {
       $content = $args->{'size_limit'} ? $_content : $response->{'content'};
     }
     else {
-      $error = _get_http_tiny_error($response)." ($url)";
+      $error = _get_http_tiny_error($response) . " ($url)";
       warn "!!! ERROR FETCHING FILE $url: $error";
     }
   }
