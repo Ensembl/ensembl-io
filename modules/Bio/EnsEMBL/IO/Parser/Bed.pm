@@ -102,8 +102,8 @@ sub add_format {
 =cut
 
 sub get_raw_chrom {
-  my $self = shift;
-  my $index = $self->{'column_map'}{'chrom'};
+  my ($self, $index) = @_;
+  $index ||= $self->{'column_map'}{'chrom'};
   return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
@@ -116,8 +116,8 @@ sub get_raw_chrom {
 =cut
 
 sub get_seqname {
-  my $self = shift;
-  (my $chr = $self->get_raw_chrom()) =~ s/^chr//i;
+  my ($self, $index) = @_;
+  (my $chr = $self->get_raw_chrom($index)) =~ s/^chr//i;
   return $chr;
 }
 
@@ -142,8 +142,8 @@ sub munge_seqname {
 =cut
 
 sub get_raw_chromStart {
-  my $self = shift;
-  my $index = $self->{'column_map'}{'chromStart'};
+  my ($self, $index) = @_;
+  $index ||= $self->{'column_map'}{'chromStart'};
   return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
@@ -157,8 +157,8 @@ sub get_raw_chromStart {
 =cut
 
 sub get_start {
-  my $self = shift;
-  return $self->get_raw_chromStart()+1;
+  my ($self, $index) = @_;
+  return $self->get_raw_chromStart($index)+1;
 }
 
 =head2 munge_start
@@ -181,8 +181,8 @@ sub munge_start {
 =cut
 
 sub get_raw_chromEnd {
-  my $self = shift;
-  my $index = $self->{'column_map'}{'chromEnd'};
+  my ($self, $index) = @_;
+  $index ||= $self->{'column_map'}{'chromEnd'};
   return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
@@ -195,8 +195,8 @@ sub get_raw_chromEnd {
 =cut
 
 sub get_end {
-  my $self = shift;
-  return $self->get_raw_chromEnd();
+  my ($self, $index) = @_;
+  return $self->get_raw_chromEnd($index);
 }
 
 ## ----------- Optional (in some subformats) fields -------------
