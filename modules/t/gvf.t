@@ -18,8 +18,9 @@ use warnings;
 
 use Test::More;
 use Bio::EnsEMBL::IO::Parser::GVF;
+use FindBin;
 
-my $test_file = "modules/t/input/data.gvf";
+my $test_file = $FindBin::Bin . '/input/data.gvf';
 
 my $parser = Bio::EnsEMBL::IO::Parser::GVF->open($test_file);
 

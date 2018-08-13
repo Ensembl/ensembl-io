@@ -18,11 +18,13 @@ use warnings;
 
 use Test::More;
 use Bio::EnsEMBL::IO::Parser::BigBed;
+use FindBin;
 
 ######################################################
 ## Test 1
 ######################################################
-my $parser = Bio::EnsEMBL::IO::Parser::BigBed->open('modules/t/input/data.bb');
+my $test_file = $FindBin::Bin . '/input/data.bb';
+my $parser = Bio::EnsEMBL::IO::Parser::BigBed->open($test_file);
 ok($parser->seek(1, 1, 10));
 
 ok($parser->next());

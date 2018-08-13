@@ -5,8 +5,9 @@ use Test::More;
 use Test::Deep;
 
 use Bio::EnsEMBL::IO::Parser::EMBL;
+use FindBin;
 
-my $test_file = "modules/t/input/data.embl";
+my $test_file = $FindBin::Bin . '/input/data.embl';
 my $parser = Bio::EnsEMBL::IO::Parser::EMBL->open($test_file);
 
 $parser->next;

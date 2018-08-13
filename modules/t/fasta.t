@@ -19,8 +19,9 @@ use warnings;
 use Test::More;
 
 use Bio::EnsEMBL::IO::Parser::Fasta;
+use FindBin;
 
-my $test_file = "modules/t/input/data.fasta";
+my $test_file = $FindBin::Bin . '/input/data.fasta';
 
 ######################################################
 ## Test 1

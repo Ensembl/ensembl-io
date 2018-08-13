@@ -18,11 +18,13 @@ use warnings;
 
 use Test::More;
 use Bio::EnsEMBL::IO::Parser::BigWig;
+use FindBin;
 
 ######################################################
 ## Test 1
 ######################################################
-my $parser = Bio::EnsEMBL::IO::Parser::BigWig->open("modules/t/input/data-variableStep.bw");
+my $test_file = $FindBin::Bin . '/input/data-variableStep.bw';
+my $parser = Bio::EnsEMBL::IO::Parser::BigWig->open($test_file);
 ok($parser->seek(1, 1, 100));
 
 ok($parser->next);
@@ -47,7 +49,8 @@ $parser->close();
 ######################################################
 ## Test 2
 ######################################################
-$parser = Bio::EnsEMBL::IO::Parser::BigWig->open('modules/t/input/data-fixedStep.bw');
+$test_file = $FindBin::Bin . '/input/data-fixedStep.bw';
+$parser = Bio::EnsEMBL::IO::Parser::BigWig->open($test_file);
 ok($parser->seek(1, 1, 100));
 
 for (my $i = 1; $i < 10; $i ++) {
