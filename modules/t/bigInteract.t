@@ -26,7 +26,7 @@ use Bio::EnsEMBL::IO::Parser::BigBed;
 ######################################################
 ## Test 1
 ######################################################
-my $test_file = $FindBin . '/input/data_interact.bb';
+my $test_file = $FindBin::Bin . '/input/data_interact.bb';
 my $parser = Bio::EnsEMBL::IO::Parser::BigBed->open($test_file);
 ok($parser->seek(3, 63820967, 63880091));
 
