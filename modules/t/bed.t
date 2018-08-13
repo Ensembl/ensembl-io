@@ -27,6 +27,11 @@ ok ($parser->next(), "Loading first record");
 is ($parser->get_seqname(), 19, 'seq name');
 is ($parser->get_start(), 6603910, 'start');
 is ($parser->get_end(), 6764455, 'end');
+## Also test column-number-based fetching of coordinates
+is ($parser->get_seqname(0), 19, 'seq name by index');
+is ($parser->get_start(1), 6603910, 'start by index');
+is ($parser->get_end(2), 6764455, 'end by index');
+## Continue with other fields
 is ($parser->get_name(), 'RP11-635J19', 'name');
 is ($parser->get_score(), 1000, 'score');
 is ($parser->get_strand(), -1, 'strand');
