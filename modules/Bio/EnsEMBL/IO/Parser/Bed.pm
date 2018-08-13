@@ -103,7 +103,7 @@ sub add_format {
 
 sub get_raw_chrom {
   my ($self, $index) = @_;
-  $index ||= $self->{'column_map'}{'chrom'};
+  $index //= $self->{'column_map'}{'chrom'};
   return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
@@ -143,7 +143,7 @@ sub munge_seqname {
 
 sub get_raw_chromStart {
   my ($self, $index) = @_;
-  $index ||= $self->{'column_map'}{'chromStart'};
+  $index //= $self->{'column_map'}{'chromStart'};
   return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
@@ -182,7 +182,7 @@ sub munge_start {
 
 sub get_raw_chromEnd {
   my ($self, $index) = @_;
-  $index ||= $self->{'column_map'}{'chromEnd'};
+  $index //= $self->{'column_map'}{'chromEnd'};
   return defined($index) ? $self->{'record'}[$index] : undef;
 }
 

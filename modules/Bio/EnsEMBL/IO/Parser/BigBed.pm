@@ -167,7 +167,7 @@ sub fetch_summary_data {
 
 sub get_raw_chrom {
   my ($self, $index) = @_;
-  $index ||= $self->{'column_map'}{'chrom'};
+  $index //= $self->{'column_map'}{'chrom'};
   return $self->{'record'}[$index] if defined($index);
 }
 
@@ -181,7 +181,7 @@ sub get_raw_chrom {
 
 sub get_raw_chromStart {
   my ($self, $index) = @_;
-  $index ||= $self->{'column_map'}{'chromStart'};
+  $index //= $self->{'column_map'}{'chromStart'};
   return $self->{'record'}[$index] if defined($index);
 }
 
@@ -194,7 +194,7 @@ sub get_raw_chromStart {
 
 sub get_raw_chromEnd {
   my ($self, $index) = @_;
-  $index ||= $self->{'column_map'}{'chromEnd'};
+  $index //= $self->{'column_map'}{'chromEnd'};
   return $self->{'record'}[$index] if defined($index);
 }
 
