@@ -59,31 +59,31 @@ sub new {
     # to do this, the list of accessors creeps larger an a different
     # set of fields is passed in during a subsequent instantiation
     foreach my $field (@$fields) {
-	no strict "refs"; 
-	# We don't want to redefine functions everytime
-	# a new instance is created
-	unless(defined *{$field}) {
-	    *$field = sub :lvalue {
-		my $me = shift;
-		$me->{$field} = shift if @_;
-		$me->{$field};
-	    };
-	}
+	    no strict "refs"; 
+	    # We don't want to redefine functions everytime
+	    # a new instance is created
+	    unless(defined *{$field}) {
+	      *$field = sub :lvalue {
+		                            my $me = shift;
+		                            $me->{$field} = shift if @_;
+		                            $me->{$field};
+	                            };
+	    }
 
-	unless(defined *{"get_$field"}) {
-	    *{"get_$field"} = sub {
-		my $me = shift;
-		$me->{$field};
-	    };
-	}
+	    unless(defined *{"get_$field"}) {
+	      *{"get_$field"} = sub {
+		                            my $me = shift;
+		                            $me->{$field};
+	                            };
+	    }
 
-	unless(defined *{"munge_$field"}) {
-	    *{"munge_$field"} = sub {
-		my $me = shift;
-		my $value = shift;
-		$me->{$field} = $value;
-	    };
-	}
+	    unless(defined *{"munge_$field"}) {
+	      *{"munge_$field"} = sub {
+		                              my $me = shift;
+		                              my $value = shift;
+		                              $me->{$field} = $value;
+	                              };
+	    }
     }
 
     bless $self, $class;
@@ -91,29 +91,54 @@ sub new {
     return $self;
 }
 
-=head2 create_record
+=head2 batch_fetch
 
-    Description: Serialize the record to it's native format, pieces may
-                 need to be overridden by inherited types.
+    Description: Fetch multiple fields from the object in one go, this
+                 allows an Object to be it's own translator. Because
+                 Objects are very simple encapsulations of records, there
+                 should be a one-to-one mapping between fields and accessor
+                 methods in the object, if there isn't, you're in big
+                 trouble to begin with.
+    Args[1]    : Object to retrieve fields from, usually self
+    Args[2]    : Arrayref, Fields to return
+    Returntype : Array, field values
 
 =cut
 
-sub create_record {
+sub batch_fields {
     my $self = shift;
+    my $object = shift;
+    my $fields = shift;
+
     my @values;
 
-    foreach my $field (@{$self->fields}) {
-	my $value;
-	if(defined($self->$field) && ref $self->$field eq 'HASH') {
-	    $value = $self->combine_fields($self->$field);
-	} else {
-	    $value = $self->$field || '.';
-	}
-
-	push @values, $value;
+    # Cycle through fields and fetch values
+    foreach my $field (@{$fields}) {
+	    my $value = $object->$field();
+	    push @values, $value;
     }
 
-    return $self->concatenate_fields(\@values) . "\n";
+    return @values;
+}
+
+=head2 set_fields
+
+    Description: Set the fields for an object in a batch,
+                 to save multiple calls to mutators
+    Args[1]    : Hashref, field/value pairs
+    Returntype : undef
+    Exceptions : If a field in the values hash doesn't
+                 exist in this object type
+
+=cut
+
+sub set_fields {
+    my $self = shift;
+    my $values = shift;
+
+    foreach my $key (keys %{$values}) {
+	    $self->$key( $values->{$key} );
+    }
 }
 
 =head2 fields
@@ -126,12 +151,12 @@ sub fields {
     my $self = shift;
 
     if(@_) {
-	my $arg = shift;
-	if(ref $arg eq 'ARRAY') {
-	    $self->{fields} = $arg;
-	}
+	    my $arg = shift;
+	    if(ref $arg eq 'ARRAY') {
+	      $self->{fields} = $arg;
+	    }
     } else {
-	return $self->{'fields'} || [];
+	    return $self->{'fields'} || [];
     }
 }
 
@@ -147,47 +172,8 @@ sub length {
     my $self = shift;
 
     if($self->can('start') && $self->can('end')) {
-	return abs($self->end - $self->start);
+	    return abs($self->end - $self->start);
     }
-}
-
-=head2 combine_fields
-
-    Description: For fields that are composite fields (ie. attributes in
-                 GXF), combine the pieces of the field using a delimiter
-
-=cut
-
-sub combine_fields {
-    my $self = shift;
-    my $values = shift;
-    my $delimiter = shift || ';';
-    my $inc_field = shift || 1;
-    my $separator = shift || '=';
-    my $valuequotes = shift || '';
-
-    my @values;
-
-    foreach my $field (keys %$values) {
-	push @values, ($inc_field ? "$field$separator" : '') . $valuequotes . $values->{$field} . $valuequotes;
-    }
-
-    return join $delimiter, @values;
-}
-
-=head2 concatenate_fields
-
-    Description: Put values together to create the final record, may need to
-                 be overridden for non-GXF column based formats
-
-=cut
-
-sub concatenate_fields {
-    my $self = shift;
-    my $values = shift;
-    my $delimiter = shift || "\t";
-
-    return join $delimiter, @{$values};
 }
 
 1;

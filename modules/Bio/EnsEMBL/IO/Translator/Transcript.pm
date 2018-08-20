@@ -30,88 +30,103 @@ use warnings;
 
 use Carp;
 
-use base qw/Bio::EnsEMBL::IO::Translator::Feature/;
+use base qw/Bio::EnsEMBL::IO::Translator::Gene/;
 
-=head2 get_itemRgb
+my %trans_field_callbacks = (
+                              'thickStart'  => 'thickStart',
+                              'thickEnd'    => 'thickEnd',
+                              'blockCount'  => 'blockCount',
+                              'blockStarts' => 'blockStarts',
+                              'blockSizes'  => 'blockSizes',
+                              );
 
-    Description:
-    Returntype : String
+=head2 new
+
+    Returntype   : Bio::EnsEMBL::IO::Translator::Transcript
 
 =cut
 
-sub get_itemRgb {
-  my ($self, $transcript) = @_;
-  return '0,0,0' unless $self->species_defs;
-  my $colours = $self->species_defs->colour('transcript');
-  my $colour = $colours->{$transcript->biotype}{'default'};
-  return $colour ? '('.join(',',$self->rgb_by_name($colour)).')' : undef;
+sub new {
+    my ($class, $args) = @_;
+
+    my $self = $class->SUPER::new($args);
+
+    # Once we have the instance, add our customized callbacks
+    # to the translator
+    $self->add_callbacks(\%trans_field_callbacks);
+
+    return $self;
+
 }
 
-=head2 get_thickStart
 
-    Description: Placeholder - needed so that column counts are correct
-    Returntype : Zero
+=head2 thickStart
+
+    Description: Gets coding start of transcript in absolute coordinates, for BED format 
+    Returntype : Integer
 
 =cut
 
-sub get_thickStart {
+sub thickStart {
   my ($self, $transcript) = @_;
-  return $transcript->coding_region_start;
+  ## Note - delete an extra bp for semi-open coordinates
+  return $transcript->slice->seq_region_start + $transcript->coding_region_start - 2;
 }
 
-=head2 get_thickEnd
+=head2 thickEnd
 
-    Description: Placeholder - needed so that column counts are correct
-    Returntype : Zero
+    Description: Gets coding end of transcript in absolute coordinates, for BED format 
+    Returntype : Integer
 
 =cut
 
-sub get_thickEnd {
+sub thickEnd {
   my ($self, $transcript) = @_;
-  return $transcript->coding_region_end;
+  return $transcript->slice->seq_region_start + $transcript->coding_region_end - 1;
 }
 
-=head2 get_blockCount
+=head2 blockCount
 
-    Description: Placeholder - needed so that column counts are correct
-    Returntype : Zero
+    Description: Gets the number of exons, for BED format 
+    Returntype : Integer
 
 =cut
 
-sub get_blockCount {
+sub blockCount {
   my ($self, $transcript) = @_;
   return scalar(@{$transcript->get_all_Exons});
 }
 
-=head2 get_blockSizes
+=head2 blockSizes
 
-    Description: Placeholder - needed so that column counts are correct
-    Returntype : Zero
+    Description: Gets the lengths of all exons, for BED format
+    Returntype : String
 
 =cut
 
-sub get_blockSizes {
+sub blockSizes {
   my ($self, $transcript) = @_;
   my @sizes;
   foreach my $exon (@{$transcript->get_all_Exons}) {
-      push(@sizes, $exon->length);
+    push(@sizes, $exon->length);
   }
   @sizes = reverse(@sizes) if ($transcript->strand == -1);
   return join(',', @sizes);
 }
 
-=head2 get_blockStart
+=head2 blockStarts
 
-    Description: Placeholder - needed so that column counts are correct
-    Returntype : Zero
+    Description: Gets the start coordinates of all exons, for BED format
+    Returntype : String
 
 =cut
 
-sub get_blockStarts {
+sub blockStarts {
   my ($self, $transcript) = @_;
   my @starts;
+
   foreach my $exon (@{$transcript->get_all_Exons}) {
-      push(@starts, $exon->start);
+    push(@starts, $exon->start - $transcript->start);
   }
   @starts = reverse(@starts) if ($transcript->strand == -1);
   return join(',', @starts);
