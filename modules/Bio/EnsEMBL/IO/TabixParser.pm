@@ -75,10 +75,13 @@ sub open {
 
 sub seek {
   my ($self, $chrom, $start, $end) = @_;
-  if (defined $self->{iterator})
-  {
-    $self->{iterator}->close();
-  }
+
+  # [ENSCORESW-2690].
+  # Under some, not yet determined, circumnstances, the iterator is assigned
+  # to an empty hash ref, hence we cannot just check if it's defined as it
+  # wouldn't be possible to call the close method for not a tabix iterator
+  $self->{iterator}->close()
+    if UNIVERSAL::isa($self->{iterator}, 'Bio::DB::HTS::Tabix::Iterator');
 
   ## Check for both possible versions of chromosome name
   foreach ($chrom, "chr$chrom")
