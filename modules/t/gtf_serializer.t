@@ -16,7 +16,6 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Deep;
 use Test::Differences;
 
 use Bio::EnsEMBL::CoordSystem;
@@ -84,6 +83,6 @@ foreach my $feature (@features) {
     $serializer->write($feature);
 }
 
-cmp_bag(${$fh->string_ref()}, $gtf_string, "Checking is serializer matches expected GTF");
+eq_or_diff(${$fh->string_ref()}, $gtf_string, "Checking is serializer matches expected GTF");
 
 done_testing();
