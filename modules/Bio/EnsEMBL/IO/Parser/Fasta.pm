@@ -141,10 +141,10 @@ sub read_sequence {
     my $arrayRef = [];
 
     while (not $self->is_at_end_of_record()) {
-        push $arrayRef, $self->{'current_block'};
+        push @{$arrayRef}, $self->{'current_block'};
         $self->next_block();
     }
-    push $arrayRef, $self->{'current_block'};
+    push @{$arrayRef}, $self->{'current_block'};
 
     return $arrayRef;
 }
