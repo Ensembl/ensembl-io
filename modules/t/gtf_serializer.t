@@ -16,6 +16,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Deep;
 use Test::Differences;
 
 use Bio::EnsEMBL::CoordSystem;
