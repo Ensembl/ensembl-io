@@ -35,14 +35,18 @@ do_the_tests(\@test_row);
 ok ($parser->next(), "Loading second record");
 @test_row = qw(10 102918295 C G 1.179596 14.23);
 is_deeply($parser->{'record'}, \@test_row, "Test basic parsing of a row");
-note "Testing each column of the row";
-do_the_tests(\@test_row);
 
 ok ($parser->next(), "Loading third record");
 @test_row = qw(10 102918295 C T 1.200556 14.36);
 is_deeply($parser->{'record'}, \@test_row, "Test basic parsing of a row");
 note "Testing each column of the row";
 do_the_tests(\@test_row);
+
+$parser->seek(10,302918295,302918295); 
+ok ($parser->next() == 0, "Next returns 0 if non existing location was used in seek");
+
+$parser->seek(33,302918295,302918295); 
+ok ($parser->next() == 0, "Next returns 0 if non existing chromosome was used in seek");
 
 ok ($parser->close(), "Closing file");
 
@@ -57,5 +61,4 @@ sub do_the_tests {
   ok($test->[4] eq $parser->get_raw_score,   'Raw score');
   ok($test->[5] eq $parser->get_phred_score, 'PHRED score');
 }
-
 
