@@ -17,6 +17,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Exception;
 use Bio::EnsEMBL::IO::Parser::VCF4Tabix;
 use FindBin;
 
@@ -125,6 +126,9 @@ my @test_row2 = qw(1	875539	rs4970377	C	A	.	PASS	AA=.;DP=129;GP=1:885676;BN=111	
 is_deeply($parser2->{'record'},\@test_row2,"Test basic parsing of a row");
 ok ($parser2->close(), "Closing file");
 
+note "\n> Testing reading non bgz/bz files:\n";
+my $test_file3 = $FindBin::Bin . '/input/data.vcf';
+throws_ok(sub{ Bio::EnsEMBL::IO::Parser::VCF4Tabix->open($test_file3)}, qr/ERROR: Input file is not bgzipped, cannot use tabix/, 'Test unsupported input file format');
 done_testing();
 
 
