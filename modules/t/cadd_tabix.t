@@ -45,8 +45,8 @@ do_the_tests(\@test_row);
 $parser->seek(10,302918295,302918295); 
 ok ($parser->next() == 0, "Next returns 0 if non existing location was used in seek");
 
-$parser->seek(33,302918295,302918295); 
-ok ($parser->next() == 0, "Next returns 0 if non existing chromosome was used in seek");
+#$parser->seek(33,302918295,302918295); 
+#ok ($parser->next() == 0, "Next returns 0 if non existing chromosome was used in seek");
 
 ok ($parser->close(), "Closing file");
 
