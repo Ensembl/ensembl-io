@@ -57,7 +57,12 @@ sub read_record {
     my $self = shift;
     # purge previous record
     foreach (keys (%{$self->{record}})) {$self->{record}->{$_} = []}
-    my $field_type = '';
+
+    # this is necessary if we want to intercept the record ID
+    my $field_type = substr($self->{current_block}, 0, 2);
+    push @{$self->{record}->{$field_type}}, $self->{current_block};
+    
+    $field_type = '';
     until ($field_type eq 'SQ' || $self->is_at_end_of_record) {
         if (!$field_type || $field_type eq 'XX' || $self->is_metadata || $field_type eq 'SQ') {
             $self->next_block;
@@ -96,6 +101,16 @@ sub read_metadata {
 sub get_sequence {
     my $self = shift;
     return $self->{record}->{sequence};
+}
+
+=head2 get_id
+    Description: Get the ID without extra qualifiers in the record
+    Returntype : String
+=cut
+
+sub get_id {
+    my $self = shift;
+    return (split /\s/, $self->get_stuff('ID')->[0])[0];
 }
 
 =head2 get_accessions
@@ -143,6 +158,22 @@ sub get_classification {
 sub get_date {
     my $self = shift;
     return $self->get_stuff('DT');
+}
+
+=head2 get_database_cross_references
+    Description:
+    Returntype: ListRef of strings in the format DB:ID
+=cut
+
+sub get_database_cross_references {
+  my $self = shift;
+  my $list = $self->get_raw_database_cross_references;
+  return unless defined $list;
+
+  chomp @$list;
+  my @xrefs = map { $_ =~ s/^\w\w\s+// and join(':', (split /; /)[0..1]) } @$list;
+  
+  return \@xrefs;
 }
 
 sub smush_text {
@@ -246,6 +277,11 @@ sub get_raw_contig {
 sub get_raw_pelevel {
     my $self = shift;
     return $self->{record}->{PE};
+}
+
+sub get_raw_database_cross_references {
+  my $self = shift;
+  return $self->{record}->{DR};
 }
 
 sub get_pelevel {

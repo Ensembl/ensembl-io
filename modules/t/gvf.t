@@ -1,4 +1,5 @@
-# Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [2016-2018] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +18,9 @@ use warnings;
 
 use Test::More;
 use Bio::EnsEMBL::IO::Parser::GVF;
+use FindBin;
 
-my $test_file = "modules/t/input/data.gvf";
+my $test_file = $FindBin::Bin . '/input/data.gvf';
 
 my $parser = Bio::EnsEMBL::IO::Parser::GVF->open($test_file);
 

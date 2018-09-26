@@ -2,7 +2,8 @@
 
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -114,13 +115,27 @@ sub close {
 sub read_block {
     my $self = shift;
     my $fh = $self->{'filehandle'};
+    return 0 unless $fh;
 
-    if (eof($fh)) {
+    if (eof($fh) || $self->{'_reached_eof'}) {
         $self->{'waiting_block'} = undef;
+        delete $self->{'_reached_eof'};
+        delete $self->{'_read_fh_ok'};
     } else {
-        $self->{'waiting_block'} = <$fh> || confess ("Error reading file handle: $!");   
+        $self->{'waiting_block'} = <$fh>;
+
+        if($self->{'waiting_block'}) {
+            $self->{'_read_fh_ok'} = 1;
+        } else {
+            if($self->{'_read_fh_ok'}) {
+                $self->{'_reached_eof'} = 1;
+            } else {
+                confess ("Error reading file handle: $!");
+            }
+        }
     }    
 
+    $self->{'waiting_block'} =~ s/\r\n/\n/ if $self->{'waiting_block'};
     return $self->{'waiting_block'};
 }
 
@@ -134,6 +149,7 @@ sub read_block {
 sub reset {
     my $self = shift;
     my $fh = $self->{'filehandle'};
+    return 0 unless $fh;
     seek($fh, 0, 0);
     return 1;
 }

@@ -2,7 +2,8 @@
 
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -42,6 +43,7 @@ sub init {
   my ($self, $fh) = @_;
 
   ## Define default column positions, because AutoSQL
+  $self->{'default_names'} = [qw(chrom chromStart chromEnd name score strand thickStart thickEnd itemRgb blockCount blockSizes chromStarts)];
   $self->{'alt_names'} = {
                           'item_colour' => 'itemRgb',
                           'colour'      => 'itemRgb',
@@ -57,7 +59,14 @@ sub init {
     my @table;
     my $cols = $autoSQL->columnList;
     while ($cols) {
-      my $real_name = $self->{'alt_names'}{$cols->name} || $cols->name;
+      my $real_name;
+      ## Check for incomplete AutoSQL
+      if (($cols->name =~ /^field\d+$/ || $cols->comment eq 'Undocumented field') && $i < scalar @{$self->{'default_names'}}) { 
+        $real_name = $self->{'default_names'}[$i];
+      }
+      else {
+        $real_name = $self->{'alt_names'}{$cols->name} || $cols->name;
+      }
       $column_map->{$real_name} = $i;
       $i++;
       $cols = $cols->next;
@@ -157,8 +166,8 @@ sub fetch_summary_data {
 =cut
 
 sub get_raw_chrom {
-  my $self = shift;
-  my $index = $self->{'column_map'}{'chrom'};
+  my ($self, $index) = @_;
+  $index //= $self->{'column_map'}{'chrom'};
   return $self->{'record'}[$index] if defined($index);
 }
 
@@ -171,8 +180,8 @@ sub get_raw_chrom {
 =cut
 
 sub get_raw_chromStart {
-  my $self = shift;
-  my $index = $self->{'column_map'}{'chromStart'};
+  my ($self, $index) = @_;
+  $index //= $self->{'column_map'}{'chromStart'};
   return $self->{'record'}[$index] if defined($index);
 }
 
@@ -184,8 +193,8 @@ sub get_raw_chromStart {
 =cut
 
 sub get_raw_chromEnd {
-  my $self = shift;
-  my $index = $self->{'column_map'}{'chromEnd'};
+  my ($self, $index) = @_;
+  $index //= $self->{'column_map'}{'chromEnd'};
   return $self->{'record'}[$index] if defined($index);
 }
 

@@ -1,4 +1,5 @@
-# Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [2016-2018] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +18,9 @@ use warnings;
 
 use Test::More;
 use Bio::EnsEMBL::IO::Parser::VCF4;
+use FindBin;
 
-my $test_file = "modules/t/input/data.vcf";
+my $test_file = $FindBin::Bin . '/input/data.vcf';
 
 my ($test_sample, $sample_info, $ind_info); 
 
@@ -120,6 +122,11 @@ ok($parser->get_metadata_by_pragma('fileDate') eq '20090805', 'getMetadataByPrag
 ok($parser->get_vcf_version eq 'VCFv4.2', 'getVCFversion');
 ok($parser->get_metadata_description('INFO', 'AA') eq 'Ancestral Allele', 'getMetaDescription'); 
 
+note "> Testing format validation";
+$parser->reset();
+$parser->shift_block;
+ok ($parser->validate(), "Validating vcf format");
+    
 ok ($parser->close(), "Closing file");
 
 done_testing();

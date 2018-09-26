@@ -2,7 +2,8 @@
 
 =head1 LICENSE
 
-  Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+  Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+  Copyright [2016-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -37,10 +38,36 @@ package Bio::EnsEMBL::IO::Parser::BaseVCF4;
 use strict;
 use warnings;
 use Carp;
+use Storable qw(freeze thaw);
+
+use Bio::EnsEMBL::IO::Format::VCF4;
 
 use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
 my $version = 4.2;
+
+my %FREEZE_EXCLUDE = (
+  current_block => 1,
+  delimiter => 1,
+  filehandle => 1,
+  iterator => 1,
+  waiting_block => 1,
+  tabix_file => 1,
+);
+
+=head2 add_format
+
+    Description : Add a format object and configure the parser
+    Returntype  : none
+
+=cut
+
+sub add_format {
+  my $self = shift;
+  my $class = "Bio::EnsEMBL::IO::Format::VCF4";
+  my $format = $class->new();
+  $self->format($format);
+}
 
 sub next {
   my $self = shift;
@@ -66,6 +93,9 @@ sub read_metadata {
                     'ALT'      => 1,
                     'SAMPLE'   => 1,
                     'PEDIGREE' => 1 );
+
+  chomp $line;
+  push @{$self->{_raw_metadata}}, $line;
 
   if ($line =~ /^##\s*(\w+)=(.+)$/) {
     my $m_type = $1;
@@ -105,8 +135,10 @@ sub read_metadata {
       foreach my $meta (split(',',$m_data)) {
 
         my ($key,$value) = split('=',$meta);
-        $value =~ s/"//g;
-        $value =~ s/!#!/,/g; # Revert the fix for the character ","
+        if(defined($value)) {
+          $value =~ s/"//g;
+          $value =~ s/!#!/,/g; # Revert the fix for the character ","
+        }
         $metadata{$key}=$value;
       }
 
@@ -220,9 +252,11 @@ sub get_raw_start {
 sub get_start {
     my $self = shift;
     my $start = $self->get_raw_start();
+    return unless defined $start;
 
     # Like indels, SVs have the base before included for reference
-    if ($self->get_raw_info =~ /SVTYPE/ || join(",", @{$self->get_alternatives}) =~ /\<|\[|\]|\>/) {
+    my $alternatives = join(",", @{$self->get_alternatives});
+    if (($self->get_raw_info && $self->get_raw_info =~ /SVTYPE/) || ($alternatives && $alternatives =~ /\<|\[|\]|\>/)) {
       $start ++;
     }
     else {
@@ -277,10 +311,12 @@ sub get_end {
       $end = $info->{END};
     }
     elsif(defined($info->{SVLEN})) {
+      return unless $self->get_start;
       my $svlen = (split(',',$info->{SVLEN}))[0];
       $end = $self->get_start + abs($svlen)-1;
     }
     else {
+      return unless $self->get_start;
       $end = $self->get_start + length($self->get_raw_reference) - 1;
     }
     return $end;
@@ -832,7 +868,7 @@ sub get_samples_info {
   if(defined($key)) {
     my %tmp = map {$formats->[$_] => $_} (0..$#{$formats});
     $format_index = $tmp{$key};
-    confess("ERROR: Key '$key' not found in format string ".join("|", @$formats)) unless defined($format_index);
+    return {} unless defined($format_index);
   }
 
   foreach my $tmp_sample_data (@{$self->get_raw_samples_info($sample_ids)}) {
@@ -907,6 +943,20 @@ sub is_polymorphic {
   my %uniq_gts = map {$self->{record}->[$_] => 1} @index_list;
 
   return scalar keys %uniq_gts > 1 ? 1 : 0;
+}
+
+# freeze a copy of the VCF record
+sub get_frozen_copy {
+  my $self = shift;
+  
+  my $copy = {
+    record => \@{$self->{record}}
+  };
+  # my $copy = thaw(freeze({ record => $self->{record} }));
+  $copy->{$_} ||= $self->{$_} for grep {!$FREEZE_EXCLUDE{$_}} keys %$self;
+  bless $copy, ref($self);
+  
+  return $copy;
 }
 
 1;

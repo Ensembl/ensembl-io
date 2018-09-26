@@ -1,4 +1,5 @@
-# Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [2016-2018] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +21,7 @@ use Test::More;
 use Test::Warn;
 
 use Bio::EnsEMBL::IO::Parser::EMF;
+use FindBin;
 
 
 ########
@@ -27,7 +29,7 @@ use Bio::EnsEMBL::IO::Parser::EMF;
 ########
 ## Resequencing
 subtest 'EMF Resequencing format', sub {
-	my $test_file = 'modules/t/input/Homo_sapiens.GRCh37.73.resequencing.chromosome.21.emf';
+	my $test_file = $FindBin::Bin . '/input/Homo_sapiens.GRCh37.73.resequencing.chromosome.21.emf';
 	my $parser = Bio::EnsEMBL::IO::Parser::EMF->open($test_file);
 	isa_ok($parser, 'Bio::EnsEMBL::IO::Parser::EMF', "correct class");
 	my $next_record = $parser->next;
@@ -53,7 +55,7 @@ subtest 'EMF Resequencing format', sub {
 
 ## Compara
 subtest 'Compara format', sub {
-	my $test_file = 'modules/t/input/Compara.13_eutherian_mammals_EPO.chr1_26.emf';
+	my $test_file = $FindBin::Bin . '/input/Compara.13_eutherian_mammals_EPO.chr1_26.emf';
 	my $parser = Bio::EnsEMBL::IO::Parser::EMF->open($test_file);	
 	isa_ok($parser, 'Bio::EnsEMBL::IO::Parser::EMF', "correct class");
 	my $next_record = $parser->next;

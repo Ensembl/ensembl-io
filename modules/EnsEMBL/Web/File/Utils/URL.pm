@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -197,6 +198,7 @@ sub read_file {
 ###         nice (optional) Boolean - see introduction
 ###         compression String (optional) - compression type
 ###         method String (optional) - defaults to 'get'
+###         size_limit (optional) - max size for the file to be read
 ### @return Hashref (in nice mode) or String - contents of file
   my ($file, $args) = @_;
   my $url = ref($file) ? $file->absolute_read_path : $file;
@@ -239,12 +241,21 @@ sub read_file {
       $options->{'headers'} = $args->{'headers'};
     }
 
+    # max size limit provided ?
+    my $_content = '';
+    if ($args->{'size_limit'}) {
+      $options->{'data_callback'} = sub {
+        $_content .= $_[0];
+        die "File size exceeds maximum allowed size\n" if length $_content > $args->{'size_limit'};
+      }
+    }
+
     my $response = $http->request(uc($method),$url,$options);
     if ($response->{'success'}) {
-      $content = $response->{'content'};
+      $content = $args->{'size_limit'} ? $_content : $response->{'content'};
     }
     else {
-      $error = _get_http_tiny_error($response);
+      $error = _get_http_tiny_error($response) . " ($url)";
       warn "!!! ERROR FETCHING FILE $url: $error";
     }
   }
@@ -446,7 +457,7 @@ sub _proxy {
 
   my $proxy = $args->{'proxy'};
   if (!$proxy && $args->{'hub'}) {
-    $proxy = $args->{'hub'}->species_defs->ENSEMBL_WWW_PROXY;
+    $proxy = $args->{'hub'}->web_proxy;
   }
   return $proxy;
 }

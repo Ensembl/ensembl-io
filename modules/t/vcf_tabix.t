@@ -1,4 +1,5 @@
-# Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [2016-2018] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +17,11 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Exception;
 use Bio::EnsEMBL::IO::Parser::VCF4Tabix;
+use FindBin;
 
-my $test_file = "modules/t/input/data.vcf.gz";
+my $test_file = $FindBin::Bin . '/input/data.vcf.gz';
 
 my ($test_sample, $sample_info, $ind_info); 
 
@@ -113,6 +116,19 @@ ok($parser->get_metadata_description('INFO', 'DP') eq 'Total Depth', 'getMetaDes
 
 ok ($parser->close(), "Closing file");
 
+note "\n> Testing reading bgz files:\n";
+my $test_file2 = $FindBin::Bin . '/input/data.vcf.bgz';
+my $parser2 = Bio::EnsEMBL::IO::Parser::VCF4Tabix->open($test_file2);
+$parser2->seek(1,875500,876000);
+note "Record 1 again";
+ok ($parser2->next(), "Loading first record");
+my @test_row2 = qw(1	875539	rs4970377	C	A	.	PASS	AA=.;DP=129;GP=1:885676;BN=111	GT:GQ:DP	1|1:100:43	1|1:49:26	1|1:100:47);
+is_deeply($parser2->{'record'},\@test_row2,"Test basic parsing of a row");
+ok ($parser2->close(), "Closing file");
+
+note "\n> Testing reading non bgz/bz files:\n";
+my $test_file3 = $FindBin::Bin . '/input/data.vcf';
+throws_ok(sub{ Bio::EnsEMBL::IO::Parser::VCF4Tabix->open($test_file3)}, qr/ERROR: Input file is not bgzipped, cannot use tabix/, 'Test unsupported input file format');
 done_testing();
 
 

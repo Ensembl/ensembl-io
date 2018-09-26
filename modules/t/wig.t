@@ -1,4 +1,5 @@
-# Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [2016-2018] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,10 +17,11 @@ use strict;
 use warnings;
 
 use Test::More;
+use FindBin;
 
 use Bio::EnsEMBL::IO::Parser::Wig;
 
-my $test_file = "modules/t/input/data.wig";
+my $test_file = $FindBin::Bin . '/input/data.wig';
 
 my $parser = Bio::EnsEMBL::IO::Parser::Wig->open($test_file);
 ok ($parser->next(), "Loading first record");

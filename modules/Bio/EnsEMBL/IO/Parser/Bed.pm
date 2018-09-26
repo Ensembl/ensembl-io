@@ -2,7 +2,8 @@
 
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,7 +19,9 @@ limitations under the License.
 
 =head1 NAME
 
-Bio::EnsEMBL::IO::Parser::Bed - A line-based parser devoted to BED format
+Bio::EnsEMBL::IO::Parser::Bed - A line-based parser devoted to BED-derived formats
+
+Bed files come with a very flexible field order, so we have to allow for that
 
 =cut
 
@@ -28,34 +31,67 @@ use strict;
 use warnings;
 no warnings 'uninitialized';
 
+use Bio::EnsEMBL::IO::Format::Bed;
+use Bio::EnsEMBL::IO::Format::BedDetail;
+use Bio::EnsEMBL::IO::Format::BedGraph;
+
 use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
- 
 
-=head2 set_fields
+=head2 add_format
 
-    Description: Setter for list of fields used in this format - uses the
-                  "public" (i.e. non-raw) names of getter methods
-    Returntype : Void
+    Description : Add a format object and configure the parser
+    Returntype  : none
 
 =cut
 
-sub set_fields {
+sub add_format {
   my $self = shift;
-  $self->{'fields'} = [qw(seqname start end name score strand thickStart thickEnd itemRgb blockCount blockSizes blockStarts)];
+
+  ## Which subformat are we dealing with?
+  my $subformat = 'Bed';
+  my $column_count;
+  $self->shift_block; ## Move first block into "memory"
+  while ($self->next) {
+    my $type = $self->get_metadata_value('type');
+    $subformat = ucfirst($type) if $type;
+
+    if ($subformat eq 'bedDetail') {
+      $column_count = scalar @{$self->{'record'}};
+    }
+    last;
+  }
+  $self->reset; ## Reset pointer
+
+  my $class = "Bio::EnsEMBL::IO::Format::$subformat";
+  my $format = $class->new();
+  $self->format($format);
+  ## Configure delimiter
+  my $delimiter = $format->delimiter;
+  if ($delimiter) {
+    $self->{'delimiter'} = $delimiter;
+    my @delimiters       = split('\|', $delimiter);
+    $self->{'default_delimiter'} = $delimiters[0];
+  }
+  ## Configure columns
+  if ($column_count) {
+    $self->{'column_map'}{'id'}           = $column_count - 2;
+    $self->{'column_map'}{'description'}  = $column_count - 1;
+
+    ## Map remaining columns to valid fields
+    my @fields = @{$format->get_field_order||[]};
+    for (my $index = 0; $index < $column_count - 2; $index++) {
+      $self->{'column_map'}{$fields[$index]} = $index;
+    }
+  }
+  else {
+    my $index = 0;
+    foreach (@{$format->get_field_order||[]}) {
+      $self->{'column_map'}{$_} = $index;
+      $index++;
+    }
+  }
 }
-
-=head2 set_minimum_column_count
-
-    Description: Sets minimum column count for a valid BED file 
-    Returntype : Void 
-
-=cut
-
-sub set_minimum_column_count {
-    my $self = shift;
-    $self->{'min_col_count'} = 3;
-}
-
+ 
 ## ----------- Mandatory fields -------------
 
 =head2 get_raw_chrom
@@ -66,8 +102,9 @@ sub set_minimum_column_count {
 =cut
 
 sub get_raw_chrom {
-  my $self = shift;
-  return $self->{'record'}[0];
+  my ($self, $index) = @_;
+  $index //= $self->{'column_map'}{'chrom'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_seqname
@@ -79,8 +116,8 @@ sub get_raw_chrom {
 =cut
 
 sub get_seqname {
-  my $self = shift;
-  (my $chr = $self->get_raw_chrom()) =~ s/^chr//;
+  my ($self, $index) = @_;
+  (my $chr = $self->get_raw_chrom($index)) =~ s/^chr//i;
   return $chr;
 }
 
@@ -93,7 +130,7 @@ sub get_seqname {
 
 sub munge_seqname {
   my ($self, $value) = @_;
-  $value = "chr$value" unless $value =~ /^chr/;
+  $value = "chr$value" unless $value =~ /^chr/i;
   return $value;
 }
 
@@ -105,8 +142,9 @@ sub munge_seqname {
 =cut
 
 sub get_raw_chromStart {
-  my $self = shift;
-  return $self->{'record'}[1];
+  my ($self, $index) = @_;
+  $index //= $self->{'column_map'}{'chromStart'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_start
@@ -119,8 +157,8 @@ sub get_raw_chromStart {
 =cut
 
 sub get_start {
-  my $self = shift;
-  return $self->get_raw_chromStart()+1;
+  my ($self, $index) = @_;
+  return $self->get_raw_chromStart($index)+1;
 }
 
 =head2 munge_start
@@ -143,8 +181,9 @@ sub munge_start {
 =cut
 
 sub get_raw_chromEnd {
-  my $self = shift;
-  return $self->{'record'}[2];
+  my ($self, $index) = @_;
+  $index //= $self->{'column_map'}{'chromEnd'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_end
@@ -156,11 +195,11 @@ sub get_raw_chromEnd {
 =cut
 
 sub get_end {
-  my $self = shift;
-  return $self->get_raw_chromEnd();
+  my ($self, $index) = @_;
+  return $self->get_raw_chromEnd($index);
 }
 
-## ----------- Optional fields -------------
+## ----------- Optional (in some subformats) fields -------------
 
 =head2 get_raw_name
 
@@ -171,8 +210,8 @@ sub get_end {
 
 sub get_raw_name {
   my $self = shift;
-  my $column = $self->get_metadata_value('type') eq 'bedGraph' ? undef : $self->{'record'}[3];
-  return $column;
+  my $index = $self->{'column_map'}{'name'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_name
@@ -196,8 +235,8 @@ sub get_name {
 
 sub get_raw_score {
   my $self = shift;
-  my $column = $self->get_metadata_value('type') eq 'bedGraph' ? 3 : 4;
-  return $self->{'record'}[$column];
+  my $index = $self->{'column_map'}{'score'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_score
@@ -226,7 +265,8 @@ sub get_score {
 
 sub get_raw_strand {
   my $self = shift;
-  return $self->{'record'}[5];
+  my $index = $self->{'column_map'}{'strand'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_strand
@@ -265,7 +305,8 @@ sub munge_strand {
 
 sub get_raw_thickStart {
   my $self = shift;
-  return $self->{'record'}[6];
+  my $index = $self->{'column_map'}{'thickStart'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_thickStart
@@ -290,7 +331,8 @@ sub get_thickStart {
 
 sub get_raw_thickEnd {
   my $self = shift;
-  return $self->{'record'}[7];
+  my $index = $self->{'column_map'}{'thickEnd'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_thickEnd
@@ -314,7 +356,8 @@ sub get_thickEnd {
 
 sub get_raw_itemRgb {
   my $self = shift;
-  return $self->{'record'}[8];
+  my $index = $self->{'column_map'}{'itemRgb'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_itemRgb
@@ -338,7 +381,8 @@ sub get_itemRgb {
 
 sub get_raw_blockCount {
   my $self = shift;
-  return $self->{'record'}[9];
+  my $index = $self->{'column_map'}{'blockCount'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_blockCount
@@ -362,7 +406,8 @@ sub get_blockCount {
 
 sub get_raw_blockSizes {
   my $self = shift;
-  return $self->{'record'}[10];
+  my $index = $self->{'column_map'}{'blockSizes'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_blockSizes
@@ -387,7 +432,8 @@ sub get_blockSizes {
 
 sub get_raw_blockStarts {
   my $self = shift;
-  return $self->{'record'}[11];
+  my $index = $self->{'column_map'}{'blockStarts'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
 =head2 get_blockStarts
@@ -403,56 +449,65 @@ sub get_blockStarts {
   return \@res;
 }
 
-=head2 validate 
+## ----------- BedDetails accessors ------------------------
 
-    Description: Format_specific validation
-    Returntype: String
+=head2 get_raw_id
+
+    Description: Getter for id field
+    Returntype : String 
 
 =cut
 
-sub validate {
-    my ($self, $subtype) = @_;
-
-    my $valid     = 0;
-    my $col_count = 0;
-    my $format    = '';
-
-    while ($self->next) {
-     
-      if ($self->is_metadata && !$subtype) {
-        $subtype = $self->get_metadata_value('type');
-      }
-      next if $self->{'current_block'} !~ /\w/;
-      $self->read_record;
-
-      ## Check we have the correct number of columns for this format
-      $col_count = scalar(@{$self->{'record'}});
-
-      ## Identify bedgraph content
-      if ($col_count == 4 && $self->{'record'}[3] =~ /^[-+]?[0-9]*\.?[0-9]+$/) {
-        $format = 'bedgraph';
-        if ($subtype =~ /bedgraph/i) {
-          $valid = 1;
-        }
-      }
-      elsif ($col_count >= $self->get_minimum_column_count
-              && $col_count <= $self->get_maximum_column_count) {
-        $format = 'bed';
-        $valid = 1;
-      }
-      last unless $valid;
-
-      ## Check we have coordinates
-      $valid = 0 if !$self->get_seqname;
-      $valid = 0 unless ($self->get_start =~ /\d+/ && $self->get_start > 0 && $self->get_end =~ /\d+/);
-      last;
-    }
-
-    ## Finished validating, so return parser to beginning of file
-    $self->reset;
-
-    return ($valid, $format, $col_count);
+sub get_raw_id {
+  my $self = shift;
+  my $index = $self->{'column_map'}{'id'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
 }
 
+=head2 get_id
+
+    Description: Getter - wrapper around get_raw_id
+    Returntype : String 
+
+=cut
+
+sub get_id {
+  my $self = shift;
+  return $self->get_raw_id();
+}
+
+=head2 get_raw_description
+
+    Description: Getter for description field
+    Returntype : String 
+
+=cut
+
+sub get_raw_description {
+  my $self = shift;
+  my $index = $self->{'column_map'}{'id'};
+  return defined($index) ? $self->{'record'}[$index] : undef;
+}
+
+=head2 get_description
+
+    Description: Getter - wrapper around get_raw_description
+    Returntype : String 
+
+=cut
+
+sub get_description {
+  my $self = shift;
+  return $self->get_raw_description();
+}
+
+
+
+
+###################################################################
+
+##### OLD FILE WRITING CODE - DEPRECATED
+
+###################################################################
 
 1;

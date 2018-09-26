@@ -17,47 +17,32 @@ use strict;
 use warnings;
 
 use Test::More;
-use Bio::EnsEMBL::IO::Parser::BigBed;
 use FindBin;
+use Bio::EnsEMBL::IO::Parser::BigBed;
+
+## TEST FOR UCSC bigInteract FORMAT
+## which is a custom bigBed format with specific AutoSQL fields
 
 ######################################################
 ## Test 1
 ######################################################
-my $test_file = $FindBin::Bin . '/input/data.bb';
+my $test_file = $FindBin::Bin . '/input/data_interact.bb';
 my $parser = Bio::EnsEMBL::IO::Parser::BigBed->open($test_file);
-ok($parser->seek(1, 1, 10));
+ok($parser->seek(3, 63820967, 63880091));
 
 ok($parser->next());
-ok($parser->get_chrom eq '1');
-ok($parser->get_start == 3);
-ok($parser->get_end == 6);
-ok($parser->get_strand == 0);
-ok($parser->get_name eq 'Mo');
-ok($parser->get_score == 1000);
+ok($parser->get_chrom eq '3');
+ok($parser->get_start == 63741419);
+ok($parser->get_end == 63978511);
+ok($parser->get_score == 350);
 
-ok($parser->next);
-ok($parser->get_chrom eq '1');
-ok($parser->get_start == 4);
-ok($parser->get_end == 8);
-ok($parser->get_strand);
-ok($parser->get_name eq 'Larry');
-ok($parser->get_score == 1000);
-
-ok($parser->seek(2, 1, 10));
-ok($parser->next);
-ok($parser->get_chrom eq '2');
-ok($parser->get_start == 2);
-ok($parser->get_end == 7);
-ok($parser->get_strand == -1);
-ok($parser->get_name eq 'Curly');
-ok($parser->get_score == 1000);
-
-## Test fetching by index
-ok($parser->get_chrom(0) eq '2');
-ok($parser->get_start(1) == 2);
-ok($parser->get_end(2) == 7);
-
-ok(!$parser->next);
+## Test customisable source and target columns
+ok($parser->get_chrom(8) eq '3');
+ok($parser->get_start(9) == 63741419);
+ok($parser->get_end(10) == 63743120);
+ok($parser->get_chrom(13) eq '3');
+ok($parser->get_start(14) == 63976339);
+ok($parser->get_end(15) == 63978511);
 
 $parser->close();
 

@@ -1,4 +1,5 @@
-# Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [2016-2018] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,9 +19,10 @@ use warnings;
 use Test::More;
 
 use Bio::EnsEMBL::IO::Parser::GFF3;
+use FindBin;
 
-my $test_file = "modules/t/input/data.gff3";
-my $test_with_fasta_file = "modules/t/input/data_with_fasta.gff3";
+my $test_file = $FindBin::Bin . '/input/data.gff3';
+my $test_with_fasta_file = $FindBin::Bin . '/input/data_with_fasta.gff3';
 
 my $parser = Bio::EnsEMBL::IO::Parser::GFF3->open($test_file);
 ## First record

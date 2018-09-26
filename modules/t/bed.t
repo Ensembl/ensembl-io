@@ -1,4 +1,5 @@
-# Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [2016-2018] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,14 +19,20 @@ use warnings;
 use Test::More;
 
 use Bio::EnsEMBL::IO::Parser::Bed;
+use FindBin;
 
-my $test_file = "modules/t/input/data.bed";
+my $test_file = $FindBin::Bin . '/input/data.bed';
 
 my $parser = Bio::EnsEMBL::IO::Parser::Bed->open($test_file);
 ok ($parser->next(), "Loading first record");
 is ($parser->get_seqname(), 19, 'seq name');
 is ($parser->get_start(), 6603910, 'start');
 is ($parser->get_end(), 6764455, 'end');
+## Also test column-number-based fetching of coordinates
+is ($parser->get_seqname(0), 19, 'seq name by index');
+is ($parser->get_start(1), 6603910, 'start by index');
+is ($parser->get_end(2), 6764455, 'end by index');
+## Continue with other fields
 is ($parser->get_name(), 'RP11-635J19', 'name');
 is ($parser->get_score(), 1000, 'score');
 is ($parser->get_strand(), -1, 'strand');

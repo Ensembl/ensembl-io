@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,6 +19,9 @@ limitations under the License.
 
 package Bio::EnsEMBL::IO::Adaptor::VCFAdaptor;
 use strict;
+
+use EnsEMBL::Web::Utils::FormatText qw(date_format);
+use File::Path qw(make_path);
 
 use Vcf;
 my $DEBUG = 0;
@@ -38,10 +42,11 @@ my $snpCode = {
 };
 
 sub new {
-  my ($class, $url) = @_;
+  my ($class, $url, $hub) = @_;
   my $self = bless {
     _cache => {},
     _url => $url,
+    _hub => $hub,
   }, $class;
       
   return $self;
@@ -49,6 +54,7 @@ sub new {
 
 sub url { return $_[0]->{'_url'} };
 
+sub hub { return $_[0]->{'_hub'} };
 
 sub snp_code {
     my ($self, $allele) = @_;
@@ -63,15 +69,20 @@ sub fetch_variations {
   if (!$self->{_cache}->{features} || (ref $self->{_cache}->{features} eq 'ARRAY' && !@{$self->{_cache}->{features}})){
     my @features;
     delete $self->{_cache}->{features};
+
+    ## Eagle fix - tabix will want to write the downloaded index file to 
+    ## the current working directory. By default this is '/'
+    my $time = date_format(time(), '%y-%m-%d'); 
+    my $path = $SiteDefs::ENSEMBL_USERDATA_DIR."/temporary/vcf_tabix/$time/";
+    make_path($path);
+
     foreach my $chr_name ($chr,"chr$chr") { # maybe UCSC-type names?
       my %args = ( 
-        region => "$chr_name:$s-$e",
-        file => $self->url
+        region  => "$chr_name:$s-$e",
+        file    => $self->url,
+        tabix   => $self->hub->species_defs->TABIX,
+        tmp_dir => $path,
       );
-
-      ## Eagle fix - tabix will want to write the downloaded index file to 
-      ## the current working directory. By default this is '/'
-      chdir($SiteDefs::ENSEMBL_TMP_DIR);
 
       my $vcf = Vcf->new(%args);
 

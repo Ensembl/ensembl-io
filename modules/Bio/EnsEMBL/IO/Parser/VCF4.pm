@@ -2,7 +2,8 @@
 
 =head1 LICENSE
 
-  Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+  Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+  Copyright [2016-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,13 +44,13 @@ use base qw/Bio::EnsEMBL::IO::Parser::BaseVCF4/;
 sub open {
     my ($caller, $filename, @other_args) = @_;
     my $class = ref($caller) || $caller;
-     
-    my $delimiter = "\t";
+
+    my $delimiter = "\\t";
     my $self = $class->SUPER::open($filename, $delimiter, @other_args);
     
     # pre-load peek buffer
     $self->next_block();
-    
+
     return $self;
 }
 

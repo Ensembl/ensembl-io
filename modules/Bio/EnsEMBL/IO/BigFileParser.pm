@@ -2,7 +2,8 @@
 
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -97,15 +98,20 @@ sub open {
     ## to the file's actual chromosome names
     my $list = $fh->chromList;
     my $head = $list->head;
-    my $chromosomes = {};
-    do {
-      if ($head->name && $head->size) {
-        (my $chr = $head->name) =~ s/^chr//;
-        $chromosomes->{$chr} = $head->name;
-      }
-    } while ($head && ($head = $head->next));
-    #use Data::Dumper; warn Dumper($chromosomes);
-    $self->{cache}{chromosomes} = $chromosomes;
+    if ($head) {
+      my $chromosomes = {};
+      my $chr_sizes   = {};
+      do {
+        if ($head->name && $head->size) {
+          (my $chr = $head->name) =~ s/^chr//;
+          $chromosomes->{$chr} = $head->name;
+          $chr_sizes->{$chr} = $head->size;
+        }
+      } while ($head && ($head = $head->next));
+      #use Data::Dumper; warn Dumper($chromosomes);
+      $self->{cache}{chromosomes} = $chromosomes;
+      $self->{cache}{chr_sizes}   = $chr_sizes;
+    }
 
     ## Do any additional pre-processing
     $self->init($fh); 
@@ -237,9 +243,61 @@ sub fetch_summary_array {
     my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
     return unless $seq_id;
 
+    ## Get whole chromosome if not defined
+    unless ($start && $end) {
+      $start = 1;
+      $end   = $self->cache->{'chr_sizes'}{$chr_id};
+    }
+
     my $method = $self->type.'SummaryArray';
     return $fh->$method("$seq_id", $start-1, $end, bbiSumMean, $bins);
 }
+
+=head2 fetch_summary_array_extended
+
+    Description: fetches data hashes from the requested region, containing the mean, min and max for each bin 
+    Returntype : ArrayRef
+
+=cut
+
+sub fetch_summary_array_extended {
+    my ($self, $chr_id, $start, $end, $bins) = @_;
+
+    my $fh = $self->open_file;
+    warn "Failed to open file ".$self->url unless $fh;
+    return unless $fh;
+
+    ## Get the internal chromosome name
+    my $seq_id = $self->cache->{'chromosomes'}{$chr_id};
+    return unless $seq_id;
+
+    ## Get whole chromosome if not defined
+    unless ($start && $end) {
+      $start = 1;
+      $end   = $self->cache->{'chr_sizes'}{$chr_id};
+    }
+
+    my $method = $self->type.'SummaryArrayExtended';
+    my $stats = $fh->$method("$seq_id", $start-1, $end, $bins);
+    my $scores = [];
+    my $max;
+    
+    foreach (@$stats) {
+      my $bin_min = sprintf('%.2f', $_->{'minVal'});
+      my $bin_max = sprintf('%.2f', $_->{'maxVal'});
+      my $mean    = $_->{'validCount'}
+                          ? sprintf('%.2f', ($_->{'sumData'} / $_->{'validCount'}))
+                          : 0;
+
+      push @$scores, {'mean' => $mean,
+                      'min' => $bin_min,
+                      'max' => $bin_max,
+                      };
+      $max = $mean if (!defined($max) || $max < $mean);
+    }
+    return ($scores, $max);
+}
+
 
 =head2 fetch_rows
 

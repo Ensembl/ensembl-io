@@ -2,7 +2,8 @@
 
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -60,6 +61,7 @@ sub new {
 	    waiting_block     => undef,
 	    record            => undef,
 	    metadata          => {},
+      errors            => {},
 	    params            => \%param_hash,
     	metadata_changed  => 0,
       strand_conversion => {'+' => '1', '.' => '0', '-' => '-1'},
@@ -71,8 +73,20 @@ sub new {
     }
 
     bless $self, $class;
-    
+   
     return $self;
+}
+
+=head2 errors
+
+    Description : Accessor for any errors recorded during parsing
+    Returntype  : Hashref
+
+=cut
+
+sub errors {
+  my $self = shift;
+  return $self->{'errors'} || {};
 }
 
 =head2 shift_block
@@ -284,10 +298,25 @@ sub _open_as {
       if ($@) {
       }
       else {
-        my $object = $class->$method(@other_args);
+        my $object = eval { $class->$method(@other_args); }; 
         return $object;
       }
     }
+}
+
+=head format
+
+    Description : Setter/getter for format object
+    Returntype  : Bio::EnsEMBL::IO::Format object
+
+=cut
+
+sub format {
+  my ($self, $format) = @_;
+  if ($format && ref($format) =~ /Bio::EnsEMBL::IO::Format/) {
+    $self->{'format'} = $format;
+  }
+  return $self->{'format'};
 }
 
 1;
