@@ -107,7 +107,7 @@ sub attributes_order {
 sub clear_attributes_order {
     my $self = shift;
 
-    @default_order = undef;
+    @default_order = ();
 }
 
 1;
