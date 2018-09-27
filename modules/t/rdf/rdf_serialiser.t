@@ -42,15 +42,19 @@ my $meta_adaptor = $adaptor->get_MetaContainer();
 my $version = $meta_adaptor->list_value_by_key('schema_version')->[0];
 
 # create some slices and features as a subset of a BulkFetcher dump
-my @slices = (Bio::EnsEMBL::Slice->new(-coord_system     => Bio::EnsEMBL::CoordSystem->new(-NAME    => 'chromosome',
-											   -VERSION => 'GRCh38',
-											   -RANK    => 1,
-											  ),
-				       -seq_region_name  => 1,
-				       -start            => 1,
-				       -end              => 248956422,
-				       -strand           => 1,
-				      ));
+my @slices = (
+  Bio::EnsEMBL::Slice->new(
+    -coord_system     => Bio::EnsEMBL::CoordSystem->new(
+      -NAME    => 'chromosome',
+      -VERSION => 'GRCh38',
+      -RANK    => 1,
+    ),
+    -seq_region_name  => 1,
+    -start            => 1,
+    -end              => 248956422,
+    -strand           => 1,
+  )
+);
 
 # read in a sample gene structure fetched by the bulk fetcher
 my $gene = from_json(slurp_file("$Bin/gene.json"));
@@ -172,13 +176,17 @@ RDF
 # 
 
 # translators for slices and (bulk fetcher derived) features
-my $slice_trans = Bio::EnsEMBL::IO::Translator::Slice->new(version => $version, meta_adaptor => $meta_adaptor);
+my $slice_trans = Bio::EnsEMBL::IO::Translator::Slice->new(
+  version => $version,
+  meta_adaptor => $meta_adaptor
+);
 
-my $feature_trans =
-  Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(version => $version,
-							xref_mapping_file => "$Bin/xref_LOD_mapping.json",
-							biotype_mapper    => Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($omulti->get_DBAdaptor('ontology')->get_OntologyTermAdaptor()),
-							adaptor           => $adaptor);
+my $feature_trans = Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(
+  version           => $version,
+  xref_mapping_file => "$Bin/xref_LOD_mapping.json",
+  biotype_mapper    => Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($omulti->get_DBAdaptor('ontology')->get_OntologyTermAdaptor()),
+  adaptor           => $adaptor
+);
 
 my $feature_writer = Bio::EnsEMBL::IO::Writer::RDF->new(); # do not pass translator, pass it when writing since we need the slice and feature translators
 
@@ -188,20 +196,43 @@ $feature_writer->open($fh);
 
 # write namespaces, pass minimal prefix set to reduce clutter
 # my $namespaces = Bio::EnsEMBL::IO::Object::RDF->namespaces();
-$feature_writer->write(Bio::EnsEMBL::IO::Object::RDF->namespaces(blastprodom => "http://purl.uniprot.org/prodom/",
-								 dataset     => 'http://rdf.ebi.ac.uk/dataset/ensembl/',
-								 dc          => 'http://purl.org/dc/elements/1.1/'));
+$feature_writer->write(
+  Bio::EnsEMBL::IO::Object::RDF->namespaces(
+    blastprodom => "http://purl.uniprot.org/prodom/",
+    dataset     => 'http://rdf.ebi.ac.uk/dataset/ensembl/',
+    dc          => 'http://purl.org/dc/elements/1.1/'
+  )
+);
 
 # write species info
-$feature_writer->write(Bio::EnsEMBL::IO::Object::RDF->species(taxon_id => $meta_adaptor->get_taxonomy_id,
-							      scientific_name => $meta_adaptor->get_scientific_name,
-							      common_name => $meta_adaptor->get_common_name));
+$feature_writer->write(
+  Bio::EnsEMBL::IO::Object::RDF->species(
+    taxon_id        => $meta_adaptor->get_taxonomy_id,
+    scientific_name => $meta_adaptor->get_scientific_name,
+    common_name     => $meta_adaptor->get_common_name
+  )
+);
 
-map { $feature_writer->write($_, $slice_trans) } @slices;
-map { $feature_writer->write($_, $feature_trans) } @features;
+
+foreach my $slice (@slices) {
+	$feature_writer->write($slice, $slice_trans);
+}
+
+foreach my $feature (@features) {
+	$feature_writer->write($feature, $feature_trans);
+}
+
+# map { $feature_writer->write($_, $slice_trans) } @slices;
+# map { $feature_writer->write($_, $feature_trans) } @features;
 
 # finally write connecting triple to master RDF file
-$feature_writer->write(Bio::EnsEMBL::IO::Object::RDF->dataset(version => $version, project => 'ensembl', production_name => 'homo_sapiens'));
+$feature_writer->write(
+  Bio::EnsEMBL::IO::Object::RDF->dataset(
+    version => $version,
+    project => 'ensembl',
+    production_name => 'homo_sapiens'
+  )
+);
 
 eq_or_diff(${$fh->string_ref()}, $rdf_string, "serializer output matches expected RDF");
 
@@ -212,14 +243,14 @@ done_testing();
 sub slurp_file {
   my $file = shift;
   defined $file or die "Undefined file";
-  
+
   my $string;
   {
     local $/=undef;
-    open FILE, "<$file" or die "Couldn't open file: $!";
-    $string = <FILE>;
-    close FILE;
+    open my $FILE, '<', $file or die "Couldn't open file $file: $!";
+    $string = <$FILE>;
+    close $FILE;
   }
-  
+
   return $string;
 }
