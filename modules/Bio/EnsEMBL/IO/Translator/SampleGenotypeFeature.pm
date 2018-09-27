@@ -70,7 +70,7 @@ sub new {
       $field_callbacks{'format'} = 'format';
     }
     else {
-      warn "There is no individuals/samples list provided!\n";
+      warn "No individuals/samples list provided!\n";
     }
     
     # Once we have the instance, add our customized callbacks
