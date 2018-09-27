@@ -3,8 +3,6 @@
 # Sample VCF4 serializer using the new ensembl-io methodology.
 #
 
-$|++;
-
 use strict;
 use warnings;
 #use Data::Dumper;
@@ -13,6 +11,8 @@ use Bio::EnsEMBL::Registry;
 use Bio::EnsEMBL::IO::Translator::SampleGenotypeFeature;
 use Bio::EnsEMBL::IO::Writer::VCF4;
 use Bio::EnsEMBL::IO::Object::VCF4Metadata;
+
+$|++;
 
 my $db_version = Bio::EnsEMBL::ApiVersion->software_version;
 

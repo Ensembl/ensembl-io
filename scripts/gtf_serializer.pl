@@ -8,18 +8,18 @@
 # Dumper chromosome 1 only for size/speed, takes about 20 minutes
 #
 
-$|++;
-
 use strict;
 use warnings;
 use Data::Dumper;
 use Getopt::Long;
 
 use Bio::EnsEMBL::Registry;
-use Bio::EnsEMBL::IO::Translator::EnsFeature;
+use Bio::EnsEMBL::IO::Translator::Feature;
 use Bio::EnsEMBL::IO::Writer::GTF;
 use Bio::EnsEMBL::IO::Object::GXFMetadata;
 use Bio::EnsEMBL::IO::Object::GTF;
+
+$|++;
 
 my $dbhost = 'ensembldb.ensembl.org';
 my $dbuser = 'anonymous';
@@ -51,7 +51,7 @@ my $adaptor = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Slice" );
 my $ga = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Gene" );
 my $dba = $adaptor->db();
 
-my $translator = Bio::EnsEMBL::IO::Translator::EnsFeature->new();
+my $translator = Bio::EnsEMBL::IO::Translator::Feature->new();
 my $serializer = Bio::EnsEMBL::IO::Writer::GTF->new($translator);
 
 # Two ways to override the callback table

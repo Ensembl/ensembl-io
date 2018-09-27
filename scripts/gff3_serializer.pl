@@ -8,17 +8,17 @@
 # Dumper chromosome 1 only for size/speed, takes about 20 minutes
 #
 
-$|++;
-
 use strict;
 use warnings;
 use Data::Dumper;
 use Getopt::Long;
 
 use Bio::EnsEMBL::Registry;
-use Bio::EnsEMBL::IO::Translator::EnsFeature;
+use Bio::EnsEMBL::IO::Translator::Feature;
 use Bio::EnsEMBL::IO::Writer::GFF3;
 use Bio::EnsEMBL::IO::Object::GXFMetadata;
+
+$|++;
 
 my $dbhost = 'ensembldb.ensembl.org';
 my $dbuser = 'anonymous';
@@ -50,7 +50,7 @@ my $adaptor = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Slice" );
 my $ga = Bio::EnsEMBL::Registry->get_adaptor( "human", "core", "Gene" );
 my $dba = $adaptor->db();
 
-my $translator = Bio::EnsEMBL::IO::Translator::EnsFeature->new();
+my $translator = Bio::EnsEMBL::IO::Translator::Feature->new();
 my $serializer = Bio::EnsEMBL::IO::Writer::GFF3->new($translator);
 $serializer->open($outfile);
 
@@ -116,7 +116,7 @@ while(my $chromosome = shift @{$features}) {
     $serializer->write($chromosome);
 
     # Write out the end of section separator for the GFF3 (ie. ###)
-    $serializer->fwd_ref_delimeter();
+    # $serializer->fwd_ref_delimeter();
 
     # Cycle through and print chromosomes, depends on DB ordering, not likely
     # good for production
@@ -143,7 +143,7 @@ while(my $chromosome = shift @{$features}) {
 	}
 
 	# Write out the end of section separator for the GFF3 (ie. ###)
-	$serializer->fwd_ref_delimeter();
+	# $serializer->fwd_ref_delimeter();
 
     }
 }
