@@ -213,17 +213,8 @@ $feature_writer->write(
   )
 );
 
-
-foreach my $slice (@slices) {
-	$feature_writer->write($slice, $slice_trans);
-}
-
-foreach my $feature (@features) {
-	$feature_writer->write($feature, $feature_trans);
-}
-
-# map { $feature_writer->write($_, $slice_trans) } @slices;
-# map { $feature_writer->write($_, $feature_trans) } @features;
+map { $feature_writer->write($_, $slice_trans) } @slices;
+map { $feature_writer->write($_, $feature_trans) } @features;
 
 # finally write connecting triple to master RDF file
 $feature_writer->write(

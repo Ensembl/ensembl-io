@@ -58,16 +58,16 @@ push @{$gene->{transcripts}[0]{xrefs}},
    'primary_id' => 'GO:0032259',
    'associated_xrefs' => [],
    'linkage_types' => [
-		       {
-			'source' => {
-				     'display_id' => 'Q8N6Q8',
-				     'primary_id' => 'Q8N6Q8',
-				     'description' => 'Methyltransferase-like protein 25 ',
-				     'dbname' => 'Uniprot/SWISSPROT'
-				    },
-			'evidence' => 'IEA'
-		       }
-		      ],
+           {
+      'source' => {
+             'display_id' => 'Q8N6Q8',
+             'primary_id' => 'Q8N6Q8',
+             'description' => 'Methyltransferase-like protein 25 ',
+             'dbname' => 'Uniprot/SWISSPROT'
+            },
+      'evidence' => 'IEA'
+           }
+          ],
    'description' => 'methylation',
    'dbname' => 'GO'
   };
@@ -113,11 +113,12 @@ my $rdf_string = <<"RDF";
 
 RDF
 
-my $feature_trans =
-  Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(version => $version,
-							xref_mapping_file => "$Bin/xref_LOD_mapping.json",
-							biotype_mapper    => Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($omulti->get_DBAdaptor('ontology')->get_OntologyTermAdaptor()),
-							adaptor      => $adaptor);
+my $feature_trans = Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(
+  version           => $version,
+  xref_mapping_file => "$Bin/xref_LOD_mapping.json",
+  biotype_mapper    => Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($omulti->get_DBAdaptor('ontology')->get_OntologyTermAdaptor()),
+  adaptor           => $adaptor
+);
 
 my $xrefs_writer = Bio::EnsEMBL::IO::Writer::RDF::XRefs->new($feature_trans);
 
@@ -126,9 +127,14 @@ my $fh = IO::String->new();
 $xrefs_writer->open($fh);
 
 # write namespaces, pass minimal prefix set to reduce clutter
-$xrefs_writer->write(Bio::EnsEMBL::IO::Object::RDF->namespaces(blastprodom => "http://purl.uniprot.org/prodom/",
-							       dataset     => 'http://rdf.ebi.ac.uk/dataset/ensembl/',
-							       dc          => 'http://purl.org/dc/elements/1.1/'));
+$xrefs_writer->write(
+  Bio::EnsEMBL::IO::Object::RDF->namespaces(
+    blastprodom => "http://purl.uniprot.org/prodom/",
+    dataset     => 'http://rdf.ebi.ac.uk/dataset/ensembl/',
+    dc          => 'http://purl.org/dc/elements/1.1/'
+  )
+);
+
 map { $xrefs_writer->write($_) } @features;
 
 eq_or_diff(${$fh->string_ref()}, $rdf_string, "serializer output matches expected RDF");
@@ -140,14 +146,14 @@ done_testing();
 sub slurp_file {
   my $file = shift;
   defined $file or die "Undefined file";
-  
+
   my $string;
   {
     local $/=undef;
-    open FILE, "<$file" or die "Couldn't open file: $!";
-    $string = <FILE>;
-    close FILE;
+    open my $FILE, '<', $file or die "Couldn't open file: $!";
+    $string = <$FILE>;
+    close $FILE;
   }
-  
+
   return $string;
 }
