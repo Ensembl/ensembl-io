@@ -33,6 +33,9 @@ base class.
 
 package Bio::EnsEMBL::IO::Object::Metadata;
 
+use strict;
+use warnings;
+
 sub new {
 
     die "Bio::EnsEMBL::IO::Object::Metadata should not be directly instantiated!";
