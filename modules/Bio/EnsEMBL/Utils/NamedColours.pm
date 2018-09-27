@@ -7,7 +7,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2./
+     http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ package Bio::EnsEMBL::Utils::NamedColours;
 use strict;
 
 ## Simple package to return the Unix named colours
+## plus other ones... it is a really just list of colours
 
 sub named_colours {
   return {
@@ -591,7 +592,7 @@ sub named_colours {
                 'royalblue2'      => '436eee',
                 'royalblue3'      => '3a5fcd',
                 'royalblue4'      => '27408b',
-		            'rust'            => 'a00000',
+                'rust'            => 'a00000',
                 'saddlebrown'     => '8b4513',
                 'salmon'          => 'fa8072',
                 'salmon1'         => 'ff8c69',
