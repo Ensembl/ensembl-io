@@ -26,7 +26,7 @@ Bio::EnsEMBL::IO::Parser::HGVS - a list-based parser for HGVS identifiers
 ### IMPORTANT - this is a work-in-progress and needs extending to fully parse
 ### the content (possibly using VEP code)
 
-package Bio::EnsEMBL::IO::ListBasedParser::HGVS;
+package Bio::EnsEMBL::IO::Parser::HGVS;
 
 use strict;
 use warnings;
