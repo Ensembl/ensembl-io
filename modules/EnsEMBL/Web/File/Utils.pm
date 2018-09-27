@@ -50,7 +50,7 @@ sub sanitise_path {
       }
     }
     else {
-      return undef;
+      return;
     }
   }
 
@@ -127,7 +127,7 @@ sub get_compression {
     return 'gz'   if $file =~ /\.gz$/;
     return 'zip'  if $file =~ /\.zip$/;
     return 'bz'   if $file =~ /\.bz2?$/;
-    return undef;
+    return;
   }
 }
 

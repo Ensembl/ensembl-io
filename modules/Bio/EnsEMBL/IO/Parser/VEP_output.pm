@@ -62,7 +62,7 @@ sub is_metadata {
 
 sub read_metadata {
 ### No useful metadata, just column names
-  return undef;
+  return;
 }
 
 =head2 set_fields

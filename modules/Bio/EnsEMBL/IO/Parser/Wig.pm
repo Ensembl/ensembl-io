@@ -274,7 +274,7 @@ sub get_score {
   my $self = shift;
   my $val = $self->get_raw_score();
   if ($val && $val =~ /^\.$/) {
-    return undef;
+    return;
   } else {
     return $val;
   }

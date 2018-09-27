@@ -619,7 +619,7 @@ sub get_info_description {
 
 sub get_raw_formats {
   my $self = shift;
-  return undef if (!$self->get_metadata_by_pragma('header')->[8] || $self->get_metadata_by_pragma('header')->[8] ne 'FORMAT');
+  return if (!$self->get_metadata_by_pragma('header')->[8] || $self->get_metadata_by_pragma('header')->[8] ne 'FORMAT');
   return $self->{'record'}[8];
 }
 
@@ -667,14 +667,14 @@ sub get_metadata_description {
 
   if (!defined($type) || !defined($id)) {
     carp("You need to provide a meta type (e.g. 'INFO') and a meta entry ID (e.g. 'AA')");
-    return undef;
+    return;
   }
 
   my $meta = $self->get_metadata_by_pragma($type);
   foreach my $meta_entry (@$meta) {
     return $meta_entry->{'Description'} if ($meta_entry->{'ID'} eq $id);
   }
-  return undef;
+  return;
 }
 
 

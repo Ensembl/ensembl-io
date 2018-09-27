@@ -283,7 +283,7 @@ sub sv_cipos {
 
     return "$info=$cipos";
   } else {
-    return undef;
+    return;
   }
 }
 
@@ -300,7 +300,7 @@ sub sv_ciend {
 
     return "$info=$ciend";
   } else {
-    return undef;
+    return;
   }
 }
 
@@ -312,7 +312,7 @@ sub sv_imprecise {
   if (($object->outer_start && $object->inner_start) || ($object->inner_end && $object->outer_end)) {
     return $info;
   } else {
-    return undef;
+    return;
   }
 }
 

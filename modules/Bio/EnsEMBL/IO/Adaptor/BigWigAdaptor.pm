@@ -77,7 +77,7 @@ sub munge_chr_id {
   
   warn "Failed to open BigWig file " . $self->url unless $bw;
   
-  return undef unless $bw;
+  return unless $bw;
 
   my $list = $bw->chromList;
   my $head = $list->head;

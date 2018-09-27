@@ -101,7 +101,7 @@ sub munge_chr_id {
 
   my $bam = $self->bam_open;
   warn "Failed to open BAM file " . $self->url unless $bam;
-  return undef unless $bam;
+  return unless $bam;
 
   my $header = $bam->header;
 
@@ -130,7 +130,7 @@ sub munge_chr_id {
   }
 
   warn " *** could not parse_region for BAM with $chr_id in file " . $self->url ."\n";
-  return undef;
+  return;
 }
 
 sub fetch_paired_alignments {

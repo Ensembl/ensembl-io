@@ -130,7 +130,7 @@ sub munge_chr_id {
   
   warn "Failed to open BigBed file " . $self->url unless $bb;
   
-  return undef unless $bb;
+  return unless $bb;
 
   my $list = $bb->chromList;
   my $head = $list->head;

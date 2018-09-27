@@ -191,7 +191,7 @@ sub fetch_file {
   else {
     if ($@) {
       throw(sprintf qq(Could not fetch contents of file '%s' due to following errors: \n%s), $path, $@) unless $args->{'no_exception'};
-      return undef;
+      return;
     }
     else {
       return $content;
@@ -237,7 +237,7 @@ sub read_file {
   else {
     if ($@) {
       throw(sprintf qq(Could not read file '%s' due to following errors: \n%s), $path, $@) unless $args->{'no_exception'};
-      return undef;
+      return;
     }
     else {
       return $content;
@@ -285,7 +285,7 @@ sub read_lines {
   else {
     if ($@) {
       throw(sprintf qq(Could not read lines from file '%s' due to following errors: \n%s), $path, $@) unless $args->{'no_exception'};
-      return undef;
+      return;
     }
     else {
       return $content;
@@ -347,7 +347,7 @@ sub preview_file {
   else {
     if ($@) {
       throw(sprintf qq(Could not fetch preview of file '%s' due to following errors: \n%s), $path, $@) unless $args->{'no_exception'};
-      return undef;
+      return;
     }
     else {
       return $lines;

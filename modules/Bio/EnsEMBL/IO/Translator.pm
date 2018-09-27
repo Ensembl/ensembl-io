@@ -168,7 +168,7 @@ sub get_field {
     }
 
     # If the field doesn't exist, return undef
-    return undef;
+    return;
 }
 
 =head2 batch_fields
@@ -230,7 +230,7 @@ sub fetch_callback {
     }
 
     # If the field doesn't exist, return undef
-    return undef
+    return;
 }
 
 1;

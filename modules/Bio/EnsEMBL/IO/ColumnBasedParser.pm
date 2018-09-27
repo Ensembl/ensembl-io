@@ -312,7 +312,7 @@ sub validate_metadata {
     ## TODO - implement validation! 
   }
 
-  return undef;
+  return;
 }
 
 =head2 validate_record

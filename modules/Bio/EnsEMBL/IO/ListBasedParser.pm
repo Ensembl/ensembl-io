@@ -57,9 +57,9 @@ sub open {
 
 ## This format has no metadata
 
-sub is_metadata { return undef; }
+sub is_metadata { return; }
 
-sub read_metadata { return undef; }
+sub read_metadata { return; }
 
 =head2 read_record
 
