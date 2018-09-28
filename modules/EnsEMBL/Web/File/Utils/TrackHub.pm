@@ -23,6 +23,7 @@ package EnsEMBL::Web::File::Utils::TrackHub;
 ### which also fetches each file in the trackhub configuration
 
 use strict;
+use warnings;
 
 use Digest::MD5 qw(md5_hex);
 

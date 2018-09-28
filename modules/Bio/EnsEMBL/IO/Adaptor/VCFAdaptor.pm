@@ -18,7 +18,9 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::IO::Adaptor::VCFAdaptor;
+
 use strict;
+use warnings;
 
 use EnsEMBL::Web::Utils::FormatText qw(date_format);
 use File::Path qw(make_path);

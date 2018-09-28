@@ -18,7 +18,9 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::IO::Adaptor::BAMAdaptor;
+
 use strict;
+use warnings;
 
 use Bio::EnsEMBL::Feature;
 use Data::Dumper;

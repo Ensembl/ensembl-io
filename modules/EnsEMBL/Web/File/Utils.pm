@@ -22,6 +22,7 @@ package EnsEMBL::Web::File::Utils;
 ### Library for location-independent file functions such as compression support
 
 use strict;
+use warnings;
 
 use Compress::Zlib qw//;
 use Compress::Bzip2;

@@ -18,7 +18,9 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::Utils::ColourMap;
+
 use strict;
+use warnings;
 
 use Bio::EnsEMBL::Utils::NamedColours;
 

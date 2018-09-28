@@ -23,8 +23,8 @@ package Bio::EnsEMBL::IO::Adaptor::PairwiseAdaptor;
 # No longer in use by the webcode; will be removed in November 2016
 ####################################################################
 
-
 use strict;
+use warnings;
 
 use Bio::EnsEMBL::IO::Parser::PairwiseTabix;
 

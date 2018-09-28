@@ -55,6 +55,7 @@ package EnsEMBL::Web::File::Utils::IO;
 ### }
 
 use strict;
+use warnings;
 
 use Bio::EnsEMBL::Utils::IO qw(:all);
 use Bio::EnsEMBL::Utils::Exception qw(throw);

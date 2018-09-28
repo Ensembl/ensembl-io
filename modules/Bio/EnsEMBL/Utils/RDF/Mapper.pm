@@ -37,6 +37,7 @@ Bio::EnsEMBL::Utils::RDF::Mapper
 package Bio::EnsEMBL::Utils::RDF::Mapper;
 
 use strict;
+use warnings;
 use JSON qw/decode_json/;
 use IO::File;
 

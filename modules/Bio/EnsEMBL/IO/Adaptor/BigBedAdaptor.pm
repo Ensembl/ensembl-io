@@ -18,8 +18,9 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::IO::Adaptor::BigBedAdaptor;
-use strict;
 
+use strict;
+use warnings;
 
 #########################################################################
 # DEPRECATED MODULE - please use Bio::EnsEMBL::IO::Parser::BigBed instead
