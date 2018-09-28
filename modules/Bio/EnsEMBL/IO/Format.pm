@@ -50,7 +50,7 @@ package Bio::EnsEMBL::IO::Format;
 use strict;
 use warnings;
 
-use Bio::EnsEMBL::IO::NamedColours;
+use Bio::EnsEMBL::Utils::NamedColours;
 
 =head2 new
 
