@@ -40,36 +40,37 @@ use Carp;
 use Bio::EnsEMBL::Utils::RDF qw/feature_uri/;
 use Bio::EnsEMBL::Utils::RDF::Mapper;
 
-my %field_callbacks = (version         => 'version',
-		       production_name => 'production_name',
-		       id_org_short    => 'id_org_short',
-		       lod_uri         => 'lod_uri',
-		       type            => 'type',
-		       id              => 'id',
-		       name            => 'name',
-		       description     => 'description',
-		       seq_region_name => 'seq_region_name',
-		       cs_name         => 'coord_system_name',
-		       cs_version      => 'coord_system_version',
-		       start           => 'start',
-		       end             => 'end',
-		       strand          => 'strand',
-		       biotype         => 'biotype',
-		       rank            => 'rank',
-		       taxon_id        => 'taxon_id',
-		       uri             => 'uri',
-		       synonyms        => 'synonyms',
-		       provenance      => 'provenance',
-		       homologues      => 'homologues',
-		       xrefs           => 'xrefs',
-		       dbname          => 'dbname',
-		       homologues      => 'homologues',
-		       transcripts     => 'transcripts',
-		       exons           => 'exons',
-		       translations    => 'translations',
-		       protein_features => 'protein_features',
-		       so_term         => 'so_term'
-		      );
+my %field_callbacks = (
+    version         => 'version',
+    production_name => 'production_name',
+    id_org_short    => 'id_org_short',
+    lod_uri         => 'lod_uri',
+    type            => 'type',
+    id              => 'id',
+    name            => 'name',
+    description     => 'description',
+    seq_region_name => 'seq_region_name',
+    cs_name         => 'coord_system_name',
+    cs_version      => 'coord_system_version',
+    start           => 'start',
+    end             => 'end',
+    strand          => 'strand',
+    biotype         => 'biotype',
+    rank            => 'rank',
+    taxon_id        => 'taxon_id',
+    uri             => 'uri',
+    synonyms        => 'synonyms',
+    provenance      => 'provenance',
+    homologues      => 'homologues',
+    xrefs           => 'xrefs',
+    dbname          => 'dbname',
+    homologues      => 'homologues',
+    transcripts     => 'transcripts',
+    exons           => 'exons',
+    translations    => 'translations',
+    protein_features => 'protein_features',
+    so_term         => 'so_term'
+);
 
 =head2 new
 
@@ -498,6 +499,12 @@ sub so_term {
 
   my $so_term;
   my ($type, $biotype) = ($self->type($object), $self->biotype($object));
+
+  if (!defined $biotype) {
+    # warn "Could not find biotype for SO term mapping\n";
+    return;
+  }
+
   eval { 
     if ($type eq 'gene') {
       $so_term = $self->biotype_mapper->gene_biotype_to_name($biotype);
