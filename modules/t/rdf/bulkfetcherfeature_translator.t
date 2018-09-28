@@ -186,9 +186,9 @@ sub slurp_file {
   my $string;
   {
     local $/=undef;
-    open FILE, "<$file" or die "Couldn't open file: $!";
-    $string = <FILE>;
-    close FILE;
+    open my $FILE, '<', $file or die "Couldn't open file: $!";
+    $string = <$FILE>;
+    close $FILE;
   }
   
   return $string;
