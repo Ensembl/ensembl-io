@@ -27,7 +27,6 @@ use IO::String;
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::CoordSystem;
 use Bio::EnsEMBL::Slice;
-use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
 
 use Bio::EnsEMBL::IO::Translator::Slice;
 use Bio::EnsEMBL::IO::Translator::BulkFetcherFeature;
@@ -184,7 +183,6 @@ my $slice_trans = Bio::EnsEMBL::IO::Translator::Slice->new(
 my $feature_trans = Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(
   version           => $version,
   xref_mapping_file => "$Bin/xref_LOD_mapping.json",
-  biotype_mapper    => Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($omulti->get_DBAdaptor('ontology')->get_OntologyTermAdaptor()),
   adaptor           => $adaptor
 );
 

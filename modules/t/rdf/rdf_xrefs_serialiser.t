@@ -26,8 +26,6 @@ use IO::String;
 
 use Bio::EnsEMBL::Test::MultiTestDB;
 
-use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
-
 use Bio::EnsEMBL::IO::Translator::BulkFetcherFeature;
 use Bio::EnsEMBL::IO::Object::RDF;
 
@@ -116,7 +114,6 @@ RDF
 my $feature_trans = Bio::EnsEMBL::IO::Translator::BulkFetcherFeature->new(
   version           => $version,
   xref_mapping_file => "$Bin/xref_LOD_mapping.json",
-  biotype_mapper    => Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($omulti->get_DBAdaptor('ontology')->get_OntologyTermAdaptor()),
   adaptor           => $adaptor
 );
 
