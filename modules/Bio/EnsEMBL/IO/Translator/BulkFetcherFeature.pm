@@ -41,36 +41,39 @@ use Bio::EnsEMBL::Utils::RDF qw/feature_uri/;
 use Bio::EnsEMBL::Utils::RDF::Mapper;
 
 my %field_callbacks = (
-    version         => 'version',
-    production_name => 'production_name',
-    id_org_short    => 'id_org_short',
-    lod_uri         => 'lod_uri',
-    type            => 'type',
-    id              => 'id',
-    name            => 'name',
-    description     => 'description',
-    seq_region_name => 'seq_region_name',
-    cs_name         => 'coord_system_name',
-    cs_version      => 'coord_system_version',
-    start           => 'start',
-    end             => 'end',
-    strand          => 'strand',
-    biotype         => 'biotype',
-    rank            => 'rank',
-    taxon_id        => 'taxon_id',
-    uri             => 'uri',
-    synonyms        => 'synonyms',
-    provenance      => 'provenance',
-    homologues      => 'homologues',
-    xrefs           => 'xrefs',
-    dbname          => 'dbname',
-    homologues      => 'homologues',
-    transcripts     => 'transcripts',
-    exons           => 'exons',
-    translations    => 'translations',
+    version          => 'version',
+    production_name  => 'production_name',
+    id_org_short     => 'id_org_short',
+    lod_uri          => 'lod_uri',
+    type             => 'type',
+    id               => 'id',
+    name             => 'name',
+    description      => 'description',
+    seq_region_name  => 'seq_region_name',
+    cs_name          => 'coord_system_name',
+    cs_version       => 'coord_system_version',
+    start            => 'start',
+    end              => 'end',
+    strand           => 'strand',
+    biotype          => 'biotype',
+    rank             => 'rank',
+    taxon_id         => 'taxon_id',
+    uri              => 'uri',
+    synonyms         => 'synonyms',
+    provenance       => 'provenance',
+    homologues       => 'homologues',
+    xrefs            => 'xrefs',
+    dbname           => 'dbname',
+    homologues       => 'homologues',
+    transcripts      => 'transcripts',
+    exons            => 'exons',
+    translations     => 'translations',
     protein_features => 'protein_features',
-    so_term         => 'so_term'
+    so_term          => 'so_term'
 );
+
+# caching of biotype to SO terms to improve speed
+my $so_cache = {};
 
 =head2 new
 
@@ -81,7 +84,7 @@ my %field_callbacks = (
 sub new {
   my ($class, %args) = @_;
   
-  my @required_args = qw/version xref_mapping_file biotype_mapper adaptor/;
+  my @required_args = qw/version xref_mapping_file adaptor/;
   my @missing_args;
   map { push @missing_args, $_ unless exists $args{$_} } @required_args;
   confess "Missing arguments required by Bio::EnsEMBL::IO::Translator::BulkFetcherFeature" . join(',', @missing_args)
@@ -89,9 +92,6 @@ sub new {
 
   # this connects Ensembl to Identifiers.org amongst other things
   my $xref_mapping = Bio::EnsEMBL::Utils::RDF::Mapper->new($args{xref_mapping_file});
-  
-  croak "Bio::EnsEMBL::IO::Translator::Feature requires a sequence ontology mapper"
-    unless $args{biotype_mapper}->isa('Bio::EnsEMBL::Utils::SequenceOntologyMapper');
 
   croak "Bio::EnsEMBL::IO::Translator::BulkFetcherFeature requires a DBAdaptor"
     unless $args{adaptor} and $args{adaptor}->isa('Bio::EnsEMBL::DBSQL::DBAdaptor');
@@ -103,10 +103,11 @@ sub new {
   $args{transcript_adaptor} = $args{adaptor}->get_TranscriptAdaptor();
   croak "Unable to get a transcript adaptor"
     unless $args{transcript_adaptor}->isa('Bio::EnsEMBL::DBSQL::TranscriptAdaptor');
-  
+      
+  $args{biotype_adaptor} = $args{adaptor}->get_BiotypeAdaptor();
+
   delete $args{adaptor};
-    
-  $args{ontology_cache} = {};
+
   $args{mapping} = $xref_mapping;
   
   my $self = $class->SUPER::new(\%args);
@@ -133,14 +134,9 @@ sub production_name {
   return $self->{production_name};
 }
 
-sub ontology_cache {
+sub biotype_adaptor {
   my $self = shift;
-  return $self->{ontology_cache};
-}
-
-sub ontology_adaptor {
-  my $self = shift;
-  return $self->{ontology_adaptor};
+  return $self->{biotype_adaptor};
 }
 
 sub meta_adaptor {
@@ -494,58 +490,25 @@ sub protein_features {
 =cut
 
 sub so_term {
-  my $self = shift;
-  my $object = shift;
+  my ($self, $object) = @_;
 
-  my $so_term;
-  my ($type, $biotype) = ($self->type($object), $self->biotype($object));
+  my $type = $self->type($object);
+  my $biotype = $self->biotype($object);
 
-  if (!defined $biotype) {
-    # warn "Could not find biotype for SO term mapping\n";
-    return;
-  }
+  # Only type gene and transcript supported
+  return unless ($type eq 'gene' || $type eq 'transcript');
 
-  eval { 
-    if ($type eq 'gene') {
-      $so_term = $self->biotype_mapper->gene_biotype_to_name($biotype);
-    } elsif ($type eq 'transcript') {
-      $so_term = $self->biotype_mapper->transcript_biotype_to_name($biotype);
-    } else {
-      $so_term = $self->_ontology_id($biotype);
-    }
-  };
+  # look if term is cached
+  my $so_acc = $so_cache->{$type}{$biotype};
 
-  # TODO: better exception handling, e.g. look up ontology_cache?!
-  if ($@) { 
-    if (! exists $self->{ontology_cache}->{$biotype}) {
-      warn sprintf "Failed to map biotype %s to SO term\n", $biotype;
-      $self->{ontology_cache}->{$biotype} = undef;
-    }
-  }
-  
-  return $so_term;
-}
+  # if so return it
+  return $so_acc if defined $so_acc;
 
-# SO terms often required for dumping RDF
-sub _ontology_id {
-  my ($self, $term) = @_;
-  my $ontology_cache = $self->ontology_cache;
-  return $self->{$ontology_cache->{$term}} if $term and exists $self->{$ontology_cache->{$term}};
+  # else retrieve the so term using the biotype adaptor, and cache it
+  $so_acc = $self->biotype_adaptor->fetch_by_name_object_type($biotype, $type)->so_acc;
+  $so_cache->{$type}{$biotype} = $so_acc;
 
-  my ($typeterm) = @{ $self->ontology_adaptor->fetch_all_by_name( $term, 'SO' ) };
-    
-  unless ($typeterm) {
-    if($term) {
-      warn "Can't find SO term for biotype '$term'";
-      $self->{$ontology_cache->{$term}} = undef;  
-    }
-    return;
-  }
-    
-  my $id = $typeterm->accession;
-  $self->{$ontology_cache->{$term}} = $id;
-  
-  return $id;
+  return $so_acc;
 }
 
 1;
