@@ -38,7 +38,7 @@ package Bio::EnsEMBL::IO::Parser::GVF;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::Parser::GXF/;
+use parent qw/Bio::EnsEMBL::IO::Parser::GXF/;
 
 sub open {
     my ($caller, $filename, @other_args) = @_;

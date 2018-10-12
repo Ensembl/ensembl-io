@@ -29,7 +29,7 @@ Translator for Ensembl slices.
 
 package Bio::EnsEMBL::IO::Translator::Slice;
 
-use base qw/Bio::EnsEMBL::IO::Translator/;
+use parent qw/Bio::EnsEMBL::IO::Translator/;
 
 use strict;
 use warnings;

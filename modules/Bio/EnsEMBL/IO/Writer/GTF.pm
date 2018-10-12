@@ -41,7 +41,7 @@ Bio::EnsEMBL::IO::Writer::GTF - Generic GTF Writer
 
 package Bio::EnsEMBL::IO::Writer::GTF;
 
-use base qw/Bio::EnsEMBL::IO::Writer::ColumnBasedGeneric/;
+use parent qw/Bio::EnsEMBL::IO::Writer::ColumnBasedGeneric/;
 
 use strict;
 use warnings;

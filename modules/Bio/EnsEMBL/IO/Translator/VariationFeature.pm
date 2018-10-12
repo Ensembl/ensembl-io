@@ -30,7 +30,7 @@ use warnings;
 
 use Carp;
 
-use base qw/Bio::EnsEMBL::IO::Translator::Feature/;
+use parent qw/Bio::EnsEMBL::IO::Translator::Feature/;
 
 sub seqname {
   my $self = shift;

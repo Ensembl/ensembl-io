@@ -31,7 +31,7 @@ package Bio::EnsEMBL::IO::Parser::Pileup;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
 =head2 open
 

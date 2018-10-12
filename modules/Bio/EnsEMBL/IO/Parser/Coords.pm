@@ -31,7 +31,7 @@ use strict;
 use warnings;
 no warnings 'uninitialized';
 
-use base qw/Bio::EnsEMBL::IO::ListBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::ListBasedParser/;
 
 
 =head2 get_coords

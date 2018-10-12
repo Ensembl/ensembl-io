@@ -29,7 +29,7 @@ use strict;
 use warnings;
 
 use URI::Escape;
-use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
 my %strand_conversion = ('+' => '1', '-' => '-1', '.' => undef, '?' => undef);
 

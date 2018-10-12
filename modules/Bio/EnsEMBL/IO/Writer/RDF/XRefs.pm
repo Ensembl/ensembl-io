@@ -29,7 +29,7 @@ Bio::EnsEMBL::IO::Writer::RDF::XRefs -
 
 package Bio::EnsEMBL::IO::Writer::RDF::XRefs;
 
-use base qw/Bio::EnsEMBL::IO::Writer/;
+use parent qw/Bio::EnsEMBL::IO::Writer/;
 
 use strict;
 use warnings;

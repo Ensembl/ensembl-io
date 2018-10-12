@@ -28,7 +28,7 @@ package Bio::EnsEMBL::IO::Parser::Wig;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
 =head2 set_fields
 

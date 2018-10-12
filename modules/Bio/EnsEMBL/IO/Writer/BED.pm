@@ -41,7 +41,7 @@ Bio::EnsEMBL::IO::Writer::BED - Generic BED Writer
 
 package Bio::EnsEMBL::IO::Writer::BED;
 
-use base qw/Bio::EnsEMBL::IO::Writer::ColumnBasedGeneric/;
+use parent qw/Bio::EnsEMBL::IO::Writer::ColumnBasedGeneric/;
 
 use strict;
 use warnings;

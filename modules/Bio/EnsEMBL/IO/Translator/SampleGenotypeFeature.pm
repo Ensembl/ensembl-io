@@ -30,7 +30,7 @@ use warnings;
 
 use Carp;
 
-use base qw/Bio::EnsEMBL::IO::Translator::VariationFeature/;
+use parent qw/Bio::EnsEMBL::IO::Translator::VariationFeature/;
 
 my %field_callbacks = ('chrom'  => 'chrom',
                        'pos'    => 'pos',

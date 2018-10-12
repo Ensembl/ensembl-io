@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use Carp;
 
-use base qw/Bio::EnsEMBL::IO::TokenBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::TokenBasedParser/;
 
 =head2 open
 

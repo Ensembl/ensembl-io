@@ -38,7 +38,7 @@ package Bio::EnsEMBL::IO::Parser::VCF4;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::Parser::BaseVCF4/;
+use parent qw/Bio::EnsEMBL::IO::Parser::BaseVCF4/;
 
 
 sub open {

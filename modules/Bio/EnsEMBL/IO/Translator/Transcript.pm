@@ -30,7 +30,7 @@ use warnings;
 
 use Carp;
 
-use base qw/Bio::EnsEMBL::IO::Translator::Gene/;
+use parent qw/Bio::EnsEMBL::IO::Translator::Gene/;
 
 my %trans_field_callbacks = (
                               'thickStart'  => 'thickStart',

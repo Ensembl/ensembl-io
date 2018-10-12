@@ -41,7 +41,7 @@ Bio::EnsEMBL::IO::Writer::VCF4 - Generic VCF4 Writer
 
 package Bio::EnsEMBL::IO::Writer::VCF4;
 
-use base qw/Bio::EnsEMBL::IO::Writer::ColumnBasedGeneric/;
+use parent qw/Bio::EnsEMBL::IO::Writer::ColumnBasedGeneric/;
 
 use strict;
 use warnings;

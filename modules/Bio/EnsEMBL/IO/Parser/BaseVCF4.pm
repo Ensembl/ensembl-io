@@ -42,7 +42,7 @@ use Storable qw(freeze thaw);
 
 use Bio::EnsEMBL::IO::Format::VCF4;
 
-use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
 my $version = 4.2;
 

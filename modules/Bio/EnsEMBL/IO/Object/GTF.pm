@@ -39,7 +39,7 @@ rather than GFF3 as the generic object does.
 
 package Bio::EnsEMBL::IO::Object::GTF;
 
-use base qw/Bio::EnsEMBL::IO::Object::ColumnBasedGeneric/;
+use parent qw/Bio::EnsEMBL::IO::Object::ColumnBasedGeneric/;
 
 use strict;
 use warnings;

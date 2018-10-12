@@ -35,7 +35,7 @@ use Bio::EnsEMBL::IO::Format::Bed;
 use Bio::EnsEMBL::IO::Format::BedDetail;
 use Bio::EnsEMBL::IO::Format::BedGraph;
 
-use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
 =head2 add_format
 

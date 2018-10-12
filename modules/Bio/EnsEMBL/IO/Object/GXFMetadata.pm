@@ -42,7 +42,7 @@ elements via setters/getters. Setter/getters are dynamically added to the class 
 
 package Bio::EnsEMBL::IO::Object::GXFMetadata;
 
-use base qw/Bio::EnsEMBL::IO::Object::Metadata/;
+use parent qw/Bio::EnsEMBL::IO::Object::Metadata/;
 
 use strict;
 use warnings;

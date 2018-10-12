@@ -31,7 +31,7 @@ package Bio::EnsEMBL::IO::Parser::HGVS;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::ListBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::ListBasedParser/;
 
 =head2 get_raw_feature_id
 

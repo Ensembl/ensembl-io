@@ -43,7 +43,7 @@ use Bio::EnsEMBL::IO::TabixParser;
 use Bio::EnsEMBL::IO::Parser::BaseVCF4;
 use Bio::DB::HTS::Tabix;
 
-use base qw/Bio::EnsEMBL::IO::TabixParser Bio::EnsEMBL::IO::Parser::BaseVCF4/;
+use parent qw/Bio::EnsEMBL::IO::TabixParser Bio::EnsEMBL::IO::Parser::BaseVCF4/;
 
 sub open {
   my ($caller, $filename, @other_args) = @_;

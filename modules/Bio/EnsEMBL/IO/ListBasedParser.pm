@@ -28,7 +28,7 @@ package Bio::EnsEMBL::IO::ListBasedParser;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::TextParser/;
+use parent qw/Bio::EnsEMBL::IO::TextParser/;
 
 =head2 open
 

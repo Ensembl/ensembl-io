@@ -33,7 +33,7 @@ use warnings;
 
 use Carp;
 
-use base qw/Bio::EnsEMBL::IO::Translator/;
+use parent qw/Bio::EnsEMBL::IO::Translator/;
 
 
 =head2 get_field

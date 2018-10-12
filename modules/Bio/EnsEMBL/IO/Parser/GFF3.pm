@@ -31,7 +31,7 @@ use warnings;
 
 use Bio::EnsEMBL::IO::Parser::Fasta;
 
-use base qw/Bio::EnsEMBL::IO::Parser::GXF/;
+use parent qw/Bio::EnsEMBL::IO::Parser::GXF/;
 
 sub open {
     my ($caller, $filename, @other_args) = @_;

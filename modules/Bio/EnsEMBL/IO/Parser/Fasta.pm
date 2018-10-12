@@ -33,7 +33,7 @@ package Bio::EnsEMBL::IO::Parser::Fasta;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::TokenBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::TokenBasedParser/;
 use Bio::EnsEMBL::IO::Object::Fasta;
 
 =head2 open

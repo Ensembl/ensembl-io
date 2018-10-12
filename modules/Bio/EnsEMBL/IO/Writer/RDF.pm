@@ -31,7 +31,7 @@ Bio::EnsEMBL::IO::Writer::ColumnBasedGeneric - Generic writer for column based f
 
 package Bio::EnsEMBL::IO::Writer::RDF;
 
-use base qw/Bio::EnsEMBL::IO::Writer/;
+use parent qw/Bio::EnsEMBL::IO::Writer/;
 
 use strict;
 use warnings;

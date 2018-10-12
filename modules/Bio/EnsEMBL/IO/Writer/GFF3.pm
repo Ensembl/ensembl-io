@@ -41,7 +41,7 @@ Bio::EnsEMBL::IO::Writer::GFF3 - Generic GFF3 Writer
 
 package Bio::EnsEMBL::IO::Writer::GFF3;
 
-use base qw/Bio::EnsEMBL::IO::Writer::ColumnBasedGeneric/;
+use parent qw/Bio::EnsEMBL::IO::Writer::ColumnBasedGeneric/;
 
 use strict;
 use warnings;

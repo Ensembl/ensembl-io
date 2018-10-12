@@ -42,7 +42,7 @@ use warnings;
 use Carp;
 use Scalar::Util qw/openhandle/;
 
-use base qw/Bio::EnsEMBL::IO::Parser/;
+use parent qw/Bio::EnsEMBL::IO::Parser/;
 
 =head2 open
 

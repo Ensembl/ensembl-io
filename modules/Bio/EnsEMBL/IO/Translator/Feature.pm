@@ -38,7 +38,7 @@ Translator to interrogate Ensembl base features for attributes needed by writers
 package Bio::EnsEMBL::IO::Translator::Feature;
 
 
-use base qw/Bio::EnsEMBL::IO::Translator/;
+use parent qw/Bio::EnsEMBL::IO::Translator/;
 
 
 use strict;

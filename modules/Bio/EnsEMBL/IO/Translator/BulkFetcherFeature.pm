@@ -30,7 +30,7 @@ extracted by the the bulk fetcher.
 
 package Bio::EnsEMBL::IO::Translator::BulkFetcherFeature;
 
-use base qw/Bio::EnsEMBL::IO::Translator/;
+use parent qw/Bio::EnsEMBL::IO::Translator/;
 
 use strict;
 use warnings;

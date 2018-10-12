@@ -33,7 +33,7 @@ use Carp;
 
 use Bio::EnsEMBL::IO::Object::ColumnBasedGeneric;
 
-use base qw/Bio::EnsEMBL::IO::TextParser/;
+use parent qw/Bio::EnsEMBL::IO::TextParser/;
 
 our %sub_strings = (
     '\n' => "\n",

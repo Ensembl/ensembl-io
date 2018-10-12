@@ -36,7 +36,7 @@ format the record as VCF4.
 
 package Bio::EnsEMBL::IO::Object::VCF4;
 
-use base qw/Bio::EnsEMBL::IO::Object::ColumnBasedGeneric/;
+use parent qw/Bio::EnsEMBL::IO::Object::ColumnBasedGeneric/;
 
 use strict;
 use warnings;
