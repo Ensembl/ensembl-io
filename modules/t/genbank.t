@@ -26,6 +26,11 @@ is($parser->get_taxon_id,'9606',"Testing get_taxon_id");
 is($parser->get_raw_dblinks,'BioProject: PRJNA30353',"Testing get_raw_dblinks");
 ok($parser->is_circular, "Testing is_circular");
 ok($parser->get_length == length($parser->get_sequence), "Testing length of the sequence");
+is(scalar @{$parser->get_db_xref_list_for_type('GeneID')}, 74, "Testing get_db_xref_list_for_type GeneID");
+is(scalar @{$parser->get_coded_by_list}, 0, "Testing get_coded_by_list");
+is($parser->get_dbsource, undef, "Testing get_dbsource");
+is($parser->get_dbsource_acc, undef, "Testing get_dbsource_acc");
+is(scalar @{$parser->get_protein_id_list}, 13, "Testing get_protein_id_list");
 
 my @features = @{ $parser->get_features };
 cmp_ok(scalar @features,'==', 105, "Testing number of features");
@@ -47,6 +52,11 @@ is($parser->get_source,'Danio rerio (zebrafish)',"Testing get_source");
 is($parser->get_taxon_id,'7955',"Testing get_taxon_id");
 cmp_ok($parser->is_circular, '==', 0, "Testing is_circular");
 ok($parser->get_length == length($parser->get_sequence), "Testing length of the sequence");
+is(scalar @{$parser->get_db_xref_list_for_type('GeneID')}, 2, "Testing get_db_xref_list_for_type GeneID");
+is(scalar @{$parser->get_coded_by_list}, 0, "Testing get_coded_by_list");
+is($parser->get_dbsource, undef, "Testing get_dbsource");
+is($parser->get_dbsource_acc, undef, "Testing get_dbsource_acc");
+is(scalar @{$parser->get_protein_id_list}, 1, "Testing get_protein_id_list");
 
 @features = @{ $parser->get_features };
 cmp_ok(scalar @features,'==', 3, "Testing number of features");
