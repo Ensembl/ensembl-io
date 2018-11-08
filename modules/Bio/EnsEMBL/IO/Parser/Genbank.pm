@@ -108,6 +108,9 @@ sub read_record {
               $self->{'record'}->{'_genebank_id'} = undef;
             }
         }
+        elsif ($field_type eq 'DBSOURCE') {
+            $self->{'record'}->{'_raw_dbsource'} = $field;
+        }
         elsif ($field_type eq 'COMMENT' || $field_type eq 'REFERENCE') {
             # REFERENCE is not used by the genebuild team so it can be "removed"
             push(@{$self->{'record'}->{'_raw_'.lc($field_type)}},  $field.$self->_get_multiline);
@@ -282,6 +285,36 @@ sub get_sequence_version {
     return $self->{'record'}->{'_version'};
 }
 
+=head2 get_dbsource
+
+    Description: Return the dbsource from the GenBank file
+    Returntype : String
+
+=cut
+
+sub get_dbsource {
+    my $self = shift;
+
+    return $self->{'record'}->{'_raw_dbsource'};
+}
+
+=head2 get_dbsource_acc
+
+    Description: Return the dbsource accession from the GenBank file
+    Returntype : String
+
+=cut
+
+sub get_dbsource_acc {
+    my $self = shift;
+
+    return unless $self->{'record'}->{'_raw_dbsource'};
+
+    my ($acc) = $self->{'record'}->{'_raw_dbsource'} =~ /REFSEQ: accession (\S+)/;
+
+    return $acc;
+}
+
 =head2 get_length
 
     Description: Return the length of the sequence
@@ -408,6 +441,51 @@ sub get_taxon_id {
         ($self->{'record'}->{'_taxon_id'}) = $self->{'record'}->{'_raw_features'} =~ /db_xref="taxon:(\d+)/;
     }
     return $self->{'record'}->{'_taxon_id'};
+}
+
+=head2 get_db_xref_list_for_type
+
+    Description: Return the list of db_xrefs for provided type
+    Returntype : Arrayref
+
+=cut
+
+sub get_db_xref_list_for_type {
+    my ($self, $type) = @_;
+
+    my @ids = $self->{'record'}->{'_raw_features'} =~ /db_xref=\"${type}:(.+?)\"/g;
+
+    return \@ids;
+}
+
+=head2 get_protein_id_list
+
+    Description: Return the list of protein_ids
+    Returntype : Arrayref
+
+=cut
+
+sub get_protein_id_list {
+    my ($self) = @_;
+
+    my @ids = $self->{'record'}->{'_raw_features'} =~ /\/protein_id=\"(.+?)\"/g;
+
+    return \@ids;
+}
+
+=head2 get_coded_by_list
+
+    Description: Return the list of protein_ids
+    Returntype : Arrayref
+
+=cut
+
+sub get_coded_by_list {
+    my ($self) = @_;
+
+    my @ids = $self->{'record'}->{'_raw_features'} =~ /\/coded_by=\"(.*?):/g;
+
+    return \@ids;
 }
 
 =head2 get_raw_dblinks
