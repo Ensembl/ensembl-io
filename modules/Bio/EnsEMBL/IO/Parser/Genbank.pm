@@ -453,6 +453,7 @@ sub get_taxon_id {
 sub get_db_xref_list_for_type {
     my ($self, $type) = @_;
 
+    return [] unless defined $type;
     my @ids = $self->{'record'}->{'_raw_features'} =~ /db_xref=\"${type}:(.+?)\"/g;
 
     return \@ids;

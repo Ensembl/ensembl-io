@@ -1304,6 +1304,7 @@ LOCUS       NM_001100954             558 bp    mRNA    linear   VRT 06-AUG-2017
 DEFINITION  Danio rerio si:dkey-111e8.5 (si:dkey-111e8.5), mRNA.
 ACCESSION   NM_001100954 XM_690278
 VERSION     NM_001100954.1
+DBSOURCE    REFSEQ: accession NM_001285679.1
 KEYWORDS    RefSeq.
 SOURCE      Danio rerio (zebrafish)
   ORGANISM  Danio rerio
@@ -1351,6 +1352,7 @@ FEATURES             Location/Qualifiers
                      /db_xref="ZFIN:ZDB-GENE-060526-192"
      CDS             1..558
                      /gene="si:dkey-111e8.5"
+                     /coded_by="NM_001285679.1:1..381"
                      /codon_start=1
                      /product="uncharacterized protein LOC566993"
                      /protein_id="NP_001094424.1"
