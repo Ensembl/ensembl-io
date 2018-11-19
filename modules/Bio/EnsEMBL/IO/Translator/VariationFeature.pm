@@ -30,19 +30,41 @@ use warnings;
 
 use Carp;
 
-use base qw/Bio::EnsEMBL::IO::Translator::Feature/;
+use parent qw/Bio::EnsEMBL::IO::Translator::Feature/;
 
+sub seqname {
+  my $self = shift;
+  my $object = shift;
+  
+  return $object->seq_region_name;
+}
 
-=head2 get_itemRgb
+sub start {
+  my $self = shift;
+  my $object = shift;
 
-    Description:
-    Returntype : String
+  return ( $object->seq_region_start() > $object->seq_region_end() ) ? $object->seq_region_end() : $object->seq_region_start();
+}
 
-=cut
+sub end {
+  my $self = shift;
+  my $object = shift;
 
-sub get_itemRgb {
-  my ($self, $vf) = @_;
-  return '';
+  return ( $object->seq_region_start() > $object->seq_region_end() ) ? $object->seq_region_start() : $object->seq_region_end();
+}
+
+sub name {
+  my $self = shift;
+  my $object = shift;
+
+  return $object->variation_name();
+}
+
+sub alleles {
+  my $self = shift;
+  my $object = shift;
+  
+  return $object->allele_string();
 }
 
 1;

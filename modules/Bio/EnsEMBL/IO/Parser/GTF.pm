@@ -27,7 +27,7 @@ package Bio::EnsEMBL::IO::Parser::GTF;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::Parser::GXF/;
+use parent qw/Bio::EnsEMBL::IO::Parser::GXF/;
 
 use Bio::EnsEMBL::IO::Object::GTF;
 

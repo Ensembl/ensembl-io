@@ -29,7 +29,7 @@ package Bio::EnsEMBL::IO::Parser::VEP_input;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
 =head2 open
 
@@ -58,9 +58,9 @@ sub open {
 
 ## This format has no metadata
 
-sub is_metadata { return undef; }
+sub is_metadata { return; }
 
-sub read_metadata { return undef; }
+sub read_metadata { return; }
 
 =head2 set_fields
 

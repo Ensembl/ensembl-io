@@ -39,13 +39,43 @@ rather than GFF3 as the generic object does.
 
 package Bio::EnsEMBL::IO::Object::GTF;
 
-use base qw/Bio::EnsEMBL::IO::Object::ColumnBasedGeneric/;
+use parent qw/Bio::EnsEMBL::IO::Object::ColumnBasedGeneric/;
 
 use strict;
 use warnings;
 use Carp;
 
 my %strand_mapping = (1 => '+', -1 => '-');
+
+=head2 fields
+
+    Description: Access the fields for a GTF type record
+    Returntype : Array of fields
+
+=cut
+
+sub fields {
+    my $self = shift;
+
+    return [qw(seqname source type start end score strand phase attributes)];
+}
+
+=head2 strand_conversion
+
+    Description: Access the strand conversion mappings
+
+=cut
+
+sub strand_conversion {
+    my $self = shift;
+
+    return \%strand_mapping;
+}
+
+##########################################
+# Old functionality that's going away
+##########################################
+
 
 =head2 create_record
 

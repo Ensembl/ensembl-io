@@ -39,7 +39,7 @@ use warnings;
 use Bio::EnsEMBL::IO::TabixParser;
 use Bio::DB::HTS::Tabix;
 
-use base qw/Bio::EnsEMBL::IO::TabixParser Bio::EnsEMBL::IO::ColumnBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::TabixParser Bio::EnsEMBL::IO::ColumnBasedParser/;
 
 sub open {
   my ($caller, $filename, @other_args) = @_;

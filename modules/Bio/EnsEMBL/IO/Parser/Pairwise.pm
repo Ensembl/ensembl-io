@@ -38,7 +38,7 @@ package Bio::EnsEMBL::IO::Parser::Pairwise;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 
 sub is_metadata {
     my $self = shift;

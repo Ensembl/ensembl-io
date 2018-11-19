@@ -30,21 +30,31 @@ use warnings;
 
 use Carp;
 
-use base qw/Bio::EnsEMBL::IO::Translator::Feature/;
+use parent qw/Bio::EnsEMBL::IO::Translator::Feature/;
 
-=head2 get_itemRgb
-
-    Description:
+=head2 name
+    Description: Wrapper around API call to feature name
     Returntype : String
-
 =cut
 
-sub get_itemRgb {
-  my ($self, $gene) = @_;
-  return '.' unless $self->species_defs;
-  my $colours = $self->species_defs->colour('gene');
-  my $colour = $colours->{$gene->biotype}{'default'};
-  return $colour ? '('.join(',',$self->rgb_by_name($colour)).')' : undef;
+sub name {
+  my ($self, $feature) = @_;
+
+  my $dxr   = $feature->can('display_xref') ? $feature->display_xref : undef;
+  my $label = $dxr ? $dxr->display_id : $feature->stable_id;
+}
+
+
+=head2 source
+    Description: Get the source of gene track
+    Returntype : Integer
+=cut
+
+sub source {
+    my $self = shift;
+    my $object = shift;
+
+    return $object->source();
 }
 
 1;

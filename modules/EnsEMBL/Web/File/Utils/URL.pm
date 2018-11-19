@@ -33,6 +33,7 @@ package EnsEMBL::Web::File::Utils::URL;
 ### can access site-wide parameters such as proxies
 
 use strict;
+use warnings;
 
 use HTTP::Tiny;
 use LWP::UserAgent;

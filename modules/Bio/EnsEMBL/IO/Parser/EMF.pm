@@ -33,7 +33,7 @@ package Bio::EnsEMBL::IO::Parser::EMF;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::TokenBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::TokenBasedParser/;
 
 
 =head2 open

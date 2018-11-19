@@ -44,7 +44,7 @@ package Bio::EnsEMBL::IO::Parser::PairwiseSimple;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::TrackBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::TrackBasedParser/;
 
 sub is_metadata {
     my $self = shift;

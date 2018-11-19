@@ -41,7 +41,7 @@ use Carp;
 use Bio::DB::HTS::Tabix;
 use Bio::DB::HTS::Tabix::Iterator;
 
-use base qw/Bio::EnsEMBL::IO::Parser/;
+use parent qw/Bio::EnsEMBL::IO::Parser/;
 
 sub open {
   my ($caller, $filename, @other_args) = @_;

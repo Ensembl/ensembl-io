@@ -109,7 +109,7 @@ use strict;
 use warnings;
 use Carp;
 
-use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 our ($AUTOLOAD);
 
 =head2 open

@@ -33,7 +33,7 @@ package Bio::EnsEMBL::IO::Parser::Fasta;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::TokenBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::TokenBasedParser/;
 use Bio::EnsEMBL::IO::Object::Fasta;
 
 =head2 open
@@ -142,10 +142,10 @@ sub read_sequence {
     my $arrayRef = [];
 
     while (not $self->is_at_end_of_record()) {
-        push @$arrayRef, $self->{'current_block'};
+        push @{$arrayRef}, $self->{'current_block'};
         $self->next_block();
     }
-    push @$arrayRef, $self->{'current_block'};
+    push @{$arrayRef}, $self->{'current_block'};
 
     return $arrayRef;
 }

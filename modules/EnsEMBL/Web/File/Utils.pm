@@ -22,6 +22,7 @@ package EnsEMBL::Web::File::Utils;
 ### Library for location-independent file functions such as compression support
 
 use strict;
+use warnings;
 
 use Compress::Zlib qw//;
 use Compress::Bzip2;
@@ -50,7 +51,7 @@ sub sanitise_path {
       }
     }
     else {
-      return undef;
+      return;
     }
   }
 
@@ -127,7 +128,7 @@ sub get_compression {
     return 'gz'   if $file =~ /\.gz$/;
     return 'zip'  if $file =~ /\.zip$/;
     return 'bz'   if $file =~ /\.bz2?$/;
-    return undef;
+    return;
   }
 }
 

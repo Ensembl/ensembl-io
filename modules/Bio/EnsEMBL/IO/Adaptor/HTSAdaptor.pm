@@ -18,7 +18,9 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::IO::Adaptor::HTSAdaptor;
+
 use strict;
+use warnings;
 
 use Bio::EnsEMBL::Feature;
 use Data::Dumper;
@@ -107,7 +109,7 @@ sub munge_chr_id {
   }
 
   warn " *** could not parse_region for BAM/CRAM with $chr_id in file " . $self->url ."\n";
-  return undef;
+  return;
 }
 
 sub fetch_paired_alignments {

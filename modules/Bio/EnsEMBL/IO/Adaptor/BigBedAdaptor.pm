@@ -18,8 +18,9 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::IO::Adaptor::BigBedAdaptor;
-use strict;
 
+use strict;
+use warnings;
 
 #########################################################################
 # DEPRECATED MODULE - please use Bio::EnsEMBL::IO::Parser::BigBed instead
@@ -130,7 +131,7 @@ sub munge_chr_id {
   
   warn "Failed to open BigBed file " . $self->url unless $bb;
   
-  return undef unless $bb;
+  return unless $bb;
 
   my $list = $bb->chromList;
   my $head = $list->head;

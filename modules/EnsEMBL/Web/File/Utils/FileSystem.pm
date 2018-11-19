@@ -43,7 +43,7 @@ sub create_path {
   my @directories   = make_path($path, { %$params, 'error' => \my $error });
 
   if (@$error) {
-    return undef if $no_exception;
+    return if $no_exception;
     throw(sprintf qq(Could not create the given path '%s' due to following errors: \n%s), $path, displayable_error($error));
   }
 
@@ -62,7 +62,7 @@ sub remove_directory {
   my $file_count    = remove_tree($path, { %$params, 'error' => \my $error});
 
   if (@$error) {
-    return undef if $no_exception;
+    return if $no_exception;
     throw(sprintf qq(Could not remove the given directory '%s' due to following errors: \n%s), $path, displayable_error($error));
   }
 
@@ -111,14 +111,14 @@ sub copy_dir_contents {
   my $no_exception  = delete $params->{'no_exception'};
   my $contents      = [];
   my %exclude       = map { $_ =~ s/\/$//r => 1 } @{$params->{'exclude'} || []};
-  my $dir_contents  = list_dir_contents($source_dir, {'no_exception' => $no_exception}) or return undef;
+  my $dir_contents  = list_dir_contents($source_dir, {'no_exception' => $no_exception}) or return;
 
   if (!-d $dest_dir) {
     if ($params->{'create_path'}) {
       push @$contents, @{ create_path($dest_dir) };
     } else {
       throw("Destination directory $dest_dir does not exist.") unless $no_exception;
-      return undef;
+      return;
     }
   }
 
@@ -188,7 +188,7 @@ sub list_dir_contents {
 
   if (!$dh) {
     throw("An error occurred while reading the directory $dir: $!") unless $params->{'no_exception'};
-    return undef;
+    return;
   }
 
   while (my $content = $dh->read) {

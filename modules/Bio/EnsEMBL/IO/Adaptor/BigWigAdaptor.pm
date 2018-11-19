@@ -18,7 +18,9 @@ limitations under the License.
 =cut
 
 package Bio::EnsEMBL::IO::Adaptor::BigWigAdaptor;
+
 use strict;
+use warnings;
 
 #########################################################################
 # DEPRECATED MODULE - please use Bio::EnsEMBL::IO::Parser::BigBed instead
@@ -77,7 +79,7 @@ sub munge_chr_id {
   
   warn "Failed to open BigWig file " . $self->url unless $bw;
   
-  return undef unless $bw;
+  return unless $bw;
 
   my $list = $bw->chromList;
   my $head = $list->head;

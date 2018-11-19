@@ -25,7 +25,7 @@ use warnings;
 
 use Carp;
 
-use base qw/Bio::EnsEMBL::IO::TextParser/;
+use parent qw/Bio::EnsEMBL::IO::TextParser/;
 
 sub open {
     my ($caller, $filename, $start_tag, $end_tag, @other_args) = @_;

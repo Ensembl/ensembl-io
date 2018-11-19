@@ -30,7 +30,7 @@ use warnings;
 
 use Carp;
 
-use base qw/Bio::EnsEMBL::IO::Translator/;
+use parent qw/Bio::EnsEMBL::IO::Translator/;
 
 # We don't need any functionality in this translator, we just need the
 # module to exist so get_translator_by_type() can instanciate an instance

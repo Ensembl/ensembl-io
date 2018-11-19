@@ -29,7 +29,7 @@ package Bio::EnsEMBL::IO::Parser::VEP_output;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
+use parent qw/Bio::EnsEMBL::IO::ColumnBasedParser/;
 =head2 open
 
     Constructor
@@ -62,7 +62,7 @@ sub is_metadata {
 
 sub read_metadata {
 ### No useful metadata, just column names
-  return undef;
+  return;
 }
 
 =head2 set_fields
