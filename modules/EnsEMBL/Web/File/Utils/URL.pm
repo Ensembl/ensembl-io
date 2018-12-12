@@ -64,7 +64,7 @@ sub chase_redirects {
     my $ua = LWP::UserAgent->new( max_redirect => $args->{'max_follow'} );
     $ua->timeout(10);
     $ua->env_proxy;
-    $ua->proxy([qw(http https)], $proxy) || ();
+    $ua->proxy([qw(http https ftp)], $proxy) || ();
     my $response = $ua->head($url);
     if ($response->is_success) {
       return $response->request->uri->as_string;
@@ -139,7 +139,7 @@ sub file_exists {
     my $ua = LWP::UserAgent->new();
     $ua->timeout(10);
     $ua->env_proxy;
-    $ua->proxy([qw(http https)], $proxy) || ();
+    $ua->proxy([qw(http https ftp)], $proxy) || ();
     my $response = $ua->head($url);
     unless ($response->is_success) {
       $error = _get_lwp_useragent_error($response);
@@ -212,7 +212,7 @@ sub read_file {
     my $ua = LWP::UserAgent->new();
     $ua->timeout(10);
     $ua->env_proxy;
-    $ua->proxy([qw(http https)], $proxy) || ();
+    $ua->proxy([qw(http https ftp)], $proxy) || ();
     my $response = $ua->$method($url, %{$args->{'headers'}});
     if ($response->is_success) {
       $content = $response->content;
@@ -336,7 +336,7 @@ sub fetch_file {
 
   $ua->timeout(10);
   $ua->env_proxy;
-  $ua->proxy([qw(http https)], $proxy) || ();
+  $ua->proxy([qw(http https ftp)], $proxy) || ();
 
   my $dest     = $args->{'destination_path'} ? $args->{'destination_path'}."$filename" : "/tmp/$filename";
   my $response = $ua->mirror($file_url, $dest);
