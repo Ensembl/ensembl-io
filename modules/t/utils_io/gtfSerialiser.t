@@ -38,8 +38,9 @@ use Bio::EnsEMBL::Exon;
 use Bio::EnsEMBL::SeqEdit;
 use Bio::EnsEMBL::Slice;
 use Bio::EnsEMBL::DBEntry;
+use FindBin qw/$Bin/;
 
-my $mtdb = Bio::EnsEMBL::Test::MultiTestDB->new();
+my $mtdb = Bio::EnsEMBL::Test::MultiTestDB->new(undef, "$Bin/..");
 my $db = $mtdb->get_DBAdaptor("core");
 
 {

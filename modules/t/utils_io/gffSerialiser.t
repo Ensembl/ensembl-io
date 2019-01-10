@@ -55,10 +55,11 @@ use Bio::EnsEMBL::Feature;
 use Bio::EnsEMBL::Slice;
 use IO::String;
 use Test::Differences;
+use FindBin qw/$Bin/;
 
-my $db = Bio::EnsEMBL::Test::MultiTestDB->new();
+my $db = Bio::EnsEMBL::Test::MultiTestDB->new(undef, "$Bin/..");
 my $dba = $db->get_DBAdaptor('core');
-my $omulti = Bio::EnsEMBL::Test::MultiTestDB->new('ontology');
+my $omulti = Bio::EnsEMBL::Test::MultiTestDB->new('ontology', "$Bin/..");
 my $odb = $omulti->get_DBAdaptor('ontology');
 
 my $id = 'ENSG00000131044';
