@@ -27,22 +27,17 @@ use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::CoordSystem;
 use Bio::EnsEMBL::Slice;
 
-
 use Bio::EnsEMBL::Utils::IO::FASTASerializer;
 use Bio::EnsEMBL::Utils::IO::GFFSerializer;
-
+use Bio::EnsEMBL::Utils::IO::GTFSerializer;
+use Bio::EnsEMBL::Utils::IO::BEDSerializer;
 use Bio::EnsEMBL::IO::Writer;
 use Bio::EnsEMBL::IO::Translator::Gene;
 use Bio::EnsEMBL::IO::Writer::GFF3;
 use Bio::EnsEMBL::IO::Object::GXFMetadata;
-
-use Bio::EnsEMBL::Utils::IO::GTFSerializer;
 use Bio::EnsEMBL::IO::Writer::GTF;
-
-use Bio::EnsEMBL::Utils::IO::BEDSerializer;
 use Bio::EnsEMBL::IO::Writer::BED;
 
-use Smart::Comments;
 
 
 # Get a DBAdaptor to from the test system
@@ -67,6 +62,8 @@ is(ref @{$genes}[0], 'Bio::EnsEMBL::Gene', "Gene objects loaded successfully");
 
 
 
+
+# ensembl-io FASTA writer is currently non-functional
 # # FASTA
 # {
 #   my ($utils_output, $ensio_output);
@@ -227,7 +224,7 @@ is(ref @{$genes}[0], 'Bio::EnsEMBL::Gene', "Gene objects loaded successfully");
 
 
 
-
+# ensembl-io and utils-io BED writers seem to produce different BED formats. Investigation needed.
 # # BED
 # {
 #   my ($utils_output, $ensio_output);
