@@ -468,10 +468,10 @@ sub add_attr {
 
 =head2 so_term
 
-    Description: Accessor to look up the Ontology term for an object
+    Description: Accessor to look up the Sequence Ontology term for an object
     Args[1]    : Feature to loop up term for
     Returntype : String (term)
-    Exceptions : If the term can't be found by the Ontology adaptor
+    Exceptions : If the term can't be found
 
 =cut
 
@@ -500,25 +500,6 @@ sub so_term {
 
     return $so_term;
 }
-
-# =head2 so_mapper
-
-#     Description: Accessor for the so term mapper
-#     Returntype : sequence ontology mapper
-#     Exceptions : If the registry isn't configured to access the database
-
-# =cut
-
-# sub so_mapper {
-#     my $self = shift;
-
-#     if( ! defined( $self->{'mapper'} ) ) {
-# 	    my $oa = Bio::EnsEMBL::Registry->get_adaptor('multi', 'ontology', 'OntologyTerm');
-# 	    $self->{'mapper'} = Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($oa);
-#     }
-
-#     return $self->{'mapper'};
-# }
 
 =head2 _default_score
 
