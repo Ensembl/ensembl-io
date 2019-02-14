@@ -175,7 +175,7 @@ sub combine_fields {
 	    }
     }
 
-    return join $delimiter, @values;
+    return join($delimiter, @values) . $delimiter;
 }
 
 =head2 concatenate_fields
