@@ -27,7 +27,7 @@ use Bio::EnsEMBL::Utils::IO::BEDSerializer;
 use Bio::EnsEMBL::Feature;
 use Bio::EnsEMBL::Slice;
 use FindBin qw/$Bin/;
-use Smart::Comments;
+
 
 my $mtdb = Bio::EnsEMBL::Test::MultiTestDB->new(undef, "$Bin/..");
 my $dba = $mtdb->get_DBAdaptor("core");
