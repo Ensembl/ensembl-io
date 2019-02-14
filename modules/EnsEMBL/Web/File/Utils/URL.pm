@@ -341,7 +341,7 @@ sub fetch_file {
 
   my $dest     = $args->{'destination_path'} ? $args->{'destination_path'}."$filename" : "/tmp/$filename";
   my $response = $ua->mirror($file_url, $dest);
-  return $dest if ($response->{_msg} eq 'OK');
+  return $dest if ($response->{_rc} == 200);
 
   if($args->{'nice'}) {
      return {'error' => "Cannot download file ($file_url). HTTP request error code ".$response->{_rc}};
