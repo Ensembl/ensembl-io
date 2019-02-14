@@ -23,9 +23,11 @@ use Bio::EnsEMBL::Utils::IO::GFFSerializer;
 use Bio::EnsEMBL::Feature;
 use Bio::EnsEMBL::Slice;
 use IO::String;
+use FindBin qw/$Bin/;
 
-my $db = Bio::EnsEMBL::Test::MultiTestDB->new();
-my $dba = $db->get_DBAdaptor('core');
+
+my $mtdb = Bio::EnsEMBL::Test::MultiTestDB->new(undef, "$Bin/..");
+my $dba = $mtdb->get_DBAdaptor("core");
 
 my $id = 'ENSG00000131044';
 
