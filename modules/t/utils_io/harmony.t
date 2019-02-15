@@ -61,43 +61,6 @@ is(ref @{$genes}[0], 'Bio::EnsEMBL::Gene', "Gene objects loaded successfully");
 
 
 
-
-
-# ensembl-io FASTA writer is currently non-functional
-# # FASTA
-# {
-#   my ($utils_output, $ensio_output);
-
-#   open my $utils_fh, '>', \$utils_output;
-#   my $utils_fasta_writer = Bio::EnsEMBL::Utils::IO::FASTASerializer->new($utils_fh); # No need to fiddle with chunk sizes at this point
-
-#     # foreach my $feature (@$features) {
-#       $utils_fasta_writer->print_Seq($gene->feature_Slice);
-#     # }
-
-#   close $utils_fh;
-
-#   ## $utils_output
-
-#   open my $ensio_fh, '>', \$ensio_output;
-
-#   my $ensio_fasta_writer = Bio::EnsEMBL::IO::Writer->new('Fasta', $ensio_fh);
-
-# my $translator = Bio::EnsEMBL::IO::Translator::Gene->new();
-#   # foreach my $feature (@$features) {
-#     $ensio_fasta_writer->write($translator);
-#   # }
-
-#   ### $utils_output
-
-#   close $ensio_output;
-
-
-#   is($utils_output, $ensio_output, "FASTA harmonization test pass");
-# }
-
-
-
 # GFF
 {
   my ($utils_output, $ensio_output);
@@ -107,7 +70,7 @@ is(ref @{$genes}[0], 'Bio::EnsEMBL::Gene', "Gene objects loaded successfully");
 
   # $utils_gff_writer->print_main_header([$gene->feature_Slice()]);
   $utils_gff_writer->print_main_header;
-  foreach my $gene (@$genes) {
+  foreach my $gene (@{$genes}) {
     $utils_gff_writer->print_feature($gene);
   }
   close $utils_fh;
@@ -125,7 +88,7 @@ is(ref @{$genes}[0], 'Bio::EnsEMBL::Gene', "Gene objects loaded successfully");
   $serializer->write(Bio::EnsEMBL::IO::Object::GXFMetadata->directive('gff-version', 3));
   # $serializer->write(Bio::EnsEMBL::IO::Object::GXFMetadata->ens_directive('genome-build', 'ensembl', 'GRCh38'));
 
-  foreach my $gene (@$genes) {
+  foreach my $gene (@{$genes}) {
     $serializer->write($gene);
   }
 
@@ -148,7 +111,7 @@ is(ref @{$genes}[0], 'Bio::EnsEMBL::Gene', "Gene objects loaded successfully");
 
   # $utils_gtf_writer->print_main_header([$gene->feature_Slice()]);
   # $utils_gtf_writer->print_main_header($db);
-  foreach my $gene (@$genes) {
+  foreach my $gene (@{$genes}) {
     $utils_gtf_writer->print_Gene($gene);
   }
 
@@ -193,7 +156,7 @@ is(ref @{$genes}[0], 'Bio::EnsEMBL::Gene', "Gene objects loaded successfully");
   # $serializer->write(Bio::EnsEMBL::IO::Object::GXFMetadata->directive('gff-version', 3));
   # $serializer->write(Bio::EnsEMBL::IO::Object::GXFMetadata->ens_directive('genome-build', 'ensembl', 'GRCh38'));
 
-  foreach my $gene (@$genes) {
+  foreach my $gene (@{$genes}) {
     $serializer->write($gene);
   }
 
@@ -223,45 +186,68 @@ is(ref @{$genes}[0], 'Bio::EnsEMBL::Gene', "Gene objects loaded successfully");
 
 
 
-
-# ensembl-io and utils-io BED writers seem to produce different BED formats. Investigation needed.
+# # ensembl-io and utils-io BED writers seem to produce different BED formats. Investigation needed.
 # # BED
 # {
 #   my ($utils_output, $ensio_output);
 
 #   open my $utils_fh, '>', \$utils_output;
-#   my $utils_bed_writer = Bio::EnsEMBL::Utils::IO::BEDSerializer->new($utils_fh); # No need to fiddle with chunk sizes at this point
 
-#   # $utils_gtf_writer->print_main_header([$gene->feature_Slice()]);
-#   # $utils_bed_writer->print_main_header($db);
-#   # foreach my $transcript ( @{$gene->get_all_Transcripts} ) {
+#   my $utils_bed_writer = Bio::EnsEMBL::Utils::IO::BEDSerializer->new($utils_fh);
+
+#   foreach my $gene (@{$genes}) {
 #     $utils_bed_writer->print_feature($gene);
-#   # }
-# ### $utils_output
+#   }
+
+#   close $utils_fh;
 
 #   open my $ensio_fh, '>', \$ensio_output;
 
 #   my $translator = Bio::EnsEMBL::IO::Translator::Gene->new();
 #   my $serializer = Bio::EnsEMBL::IO::Writer::BED->new($translator);
 
-#   # my $serializer = Bio::EnsEMBL::IO::Writer->new('Bed', $translator);
-
-#   # $translator->add_callbacks( { type => sub { return 'fake_type' } } );
-#   # $translator->add_callbacks( { type => sub { return 'region' } } );
 #   $serializer->open($ensio_fh);
 
-#   # Write headers
-#   # $serializer->write(Bio::EnsEMBL::IO::Object::GXFMetadata->directive('gff-version', 3));
-#   # $serializer->write(Bio::EnsEMBL::IO::Object::GXFMetadata->ens_directive('genome-build', 'ensembl', 'GRCh38'));
-
-#   # foreach my $transcript ( @{$gene->get_all_Transcripts} ) {
+#   foreach my $gene (@{$genes}) {
 #     $serializer->write($gene);
+#   }
+
+#   close $ensio_fh;
+
+#   is($utils_output, $ensio_output, "BED harmonization test pass");
+# }
+
+
+
+
+# # ensembl-io FASTA writer is currently missing. Implementation required?
+# # FASTA
+# {
+#   my ($utils_output, $ensio_output);
+
+#   open my $utils_fh, '>', \$utils_output;
+#   my $utils_fasta_writer = Bio::EnsEMBL::Utils::IO::FASTASerializer->new($utils_fh); # No need to fiddle with chunk sizes at this point
+
+#   # foreach my $gene (@{$genes}) {
+#     $utils_fasta_writer->print_Seq($gene->feature_Slice);
+#   # }
+
+#   close $utils_fh;
+
+#   open my $ensio_fh, '>', \$ensio_output;
+
+#   my $ensio_fasta_writer = Bio::EnsEMBL::IO::Writer->new('Fasta', $ensio_fh);
+#   my $translator = Bio::EnsEMBL::IO::Translator::Gene->new();
+#   # my $serializer = Bio::EnsEMBL::IO::Writer::FASTA->new($translator);
+
+#   # foreach my $gene (@{$genes}) {
+#     $ensio_fasta_writer->write($translator);
+#     # $serializer->write($gene);
 #   # }
 
 #   close $ensio_fh;
-# ### $ensio_output
 
-#   is($utils_output, $ensio_output, "BED harmonization test pass");
+#   is($utils_output, $ensio_output, "FASTA harmonization test pass");
 # }
 
 
