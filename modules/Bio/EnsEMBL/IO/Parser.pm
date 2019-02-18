@@ -41,7 +41,6 @@ use strict;
 use warnings;
 
 use Carp;
-use Try::Tiny;
 use Bio::EnsEMBL::IO::Utils;
 
 =head2 new
@@ -297,9 +296,10 @@ sub _open_as {
       my $class = 'Bio::EnsEMBL::IO::Parser::'.$subclass;
       my $object;
 
-      try {
-        $object = $class->$method(@other_args);
-      };
+      eval "require $class";
+      unless ($@) {
+        $object = eval { $class->$method(@other_args); }; 
+      }
 
       return $object;
     }
