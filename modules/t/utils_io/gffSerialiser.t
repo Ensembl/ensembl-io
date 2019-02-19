@@ -182,17 +182,14 @@ OUT
 }
 
 {
+  # Deprecated constructor call.
   my $fh = IO::String->new();
 
   my $ontology_adaptor = {};
   bless($ontology_adaptor, 'Bio::EnsEMBL::DBSQL::OntologyTermAdaptor');
 
-  my $warning = warning {
-  my $ser = Bio::EnsEMBL::Utils::IO::GFFSerializer->new($ontology_adaptor, $fh) };
-  like( $warning,
-      qr/GFF format does not require an instance of Bio::EnsEMBL::DBSQL::OntologyTermAdaptor anymore./,
-      "Legacy constructor throws warning",
-  ) or diag 'Got warning: ', explain($warning);
+  my $ser = Bio::EnsEMBL::Utils::IO::GFFSerializer->new($ontology_adaptor, $fh);
+  ok($ser, "Legacy constructor backwards compatibility. Here to remind of deprecated message.");
 }
 
 
