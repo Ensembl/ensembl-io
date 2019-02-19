@@ -52,7 +52,7 @@ package Bio::EnsEMBL::Utils::IO::GFFSerializer;
 
 use strict;
 use warnings;
-use Bio::EnsEMBL::Utils::Exception;
+use Bio::EnsEMBL::Utils::Exception qw/throw deprecate/;
 use URI::Escape;
 use Bio::EnsEMBL::Utils::IO::FeatureSerializer;
 use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
@@ -69,9 +69,9 @@ my %strand_conversion = ( '1' => '+', '0' => '.', '-1' => '-');
 
     Returntype : Bio::EnsEMBL::Utils::IO::GFFSerializer
 
-    Warning    : If legacy mandatory 'Ontology Adaptor' first argument provided.
-                 This argument has been removed but method will continue functioning if still provided,
-                 raising only a warning to the user stating that it can be removed.
+    Warning    : If legacy new() method is used.
+                 An 'Ontology Adaptor' was required as first argument. This argument has been removed but method will
+                 provide backwards comparability showing a warning to the user stating that it can be removed.
 
 =cut
 
@@ -83,15 +83,15 @@ sub new {
 # this is to support and keep scripts using the legacy constructor functioning (with an extra warning)
 # Can probably be removed some time in the future
     if ( check_ref($arg1, "Bio::EnsEMBL::DBSQL::OntologyTermAdaptor" )) {
-        warning("GFF format does not require an instance of Bio::EnsEMBL::DBSQL::OntologyTermAdaptor anymore."
-            . "\nFirst argument at Bio::EnsEMBL::Utils::IO::GFFSerializer->new() can be safely removed.");
+        deprecate("new() does not require an instance of Bio::EnsEMBL::DBSQL::OntologyTermAdaptor anymore."
+            . "\nFirst argument of method call can be safely removed.");
         $arg1 = shift;
     }
 
     my $arg2 = shift;
 
     my $self = {
-        filehandle => $arg1,
+        filehandle     => $arg1,
         default_source => $arg2
     };
     bless $self, $class;
@@ -159,7 +159,7 @@ sub print_feature {
         }
         # could not get it, throw exception
         if ( !$so_term ) {
-            throw "Unable to find an SO term for feature %s.", $summary{id};
+            throw("Unable to find an SO term for feature %s.", $summary{id});
         }
 
         if ($so_term eq 'protein_coding_gene') {
@@ -269,14 +269,14 @@ sub print_feature {
         while(my $attribute = shift @keys) {
             my $data_written = 0;
             if (ref $summary{$attribute} eq "ARRAY") {
-		if (scalar(@{$summary{$attribute}}) > 0) {
-		    $row .= $attribute."=".join (',',map { uri_escape($_,'\t\n\r;=%&,') } grep { defined $_ } @{$summary{$attribute}});
-		    $data_written = 1;
-		}
+        if (scalar(@{$summary{$attribute}}) > 0) {
+            $row .= $attribute."=".join (',',map { uri_escape($_,'\t\n\r;=%&,') } grep { defined $_ } @{$summary{$attribute}});
+            $data_written = 1;
+        }
             }
             else {
                 if (defined $summary{$attribute}) {
-                  $row .= $attribute."=".uri_escape($summary{$attribute},'\t\n\r;=%&,');
+                  $row .= $attribute . "=" . uri_escape($summary{$attribute} , '\t\n\r;=%&,');
                   $data_written = 1;
                 }
             }
