@@ -297,6 +297,7 @@ sub _open_as {
       my $class = 'Bio::EnsEMBL::IO::Parser::'.$subclass;
       my $object;
 
+      eval "require $class";
       try {
         $object = $class->$method(@other_args);
       };
