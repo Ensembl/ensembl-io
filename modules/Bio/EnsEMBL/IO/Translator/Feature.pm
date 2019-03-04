@@ -468,55 +468,37 @@ sub add_attr {
 
 =head2 so_term
 
-    Description: Accessor to look up the Ontology term for an object
+    Description: Accessor to look up the Sequence Ontology term for an object
     Args[1]    : Feature to loop up term for
     Returntype : String (term)
-    Exceptions : If the term can't be found by the Ontology adaptor
+    Exceptions : If the term can't be found
 
 =cut
 
 sub so_term {
     my $self = shift;
     my $object = shift;
-    
-    my $so_term = eval { $self->so_mapper()->to_name($object); };
-    if($@) {
-      if ($self->no_exception) {
-        ## Quick'n'dirty method for objects with no ontology
-        my @namespace = split('::', ref($object));
-        (my $type = $namespace[-1]) =~ s/Feature$//;
-        return lc $type;
-      }
-      else {
-        throw sprintf "Unable to map feature %s to SO term.\n$@", $object->display_id;
-      }
+
+    my $so_term;
+    # get biotype SO acc if feature can do it
+    if ( $object->can('get_Biotype') ) {
+        $so_term = $object->get_Biotype->so_term;
+    }
+    # if no biotype SO acc, get the feature one
+    if ( !$so_term ) {
+        $so_term = $object->feature_so_term;
+    }
+    # could not get it, throw exception
+    if ( !$so_term ) {
+        throw sprintf "Unable to find an SO term for feature %s.\n$@", $object->display_id;
     }
 
-    if ($so_term eq 'protein_coding_gene') { 
-    # Special treatment for protein_coding_gene, as more commonly expected term is 'gene'
+    if ($so_term eq 'protein_coding_gene') {
+# Special treatment for protein_coding_gene, as more commonly expected term is 'gene'
       $so_term = 'gene';
     }
 
     return $so_term;
-}
-
-=head2 so_mapper
-
-    Description: Accessor for the so term mapper
-    Returntype : sequence ontology mapper
-    Exceptions : If the registry isn't configured to access the database
-
-=cut
-
-sub so_mapper {
-    my $self = shift;
-
-    if( ! defined( $self->{'mapper'} ) ) {
-	    my $oa = Bio::EnsEMBL::Registry->get_adaptor('multi', 'ontology', 'OntologyTerm');
-	    $self->{'mapper'} = Bio::EnsEMBL::Utils::SequenceOntologyMapper->new($oa);
-    }
-
-    return $self->{'mapper'};
 }
 
 =head2 _default_score
