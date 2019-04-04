@@ -80,3 +80,9 @@ script: "./travisci/harness.sh"
 #     - perl: "5.14"
 #       env: COVERALLS=true  DB=mysql
 #
+
+notifications:
+  slack:
+    rooms:
+      secure: bNSqBwR+6GpKqW22MuBbdAH9Pb25hbX8UOW3MVd9HI7CnQBOfifXR47AMClFgfV5ZcHHRnOtOqin8RYccmrTJOxAAa6IilFJ/z5XAjVIMLQAORut+fVYnwOmQuvedWR8GdXq/awgVLeNG/ROIwl1gyFirTWYV5ygwM4McvD8y5A=
+    on_failure: change
