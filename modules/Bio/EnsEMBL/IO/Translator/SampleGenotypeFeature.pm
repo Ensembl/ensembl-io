@@ -288,8 +288,8 @@ sub ancestral_allele {
   my $self = shift;
   my $object = shift;
   my $info = shift;
-  
-  my $data = $object->variation->ancestral_allele;
+
+  my $data = $object->ancestral_allele;
   return ($data) ? "$info=$data" : undef;
 }
 
