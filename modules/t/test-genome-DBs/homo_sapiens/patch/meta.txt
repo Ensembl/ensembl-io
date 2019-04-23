@@ -110,3 +110,6 @@
 2117	\N	patch	patch_95_96_a.sql|schema_version
 2118	\N	patch	patch_96_97_a.sql|schema_version
 2119	\N	patch	patch_96_97_b.sql|biotype_so_term
+2120	\N	patch	patch_96_97_c.sql|rnaproduct_tables
+2121	\N	patch	patch_96_97_d.sql|add_object_type_rnaproduct
+2122	\N	patch	patch_96_97_e.sql|add_stable_id_event_type_rnaproduct

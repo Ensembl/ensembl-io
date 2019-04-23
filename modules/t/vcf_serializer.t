@@ -89,8 +89,7 @@ foreach my $var (@vars) {
   my $var_d = $var_data{$var};
 
   my $var_obj = Bio::EnsEMBL::Variation::Variation->new(
-     -NAME   => $var,
-     -ANCESTRAL_ALLELE => $var_d->{'aa'}
+     -NAME   => $var
   );
   
   #my %sample_genotypes = ();
@@ -112,7 +111,8 @@ foreach my $var (@vars) {
     -VARIATION_NAME => $var,
     -MINOR_ALLELE => $var_d->{'ma'},
     -MINOR_ALLELE_FREQUENCY => $var_d->{'maf'},
-    -MINOR_ALLELE_COUNT => $var_d->{'mac'}
+    -MINOR_ALLELE_COUNT => $var_d->{'mac'},
+    -ANCESTRAL_ALLELE => $var_d->{'aa'}
   );
   
   
