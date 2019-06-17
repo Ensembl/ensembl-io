@@ -1,6 +1,6 @@
 # ensembl-io
 
-![Build Status](https://travis-ci.org/Ensembl/ensembl-io.svg)
+[![Build Status](https://travis-ci.org/Ensembl/ensembl-io.svg?branch=master)][travis]
 
 ## File parsing and writing code for Ensembl
 
@@ -24,3 +24,5 @@ to be installed. For details on how to obtain and install this please
 see [https://github.com/Ensembl/Bio-HTS](https://github.com/Ensembl/Bio-HTS).
 
 Alternatively, Bio::DB::HTS can be installed from CPAN.
+
+[travis]: https://travis-ci.org/Ensembl/ensembl-io
