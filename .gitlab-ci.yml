@@ -1,0 +1,63 @@
+#
+# Test-job template
+#
+
+.ensembl_test_template:
+  image: dockerhub.ebi.ac.uk/ensembl-infrastructure/ensembl-ci-docker-images:${PERL_VERSION}
+
+  services:
+    - mysql:5.6
+
+  variables:
+    # FIXME: set some password for both users
+    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    MYSQL_USER: "travis"
+    MYSQL_PASSWORD: ""
+    USER: "gitlabci"
+    DEPS: "${CI_PROJECT_DIR}/dependencies"
+
+  cache:
+    paths:
+      - dependencies/
+
+  before_script:
+    - apt-get update
+    - apt-get install -y build-essential cpanminus git
+    - apt-get install -y libmysqlclient-dev mysql-client || apt-get install -y default-libmysqlclient-dev default-mysql-client
+    - apt-get install -y libssl-dev sqlite3
+    - git clone --branch=master --depth=1 https://github.com/Ensembl/ensembl-test.git
+    - git clone --branch=master --depth=1 https://github.com/Ensembl/ensembl.git
+    - git clone --branch=master --depth=1 https://github.com/Ensembl/ensembl-variation.git
+    - mkdir -p "${DEPS}"
+    - cd "${DEPS}"
+    - ${CI_PROJECT_DIR}/travisci/get_dependencies.sh
+    - cd ${CI_PROJECT_DIR}
+    - cpanm -v --installdeps --notest .
+    - ( cd ensembl && cpanm -v --installdeps --notest . )
+    - cpanm Bio::DB::HTS
+    - cpanm -n Devel::Cover::Report::Coveralls
+    - cpanm -n DBD::SQLite
+    - cpanm JSON URI::Escape
+    - cp travisci/MultiTestDB.conf.gitlabci.mysql  modules/t/MultiTestDB.conf.mysql
+    - cp travisci/MultiTestDB.conf.travisci.SQLite modules/t/MultiTestDB.conf.SQLite
+    - mysql -u root -h mysql -e 'GRANT ALL PRIVILEGES ON *.* TO "travis"@"%"'
+
+#
+# Test jobs
+#
+
+test:perl5.14-sqlite:
+  stage: test
+  extends: .ensembl_test_template
+  variables:
+    PERL_VERSION: "5.14"
+  script:
+    - ./travisci/harness.sh
+
+test:perl5.30-mysql:
+  stage: test
+  extends: .ensembl_test_template
+  variables:
+    PERL_VERSION: "5.30"
+  script:
+    - ./travisci/harness.sh
