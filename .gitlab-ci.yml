@@ -31,6 +31,8 @@
     - git clone --branch=master --depth=1 https://github.com/Ensembl/ensembl-variation.git
     - export HTSLIB_DIR="${DEPS}/htslib"
     - export KENT_SRC="${DEPS}/kent-335_base/src"
+    - echo "${HTSLIB_DIR}" >> /etc/ld.so.conf.d/99gitlabci
+    - ldconfig
     - mkdir -p "${DEPS}"
     - cd "${DEPS}"
     - ${CI_PROJECT_DIR}/travisci/get_dependencies.sh
