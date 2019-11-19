@@ -44,7 +44,7 @@
     - cpanm -n DBD::SQLite
     - cpanm JSON URI::Escape
     - cp travisci/MultiTestDB.conf.gitlabci.mysql  modules/t/MultiTestDB.conf.mysql
-    - cp travisci/MultiTestDB.conf.travisci.SQLite modules/t/MultiTestDB.conf.SQLite
+#    - cp travisci/MultiTestDB.conf.travisci.SQLite modules/t/MultiTestDB.conf.SQLite
     - mysql -u root -h mysql -e 'GRANT ALL PRIVILEGES ON *.* TO "travis"@"%"'
 
 #
