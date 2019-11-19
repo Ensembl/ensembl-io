@@ -16,8 +16,6 @@
     USER: "gitlabci"
     CFLAGS: "-fPIC"
     DEPS: "${CI_PROJECT_DIR}/dependencies"
-    HTSLIB_DIR: "${DEPS}/htslib"
-    KENT_SRC: "${DEPS}/kent-335_base/src"
 
   cache:
     paths:
@@ -31,6 +29,8 @@
     - git clone --branch=master --depth=1 https://github.com/Ensembl/ensembl-test.git
     - git clone --branch=master --depth=1 https://github.com/Ensembl/ensembl.git
     - git clone --branch=master --depth=1 https://github.com/Ensembl/ensembl-variation.git
+    - export HTSLIB_DIR="${DEPS}/htslib"
+    - export KENT_SRC="${DEPS}/kent-335_base/src"
     - mkdir -p "${DEPS}"
     - cd "${DEPS}"
     - ${CI_PROJECT_DIR}/travisci/get_dependencies.sh
