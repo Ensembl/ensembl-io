@@ -14,7 +14,10 @@
     MYSQL_USER: "travis"
     MYSQL_PASSWORD: ""
     USER: "gitlabci"
+    CFLAGS: "-fPIC"
     DEPS: "${CI_PROJECT_DIR}/dependencies"
+    HTSLIB_DIR: "${DEPS}/htslib"
+    KENT_SRC: "${DEPS}/kent-335_base/src"
 
   cache:
     paths:
@@ -31,7 +34,9 @@
     - mkdir -p "${DEPS}"
     - cd "${DEPS}"
     - ${CI_PROJECT_DIR}/travisci/get_dependencies.sh
+    - ${CI_PROJECT_DIR}/travisci/build_c.sh
     - cd ${CI_PROJECT_DIR}
+    - export MACHTYPE=$(uname -m)
     - cpanm -v --installdeps --notest .
     - ( cd ensembl && cpanm -v --installdeps --notest . )
     - cpanm Bio::DB::HTS
