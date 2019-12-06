@@ -190,7 +190,7 @@ sub _bulk_fetcher_feature_record {
     # Homeologues - same species, different sub-genome in a polyploid species.
     foreach my $alt_gene (@{$translator->homologues($object)}) {
       my $predicate = ($alt_gene->{description} eq 'within_species_paralog') ? 'sio:SIO_000630': 'sio:SIO_000558';
-      ${$record} .= sprintf "%s\n", triple(u($feature_uri), $predicate, 'ensembl:'.$alt_gene->{stable_id});
+      ${$record} .= sprintf "%s\n", triple(u($feature_uri), $predicate, 'ensembl:'.uri_escape($alt_gene->{stable_id}));
     }
   }
 
