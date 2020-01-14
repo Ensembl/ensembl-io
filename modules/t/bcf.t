@@ -174,10 +174,11 @@ is_deeply ($info_result, {
 }, 'info read correctly');
 
 # Query tests
-ok ($row = $parser->seek(20,1000000,1231000), "can query a region");
+# FIXME
+# ok ($row = $parser->seek(20,1000000,1231000), "can query a region");
 
-# ok ($row = $parser->next(), "can get first value");
-# do { $row = $parser->next() } until ($row->chromosome($h) == 20 && $row->position == 1110696 );
+ok ($row = $parser->next(), "can get first value");
+do { $row = $parser->next() } until ($row->chromosome($h) == 20 && $row->position == 1110696 );
 
 # # 20	1110696	rs6040355	A	G,T	67	PASS	NS=2;DP=10;AF=0.333,0.667;AA=T;DB	GT:GQ:DP:HQ	1|2:21:6:23,27	2|1:2:0:18,2	2/2:35:4:.,.
 is ($row->chromosome($h), 20, 'chr');
