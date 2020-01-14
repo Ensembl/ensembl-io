@@ -39,7 +39,7 @@ use warnings;
 use Carp;
 use Bio::DB::HTS::VCF;
 use Bio::DB::HTS::VCF::Iterator;
-use Smart::Comments;
+
 use parent qw/Bio::EnsEMBL::IO::Parser/;
 
 sub open {
