@@ -18,17 +18,16 @@ use warnings;
 use Test::More;
 use Bio::EnsEMBL::IO::Parser::BCF;
 
-use FindBin;
+use FindBin qw( $Bin );
 
-my $test_file = $FindBin::Bin . '/input/test.bcf';
-
+my $test_file = $Bin . '/input/test.bcf';
 
 # Test standard functions on a BCF file
 ok (my $parser = Bio::EnsEMBL::IO::Parser::BCF->open($test_file), "BCF file open");
 is ($parser->num_variants(), 9, 'correct number of variants identified in file');
 
 ok (my $h = $parser->header(), "Got header");
-my $header_str = <<"HEADER";
+my $header_str = <<HEADER;
 ##fileformat=VCFv4.0
 ##FILTER=<ID=PASS,Description="All filters passed">
 ##fileDate=20090805
@@ -174,11 +173,8 @@ is_deeply ($info_result, {
 }, 'info read correctly');
 
 # Query tests
-# FIXME
-# ok ($row = $parser->seek(20,1000000,1231000), "can query a region");
-
 ok ($row = $parser->next(), "can get first value");
-do { $row = $parser->next() } until ($row->chromosome($h) == 20 && $row->position == 1110696 );
+ok ($row = $parser->seek(20,1000000,1231000), "can query a region");
 
 # # 20	1110696	rs6040355	A	G,T	67	PASS	NS=2;DP=10;AF=0.333,0.667;AA=T;DB	GT:GQ:DP:HQ	1|2:21:6:23,27	2|1:2:0:18,2	2/2:35:4:.,.
 is ($row->chromosome($h), 20, 'chr');
