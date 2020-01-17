@@ -80,12 +80,12 @@ is ($row->get_variant_type(1), 1, "Variant type matches");
 # info related tests
 ok (my $info_result = $row->get_info($h), "Got info");
 is_deeply ($info_result, {
-	AF => [0.5],
-	DB => [1],
-	DP => [14],
-	H2 => [1],
-	NS => [3],
-	TT => ['TESTSTRING']
+  AF => [0.5],
+  DB => [1],
+  DP => [14],
+  H2 => [1],
+  NS => [3],
+  TT => ['TESTSTRING']
 }, 'info read correctly');
 $info_result = $row->get_info($h, "DB") ;
 isa_ok ($info_result, 'ARRAY');
@@ -111,8 +111,8 @@ is_deeply ($row->get_format($h, "GT"), [2, 3, 2, 3, 2, 4], 'format int read');
 is_deeply ($row->get_format($h, "HQ"), [10, 10, 10, 10, 3, 3], 'format int read');
 is ($row->get_format($h, "INVALID"), "ID_NOT_FOUND", 'format ID not present');
 is_deeply ($row->get_format($h), {
-	GT => [2, 3, 2, 3, 2, 4],
-	HQ => [10, 10, 10, 10, 3, 3]
+  GT => [2, 3, 2, 3, 2, 4],
+  HQ => [10, 10, 10, 10, 3, 3]
 }, "format read");
 
 ok ($row = $parser->next(), "Next row");
@@ -137,8 +137,8 @@ is_deeply ($row->get_format($h, "GT"), [2, 3, 2, 3, 2, 4], 'format int read');
 is_deeply ($row->get_format($h, "HQ"), [10, 10, 10, 10, 3, 3], 'format int read');
 is ($row->get_format($h, "INVALID"), "ID_NOT_FOUND", 'format ID not present');
 is_deeply ($row->get_format($h), {
-	GT => [2, 3, 2, 3, 2, 4],
-	HQ => [10, 10, 10, 10, 3, 3]
+  GT => [2, 3, 2, 3, 2, 4],
+  HQ => [10, 10, 10, 10, 3, 3]
 }, "format read");
 
 # format and genotype tests
@@ -151,10 +151,10 @@ is_deeply ($row->get_format($h, "DP"), [1,8,5], 'format int read');
 
 is_deeply ($row->get_format($h, "HQ"), [51,51,51,51,'-2147483648','-2147483648'], 'format int read');
 is_deeply ($row->get_format($h), {
-	GT => [2,3,4,3,4,4],
-	GQ => [48,48,43],
-	DP => [1,8,5],
-	HQ => [51,51,51,51,'-2147483648','-2147483648']
+  GT => [2,3,4,3,4,4],
+  GQ => [48,48,43],
+  DP => [1,8,5],
+  HQ => [51,51,51,51,'-2147483648','-2147483648']
 }, "format read");
 
 my $fmt_result = $row->get_genotypes($h);
@@ -165,7 +165,7 @@ is ($row->get_format($h,"IDONTEXIST"), 'ID_NOT_FOUND', 'format id not found');
 is ($row->get_info($h,"IDONTEXIST"), 'ID_NOT_FOUND', 'info id not found');
 $info_result = $row->get_info($h);
 is_deeply ($info_result, {
-	NS => [3],
+  NS => [3],
   DP => [14],
   AF => [0.5],
   DB => [1],
@@ -193,9 +193,10 @@ is ($row->position, 1230237, 'position');
 is ($row->id, '.', 'id');
 is ($row->reference, 'T', 'reference');
 is_deeply ($row->get_info($h), {
-			 NS => [3],
-			 DP => [13],
-			 AA => ['T']}, 'info');
+  NS => [3],
+  DP => [13],
+  AA => ['T']
+}, 'info');
 
 ok ($parser->close(), "Close successful");
 
