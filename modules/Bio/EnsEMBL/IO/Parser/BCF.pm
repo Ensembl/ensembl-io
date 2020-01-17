@@ -54,7 +54,6 @@ sub open {
   $self->{bcf_file} = Bio::DB::HTS::VCF->new( filename => $filename );
 
   $self->{iterator} = undef;
-  # $self->{delimiter} = "\t";
 
   return $self;
 }
@@ -66,8 +65,7 @@ sub seek {
     if UNIVERSAL::isa($self->{iterator}, 'Bio::DB::HTS::VCF::Iterator');
 
   ## Check for both possible versions of chromosome name
-  foreach ($chrom, "chr$chrom")
-  {
+  foreach ($chrom, "chr$chrom") {
     my $region = "$_:$start-$end";
     $self->{iterator} = $self->{bcf_file}->query($region) ;
     last if $self->{iterator};
@@ -76,10 +74,9 @@ sub seek {
   # pre-load peek buffer
   if ($self->{iterator}) {
     $self->next_block();
-    return 1;
-  }
-  else {
-    return 0;
+    return $self->{waiting_block};
+  } else {
+    return;
   }
 }
 
