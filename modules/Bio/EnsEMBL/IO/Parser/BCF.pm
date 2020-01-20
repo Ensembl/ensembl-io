@@ -74,9 +74,10 @@ sub seek {
   # pre-load peek buffer
   if ($self->{iterator}) {
     $self->next_block();
-    return $self->{waiting_block};
+    $self->{record} = $self->{waiting_block};
+    return 1;
   } else {
-    return;
+    return 0;
   }
 }
 
@@ -116,13 +117,26 @@ sub header {
 sub next {
   my $self = shift;
 
-  return $self->{bcf_file}->next();
+  $self->{record} = $self->{bcf_file}->next();
+
+  if (defined $self->{record}) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 sub query {
-   my ($self, $region) = @_;
+  my ($self, $region) = @_;
 
   return $self->{bcf_file}->query($region);
 }
+
+sub read_record {
+  my $self = shift;
+
+  return $self->{record};
+}
+
 
 1;

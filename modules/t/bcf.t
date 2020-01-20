@@ -68,7 +68,9 @@ is_deeply ($h->get_sample_names(), ['NA00001','NA00002','NA00003'], "sample name
 is ($h->num_seqnames(), 3, "Number of seqnames");
 is_deeply ($h->get_seqnames(), ['19','20','X'], "sequence names correct");
 
-ok (my $row = $parser->next(), "Next row");
+ok ($parser->next(), "Next row");
+ok (my $row = $parser->read_record, "Get row");
+
 is ($row->chromosome($h), "19", "Chromosome value read");
 is ($row->position(), "111", "Position value read");
 is ($row->id(), "testid", "ID value read");
@@ -115,7 +117,8 @@ is_deeply ($row->get_format($h), {
   HQ => [10, 10, 10, 10, 3, 3]
 }, "format read");
 
-ok ($row = $parser->next(), "Next row");
+ok ($parser->next(), "Next row");
+ok ($row = $parser->read_record, "Get row");
 is ($row->chromosome($h), "19", "Chromosome value read");
 is ($row->position(), "112", "Position value read");
 is ($row->quality(), "10", "Quality value read");
@@ -142,7 +145,8 @@ is_deeply ($row->get_format($h), {
 }, "format read");
 
 # format and genotype tests
-ok ($row = $parser->next(), "Next row");
+ok ($parser->next(), "Next row");
+ok ($row = $parser->read_record, "Get row");
 is ($row->chromosome($h), "20", "Chromosome value read");
 is ($row->get_format_type($h, "DP"), "Integer", "int format type correct");
 is_deeply ($row->get_format($h, "GT"), [2,3,4,3,4,4], 'format int read');
@@ -173,8 +177,9 @@ is_deeply ($info_result, {
 }, 'info read correctly');
 
 # Query tests
-ok ($row = $parser->next(), "can get first value");
-ok ($row = $parser->seek(20,1000000,1231000), "can query a region");
+
+ok ($parser->seek(20,1000000,1231000), "can query a region");
+ok ($row = $parser->read_record, "Get row");
 
 # # 20	1110696	rs6040355	A	G,T	67	PASS	NS=2;DP=10;AF=0.333,0.667;AA=T;DB	GT:GQ:DP:HQ	1|2:21:6:23,27	2|1:2:0:18,2	2/2:35:4:.,.
 is ($row->chromosome($h), 20, 'chr');
@@ -186,7 +191,8 @@ is_deeply ($row->get_info($h, 'DP'), [10], 'info');
 is_deeply ($row->get_info($h, 'AA'), ['T'], 'info');
 is_deeply ($row->get_info($h, 'DB'), [1], 'info');
 
-ok ($row = $parser->next(), "can get a value from the iterator");
+ok ($parser->next(), "Next row");
+ok ($row = $parser->read_record, "Get row");
 # 20	1230237	.	T	.	47	PASS	NS=3;DP=13;AA=T	GT:GQ:DP:HQ	0|0:54:.:56,60	0|0:48:4:51,51	0/0:61:2:.,.
 is ($row->chromosome($h), 20, 'chr');
 is ($row->position, 1230237, 'position');
