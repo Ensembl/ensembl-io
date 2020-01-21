@@ -2,7 +2,7 @@
 
 =head1 LICENSE
 
-  Copyright [2020] EMBL-European Bioinformatics Institute
+Copyright [2020] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,14 +16,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-=cut
-
-
 =head1 NAME
 
 Bio::EnsEMBL::IO::Parser::BCF - A line-based parser devoted to BCF
-
-=cut
 
 =head1 DESCRIPTION
 
@@ -49,10 +44,8 @@ sub open {
   # initialize generic parser
   my $self = $class->SUPER::new(@other_args);
 
-
   $self->{record} = undef;
   $self->{bcf_file} = Bio::DB::HTS::VCF->new( filename => $filename );
-
   $self->{iterator} = undef;
 
   return $self;
@@ -83,6 +76,7 @@ sub seek {
 
 sub next_block {
   my $self = shift;
+
   if (!defined $self->{iterator}) {
     exit 1;
   }
@@ -91,14 +85,17 @@ sub next_block {
 }
 
 sub read_block {
-    my $self = shift;
-    $self->{waiting_block} = $self->{iterator}->next;
+  my $self = shift;
+
+  $self->{waiting_block} = $self->{iterator}->next;
 }
 
 sub close {
   my $self = shift;
+
   $self->{iterator}->close if $self->{iterator};
   my $report = $self->{bcf_file}->DESTROY;
+
   return (defined $report) ? 0 : 1;
 }
 
@@ -137,6 +134,5 @@ sub read_record {
 
   return $self->{record};
 }
-
 
 1;
