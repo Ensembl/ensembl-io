@@ -67,10 +67,8 @@ is ($h->num_samples(), 3, "Number of samples");
 is_deeply ($h->get_sample_names(), ['NA00001','NA00002','NA00003'], "sample names correct");
 is ($h->num_seqnames(), 3, "Number of seqnames");
 is_deeply ($h->get_seqnames(), ['19','20','X'], "sequence names correct");
-
 ok ($parser->next(), "Next row");
 ok (my $row = $parser->read_record, "Get row");
-
 is ($row->chromosome($h), "19", "Chromosome value read");
 is ($row->position(), "111", "Position value read");
 is ($row->id(), "testid", "ID value read");
@@ -93,12 +91,10 @@ $info_result = $row->get_info($h, "DB") ;
 isa_ok ($info_result, 'ARRAY');
 is_deeply ($info_result, [1], 'info flag read correctly');
 is ($row->get_info_type($h, "DB"), "Flag", "info flag type correct");
-
 $info_result = $row->get_info($h, "AF");
 isa_ok ($info_result, 'ARRAY');
 is_deeply ($info_result, [0.5], 'info float read correctly');
-is ($row->get_info_type($h,"AF"), "Float", "info float type correct");
-
+is ($row->get_info_type($h, "AF"), "Float", "info float type correct");
 $info_result = $row->get_info($h, "TT");
 isa_ok ($info_result, 'ARRAY');
 is_deeply ($info_result, ["TESTSTRING"], 'info string read correctly');
@@ -106,7 +102,7 @@ is ($row->get_info_type($h,"TT"), "String", "info String type correct");
 $info_result = $row->get_info($h, "NS");
 isa_ok ($info_result, 'ARRAY');
 is_deeply ($info_result, [3], 'info ints read correctly');
-is ($row->get_info_type($h,"NS"), "Integer", "info int type correct");
+is ($row->get_info_type($h, "NS"), "Integer", "info int type correct");
 
 # format related tests
 is_deeply ($row->get_format($h, "GT"), [2, 3, 2, 3, 2, 4], 'format int read');
@@ -116,7 +112,6 @@ is_deeply ($row->get_format($h), {
   GT => [2, 3, 2, 3, 2, 4],
   HQ => [10, 10, 10, 10, 3, 3]
 }, "format read");
-
 ok ($parser->next(), "Next row");
 ok ($row = $parser->read_record, "Get row");
 is ($row->chromosome($h), "19", "Chromosome value read");
@@ -125,7 +120,7 @@ is ($row->quality(), "10", "Quality value read");
 is ($row->reference(), "A", "Reference value read");
 is ($row->num_alleles(), 1, "Num Alleles");
 is ($row->is_snp(), 1, "Is SNP");
-my $a_team = $row->get_alleles();
+ok (my $a_team = $row->get_alleles(), "Get alleles");
 isa_ok ($a_team, 'ARRAY');
 is_deeply ($a_team, ['G'], 'alleles are correct');
 is ($row->num_filters(), 1, "Num Filters OK");
@@ -152,7 +147,6 @@ is ($row->get_format_type($h, "DP"), "Integer", "int format type correct");
 is_deeply ($row->get_format($h, "GT"), [2,3,4,3,4,4], 'format int read');
 is_deeply ($row->get_format($h, "GQ"), [48,48,43], 'format int read');
 is_deeply ($row->get_format($h, "DP"), [1,8,5], 'format int read');
-
 is_deeply ($row->get_format($h, "HQ"), [51,51,51,51,'-2147483648','-2147483648'], 'format int read');
 is_deeply ($row->get_format($h), {
   GT => [2,3,4,3,4,4],
@@ -161,9 +155,8 @@ is_deeply ($row->get_format($h), {
   HQ => [51,51,51,51,'-2147483648','-2147483648']
 }, "format read");
 
-my $fmt_result = $row->get_genotypes($h);
+ok (my $fmt_result = $row->get_genotypes($h), "Get genotypes");
 isa_ok ($fmt_result, 'ARRAY');
-# TODO resolve how these translate to the strings in htslib
 is_deeply ($fmt_result, [2,3,4,3,4,4], 'genotypes read correctly');
 is ($row->get_format($h,"IDONTEXIST"), 'ID_NOT_FOUND', 'format id not found');
 is ($row->get_info($h,"IDONTEXIST"), 'ID_NOT_FOUND', 'info id not found');
@@ -177,11 +170,11 @@ is_deeply ($info_result, {
 }, 'info read correctly');
 
 # Query tests
-
-ok ($parser->seek(20,1000000,1231000), "can query a region");
+is ($parser->seek(0,0,0), 0, "Returns 0 on querying non existing region");
+is ($parser->seek(20,1000000,1231000), 1, "Returns 1 on querying existing region");
 ok ($row = $parser->read_record, "Get row");
 
-# # 20	1110696	rs6040355	A	G,T	67	PASS	NS=2;DP=10;AF=0.333,0.667;AA=T;DB	GT:GQ:DP:HQ	1|2:21:6:23,27	2|1:2:0:18,2	2/2:35:4:.,.
+# 20	1110696	rs6040355	A	G,T	67	PASS	NS=2;DP=10;AF=0.333,0.667;AA=T;DB	GT:GQ:DP:HQ	1|2:21:6:23,27	2|1:2:0:18,2	2/2:35:4:.,.
 is ($row->chromosome($h), 20, 'chr');
 is ($row->position, 1110696, 'position');
 is ($row->id, 'rs6040355', 'id');
@@ -205,6 +198,5 @@ is_deeply ($row->get_info($h), {
 }, 'info');
 
 ok ($parser->close(), "Close successful");
-
 
 done_testing();
