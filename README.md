@@ -1,6 +1,6 @@
 # ensembl-io
 
-[![Build Status](https://travis-ci.org/Ensembl/ensembl-io.svg?branch=release/100)][travis]
+[![Build Status](https://travis-ci.org/Ensembl/ensembl-io.svg?branch=master)][travis]
 
 ## File parsing and writing code for Ensembl
 
