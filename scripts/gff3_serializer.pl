@@ -92,7 +92,7 @@ my $gc = $dba->get_GenomeContainer();
 
 # Get the build. name gives us GRCh37.p1 where as default gives us GRCh37
 my $assembly_name = $gc->get_assembly_name();
-my $providers = $mc->list_value_by_key('provider.name') || '';
+my $providers = $mc->list_value_by_key('assembly.provider_name') || '';
 my $provider = join(";", @$providers);
 $serializer->write(Bio::EnsEMBL::IO::Object::GXFMetadata->ens_directive('genome-build', $provider, $assembly_name)) if $assembly_name;
  
