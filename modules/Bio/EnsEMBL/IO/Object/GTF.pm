@@ -77,31 +77,6 @@ sub strand_conversion {
 ##########################################
 
 
-=head2 create_record
-
-    Description: Serialize the record to it's native format, pieces may
-                 need to be overridden by inherited types.
-
-=cut
-
-sub create_record {
-    my $self = shift;
-    my @values;
-
-    foreach my $field (@{$self->fields}) {
-	my $value;
-	if(defined($self->$field) && ref $self->$field eq 'HASH') {
-	    $value = $self->combine_fields($self->$field, '; ', 1, ' ', '"');
-	} else {
-	    $value = $self->$field || '.';
-	}
-
-	push @values, $value;
-    }
-
-    return $self->concatenate_fields(\@values) . "\n";
-}
-
 =head2
 
     Description: Map to a GTF type strand (+/-) when accessing the strand value

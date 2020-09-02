@@ -170,7 +170,9 @@ sub combine_fields {
 		        push @values, ($inc_field ? "$field$separator" : '') . qq($valuequotes$v$valuequotes);
 		      }
 	      }
-	    } else {
+	    } elsif (ref($values->{$field}) eq 'HASH'){
+                     push @values, $self->combine_fields($values->{$field}, $order, $delimiter, $inc_field, $separator, $valuequotes, $multi_delimiter);
+            } else {
 	      push @values, ($inc_field ? "$field$separator" : '') . $valuequotes . $values->{$field} . $valuequotes;
 	    }
     }
