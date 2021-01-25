@@ -17,6 +17,7 @@ use warnings;
 
 use Test::More;
 use Bio::EnsEMBL::IO::Parser::BCF;
+use Cwd qw(getcwd);
 
 use FindBin qw( $Bin );
 
@@ -25,6 +26,14 @@ my $test_file = $Bin . '/input/test.bcf';
 # Test standard functions on a BCF file
 ok (my $parser = Bio::EnsEMBL::IO::Parser::BCF->open($test_file), "BCF file open");
 is ($parser->num_variants(), 9, 'correct number of variants identified in file');
+
+#test open with $location
+my $currentDir = getcwd();
+chdir('/');
+ok ($parser = Bio::EnsEMBL::IO::Parser::BCF->open($test_file, $currentDir), "BCF file open with location");
+is ($parser->num_variants(), 9, 'correct number of variants identified in file');
+chdir($currentDir);
+
 
 ok (my $h = $parser->header(), "Got header");
 my $header_str = <<HEADER;
