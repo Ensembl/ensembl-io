@@ -188,7 +188,7 @@ OUT
   my $ontology_adaptor = {};
   bless($ontology_adaptor, 'Bio::EnsEMBL::DBSQL::OntologyTermAdaptor');
 
-  my $ser = Bio::EnsEMBL::Utils::IO::GFFSerializer->new($ontology_adaptor, $fh);
+  my $ser = Bio::EnsEMBL::Utils::IO::GFFSerializer->new($fh);
   ok($ser, "Legacy constructor backwards compatibility. Here to remind of deprecated message.");
 }
 
