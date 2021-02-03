@@ -34,7 +34,7 @@ use warnings;
 use Carp;
 use Bio::DB::HTS::VCF;
 use Bio::DB::HTS::VCF::Iterator;
-
+use Cwd qw(getcwd);
 use parent qw/Bio::EnsEMBL::IO::Parser/;
 
 sub open {
@@ -48,6 +48,21 @@ sub open {
   $self->{bcf_file} = Bio::DB::HTS::VCF->new( filename => $filename );
   $self->{iterator} = undef;
 
+  return $self;
+}
+
+sub open_with_location {
+  my ($caller, $filename, $location, @other_args) = @_;
+  my $class = ref($caller) || $caller;
+
+  # initialize generic parser
+  my $self = $class->SUPER::new(@other_args);
+  my $currentDir = getcwd();
+  chdir($location);
+  $self->{record} = undef;
+  $self->{bcf_file} = Bio::DB::HTS::VCF->new( filename => $filename );
+  $self->{iterator} = undef;
+  chdir($currentDir);
   return $self;
 }
 
