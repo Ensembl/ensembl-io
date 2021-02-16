@@ -502,7 +502,11 @@ sub _finish_feature {
     foreach my $section (@sections) {
         my ($key,$value) = split '=',$section;
         $value =~ s/"//g if $value;
-        push @{ $feature->{$key} },$value if ($key && $value);
+        if ($key && $value) {
+            push @{ $feature->{$key} },$value;
+        } elsif ($key) {
+            push @{ $feature->{$key} },'1';
+        }
     }
     my %final_copy = %$feature;
     return \%final_copy;
