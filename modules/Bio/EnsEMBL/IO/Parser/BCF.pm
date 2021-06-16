@@ -35,7 +35,7 @@ use Carp;
 use Bio::DB::HTS::VCF;
 use Bio::DB::HTS::VCF::Iterator;
 use Cwd qw(getcwd);
-use parent qw/Bio::EnsEMBL::IO::Parser/;
+use parent qw/Bio::EnsEMBL::IO::Parser::BaseVCF4/;
 
 sub open {
   my ($caller, $filename, @other_args) = @_;
@@ -149,5 +149,56 @@ sub read_record {
 
   return $self->{record};
 }
+
+## Override 'raw' VCF accessors because we're dealing with an object, not an arrayref
+
+sub get_raw_seqname {
+    my $self = shift;
+    return $self->{'record'}->chromosome($self->header);
+}
+
+sub get_raw_start {
+    my $self = shift;
+    return $self->{'record'}->position;
+}
+
+sub get_raw_end {
+    my $self = shift;
+    my $info = $self->get_info($self->header);
+    my $end;
+    if (defined($info->{END})) {
+      $end = $info->{END};
+    }
+    elsif(defined($info->{SVLEN})) {
+      my $svlen = (split(',',$info->{SVLEN}))[0];
+      $end = $self->get_raw_start + abs($svlen);
+    }
+    else {
+      $end = $self->get_raw_start + length($self->get_raw_reference) - 1;
+    }
+    return $end;
+}
+
+sub get_raw_IDs {
+    my $self = shift;
+    return $self->{'record'}->id;
+}
+
+sub get_raw_reference {
+    my $self = shift;
+    return $self->{'record'}->reference;
+}
+
+sub get_raw_alternatives {
+    my $self = shift;
+    my @A = $self->{'record'}->get_alleles;
+    return join(',', @A);
+}
+
+sub get_raw_info {
+  my $self = shift;
+  return $self->{'record'}->get_info($self->header);
+}
+
 
 1;
