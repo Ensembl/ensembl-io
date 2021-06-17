@@ -275,6 +275,23 @@ sub get_filter_results {
   return $self->get_raw_filter_results;
 }
 
+sub get_raw_formats {
+  my $self = shift;
+  return {} unless $self->{metadata}{FORMAT}; 
+  return $self->{record}->get_format($self->header);
+}
+
+sub get_formats {
+  my $self = shift;
+  return keys %{$self->get_raw_formats||{}};
+}
+
+sub get_individuals {
+  my $self = shift;
+
+  return $self->header->get_samples;
+}
+
 ## These methods are only needed by non-binary VCF formats,
 ## so prevent them from returning nonsense
 
