@@ -3,7 +3,7 @@
 =head1 LICENSE
 
 Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
-Copyright [2016-2020] EMBL-European Bioinformatics Institute
+Copyright [2016-2021] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -502,7 +502,11 @@ sub _finish_feature {
     foreach my $section (@sections) {
         my ($key,$value) = split '=',$section;
         $value =~ s/"//g if $value;
-        push @{ $feature->{$key} },$value if ($key && $value);
+        if ($key && $value) {
+            push @{ $feature->{$key} },$value;
+        } elsif ($key) {
+            push @{ $feature->{$key} },'1';
+        }
     }
     my %final_copy = %$feature;
     return \%final_copy;

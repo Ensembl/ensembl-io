@@ -1,7 +1,7 @@
 =head1 LICENSE
 
 Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
-Copyright [2016-2020] EMBL-European Bioinformatics Institute
+Copyright [2016-2021] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -170,7 +170,9 @@ sub combine_fields {
 		        push @values, ($inc_field ? "$field$separator" : '') . qq($valuequotes$v$valuequotes);
 		      }
 	      }
-	    } else {
+	    } elsif (ref($values->{$field}) eq 'HASH'){
+                     push @values, $self->combine_fields($values->{$field}, $order, $delimiter, $inc_field, $separator, $valuequotes, $multi_delimiter);
+            } else {
 	      push @values, ($inc_field ? "$field$separator" : '') . $valuequotes . $values->{$field} . $valuequotes;
 	    }
     }

@@ -1,7 +1,7 @@
 =head1 LICENSE
 
 Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
-Copyright [2016-2020] EMBL-European Bioinformatics Institute
+Copyright [2016-2021] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -48,7 +48,6 @@ use Carp;
 use URI::Escape;
 use Scalar::Util qw/blessed/;
 
-use Bio::EnsEMBL::Utils::SequenceOntologyMapper;
 use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
 my %ens_field_callbacks = (seqname        => 'seqname',
@@ -75,7 +74,7 @@ my %ens_field_callbacks = (seqname        => 'seqname',
 
 sub new {
     my ($class, $args) = @_;
-  
+
     my $self = $class->SUPER::new($args);
 
     # Once we have the instance, add our customized callbacks
@@ -113,7 +112,7 @@ sub start {
 }
 
 =head2 bedstart
-    Description: Subtract 1 from Ensembl start, for BED semi-open coordinates 
+    Description: Subtract 1 from Ensembl start, for BED semi-open coordinates
     Returntype : Integer
 =cut
 
@@ -137,8 +136,8 @@ sub end {
     my $end = $object->seq_region_end();
 
     # the start coordinate of the feature, here shifted to chromosomal coordinates
-    # Start and end must be in ascending order for GXF. Circular genomes require the length of 
-    # the circuit to be added on.    
+    # Start and end must be in ascending order for GXF. Circular genomes require the length of
+    # the circuit to be added on.
     if( $object->seq_region_start() > $object->seq_region_end() ) {
 	    if ($object->slice() && $object->slice()->is_circular() ) {
 	      $end = $end + $object->seq_region_length;
@@ -164,12 +163,12 @@ sub source {
     my $source;
     if (ref($object)->isa('Bio::EnsEMBL::Slice') ) {
 	    $source = $object->source || $object->coord_system->version
-    } 
+    }
     elsif (ref($object)->isa('Bio::EnsEMBL::ExonTranscript') ||
 	          ref($object)->isa('Bio::EnsEMBL::CDS') ||
 	          ref($object)->isa('Bio::EnsEMBL::UTR') ) {
 	    $source = $object->transcript()->source();
-    } 
+    }
     elsif (ref($object)->isa('Bio::EnsEMBL::Feature') &&
 	          defined($object->analysis) && $object->analysis->gff_source() ) {
 	    $source = $object->analysis->gff_source();
@@ -179,7 +178,7 @@ sub source {
 }
 
 =head2 feature
-    Description: Object type for GFF2/GTF 
+    Description: Object type for GFF2/GTF
     Returntype : String
 =cut
 
@@ -192,7 +191,7 @@ sub feature {
 }
 
 =head2 type
-    Description: Object type for GFF3 - must be an ontology term 
+    Description: Object type for GFF3 - must be an ontology term
     Returntype : String
 =cut
 
@@ -335,8 +334,8 @@ sub attributes {
           $attrs{$attribute} = join (',',map { uri_escape($_,'\t\n\r;=%&,') } grep { defined $_ } @{$summary{$attribute}});
         }
       } else {
-        if (defined $summary{$attribute}) { 
-          $attrs{$attribute} = uri_escape($summary{$attribute},'\t\n\r;=%&,'); 
+        if (defined $summary{$attribute}) {
+          $attrs{$attribute} = uri_escape($summary{$attribute},'\t\n\r;=%&,');
 	      }
 	    }
     }

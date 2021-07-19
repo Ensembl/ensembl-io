@@ -1,7 +1,7 @@
 =head1 LICENSE
 
 Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
-Copyright [2016-2020] EMBL-European Bioinformatics Institute
+Copyright [2016-2021] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -76,31 +76,6 @@ sub strand_conversion {
 # Old functionality that's going away
 ##########################################
 
-
-=head2 create_record
-
-    Description: Serialize the record to it's native format, pieces may
-                 need to be overridden by inherited types.
-
-=cut
-
-sub create_record {
-    my $self = shift;
-    my @values;
-
-    foreach my $field (@{$self->fields}) {
-	my $value;
-	if(defined($self->$field) && ref $self->$field eq 'HASH') {
-	    $value = $self->combine_fields($self->$field, '; ', 1, ' ', '"');
-	} else {
-	    $value = $self->$field || '.';
-	}
-
-	push @values, $value;
-    }
-
-    return $self->concatenate_fields(\@values) . "\n";
-}
 
 =head2
 
