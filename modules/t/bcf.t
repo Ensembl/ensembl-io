@@ -78,9 +78,10 @@ is ($h->num_seqnames(), 3, "Number of seqnames");
 is_deeply ($h->get_seqnames(), ['19','20','X'], "sequence names correct");
 ok ($parser->next(), "Next row");
 ok (my $row = $parser->read_record, "Get row");
-is ($row->chromosome($h), "19", "Chromosome value read");
-is ($row->position(), "111", "Position value read");
-is ($row->id(), "testid", "ID value read");
+is ($parser->get_seqname($h), "19", "Chromosome value read");
+is ($parser->get_start(), "111", "Position value read");
+my $ids = $parser->get_IDs();
+is ($ids->[0], "testid", "ID value read");
 is ($row->num_filters(), 2, "Num Filters OK");
 is ($row->has_filter($h, "DP50"), 1, "Actual Filter present");
 is ($row->has_filter($h, "."), 0, "PASS filter absent");
@@ -123,9 +124,9 @@ is_deeply ($row->get_format($h), {
 }, "format read");
 ok ($parser->next(), "Next row");
 ok ($row = $parser->read_record, "Get row");
-is ($row->chromosome($h), "19", "Chromosome value read");
-is ($row->position(), "112", "Position value read");
-is ($row->quality(), "10", "Quality value read");
+is ($parser->get_seqname($h), "19", "Chromosome value read");
+is ($parser->get_start(), "112", "Position value read");
+is ($parser->get_score(), "10", "Quality value read");
 is ($row->reference(), "A", "Reference value read");
 is ($row->num_alleles(), 1, "Num Alleles");
 is ($row->is_snp(), 1, "Is SNP");
@@ -151,7 +152,7 @@ is_deeply ($row->get_format($h), {
 # format and genotype tests
 ok ($parser->next(), "Next row");
 ok ($row = $parser->read_record, "Get row");
-is ($row->chromosome($h), "20", "Chromosome value read");
+is ($parser->get_seqname($h), "20", "Chromosome value read");
 is ($row->get_format_type($h, "DP"), "Integer", "int format type correct");
 is_deeply ($row->get_format($h, "GT"), [2,3,4,3,4,4], 'format int read');
 is_deeply ($row->get_format($h, "GQ"), [48,48,43], 'format int read');
@@ -184,9 +185,10 @@ is ($parser->seek(20,1000000,1231000), 1, "Returns 1 on querying existing region
 ok ($row = $parser->read_record, "Get row");
 
 # 20	1110696	rs6040355	A	G,T	67	PASS	NS=2;DP=10;AF=0.333,0.667;AA=T;DB	GT:GQ:DP:HQ	1|2:21:6:23,27	2|1:2:0:18,2	2/2:35:4:.,.
-is ($row->chromosome($h), 20, 'chr');
-is ($row->position, 1110696, 'position');
-is ($row->id, 'rs6040355', 'id');
+is ($parser->get_seqname($h), 20, 'chr');
+is ($parser->get_start, 1110696, 'position');
+$ids = $parser->get_IDs();
+is ($ids->[0], 'rs6040355', 'id');
 is ($row->reference, 'A', 'reference');
 is_deeply ($row->get_info($h, 'NS'), [2], 'info');
 is_deeply ($row->get_info($h, 'DP'), [10], 'info');
@@ -196,9 +198,10 @@ is_deeply ($row->get_info($h, 'DB'), [1], 'info');
 ok ($parser->next(), "Next row");
 ok ($row = $parser->read_record, "Get row");
 # 20	1230237	.	T	.	47	PASS	NS=3;DP=13;AA=T	GT:GQ:DP:HQ	0|0:54:.:56,60	0|0:48:4:51,51	0/0:61:2:.,.
-is ($row->chromosome($h), 20, 'chr');
-is ($row->position, 1230237, 'position');
-is ($row->id, '.', 'id');
+is ($parser->get_seqname($h), 20, 'chr');
+is ($parser->get_start, 1230237, 'position');
+$ids = $parser->get_IDs();
+is ($ids->[0], '.', 'id');
 is ($row->reference, 'T', 'reference');
 is_deeply ($row->get_info($h), {
   NS => [3],
