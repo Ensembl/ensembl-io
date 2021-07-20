@@ -87,71 +87,11 @@ sub read_metadata {
   my $self = shift;
   my $line = ($self->{'current_block'}) ? $self->{'current_block'} : shift;
 
-  my %meta_info = ( 'INFO'     => 1,
-                    'FILTER'   => 1,
-                    'FORMAT'   => 1,
-                    'ALT'      => 1,
-                    'SAMPLE'   => 1,
-                    'PEDIGREE' => 1 );
-
   chomp $line;
   push @{$self->{_raw_metadata}}, $line;
 
   if ($line =~ /^##\s*(\w+)=(.+)$/) {
-    my $m_type = $1;
-    my $m_data = $2;
-
-    push @{$self->{_metadata_order}}, $m_type;
-
-    # Check the fileformat
-    if ($m_type eq 'fileformat') {
-      if ($m_data =~ /(\d+)\.(\d+)/) {
-        my ($file_version_major, $file_version_minor) = ($1, $2);
-        my $f_version = $file_version_major.'.'.$file_version_minor;
-
-        # get version of this parser
-        $version =~ /(\d+)\.(\d+)/;
-        my ($parser_version_major, $parser_version_minor) = ($1, $2);
-
-        confess "The VCF file format version $f_version is not compatible with the parser version (VCF v$version)" if ($file_version_major != $parser_version_major) || ($file_version_major == $parser_version_major && $parser_version_major < $file_version_major);
-        #warn "VCF file version $f_version may be incompatible with parser version $version" if ($file_version_major == $parser_version_major && $parser_version_minor != $file_version_minor);
-      }
-      else {
-        die "The script can't read the VCF file format version of '$m_type'";
-      }
-    }
-
-    # Can have more than 1 sequence region
-    if ($meta_info{$m_type}) {
-      $m_data =~ s/[<>]//g;
-      my %metadata;
-
-      # Fix when the character "," is found in the description field
-      if($m_data =~ /(.*)(".+")(.*)/) {
-        my ($before, $content, $after) = ($1, $2, $3);
-        $content =~ s/,/!#!/g;
-        $m_data = ($before || '').$content.($after || '');
-      }
-      foreach my $meta (split(',',$m_data)) {
-
-        my ($key,$value) = split('=',$meta);
-        if(defined($value)) {
-          $value =~ s/"//g;
-          $value =~ s/!#!/,/g; # Revert the fix for the character ","
-        }
-        $metadata{$key}=$value;
-      }
-
-      if ($self->{'metadata'}->{$m_type}) {
-        push(@{$self->{'metadata'}->{$m_type}}, \%metadata);
-      }
-      else {
-        $self->{'metadata'}->{$m_type} = [\%metadata];
-      }
-    }
-    else {
-      $self->{'metadata'}->{$m_type} = $m_data;
-    }
+    $self->_parse_metadata_line($line, $1, $2);
   }
   elsif ($line =~ /^#\s*(.+)$/) {
     $self->{'metadata'}->{'header'} = [split("\t",$1)];
@@ -159,6 +99,68 @@ sub read_metadata {
   }
 }
 
+sub _parse_metadata_line {
+  my ($self, $line, $m_type, $m_data) = @_;
+  my %meta_info = ( 'INFO'     => 1,
+                    'FILTER'   => 1,
+                    'FORMAT'   => 1,
+                    'ALT'      => 1,
+                    'SAMPLE'   => 1,
+                    'PEDIGREE' => 1 );
+
+
+  push @{$self->{_metadata_order}}, $m_type;
+
+  # Check the fileformat
+  if ($m_type eq 'fileformat') {
+    if ($m_data =~ /(\d+)\.(\d+)/) {
+      my ($file_version_major, $file_version_minor) = ($1, $2);
+      my $f_version = $file_version_major.'.'.$file_version_minor;
+
+      # get version of this parser
+      $version =~ /(\d+)\.(\d+)/;
+      my ($parser_version_major, $parser_version_minor) = ($1, $2);
+
+      confess "The VCF file format version $f_version is not compatible with the parser version (VCF v$version)" if ($file_version_major != $parser_version_major) || ($file_version_major == $parser_version_major && $parser_version_major < $file_version_major);
+      #warn "VCF file version $f_version may be incompatible with parser version $version" if ($file_version_major == $parser_version_major && $parser_version_minor != $file_version_minor);
+    }
+    else {
+      die "The script can't read the VCF file format version of '$m_type'";
+    }
+  }
+
+  # Can have more than 1 sequence region
+  if ($meta_info{$m_type}) {
+    $m_data =~ s/[<>]//g;
+    my %metadata;
+
+    # Fix when the character "," is found in the description field
+    if ($m_data =~ /(.*)(".+")(.*)/) {
+      my ($before, $content, $after) = ($1, $2, $3);
+      $content =~ s/,/!#!/g;
+      $m_data = ($before || '').$content.($after || '');
+    }
+    foreach my $meta (split(',',$m_data)) {
+
+      my ($key,$value) = split('=',$meta);
+      if (defined($value)) {
+        $value =~ s/"//g;
+        $value =~ s/!#!/,/g; # Revert the fix for the character ","
+      }
+      $metadata{$key}=$value;
+    }
+
+    if ($self->{'metadata'}->{$m_type}) {
+      push(@{$self->{'metadata'}->{$m_type}}, \%metadata);
+    }
+    else {
+      $self->{'metadata'}->{$m_type} = [\%metadata];
+    }
+  }
+  else {
+    $self->{'metadata'}->{$m_type} = $m_data;
+  }
+}
 
 =head2 get_metadata_key_list
     Description : Retrieve the list of metadata keys available as a
