@@ -427,8 +427,9 @@ sub _print_attribs {
 
   my $fh = $self->{'filehandle'};
 
-  print $fh "gene_id \"" . get_id_from_obj($gene) ."\";";
-  print $fh " gene_version \"" . $gene_version . "\";" if $gene_version;
+  # print $fh "gene_id \"" . get_id_from_obj($gene) ."\";";
+  # print $fh " gene_version \"" . $gene_version . "\";" if $gene_version;
+  print $fh "gene_id \"" . get_id_from_obj($gene) . "." . $gene_version . "\";" if $gene_version;
   if($type ne 'gene') {
     print $fh " transcript_id \"" . get_id_from_obj($transcript) . "\";";
     print $fh " transcript_version \"" . $trans_version . "\";" if $trans_version;
