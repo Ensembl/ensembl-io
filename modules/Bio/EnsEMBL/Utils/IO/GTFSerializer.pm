@@ -415,20 +415,22 @@ sub _print_attribs {
        $has_selenocysteine )
     = @_;
 
-  my ( $gene_name, $gene_source, $gene_version );
+  my ( $gene_name, $gene_source, $gene_version, $gene_level );
   $gene_name = $gene->external_name;
   $gene_source = $gene->source;
   $gene_version = $gene->version;
+  $gene_level = get_level($gene_source);
 
-  my ( $trans_name, $trans_source, $trans_version );
+  my ( $trans_name, $trans_source, $trans_version, $trans_level );
   $trans_name = $transcript->external_name;
   $trans_source = $transcript->source;
   $trans_version = $transcript->version;
+  $trans_level = get_level($trans_source);
 
   my $fh = $self->{'filehandle'};
 
-  print $fh "gene_id \"" . get_id_from_obj($gene) ."\";";
-  print $fh " gene_version \"" . $gene_version . "\";" if $gene_version;
+  print $fh "gene_id \"" . get_id_from_obj($gene) . ($gene_version ? ".".$gene_version : "") ."\";";
+  #print $fh " gene_version \"" . $gene_version . "\";" if $gene_version;
   if($type ne 'gene') {
     print $fh " transcript_id \"" . get_id_from_obj($transcript) . "\";";
     print $fh " transcript_version \"" . $trans_version . "\";" if $trans_version;
@@ -505,6 +507,47 @@ sub _print_attribs {
     if (@{$proj_parent_attributes}) {
       my $value = $proj_parent_attributes->[0]->value;
       print $fh qq{ projection_parent_transcript "${value}";};
+    }
+  }
+
+  # Add gene and transcript level
+  if ($type eq 'gene') {
+    print $fh " level \"" . $gene_level . "\";" if ($gene_level);
+  } else {
+      print $fh " level \"" . $trans_level . "\";" if ($trans_level);
+  }
+
+  #Add HGNC/MGI id
+  my ($ndb, $hgnc_mgi_id);
+  if ($self->{'species'} eq "homo_sapiens") {
+    $ndb = "HGNC";
+  } elsif ($self->{'species'} eq "mus_musculus") {
+    $ndb = "MGI";
+  }
+  my ($hgnc_mgi_dbentry) = grep {$_->display_id eq $gene_name} @{$gene->get_all_DBEntries($ndb)};
+  if ($hgnc_mgi_dbentry) {
+    $hgnc_mgi_id = $hgnc_mgi_dbentry->primary_id;
+  }
+  if ($hgnc_mgi_id) {
+    print $fh " ".lc($ndb)."_id \"".$hgnc_mgi_id."\";";
+  }
+
+  # Add APPRIS tag
+  foreach my $attrib (@{$transcript->get_all_Attributes}){
+    if ($attrib->code eq "appris" and $attrib->value =~ /principal1/){
+      print $fh qq{ tag "appris_principal_1";};
+    } elsif ($attrib->code eq "appris" and $attrib->value =~ /principal2/){
+      print $fh qq{ tag "appris_principal_2";};
+    } elsif ($attrib->code eq "appris" and $attrib->value =~ /principal3/){
+      print $fh qq{ tag "appris_principal_3";};
+    } elsif ($attrib->code eq "appris" and $attrib->value =~ /principal4/){
+      print $fh qq{ tag "appris_principal_4";};
+    } elsif ($attrib->code eq "appris" and $attrib->value =~ /principal5/){
+      print $fh qq{ tag "appris_principal_5";};
+    } elsif ($attrib->code eq "appris" and $attrib->value =~ /alternative1/){
+      print $fh qq{ tag "appris_alternative_1";};
+    } elsif ($attrib->code eq "appris" and $attrib->value =~ /alternative2/){
+      print $fh qq{ tag "appris_alternative_2";};
     }
   }
 
@@ -709,5 +752,24 @@ sub _check_start_and_stop {
   return ( $has_start, $has_end );
 
 } ## end sub _check_start_and_stop
+
+=head2 _get_level
+
+  Arg [0] : annotation source
+  Example :
+  Description : Get annotation level depending on source
+  Returntype : Integer
+
+=cut
+
+sub get_level {
+  my ($source) = @_;
+
+  if ($source =~ /havana/) {
+    return 2;
+  } else {
+    return 3;
+  }
+}
 
 1;
