@@ -432,8 +432,8 @@ sub _print_attribs {
   print $fh "gene_id \"" . get_id_from_obj($gene) . ($gene_version ? ".".$gene_version : "") ."\";";
   #print $fh " gene_version \"" . $gene_version . "\";" if $gene_version;
   if($type ne 'gene') {
-    print $fh " transcript_id \"" . get_id_from_obj($transcript) . "\";";
-    print $fh " transcript_version \"" . $trans_version . "\";" if $trans_version;
+    print $fh " transcript_id \"" . get_id_from_obj($transcript) . ($trans_version ? ".".$trans_version : "") . "\";";
+    #print $fh " transcript_version \"" . $trans_version . "\";" if $trans_version;
     print $fh " exon_number \"$count\";" if $count > 0;
   }
   print $fh " gene_name \"" . $gene_name . "\";"     if ($gene_name);
@@ -463,7 +463,9 @@ sub _print_attribs {
       print $fh qq{ tag "CCDS";};
       foreach my $ccds (sort { $a->primary_id() cmp $b->primary_id() } @{$ccds_entries}) {
         my $primary_ccds_id = $ccds->primary_id();
-        print $fh qq{ ccds_id "$primary_ccds_id";};
+	my $ccds_version = $ccds->version();
+        print $fh " ccds_id \"" . $primary_ccds_id . ($ccds_version ? ".".$ccds_version : "") . "\";";
+	#print $fh qq{ ccds_id "$primary_ccds_id";};
       }
     }
     if ($transcript->havana_transcript()) {
@@ -473,15 +475,15 @@ sub _print_attribs {
   }
 
   if ( $type eq 'CDS' ) {
-    print $fh ' protein_id "' .
-      get_id_from_obj( $transcript->translation ) . '";';
-    print $fh ' protein_version "' .
-      $transcript->translation->version . "\";" if $transcript->translation->version;
+    my $protein_version = $transcript->translation->version;
+    print $fh ' protein_id "' . get_id_from_obj( $transcript->translation ) . ($protein_version ? ".".$protein_version : "") . '";';
+    #print $fh ' protein_version "' . $transcript->translation->version . "\";" if $transcript->translation->version;
   }
   if ($exon) {
-    printf $fh ' exon_id "%s";', get_id_from_obj($exon);
-    print $fh ' exon_version "' .
-      $exon->version . "\";" if $exon->version;
+    my $exon_version = $exon->version;
+    print $fh ' exon_id "' . get_id_from_obj($exon) . ($exon_version ? ".".$exon_version : "") . '";';
+    #printf $fh ' exon_id "%s";', get_id_from_obj($exon);
+    #print $fh ' exon_version "' .$exon->version . "\";" if $exon->version;
   }
 
   if($has_selenocysteine) {
