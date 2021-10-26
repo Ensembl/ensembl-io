@@ -518,18 +518,16 @@ sub _print_attribs {
   }
 
   #Add HGNC/MGI id
-  my ($ndb, $hgnc_mgi_id);
-  if ($self->{'species'} eq "homo_sapiens") {
-    $ndb = "HGNC";
-  } elsif ($self->{'species'} eq "mus_musculus") {
-    $ndb = "MGI";
-  }
-  my ($hgnc_mgi_dbentry) = grep {$_->display_id eq $gene_name} @{$gene->get_all_DBEntries($ndb)};
-  if ($hgnc_mgi_dbentry) {
-    $hgnc_mgi_id = $hgnc_mgi_dbentry->primary_id;
-  }
-  if ($hgnc_mgi_id) {
-    print $fh " ".lc($ndb)."_id \"".$hgnc_mgi_id."\";";
+  foreach my $ndb ('HGNC', 'MGI') {
+    my $hgnc_mgi_id;
+    my ($hgnc_mgi_dbentry) = grep {$_->display_id eq $gene_name} @{$gene->get_all_DBEntries($ndb)};
+    if ($hgnc_mgi_dbentry) {
+      $hgnc_mgi_id = $hgnc_mgi_dbentry->primary_id;
+    }
+
+    if ($hgnc_mgi_id) {
+      print $fh " ".lc($ndb)."_id \"".$hgnc_mgi_id."\";";
+    }
   }
 
   # Add APPRIS tag
