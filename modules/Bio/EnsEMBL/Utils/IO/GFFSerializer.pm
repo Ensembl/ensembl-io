@@ -149,6 +149,7 @@ sub print_feature {
 
 #   Column 3 - feature, the ontology term for the kind of feature this row is
         my $so_term;
+        my $parent_so_term;
         # get biotype SO acc if feature can do it
         if ( $feature->can('get_Biotype') ) {
             $so_term = $feature->get_Biotype->so_term;
@@ -156,6 +157,10 @@ sub print_feature {
         # if no biotype SO acc, get the feature one
         if ( !$so_term ) {
             $so_term = $feature->feature_so_term;
+        }
+        if ($feature->isa('Bio::EnsEMBL::MiscFeature')) {
+          $so_term = $summary{'so_term'};
+          $parent_so_term = $summary{'parent_so_term'};
         }
         # could not get it, throw exception
         if ( !$so_term ) {
@@ -222,6 +227,8 @@ sub print_feature {
         delete $summary{'score'};
         delete $summary{'source'};
         delete $summary{'type'};
+        delete $summary{'so_term'};
+        delete $summary{'parent_so_term'};
 #   Slice the hash for specific keys in GFF-friendly order
         my @ordered_keys = grep { exists $summary{$_} } qw(id Name Alias Parent Target Gap Derives_from Note Dbxref Ontology_term Is_circular);
         my @ordered_values = @summary{@ordered_keys};
@@ -230,12 +237,15 @@ sub print_feature {
             delete $summary{$key};
             if ($value && $value ne '') {
                 if ($key =~ /id/) {
+                  $value .= ".".$summary{'version'} if (defined($summary{'version'}));
+
                   if ($feature->isa('Bio::EnsEMBL::Transcript')) {
                     $value = 'transcript:' . $value;
                   } elsif ($feature->isa('Bio::EnsEMBL::Gene')) {
                     $value = 'gene:' . $value;
                   } elsif ($feature->isa('Bio::EnsEMBL::Exon')) {
-                    $key = 'Name';
+                    #$key = 'Name';
+                    $value = 'exon:' . $value;
                   } elsif ($feature->isa('Bio::EnsEMBL::CDS')) {
                     my $trans_spliced = $feature->transcript->get_all_Attributes('trans_spliced');
                     if (scalar(@$trans_spliced)) {
@@ -248,10 +258,17 @@ sub print_feature {
                   }
                 }
                 if ($key eq 'Parent') {
-                 if ($feature->isa('Bio::EnsEMBL::Transcript')) {
-                    $value = 'gene:' . $value;
+                  if ($feature->isa('Bio::EnsEMBL::Transcript')) {
+                    my $parent = $feature->get_Gene();
+                    my $parent_version = $parent->version;
+                    $value = 'gene:' . $value . ($parent_version ? ".".$parent_version : "");
                   } elsif ($feature->isa('Bio::EnsEMBL::Exon') || $feature->isa('Bio::EnsEMBL::UTR') || $feature->isa('Bio::EnsEMBL::CDS')) {
-                    $value = 'transcript:' . $value;
+                    my $parent = $feature->transcript();
+                    my $parent_version = $parent->version;
+                    $value = 'transcript:' . $value . ($parent_version ? ".".$parent_version : "");
+                  } elsif ($feature->isa('Bio::EnsEMBL::MiscFeature')) {
+                    my $parent_version = $summary{'version'} if (defined($summary{'version'}));
+                    $value = $parent_so_term . ":" . $value . ($parent_version ? ".".$parent_version : "");
                   }
                 }
                 $key = uc($key) if $key eq 'id';
@@ -308,7 +325,47 @@ sub print_main_header {
     my $dba = shift;
     my $fh = $self->{'filehandle'};
 
+    my ($day, $month, $year) = (localtime)[3,4,5];
+    my $today = sprintf("%04d-%02d-%02d", $year+1900, $month+1, $day);
+
+    my ($assembly_name, $provider, $version, $assembly_date, $accession, $genebuild_last_date, $species);
+
+    if ($dba) {
+      my $mc = $dba->get_MetaContainer();
+      my $gc = $dba->get_GenomeContainer();
+
+      # Get the build. name gives us GRCh37.p1 where as default gives us GRCh37
+      $assembly_name = $gc->get_assembly_name();
+      my $providers = $mc->list_value_by_key('assembly.provider_name') || '';
+      $provider = join(";", @$providers);
+
+      # Get the build default
+      $version = $gc->get_version();
+
+      # Get the date of the genome build
+      $assembly_date = $gc->get_assembly_date();
+
+      # Get accession and only print if it is there
+      $accession = $gc->get_accession();
+
+      # Genebuild last updated
+      $genebuild_last_date = $gc->get_genebuild_last_geneset_update();
+
+      # Species
+      $species = $mc->db->species();
+    }
+
     print $fh "##gff-version 3\n";
+    print $fh "#description: evidence-based annotation of the $species genome\n" if $species;
+    print $fh "#provider: Ensembl\n";
+    print $fh "#contact: helpdesk\@ensembl.org\n";
+    print $fh "#date: $today\n";
+    print $fh "#!genome-build $provider $assembly_name\n" if $assembly_name;
+    print $fh "#!genome-version ${version}\n" if $version;
+    print $fh "#!genome-date ${assembly_date}\n" if $assembly_date;
+    print $fh "#!genome-build-accession $accession" if $accession;
+    print $fh "#!genebuild-last-updated ${genebuild_last_date}\n" if $genebuild_last_date;
+
     foreach my $slice (@{$arrayref_of_slices}) {
         if (not defined($slice)) {
             warning("Slice not defined.\n");
@@ -316,40 +373,6 @@ sub print_main_header {
         }
         print $fh "##sequence-region   ",$slice->seq_region_name," ",$slice->start," ",$slice->end,"\n";
     }
-
-    if (!$dba) {
-      print "\n";
-      return;
-    }
-
-    my $mc = $dba->get_MetaContainer();
-    my $gc = $dba->get_GenomeContainer();
-
-    # Get the build. name gives us GRCh37.p1 where as default gives us GRCh37
-    my $assembly_name = $gc->get_assembly_name();
-    my $providers = $mc->list_value_by_key('assembly.provider_name') || '';
-    my $provider = join(";", @$providers);
-    print $fh "#!genome-build $provider $assembly_name\n" if $assembly_name;
-
-    # Get the build default
-    my $version = $gc->get_version();
-    print $fh "#!genome-version ${version}\n" if $version;
-
-    # Get the date of the genome build
-    my $assembly_date = $gc->get_assembly_date();
-    print $fh "#!genome-date ${assembly_date}\n" if $assembly_date;
-
-    # Get accession and only print if it is there
-    my $accession = $gc->get_accession();
-    if($accession) {
-       my $string = "#!genome-build-accession $accession";
-
-       print $fh "$string\n";
-    }
-
-    # Genebuild last updated
-    my $genebuild_last_date = $gc->get_genebuild_last_geneset_update();
-    print $fh "#!genebuild-last-updated ${genebuild_last_date}\n" if $genebuild_last_date;
 
     print "\n";
 
@@ -367,6 +390,5 @@ sub _default_source {
     my ($self) = @_;
     return $self->{default_source};
 }
-
 
 1;
