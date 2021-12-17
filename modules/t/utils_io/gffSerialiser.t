@@ -33,18 +33,24 @@ my $id = 'ENSG00000131044';
 
 my $ga = $dba->get_GeneAdaptor();
 
+my ($day, $month, $year) = (localtime)[3,4,5];
+my $today = sprintf("%04d-%02d-%02d", $year+1900, $month+1, $day);
+
 {
   my $gene = $ga->fetch_by_stable_id($id);
   delete $gene->{source};
   $gene->{description} = undef; #empty value means don't emit the key
-  my $expected = <<'OUT';
+  my $expected = <<"OUT";
 ##gff-version 3
+#provider: Ensembl
+#contact: helpdesk\@ensembl.org
+#date: $today
 ##sequence-region   20 30274334 30300924
 OUT
   #Have to do this outside of the HERETO thanks to tabs
   $expected .= join("\t",
     qw/20  ensembl gene 30274334  30300924  . + ./,
-    'ID=gene:ENSG00000131044;Name=C20orf125;biotype=protein_coding;gene_id=ENSG00000131044;logic_name=ensembl;projection_parent_gene=ENSG_PARENT_GENE;version=1'
+    'ID=gene:ENSG00000131044.1;Name=C20orf125;biotype=protein_coding;gene_id=ENSG00000131044;logic_name=ensembl;projection_parent_gene=ENSG_PARENT_GENE;version=1'
   );
   $expected .= "\n";
 
@@ -65,8 +71,11 @@ OUT
     -END => 10,
     -STRAND => 1,
   );
-  my $expected = <<'OUT';
+  my $expected = <<"OUT";
 ##gff-version 3
+#provider: Ensembl
+#contact: helpdesk\@ensembl.org
+#date: $today
 ##sequence-region   wibble 1 10
 OUT
   #Have to do this outside of the HERETO thanks to tabs
@@ -83,35 +92,44 @@ OUT
 {
   my $gene = $ga->fetch_by_stable_id($id);
   $gene->source('wibble');
-  my $expected = <<'OUT';
+  my $expected = <<"OUT";
 ##gff-version 3
+#provider: Ensembl
+#contact: helpdesk\@ensembl.org
+#date: $today
 ##sequence-region   20 30274334 30300924
 OUT
   #Have to do this outside of the HERETO thanks to tabs
   $expected .= join("\t",
     qw/20  wibble gene 30274334  30300924  . + ./,
-    'ID=gene:ENSG00000131044;Name=C20orf125;biotype=protein_coding;description=DJ310O13.1.2 (NOVEL PROTEIN SIMILAR DROSOPHILA PROTEIN CG7474%2C ISOFORM 2 ) (FRAGMENT). [Source:SPTREMBL%3BAcc:Q9BR18];gene_id=ENSG00000131044;logic_name=ensembl;projection_parent_gene=ENSG_PARENT_GENE;version=1'
+    'ID=gene:ENSG00000131044.1;Name=C20orf125;biotype=protein_coding;description=DJ310O13.1.2 (NOVEL PROTEIN SIMILAR DROSOPHILA PROTEIN CG7474%2C ISOFORM 2 ) (FRAGMENT). [Source:SPTREMBL%3BAcc:Q9BR18];gene_id=ENSG00000131044;logic_name=ensembl;projection_parent_gene=ENSG_PARENT_GENE;version=1'
   );
   $expected .= "\n";
   assert_gff3($gene, $expected, 'Gene with custom source serialises to GFF3 as expected. Source is wibble');
-  $expected = <<'OUT';
+  $expected = <<"OUT";
 ##gff-version 3
+#provider: Ensembl
+#contact: helpdesk\@ensembl.org
+#date: $today
 ##sequence-region   20 30274334 30298904
 OUT
   $expected .= join("\t",
   qw/20      ensembl mRNA  30274334        30298904        .       +       ./,
-  'ID=transcript:ENST00000310998;Name=C20orf125;Parent=gene:ENSG00000131044;biotype=protein_coding;logic_name=ensembl;projection_parent_transcript=ENSG_PARENT_TRANSCRIPT;transcript_id=ENST00000310998;version=1'
+  'ID=transcript:ENST00000310998.1;Name=C20orf125;Parent=gene:ENSG00000131044.1;biotype=protein_coding;logic_name=ensembl;projection_parent_transcript=ENSG_PARENT_TRANSCRIPT;transcript_id=ENST00000310998;version=1'
   );
   $expected .= "\n";
   assert_gff3($gene->canonical_transcript(), $expected, 'Transcript with custom source serialises to GFF3 as expected. Source is wibble');
 
-  $expected = <<'OUT';
+  $expected = <<"OUT";
 ##gff-version 3
+#provider: Ensembl
+#contact: helpdesk\@ensembl.org
+#date: $today
 ##sequence-region   20 30274334 30274425
 OUT
   $expected .= join("\t",
   qw/20      ensembl CDS  30274334        30274425        .       +       0/,
-  'ID=CDS:ENSP00000308980;Parent=transcript:ENST00000310998;protein_id=ENSP00000308980'
+  'ID=CDS:ENSP00000308980;Parent=transcript:ENST00000310998.1;protein_id=ENSP00000308980'
   );
   $expected .= "\n";
   my $cds = $gene->canonical_transcript->get_all_CDS();
@@ -119,13 +137,16 @@ OUT
 
   my $cds_expected = $expected;
 
-  $expected = <<'OUT';
+  $expected = <<"OUT";
 ##gff-version 3
+#provider: Ensembl
+#contact: helpdesk\@ensembl.org
+#date: $today
 ##sequence-region   20 30274334 30274425
 OUT
   $expected .= join("\t",
   qw/20 ensembl       exon  30274334        30274425        .       +       ./,
-  'Name=ENSE00001155821;Parent=transcript:ENST00000310998;constitutive=0;ensembl_end_phase=2;ensembl_phase=0;exon_id=ENSE00001155821;rank=1;version=1'
+  'ID=exon:ENSE00001155821.1;Parent=transcript:ENST00000310998.1;constitutive=0;ensembl_end_phase=2;ensembl_phase=0;exon_id=ENSE00001155821;rank=1;version=1'
   );
   $expected .= "\n";
   my $exon = $gene->canonical_transcript->get_all_ExonTranscripts();
@@ -134,20 +155,23 @@ OUT
   my $new_id = 'ENSG00000126003';
   my $utr_gene = $ga->fetch_by_stable_id($new_id);
   my $utrs = $utr_gene->canonical_transcript->get_all_five_prime_UTRs();
-  $expected = <<'OUT';
+  $expected = <<"OUT";
 ##gff-version 3
+#provider: Ensembl
+#contact: helpdesk\@ensembl.org
+#date: $today
 ##sequence-region   20 30583501 30583588
 OUT
   $expected .= join("\t",
   qw/20 ensembl       five_prime_UTR  30583501  30583588        .       -       ./,
-  'Parent=transcript:ENST00000246229'
+  'Parent=transcript:ENST00000246229.1'
   );
   $expected .= "\n";
   assert_gff3($utrs->[0], $expected, 'UTR feature serialises to GFF3 as expected');
 
   $cds_expected .= join("\t",
   qw/20 ensembl       exon  30274334        30274425        .       +       ./,
-  'Name=ENSE00001155821;Parent=transcript:ENST00000310998;constitutive=0;ensembl_end_phase=2;ensembl_phase=0;exon_id=ENSE00001155821;rank=1;version=1'
+  'ID=exon:ENSE00001155821.1;Parent=transcript:ENST00000310998.1;constitutive=0;ensembl_end_phase=2;ensembl_phase=0;exon_id=ENSE00001155821;rank=1;version=1'
   );
   $cds_expected .= "\n";
   my @list;
@@ -167,14 +191,17 @@ OUT
   local undef &{Bio::EnsEMBL::Gene::summary_as_hash};
   local *{Bio::EnsEMBL::Gene::summary_as_hash} = sub {return $summary};
 
-  my $expected = <<'OUT';
+  my $expected = <<"OUT";
 ##gff-version 3
+#provider: Ensembl
+#contact: helpdesk\@ensembl.org
+#date: $today
 ##sequence-region   20 30274334 30300924
 OUT
   #Have to do this outside of the HERETO thanks to tabs
   $expected .= join("\t",
     qw/20  ensembl gene 30274334  30300924  . + ./,
-    'ID=gene:ENSG00000131044;Name=C20orf125;Dbxref=bibble,fibble;Ontology_term=GO:0001612;biotype=protein_coding;description=DJ310O13.1.2 (NOVEL PROTEIN SIMILAR DROSOPHILA PROTEIN CG7474%2C ISOFORM 2 ) (FRAGMENT). [Source:SPTREMBL%3BAcc:Q9BR18];gene_id=ENSG00000131044;logic_name=ensembl;projection_parent_gene=ENSG_PARENT_GENE;version=1'
+    'ID=gene:ENSG00000131044.1;Name=C20orf125;Dbxref=bibble,fibble;Ontology_term=GO:0001612;biotype=protein_coding;description=DJ310O13.1.2 (NOVEL PROTEIN SIMILAR DROSOPHILA PROTEIN CG7474%2C ISOFORM 2 ) (FRAGMENT). [Source:SPTREMBL%3BAcc:Q9BR18];gene_id=ENSG00000131044;logic_name=ensembl;projection_parent_gene=ENSG_PARENT_GENE;version=1'
   );
   $expected .= "\n";
 
