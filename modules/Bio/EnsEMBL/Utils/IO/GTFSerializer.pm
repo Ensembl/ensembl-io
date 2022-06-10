@@ -496,6 +496,15 @@ sub _print_attribs {
         print $fh qq{ tag "${value}";};
       }
     }
+
+    # A transcript can have different types of MANE-related attributes (MANE_Select, MANE_Plus_Clinical)
+    # We depend on the Bio::EnsEMBL::MANE object to get the specific type
+    my $mane = $transcript->mane_transcript();
+    if ($mane) {
+      my $mane_type = $mane->type();
+      print $fh qq{ tag "${mane_type}";} if ($mane_type);
+    }
+
     my $attributes = $transcript->get_all_Attributes("TSL");
     if (@{$attributes}) {
       my $value = $attributes->[0]->value;
