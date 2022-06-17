@@ -487,14 +487,24 @@ sub _print_attribs {
   }
 
   if($transcript && $transcript->isa('Bio::EnsEMBL::Transcript')) {
-    foreach my $tag (qw/cds_end_NF cds_start_NF mRNA_end_NF mRNA_start_NF gencode_basic/) {
+    foreach my $tag (qw/cds_end_NF cds_start_NF mRNA_end_NF mRNA_start_NF gencode_basic is_canonical/) {
       my $attributes = $transcript->get_all_Attributes($tag);
       if(@{$attributes}) {
         my $value = $tag;
         $value = "basic" if $tag eq "gencode_basic";
+        $value = "Ensembl_canonical" if $tag eq "is_canonical";
         print $fh qq{ tag "${value}";};
       }
     }
+
+    # A transcript can have different types of MANE-related attributes (MANE_Select, MANE_Plus_Clinical)
+    # We depend on the Bio::EnsEMBL::MANE object to get the specific type
+    my $mane = $transcript->mane_transcript();
+    if ($mane) {
+      my $mane_type = $mane->type();
+      print $fh qq{ tag "${mane_type}";} if ($mane_type);
+    }
+
     my $attributes = $transcript->get_all_Attributes("TSL");
     if (@{$attributes}) {
       my $value = $attributes->[0]->value;
