@@ -121,6 +121,9 @@ ok($parser->get_metadata_key_list eq 'FILTER, FORMAT, INFO, contig, fileDate, fi
 ok($parser->get_metadata_by_pragma('fileDate') eq '20090805', 'getMetadataByPragma');
 ok($parser->get_vcf_version eq 'VCFv4.2', 'getVCFversion');
 ok($parser->get_metadata_description('INFO', 'AA') eq 'Ancestral Allele', 'getMetaDescription'); 
+ok($parser->get_metadata_field('contig', '20', 'length') eq 62435964, 'getMetaField');
+ok(!defined($parser->get_metadata_field('contig', '20', 'URL')), 'getMetaField - non-existing field');
+ok($parser->get_metadata_field('contig', 'ctg1', 'URL') =~ /ftp/, 'Multiple contigs');
 
 note "> Testing format validation";
 $parser->reset();
