@@ -1,4 +1,4 @@
-1	\N	schema_version	111
+1	\N	schema_version	112
 2	1	assembly.default	NCBI34
 3	1	species.taxonomy_id	9606
 26	1	species.classification	Homo sapiens
@@ -128,3 +128,5 @@
 195	\N	patch	patch_109_110_b.sql|Add IS_PAR relationship to link X- and Y-PAR genes
 196	\N	patch	patch_109_110_c.sql|Allow gene id to belong to multiple alt allele groups
 197	\N	patch	patch_110_111_a.sql|schema_version
+198	\N	patch	patch_111_112_a.sql|schema_version
+199	\N	patch	patch_111_112_b.sql|Allow meta_value to be null
