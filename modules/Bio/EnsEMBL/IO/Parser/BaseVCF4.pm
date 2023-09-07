@@ -700,7 +700,16 @@ sub get_metadata_description {
   my $type = shift;
   my $id   = shift;
 
-  return $self->get_metadata_field($type, $id, 'Description');
+  if (!defined($type) || !defined($id)) {
+    carp("You need to provide a meta type (e.g. 'INFO') and a meta entry ID (e.g. 'AA')");
+    return;
+  }
+
+  my $meta = $self->get_metadata_by_pragma($type);
+  foreach my $meta_entry (@$meta) {
+    return $meta_entry->{'Description'} if ($meta_entry->{'ID'} eq $id);
+  }
+  return;
 }
 
 
