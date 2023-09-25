@@ -106,7 +106,8 @@ sub _parse_metadata_line {
                     'FORMAT'   => 1,
                     'ALT'      => 1,
                     'SAMPLE'   => 1,
-                    'PEDIGREE' => 1 );
+                    'PEDIGREE' => 1,
+                    'contig'   => 1 );
 
 
   push @{$self->{_metadata_order}}, $m_type;
@@ -652,6 +653,38 @@ sub get_format_description {
   my $self   = shift;
   my $format = shift;
   return $self->get_metadata_description('FORMAT', $format);
+}
+
+
+=head2 get_metadata_field
+    Argument [1]: Metadata type, e.g. 'INFO'
+    Argument [2]: Metadata ID, e.g. 'AA'
+    Argument [3]: Metadata field, e.g. 'Description'
+    Description : Retrieve a field of the given metadata type and metadata ID
+    Returntype  : String
+=cut
+
+sub get_metadata_field {
+  my $self  = shift;
+  my $type  = shift;
+  my $id    = shift;
+  my $field = shift;
+
+  if (!defined($type) || !defined($id)) {
+    carp("You need to provide a meta type (e.g. 'INFO') and a meta entry ID (e.g. 'AA')");
+    return;
+  } elsif (!defined($field)) {
+    carp("You need to provide a field (e.g. 'Description')");
+    return;
+  }
+
+  my $meta = $self->get_metadata_by_pragma($type);
+  foreach my $meta_entry (@$meta) {
+    if ($meta_entry->{'ID'} eq $id and $meta_entry->{$field}) {
+      return $meta_entry->{$field};
+    }
+  }
+  return;
 }
 
 
