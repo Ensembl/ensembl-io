@@ -3,15 +3,15 @@
 export PERL5LIB=$PWD/bioperl-live-bioperl-release-1-2-3:$PWD/ensembl-test/modules:$PWD/ensembl/modules:$PWD/modules:$PWD/ensembl-variation/modules:$DEPS/Bio-HTS/blib/lib/:$DEPS/Bio-HTS/blib/arch:$PERL5LIB
 
 
-# if [ "$DB" = 'mysql' ]; then
-#     (cd modules/t && ln -sf MultiTestDB.conf.mysql MultiTestDB.conf)
+if [ "$DB" = 'mysql' ]; then
+   (cd modules/t && ln -sf MultiTestDB.conf.mysql MultiTestDB.conf)
 # elif [ "$DB" = 'sqlite' ]; then
 #     (cd modules/t && ln -sf MultiTestDB.conf.SQLite MultiTestDB.conf)
 #     SKIP_TESTS="--skip dbConnection.t,schema.t,schemaPatches.t"
-# else
-#     echo "Don't know about DB '$DB'"
-#     exit 1;
-# fi
+else
+   echo "Don't know about DB '$DB'"
+   exit 1;
+fi
 
 echo "Running test suite"
 if [ "$COVERALLS" = 'true' ]; then
