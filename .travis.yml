@@ -34,9 +34,7 @@ services:
 
 before_install:
     - export ENSEMBL_BRANCH='main'
-    - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
     - if [[ $TRAVIS_BRANCH =~ ^release\/[0-9]+$ ]]; then export ENSEMBL_BRANCH=$TRAVIS_BRANCH; fi
-    - echo "ENSEMBL_BRANCH=$ENSEMBL_BRANCH"
     - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-test.git
     - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl.git
     - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-variation.git
@@ -71,13 +69,9 @@ script: "./travisci/harness.sh"
 
 # Get the matrix to only build coveralls support when on 5.26
 jobs:
-  include:
-    - perl: "5.30"
-      env: COVERALLS=false DB=mysql
-      dist: focal
   exclude:
     - perl: "5.30"
-      dist: trusty
+      env: COVERALLS=false DB=mysql
     - perl: "5.26"
       env: COVERALLS=false DB=mysql
 
