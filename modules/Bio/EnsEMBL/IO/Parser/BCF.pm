@@ -124,7 +124,9 @@ sub read_block {
 sub close {
   my $self = shift;
 
-  $self->{iterator}->close if $self->{iterator};
+  if ($self->{iterator} and UNIVERSAL::isa($self->{iterator}, 'Bio::DB::HTS::VCF::Iterator')) {
+    $self->{iterator}->close();
+  }
   my $report = $self->{bcf_file}->DESTROY;
 
   return (defined $report) ? 0 : 1;

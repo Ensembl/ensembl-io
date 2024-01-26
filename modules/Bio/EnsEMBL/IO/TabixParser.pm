@@ -118,7 +118,11 @@ sub read_block {
 
 sub close {
   my $self = shift;
-  $self->{iterator}->close if $self->{iterator};
+
+  if ($self->{iterator} and UNIVERSAL::isa($self->{iterator}, 'Bio::DB::HTS::Tabix::Iterator')) {
+    $self->{iterator}->close();
+  }
+
   my $report = $self->{tabix_file}->DESTROY;
   return (defined $report) ? 0 : 1;
 }
