@@ -18,7 +18,7 @@ env:
   matrix:
   - COVERALLS=true  DB=mysql
   - COVERALLS=false DB=mysql
-  #- COVERALLS=false DB=sqlite
+  - COVERALLS=false DB=sqlite
 
 addons:
   apt:
@@ -72,7 +72,7 @@ script: "./travisci/harness.sh"
 jobs:
   exclude:
     - perl: "5.30"
-      env: COVERALLS=false DB=mysql
+      env: COVERALLS=true DB=mysql
     - perl: "5.26"
       env: COVERALLS=false DB=mysql
 
