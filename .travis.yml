@@ -12,13 +12,11 @@ cache:
 
 perl:
   - "5.26"
-  - "5.14"
-#  - "5.12"
-#  - "5.10"
+#  - "5.30"
 
-# env:
+env:
+   - COVERALLS=false DB=mysql
 #  - COVERALLS=true  DB=mysql
-  # - COVERALLS=false DB=mysql
 #  - COVERALLS=false DB=sqlite
 
 addons:
@@ -34,9 +32,14 @@ services:
   - mysql
 
 before_install:
-    - git clone --branch main --depth 1 https://github.com/Ensembl/ensembl-test.git
-    - git clone --branch main --depth 1 https://github.com/Ensembl/ensembl.git
-    - git clone --branch main --depth 1 https://github.com/Ensembl/ensembl-variation.git
+    - export ENSEMBL_BRANCH='main'
+    - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
+    - if [[ $TRAVIS_BRANCH =~ ^release\/[0-9]+$ ]]; then export ENSEMBL_BRANCH=$TRAVIS_BRANCH; fi
+    - echo "ENSEMBL_BRANCH=$ENSEMBL_BRANCH"
+
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-test.git
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl.git
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-variation.git
     - export CWD=$PWD
     - export DEPS=$HOME/dependencies
     - mkdir -p $DEPS
