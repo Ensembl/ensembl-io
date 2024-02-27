@@ -121,7 +121,15 @@ sub get_attributes {
     $value =~ s/"//g if $value;
     $key =~ s/^\s+//;
     $key =~ s/\s+$//;
-    $attributes{$key} = $value ? $self->decode_string($value) : $value;
+    $value = $self->decode_string($value) if $value;
+
+    if (defined($attributes{$key})) {
+      my @values = (ref($attributes{$key}) eq 'ARRAY' ? @{$attributes{$key}} : ($attributes{$key}));
+      push(@values, $value);
+      $attributes{$key} = \@values;
+    } else {
+      $attributes{$key} = $value;
+    }
   }
   return \%attributes;
 }
@@ -158,3 +166,4 @@ sub create_object {
 }
 
 1;
+
