@@ -487,11 +487,12 @@ sub _print_attribs {
   }
 
   if($transcript && $transcript->isa('Bio::EnsEMBL::Transcript')) {
-    foreach my $tag (qw/cds_end_NF cds_start_NF mRNA_end_NF mRNA_start_NF gencode_basic/) {
+    foreach my $tag (qw/cds_end_NF cds_start_NF mRNA_end_NF mRNA_start_NF gencode_basic gencode_primary/) {
       my $attributes = $transcript->get_all_Attributes($tag);
       if(@{$attributes}) {
         my $value = $tag;
         $value = "basic" if $tag eq "gencode_basic";
+        $value = "primary" if $tag eq "gencode_primary";
         print $fh qq{ tag "${value}";};
       }
     }
