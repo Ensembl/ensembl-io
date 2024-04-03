@@ -363,54 +363,50 @@ sub gtf_attributes {
 
     my $gene;
     if ( $object->isa('Bio::EnsEMBL::Gene') ) {
-	    # For Genes only
-	    $gene = $object;
+      # For Genes only
+      $gene = $object;
     } else {
-	    # For anything but a Gene
-	    my $transcript;
+      # For anything but a Gene
+      my $transcript;
 
-	    if ( $object->isa('Bio::EnsEMBL::Transcript') ) {
-	      $transcript = $object;
+      if ( $object->isa('Bio::EnsEMBL::Transcript') ) {
+        $transcript = $object;
 
-	      foreach my $tag (qw/cds_end_NF cds_start_NF mRNA_end_NF mRNA_start_NF gencode_basic gencode_primary MANE_Select is_canonical MANE_Plus_Clinical/) {
-		      my $attributes = $transcript->get_all_Attributes($tag);
-		      if(@{$attributes}) {
-		        my $value = $tag;
-		        $value = "basic" if $tag eq "gencode_basic";
-		        $value = "primary" if $tag eq "gencode_primary";
-                $value = "Ensembl_canonical" if $tag eq "is_canonical";
-		        $self->add_attr($attrs, 'tag', $value);
-		      }
-	      }
+        foreach my $tag (qw/cds_end_NF cds_start_NF mRNA_end_NF mRNA_start_NF gencode_basic gencode_primary MANE_Select is_canonical MANE_Plus_Clinical/) {
+          my $attributes = $transcript->get_all_Attributes($tag);
+          if(@{$attributes}) {
+            my $value = $tag;
+            $value = "basic" if $tag eq "gencode_basic";
+            $value = "primary" if $tag eq "gencode_primary";
+            $value = "Ensembl_canonical" if $tag eq "is_canonical";
+            $self->add_attr($attrs, 'tag', $value);
+          }
+        }
 
-	    } else {
-	      if ( $object->isa('Bio::EnsEMBL::ExonTranscript') ) {
+      } else {
+        $transcript = $object->transcript();
+      }
 
-	      }
+      # CCDS records
+      my $ccds_entries = $transcript->get_all_DBEntries('CCDS');
+      if(@{$ccds_entries}) {
+        $self->add_attr($attrs, 'tag', 'CCDS');
+        foreach my $ccds (sort { $a->primary_id() cmp $b->primary_id() } @{$ccds_entries}) {
+          my $primary_ccds_id = $ccds->primary_id();
+          $self->add_attr($attrs, 'ccds_id', $primary_ccds_id);
+        }
+      }
 
-	      $transcript = $object->transcript();
-	    }
+      $attrs->{transcript_id} = $transcript->display_id;
+      $attrs->{transcript_version} = $transcript->version;
+      $attrs->{transcript_name} = $transcript->external_name if $transcript->external_name;
+      $attrs->{transcript_source} = $transcript->source;
+      $attrs->{transcript_biotype} = $transcript->biotype();
+      $attrs->{havana_transcript} = $transcript->havana_transcript()->display_id if $transcript->havana_transcript();
+      $attrs->{havana_version} = $transcript->havana_transcript()->version if $transcript->havana_transcript();
+      $attrs->{transcript_support_level} = $transcript->tsl() if $transcript->tsl();
 
-	    # CCDS records
-	    my $ccds_entries = $transcript->get_all_DBEntries('CCDS');
-	    if(@{$ccds_entries}) {
-	      $self->add_attr($attrs, 'tag', 'CCDS');
-	      foreach my $ccds (sort { $a->primary_id() cmp $b->primary_id() } @{$ccds_entries}) {
-		      my $primary_ccds_id = $ccds->primary_id();
-		      $self->add_attr($attrs, 'ccds_id', $primary_ccds_id);
-	      }
-	    }
-
-	    $attrs->{transcript_id} = $transcript->display_id;
-	    $attrs->{transcript_version} = $transcript->version;
-	    $attrs->{transcript_name} = $transcript->external_name if $transcript->external_name;
-	    $attrs->{transcript_source} = $transcript->source;
-	    $attrs->{transcript_biotype} = $transcript->biotype();
-	    $attrs->{havana_transcript} = $transcript->havana_transcript()->display_id if $transcript->havana_transcript();
-	    $attrs->{havana_version} = $transcript->havana_transcript()->version if $transcript->havana_transcript();
-	    $attrs->{transcript_support_level} = $transcript->tsl() if $transcript->tsl();
-
-	    $gene = $object->get_Gene();
+      $gene = $object->get_Gene();
     }
 
     $attrs->{gene_id} = $gene->display_id;
