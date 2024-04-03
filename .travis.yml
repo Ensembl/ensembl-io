@@ -1,4 +1,4 @@
-dist: trusty
+dist: xenial
 
 language: "perl"
 
@@ -12,21 +12,20 @@ cache:
 
 perl:
   - "5.26"
-  - "5.14"
-#  - "5.12"
-#  - "5.10"
+  - "5.30"
 
-# env:
-#  - COVERALLS=true  DB=mysql
-  # - COVERALLS=false DB=mysql
-#  - COVERALLS=false DB=sqlite
+env:
+  matrix:
+  - COVERALLS=true  DB=mysql
+  - COVERALLS=false DB=mysql
+  - COVERALLS=false DB=sqlite
 
 addons:
   apt:
     packages:
       - unzip
       - apache2
-      - libpng12-dev
+      - libpng-dev
       - libssl-dev
       - openssl
 
@@ -34,9 +33,12 @@ services:
   - mysql
 
 before_install:
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-test.git
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl.git
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-variation.git
+    - export ENSEMBL_BRANCH='main'
+    - export ENSEMBL_VER=$(echo $TRAVIS_BRANCH | grep -P -o '(?<=version[\W_]|fix[\W_]|release[\W_])(\d+)')
+    - if [[ $ENSEMBL_VER =~ [0-9]+ ]]; then ENSEMBL_BRANCH="release/$ENSEMBL_VER"; fi
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-test.git
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl.git
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-variation.git
     - export CWD=$PWD
     - export DEPS=$HOME/dependencies
     - mkdir -p $DEPS
@@ -57,31 +59,21 @@ install:
     - cd $CWD
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
     - cpanm -v --installdeps --notest .
-    - cpanm Bio::DB::HTS
     - cpanm -n Devel::Cover::Report::Coveralls
-    - cpanm -n DBD::SQLite
-    - cpanm JSON
-    - cpanm URI::Escape
+    - cpanm -n Bio::DB::HTS DBD::SQLite JSON URI::Escape
     - mysql -u root -h localhost -e 'GRANT ALL PRIVILEGES ON *.* TO "travis"@"%"'
-    - cp travisci/MultiTestDB.conf.travisci.mysql  modules/t/MultiTestDB.conf
-#    - cp travisci/MultiTestDB.conf.travisci.SQLite modules/t/MultiTestDB.conf.SQLite
+    - cp travisci/MultiTestDB.conf.travisci.mysql  modules/t/MultiTestDB.conf.mysql
+    - cp travisci/MultiTestDB.conf.travisci.SQLite modules/t/MultiTestDB.conf.SQLite
 
 script: "./travisci/harness.sh"
 
-# Get the matrix to only build coveralls support when on 5.10
-# matrix:
-#   exclude:
-#     - perl: "5.10"
-#       env: COVERALLS=false DB=mysql
-#     - perl: "5.12"
-#       env: COVERALLS=false DB=sqlite
-#     - perl: "5.12"
-#       env: COVERALLS=true  DB=mysql
-#     - perl: "5.14"
-#       env: COVERALLS=false DB=sqlite
-#     - perl: "5.14"
-#       env: COVERALLS=true  DB=mysql
-#
+# Get the matrix to only build coveralls support when on 5.26
+jobs:
+  exclude:
+    - perl: "5.30"
+      env: COVERALLS=true DB=mysql
+    - perl: "5.26"
+      env: COVERALLS=false DB=mysql
 
 notifications:
   slack:
