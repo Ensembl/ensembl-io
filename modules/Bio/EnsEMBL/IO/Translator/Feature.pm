@@ -372,12 +372,13 @@ sub gtf_attributes {
 	    if ( $object->isa('Bio::EnsEMBL::Transcript') ) {
 	      $transcript = $object;
 
-	      foreach my $tag (qw/cds_end_NF cds_start_NF mRNA_end_NF mRNA_start_NF gencode_basic gencode_primary/) {
+	      foreach my $tag (qw/cds_end_NF cds_start_NF mRNA_end_NF mRNA_start_NF gencode_basic gencode_primary MANE_Select is_canonical MANE_Plus_Clinical/) {
 		      my $attributes = $transcript->get_all_Attributes($tag);
 		      if(@{$attributes}) {
 		        my $value = $tag;
 		        $value = "basic" if $tag eq "gencode_basic";
 		        $value = "primary" if $tag eq "gencode_primary";
+                $value = "Ensembl_canonical" if $tag eq "is_canonical";
 		        $self->add_attr($attrs, 'tag', $value);
 		      }
 	      }
@@ -407,7 +408,6 @@ sub gtf_attributes {
 	    $attrs->{transcript_biotype} = $transcript->biotype();
 	    $attrs->{havana_transcript} = $transcript->havana_transcript()->display_id if $transcript->havana_transcript();
 	    $attrs->{havana_version} = $transcript->havana_transcript()->version if $transcript->havana_transcript();
-	    $self->add_attr($attrs, 'tag', 'basic') if $transcript->gencode_basic();
 	    $attrs->{transcript_support_level} = $transcript->tsl() if $transcript->tsl();
 
 	    $gene = $object->get_Gene();
