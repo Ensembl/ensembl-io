@@ -139,13 +139,13 @@ sub end {
     # Start and end must be in ascending order for GXF. Circular genomes require the length of
     # the circuit to be added on.
     if( $object->seq_region_start() > $object->seq_region_end() ) {
-	    if ($object->slice() && $object->slice()->is_circular() ) {
-	      $end = $end + $object->seq_region_length;
-	    }
-	    # non-circular, but end still before start
-	    else {
-	      $end = $object->seq_region_start();
-	    }
+       if ($object->slice() && $object->slice()->is_circular() ) {
+          $end = $end + $object->seq_region_length;
+       }
+       # non-circular, but end still before start
+       else {
+          $end = $object->seq_region_start();
+       }
     }
 
     return $end;
@@ -162,16 +162,16 @@ sub source {
 
     my $source;
     if (ref($object)->isa('Bio::EnsEMBL::Slice') ) {
-	    $source = $object->source || $object->coord_system->version
+       $source = $object->source || $object->coord_system->version
     }
     elsif (ref($object)->isa('Bio::EnsEMBL::ExonTranscript') ||
-	          ref($object)->isa('Bio::EnsEMBL::CDS') ||
-	          ref($object)->isa('Bio::EnsEMBL::UTR') ) {
-	    $source = $object->transcript()->source();
+          ref($object)->isa('Bio::EnsEMBL::CDS') ||
+          ref($object)->isa('Bio::EnsEMBL::UTR') ) {
+       $source = $object->transcript()->source();
     }
     elsif (ref($object)->isa('Bio::EnsEMBL::Feature') &&
-	          defined($object->analysis) && $object->analysis->gff_source() ) {
-	    $source = $object->analysis->gff_source();
+          defined($object->analysis) && $object->analysis->gff_source() ) {
+       $source = $object->analysis->gff_source();
     }
 
     return $source;
@@ -226,9 +226,9 @@ sub strand {
     my $object = shift;
 
     if( ref($object)->isa('Bio::EnsEMBL::Slice') ) {
-	    return '.';
+       return '.';
     } else {
-	    return ( $self->{_strand_conversion}->{ $object->{strand} } ? $self->{_strand_conversion}->{ $object->strand() } : $object->strand() );
+       return ( $self->{_strand_conversion}->{ $object->{strand} } ? $self->{_strand_conversion}->{ $object->strand() } : $object->strand() );
     }
 }
 
@@ -250,9 +250,9 @@ sub phase {
     my $object = shift;
 
     if (ref($object)->isa('Bio::EnsEMBL::CDS') ) {
-	    return $object->phase();
+       return $object->phase();
     } else {
-	    return '.';
+       return '.';
     }
 }
 
@@ -281,63 +281,60 @@ sub attributes {
     delete $summary{'source'};
     delete $summary{'type'};
 
-#    my @attrs;
     my %attrs;
     my @ordered_keys = grep { exists $summary{$_} } qw(id Name Alias Parent Target Gap Derives_from Note Dbxref Ontology_term Is_circular);
     my @ordered_values = @summary{@ordered_keys};
     while (my $key = shift @ordered_keys) {
-	    my $value = shift @ordered_values;
-	    delete $summary{$key};
-	    if ($value && $value ne '') {
-	      if ($key =~ /id/) {
-          $key = uc($key);
-		      if ($object->isa('Bio::EnsEMBL::Transcript')) {
-            $value = 'transcript:' . $value;
-		      } elsif ($object->isa('Bio::EnsEMBL::Gene')) {
-            $value = 'gene:' . $value;
-		      } elsif ($object->isa('Bio::EnsEMBL::Exon')) {
-            $key = 'Name';
-		      } elsif ($object->isa('Bio::EnsEMBL::CDS')) {
-            my $trans_spliced = $object->transcript->get_all_Attributes('trans_spliced');
-            if (scalar(@$trans_spliced)) {
-			        $value = $self->so_term($object) . ':' . join('_', $value, $object->seq_region_name, $object->seq_region_strand);
-            } else {
-			        $value = $self->so_term($object) . ':' . $value;
-            }
-		      } else {
-            $value = $self->so_term($object) . ':' . $value;
-		      }
-	      }
-
-	      if ($key eq 'Parent') {
-		      if ($object->isa('Bio::EnsEMBL::Transcript')) {
-            $value = 'gene:' . $value;
-		      } elsif ($object->isa('Bio::EnsEMBL::Exon') || $object->isa('Bio::EnsEMBL::UTR') || $object->isa('Bio::EnsEMBL::CDS')) {
-            $value = 'transcript:' . $value;
-		      }
-	      }
-
-	      if (ref $value eq "ARRAY" && scalar(@{$value}) > 0) {
-		      $attrs{$key} = join (',',map { uri_escape($_,'\t\n\r;=%&,') } grep { defined $_ } @{$value});
-	      } else {
-		      $attrs{$key} = uri_escape($value,'\t\n\r;=%&,');
-	      }
-	    }
+       my $value = shift @ordered_values;
+       delete $summary{$key};
+       if ($value && $value ne '') {
+          if ($key =~ /id/) {
+             $key = uc($key);
+             if ($object->isa('Bio::EnsEMBL::Transcript')) {
+                $value = 'transcript:' . $value;
+             } elsif ($object->isa('Bio::EnsEMBL::Gene')) {
+                $value = 'gene:' . $value;
+             } elsif ($object->isa('Bio::EnsEMBL::Exon')) {
+                $key = 'Name';
+             } elsif ($object->isa('Bio::EnsEMBL::CDS')) {
+                my $trans_spliced = $object->transcript->get_all_Attributes('trans_spliced');
+                if (scalar(@$trans_spliced)) {
+                   $value = $self->so_term($object) . ':' . join('_', $value, $object->seq_region_name, $object->seq_region_strand);
+                } else {
+                   $value = $self->so_term($object) . ':' . $value;
+                }
+             } else {
+                $value = $self->so_term($object) . ':' . $value;
+             }
+          }
+          if ($key eq 'Parent') {
+             if ($object->isa('Bio::EnsEMBL::Transcript')) {
+                $value = 'gene:' . $value;
+             } elsif ($object->isa('Bio::EnsEMBL::Exon') || $object->isa('Bio::EnsEMBL::UTR') || $object->isa('Bio::EnsEMBL::CDS')) {
+                $value = 'transcript:' . $value;
+             }
+          }
+          if (ref $value eq "ARRAY" && scalar(@{$value}) > 0) {
+             $attrs{$key} = join (',',map { uri_escape($_,'\t\n\r;=%&,') } grep { defined $_ } @{$value});
+          } else {
+             $attrs{$key} = uri_escape($value,'\t\n\r;=%&,');
+          }
+       }
     }
 
     #   Catch the remaining keys, containing whatever else the Feature provided
     my @keys = sort keys %summary;
     while(my $attribute = shift @keys) {
 
-      if (ref $summary{$attribute} eq "ARRAY") {
-        if (scalar(@{$summary{$attribute}}) > 0) {
-          $attrs{$attribute} = join (',',map { uri_escape($_,'\t\n\r;=%&,') } grep { defined $_ } @{$summary{$attribute}});
-        }
-      } else {
-        if (defined $summary{$attribute}) {
-          $attrs{$attribute} = uri_escape($summary{$attribute},'\t\n\r;=%&,');
-	      }
-	    }
+       if (ref $summary{$attribute} eq "ARRAY") {
+          if (scalar(@{$summary{$attribute}}) > 0) {
+             $attrs{$attribute} = join (',',map { uri_escape($_,'\t\n\r;=%&,') } grep { defined $_ } @{$summary{$attribute}});
+          }
+       } else {
+          if (defined $summary{$attribute}) {
+             $attrs{$attribute} = uri_escape($summary{$attribute},'\t\n\r;=%&,');
+          }
+       }
     }
 
     return \%attrs;
@@ -363,53 +360,50 @@ sub gtf_attributes {
 
     my $gene;
     if ( $object->isa('Bio::EnsEMBL::Gene') ) {
-	    # For Genes only
-	    $gene = $object;
+      # For Genes only
+      $gene = $object;
     } else {
-	    # For anything but a Gene
-	    my $transcript;
+      # For anything but a Gene
+      my $transcript;
 
-	    if ( $object->isa('Bio::EnsEMBL::Transcript') ) {
-	      $transcript = $object;
+      if ( $object->isa('Bio::EnsEMBL::Transcript') ) {
+        $transcript = $object;
 
-	      foreach my $tag (qw/cds_end_NF cds_start_NF mRNA_end_NF mRNA_start_NF gencode_basic/) {
-		      my $attributes = $transcript->get_all_Attributes($tag);
-		      if(@{$attributes}) {
-		        my $value = $tag;
-		        $value = "basic" if $tag eq "gencode_basic";
-		        $self->add_attr($attrs, 'tag', $value);
-		      }
-	      }
+        foreach my $tag (qw/cds_end_NF cds_start_NF mRNA_end_NF mRNA_start_NF gencode_basic gencode_primary MANE_Select is_canonical MANE_Plus_Clinical/) {
+          my $attributes = $transcript->get_all_Attributes($tag);
+          if(@{$attributes}) {
+            my $value = $tag;
+            $value = "basic" if $tag eq "gencode_basic";
+            $value = "primary" if $tag eq "gencode_primary";
+            $value = "Ensembl_canonical" if $tag eq "is_canonical";
+            $self->add_attr($attrs, 'tag', $value);
+          }
+        }
 
-	    } else {
-	      if ( $object->isa('Bio::EnsEMBL::ExonTranscript') ) {
+      } else {
+        $transcript = $object->transcript();
+      }
 
-	      }
+      # CCDS records
+      my $ccds_entries = $transcript->get_all_DBEntries('CCDS');
+      if(@{$ccds_entries}) {
+        $self->add_attr($attrs, 'tag', 'CCDS');
+        foreach my $ccds (sort { $a->primary_id() cmp $b->primary_id() } @{$ccds_entries}) {
+          my $primary_ccds_id = $ccds->primary_id();
+          $self->add_attr($attrs, 'ccds_id', $primary_ccds_id);
+        }
+      }
 
-	      $transcript = $object->transcript();
-	    }
+      $attrs->{transcript_id} = $transcript->display_id;
+      $attrs->{transcript_version} = $transcript->version;
+      $attrs->{transcript_name} = $transcript->external_name if $transcript->external_name;
+      $attrs->{transcript_source} = $transcript->source;
+      $attrs->{transcript_biotype} = $transcript->biotype();
+      $attrs->{havana_transcript} = $transcript->havana_transcript()->display_id if $transcript->havana_transcript();
+      $attrs->{havana_version} = $transcript->havana_transcript()->version if $transcript->havana_transcript();
+      $attrs->{transcript_support_level} = $transcript->tsl() if $transcript->tsl();
 
-	    # CCDS records
-	    my $ccds_entries = $transcript->get_all_DBEntries('CCDS');
-	    if(@{$ccds_entries}) {
-	      $self->add_attr($attrs, 'tag', 'CCDS');
-	      foreach my $ccds (sort { $a->primary_id() cmp $b->primary_id() } @{$ccds_entries}) {
-		      my $primary_ccds_id = $ccds->primary_id();
-		      $self->add_attr($attrs, 'ccds_id', $primary_ccds_id);
-	      }
-	    }
-
-	    $attrs->{transcript_id} = $transcript->display_id;
-	    $attrs->{transcript_version} = $transcript->version;
-	    $attrs->{transcript_name} = $transcript->external_name if $transcript->external_name;
-	    $attrs->{transcript_source} = $transcript->source;
-	    $attrs->{transcript_biotype} = $transcript->biotype();
-	    $attrs->{havana_transcript} = $transcript->havana_transcript()->display_id if $transcript->havana_transcript();
-	    $attrs->{havana_version} = $transcript->havana_transcript()->version if $transcript->havana_transcript();
-	    $self->add_attr($attrs, 'tag', 'basic') if $transcript->gencode_basic();
-	    $attrs->{transcript_support_level} = $transcript->tsl() if $transcript->tsl();
-
-	    $gene = $object->get_Gene();
+      $gene = $object->get_Gene();
     }
 
     $attrs->{gene_id} = $gene->display_id;
@@ -453,14 +447,14 @@ sub add_attr {
     my $value = shift;
 
     if (defined($attrs->{$attr})) {
-	    if( ref($attrs->{$attr}) eq 'ARRAY' ) {
-        my $duplicate = grep {$_ eq $value} @{$attrs->{$attr}};
-	      push @{$attrs->{$attr}}, $value unless $duplicate;
-	    } else {
-	      $attrs->{$attr} = [ $attrs->{$attr}, $value ] unless ($attrs->{$attr} eq $value);
-	    }
+       if( ref($attrs->{$attr}) eq 'ARRAY' ) {
+          my $duplicate = grep {$_ eq $value} @{$attrs->{$attr}};
+          push @{$attrs->{$attr}}, $value unless $duplicate;
+       } else {
+          $attrs->{$attr} = [ $attrs->{$attr}, $value ] unless ($attrs->{$attr} eq $value);
+       }
     } else {
-	    $attrs->{$attr} = $value;
+       $attrs->{$attr} = $value;
     }
 
 }
@@ -502,14 +496,14 @@ sub so_term {
 
 =head2 _default_score
 
-    Description: Return the default source type for a feature
-    Returntype : String
+   Description: Return the default source type for a feature
+   Returntype : String
 
 =cut
 
 sub _default_source {
-    my ($self) = @_;
-    return $self->{default_source};
+   my ($self) = @_;
+   return $self->{default_source};
 }
 
 
@@ -517,20 +511,20 @@ sub _default_source {
 
 =head2 strand_conversion
 
-    Description: Sets hash giving the strand conversion for this
-                 output type
-    Args[1]    : Reference to hash
+   Description: Sets hash giving the strand conversion for this
+                output type
+   Args[1]    : Reference to hash
 
 =cut
 
 sub strand_conversion {
-    my $self = shift;
+   my $self = shift;
 
-    if( @_ ) {
-	    $self->{_strand_conversion} = shift;
-    }
+   if( @_ ) {
+      $self->{_strand_conversion} = shift;
+   }
 
-    return $self->{_strand_conversion};
+   return $self->{_strand_conversion};
 }
 
 1;
