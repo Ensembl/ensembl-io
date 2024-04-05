@@ -373,8 +373,7 @@ sub gtf_attributes {
           my $attributes = $transcript->get_all_Attributes($tag);
           if(@{$attributes}) {
             my $value = $tag;
-            $value = "GENCODE basic" if $tag eq "gencode_basic";
-            $value = "GENCODE primary" if $tag eq "gencode_primary";
+            $value = "basic" if $tag eq "gencode_basic";
             $value = "Ensembl_canonical" if $tag eq "is_canonical";
             $self->add_attr($attrs, 'tag', $value);
           }
