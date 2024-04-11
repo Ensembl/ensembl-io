@@ -492,7 +492,6 @@ sub _print_attribs {
       if(@{$attributes}) {
         my $value = $tag;
         $value = "basic" if $tag eq "gencode_basic";
-        $value = "GENCODE Primary" if $tag eq "gencode_primary";
         $value = "Ensembl_canonical" if $tag eq "is_canonical";
         print $fh qq{ tag "${value}";};
       }

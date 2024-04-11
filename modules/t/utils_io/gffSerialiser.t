@@ -100,7 +100,7 @@ OUT
 OUT
   $expected .= join("\t",
   qw/20      ensembl mRNA  30274334        30298904        .       +       ./,
-  'ID=transcript:ENST00000310998;Name=C20orf125;Parent=gene:ENSG00000131044;biotype=protein_coding;logic_name=ensembl;projection_parent_transcript=ENSG_PARENT_TRANSCRIPT;tag=Ensembl_canonical;transcript_id=ENST00000310998;version=1'
+  'ID=transcript:ENST00000310998;Name=C20orf125;Parent=gene:ENSG00000131044;biotype=protein_coding;logic_name=ensembl;projection_parent_transcript=ENSG_PARENT_TRANSCRIPT;tag=Ensembl_canonical,gencode_primary;transcript_id=ENST00000310998;version=1'
   );
   $expected .= "\n";
   assert_gff3($gene->canonical_transcript(), $expected, 'Transcript with custom source serialises to GFF3 as expected. Source is wibble');
