@@ -118,6 +118,8 @@ sub get_attributes {
   my %attributes;
   foreach my $attr (split(';',$self->get_raw_attributes)) {
     my ($key, $value) = split(' ',$attr, 2);
+    next unless $key;
+
     $value =~ s/"//g if $value;
     $key =~ s/^\s+//;
     $key =~ s/\s+$//;
