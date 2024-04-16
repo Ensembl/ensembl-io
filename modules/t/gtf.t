@@ -79,7 +79,7 @@ is( $parser->get_attribute_by_name('transcript_source'),
 ## Second record
 ok( $parser->next(), "Loading second record" );
 $expected_raw_attributes =
-'gene_id "ENSGALG00000014638"; gene_version "4"; gene_name "ASH1L"; gene_source "ensembl"; gene_biotype "protein_coding";';
+'gene_id "ENSGALG00000014638"; gene_version "4"; gene_name "ASH1L"; gene_source "ensembl"; gene_biotype "protein_coding"; ';
 $expected_attributes = {
     gene_id      => 'ENSGALG00000014638',
     gene_version => '4',
