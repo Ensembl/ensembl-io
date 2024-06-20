@@ -25,5 +25,4 @@ see [https://github.com/Ensembl/Bio-HTS](https://github.com/Ensembl/Bio-HTS).
 
 Alternatively, Bio::DB::HTS can be installed from CPAN.
 
-
 [travis]: https://travis-ci.org/Ensembl/ensembl-io
