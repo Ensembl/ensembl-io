@@ -1,4 +1,4 @@
-dist: xenial
+dist: focal
 
 language: "perl"
 
@@ -16,14 +16,13 @@ perl:
 
 env:
   matrix:
-  - COVERALLS=true  DB=mysql
+  - COVERALLS=true  DB=mysql COVERALLS_REPO_TOKEN=${{secret.COVERALLS_REPO_TOKEN}}
   - COVERALLS=false DB=mysql
   - COVERALLS=false DB=sqlite
 
 addons:
   apt:
     packages:
-      - unzip
       - apache2
       - libpng-dev
       - libssl-dev
@@ -53,14 +52,12 @@ install:
     - export HTSLIB_DIR=$DEPS/htslib
     - export MACHTYPE=$(uname -m)
     - export CFLAGS="-fPIC"
-    - export PERL5LIB=$DEPS/bioperl-live-release-1-6-924:$PERL5LIB
+    - export PERL5LIB=$DEPS/bioperl-live:$PERL5LIB
     - cd $DEPS
     - $CWD/travisci/build_c.sh
     - cd $CWD
-    - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
-    - cpanm -v --installdeps --notest .
-    - cpanm -n Devel::Cover::Report::Coveralls
-    - cpanm -n Bio::DB::HTS DBD::SQLite JSON URI::Escape
+    - cpanm -v --installdeps --with-all-features --notest --cpanfile ensembl/cpanfile .
+    - cpanm -v --installdeps .
     - mysql -u root -h localhost -e 'GRANT ALL PRIVILEGES ON *.* TO "travis"@"%"'
     - cp travisci/MultiTestDB.conf.travisci.mysql  modules/t/MultiTestDB.conf.mysql
     - cp travisci/MultiTestDB.conf.travisci.SQLite modules/t/MultiTestDB.conf.SQLite
@@ -71,7 +68,7 @@ script: "./travisci/harness.sh"
 jobs:
   exclude:
     - perl: "5.30"
-      env: COVERALLS=true DB=mysql
+      env: COVERALLS=true DB=mysql COVERALLS_REPO_TOKEN=${{secret.COVERALLS_REPO_TOKEN}}
     - perl: "5.26"
       env: COVERALLS=false DB=mysql
 

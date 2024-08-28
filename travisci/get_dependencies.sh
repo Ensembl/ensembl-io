@@ -1,14 +1,13 @@
 #!/bin/bash
 
 echo 'Getting BioPerl'
-if [ ! -f release-1-6-924.zip ]; then
-  wget -O release-1-6-924.zip https://github.com/bioperl/bioperl-live/archive/release-1-6-924.zip
-  unzip -q release-1-6-924.zip
+if [ ! -d bioperl-live ]; then
+  git clone -b release-1-6-924 --depth 1 https://github.com/bioperl/bioperl-live.git
 fi
 
 echo 'Getting HTSlib'
 if [ ! -d htslib ]; then
-  git clone --branch 1.3.2 --depth 1 https://github.com/samtools/htslib.git
+  git clone --branch 1.13 --depth 1 https://github.com/samtools/htslib.git
 fi
 
 echo 'Getting jksrc'
