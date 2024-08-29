@@ -44,7 +44,7 @@ before_install:
     - if [[ $ENSEMBL_VER =~ [0-9]+ ]]; then ENSEMBL_BRANCH="release/$ENSEMBL_VER"; fi
     - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-test.git
     - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl.git
-    - git-ensembl --clone --branch $ENSEMBL_BRANCH --secondary_branch main --depth 1 https://github.com/Ensembl/ensembl-variation.git
+    - git-ensembl --clone --branch $ENSEMBL_BRANCH --secondary_branch main --depth 1 ensembl-variation
     - export CWD=$PWD
     - export DEPS=$HOME/dependencies
     - mkdir -p $DEPS
