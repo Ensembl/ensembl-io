@@ -7,7 +7,7 @@ fi
 
 echo 'Getting HTSlib'
 if [ ! -d htslib ]; then
-  git clone --branch 1.13 --depth 1 https://github.com/samtools/htslib.git
+  git clone --branch 1.13 --recurse-submodules --shallow-submodules https://github.com/samtools/htslib.git
 fi
 
 echo 'Getting jksrc'
