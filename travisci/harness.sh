@@ -2,7 +2,6 @@
 
 export PERL5LIB=$PWD/bioperl-live:$PWD/ensembl-test/modules:$PWD/ensembl/modules:$PWD/modules:$PWD/ensembl-variation/modules:$PERL5LIB
 
-
 if [ "$DB" = 'mysql' ]; then
    (cd modules/t && ln -sf MultiTestDB.conf.mysql MultiTestDB.conf)
  elif [ "$DB" = 'sqlite' ]; then
