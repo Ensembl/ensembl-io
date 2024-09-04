@@ -1,4 +1,4 @@
-dist: xenial
+dist: focal
 
 language: "perl"
 
@@ -12,19 +12,23 @@ cache:
 
 perl:
   - "5.26"
-  - "5.30"
+  - "5.32"
 
 env:
   matrix:
-  - COVERALLS=true  DB=mysql
+  - COVERALLS=true  DB=mysql COVERALLS_REPO_TOKEN=${{secret.COVERALLS_REPO_TOKEN}}
   - COVERALLS=false DB=mysql
   - COVERALLS=false DB=sqlite
 
 addons:
   apt:
     packages:
-      - unzip
       - apache2
+      - libbz2-dev
+      - libcurl4-gnutls-dev
+      - libexpat1-dev
+      - liblzma-dev
+      - libmysqlclient-dev
       - libpng-dev
       - libssl-dev
       - openssl
@@ -33,12 +37,14 @@ services:
   - mysql
 
 before_install:
+    - git clone --depth 1 https://github.com/Ensembl/ensembl-git-tools.git
+    - export PATH=$PWD/ensembl-git-tools/bin:$PATH
     - export ENSEMBL_BRANCH='main'
     - export ENSEMBL_VER=$(echo $TRAVIS_BRANCH | grep -P -o '(?<=version[\W_]|fix[\W_]|release[\W_])(\d+)')
     - if [[ $ENSEMBL_VER =~ [0-9]+ ]]; then ENSEMBL_BRANCH="release/$ENSEMBL_VER"; fi
     - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-test.git
     - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl.git
-    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-variation.git
+    - git-ensembl --clone --branch $ENSEMBL_BRANCH --secondary_branch main --depth 1 ensembl-variation
     - export CWD=$PWD
     - export DEPS=$HOME/dependencies
     - mkdir -p $DEPS
@@ -53,15 +59,14 @@ install:
     - export HTSLIB_DIR=$DEPS/htslib
     - export MACHTYPE=$(uname -m)
     - export CFLAGS="-fPIC"
-    - export PERL5LIB=$DEPS/bioperl-live-release-1-6-924:$PERL5LIB
+    - export PERL5LIB=$DEPS/bioperl-live:$PERL5LIB
     - cd $DEPS
     - $CWD/travisci/build_c.sh
     - cd $CWD
-    - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
-    - cpanm -v --installdeps --notest .
-    - cpanm -n Devel::Cover::Report::Coveralls
-    - cpanm -n Bio::DB::HTS DBD::SQLite JSON URI::Escape
+    - cpanm -v --sudo --installdeps --with-all-features --notest --cpanfile ensembl/cpanfile .
+    - cpanm -v --sudo --installdeps .
     - mysql -u root -h localhost -e 'GRANT ALL PRIVILEGES ON *.* TO "travis"@"%"'
+    - mysql -u root -h localhost -e 'SET GLOBAL local_infile=1'
     - cp travisci/MultiTestDB.conf.travisci.mysql  modules/t/MultiTestDB.conf.mysql
     - cp travisci/MultiTestDB.conf.travisci.SQLite modules/t/MultiTestDB.conf.SQLite
 
@@ -70,8 +75,8 @@ script: "./travisci/harness.sh"
 # Get the matrix to only build coveralls support when on 5.26
 jobs:
   exclude:
-    - perl: "5.30"
-      env: COVERALLS=true DB=mysql
+    - perl: "5.32"
+      env: COVERALLS=true DB=mysql COVERALLS_REPO_TOKEN=${{secret.COVERALLS_REPO_TOKEN}}
     - perl: "5.26"
       env: COVERALLS=false DB=mysql
 
