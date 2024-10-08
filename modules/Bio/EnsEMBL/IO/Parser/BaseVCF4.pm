@@ -316,11 +316,10 @@ sub get_end {
     elsif(defined($info->{SVLEN})) {
       return unless $self->get_start;
       my $svlen = (split(',',$info->{SVLEN}))[0];
-      $end = $self->get_start + abs($svlen)-1;
+      $end = $self->get_start + abs($svlen) - 1;
     }
     else {
-      return unless $self->get_start;
-      $end = $self->get_start + length($self->get_raw_reference) - 1;
+      $end = $self->get_raw_start + length($self->get_raw_reference) - 1;
     }
     return $end;
 }

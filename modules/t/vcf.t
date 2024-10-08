@@ -35,7 +35,7 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 note "> Testing each column of the row";
 do_the_tests(\@test_row);
 my $index = 0;
-$test_sample = [$inds[$index], $test_row[9]];
+$test_sample = [$inds[$index], $test_row[9+$index]];
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
 is_deeply($test_sample, $ind_info->[$index], 'Individual data (DEPRECATED)');
 $sample_info = $parser->get_raw_samples_info($inds[$index]);
@@ -49,7 +49,7 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 note "> Testing each column of the row";
 do_the_tests(\@test_row);
 $index = 1;
-$test_sample = [$inds[$index], $test_row[10]];
+$test_sample = [$inds[$index], $test_row[9+$index]];
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
 is_deeply($test_sample, $ind_info->[$index], 'Individual data (DEPRECATED)');
 $sample_info = $parser->get_raw_samples_info($inds[$index]);
@@ -63,7 +63,7 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 note "> Testing each column of the row";
 do_the_tests(\@test_row);
 $index = 2;
-$test_sample = [$inds[$index], $test_row[11]];
+$test_sample = [$inds[$index], $test_row[9+$index]];
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
 is_deeply($test_sample, $ind_info->[$index], 'Individual data (DEPRECATED)');
 $sample_info  = $parser->get_raw_samples_info($inds[$index]);
@@ -77,7 +77,7 @@ is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 note "> Testing each column of the row";
 do_the_tests(\@test_row);
 $index = 0;
-$test_sample = [$inds[$index], $test_row[9]];
+$test_sample = [$inds[$index], $test_row[9+$index]];
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
 is_deeply($test_sample, $ind_info->[$index], 'Individual data (DEPRECATED)');
 $sample_info  = $parser->get_raw_samples_info($inds[$index]);
@@ -85,22 +85,33 @@ is_deeply($test_sample, $sample_info->[$index], 'Sample data');
 
 
 note "Record 5";
-ok ($parser->next(), "Loading fifth record");
+ok ($parser->next(), "Loading the fifth record");
+@test_row = (qw(20 186302389   .  TTA   T  6  PASS  .  .  .  .  .));
+is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
+note "> Testing each column of the row";
+do_the_tests(\@test_row);
+ok($parser->get_seqname eq '20', 'get_seqname');
+ok($parser->get_start == 186302390, 'get_start');
+ok($parser->get_end == 186302391, 'get_end');
+
+
+note "Record 6";
+ok ($parser->next(), "Loading the sixth record");
 @test_row = (qw(20	1234567	microsat1	GTC), 'G,GTCT', 50, 'PASS', qw(NS=3;DP=9;AA=G	GT:GQ:DP	0/1:35:4	0/2:17:2	1/1:40:3));
 is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
 note "> Testing each column of the row";
 do_the_tests(\@test_row);
-$index = 0;
-$test_sample = [$inds[$index], $test_row[9]];
+$index = 1;
+$test_sample = [$inds[$index], $test_row[9+$index]];
 $ind_info  = $parser->get_raw_individuals_info($inds[$index]);
 is_deeply($test_sample, $ind_info->[$index], 'Individual data (DEPRECATED)');
 $sample_info  = $parser->get_raw_samples_info($inds[$index]);
 is_deeply($test_sample, $sample_info->[$index], 'Sample data');
 
-print "\n> Testing the getters (only for the last record):\n";
+print "> Testing the getters (only for the 6th record):\n";
 ok($parser->get_seqname eq '20', 'get_seqname');
 ok($parser->get_start == 1234568, 'get_start');
-ok($parser->get_end == 1234570, 'get_end');
+ok($parser->get_end == 1234569, 'get_end');
 ok($parser->get_IDs->[0] eq 'microsat1', 'get_IDs');
 ok($parser->get_reference eq 'GTC', 'get_reference');
 ok($parser->get_alternatives->[0] eq 'G', 'get_alternatives');
@@ -116,7 +127,21 @@ ok($parser->get_individuals_genotypes($inds[$index])->{$inds[$index]} eq 'GTC/G'
 ok($parser->get_samples_info($inds[$index])->{$inds[$index]}->{'GT'} eq '0/1', 'get_samples_info');
 ok($parser->get_samples_genotypes($inds[$index])->{$inds[$index]} eq 'GTC/G', 'get_samples_genotypes');
 
-note "> Testing metadata getters";
+
+note "Record 7";
+ok ($parser->next(), "Loading the seventh record");
+@test_row = (qw(20 1234567  INS0  C  <ctg1>   6  PASS  .  .  .  .  .));
+is_deeply($parser->{'record'},\@test_row,"Test basic parsing of a row");
+note "> Testing each column of the row";
+do_the_tests(\@test_row);
+$index = 2;
+$test_sample = [$inds[$index], $test_row[9+$index]];
+$ind_info  = $parser->get_raw_individuals_info($inds[$index]);
+is_deeply($test_sample, $ind_info->[$index], 'Individual data (DEPRECATED)');
+$sample_info  = $parser->get_raw_samples_info($inds[$index]);
+is_deeply($test_sample, $sample_info->[$index], 'Sample data');
+
+note "\n> Testing metadata getters";
 ok($parser->get_metadata_key_list eq 'FILTER, FORMAT, INFO, contig, fileDate, fileformat, header, phasing, reference, source', 'getMetadataKeyList');
 ok($parser->get_metadata_by_pragma('fileDate') eq '20090805', 'getMetadataByPragma');
 ok($parser->get_vcf_version eq 'VCFv4.2', 'getVCFversion');
@@ -125,7 +150,7 @@ ok($parser->get_metadata_field('contig', '20', 'length') eq 62435964, 'getMetaFi
 ok(!defined($parser->get_metadata_field('contig', '20', 'URL')), 'getMetaField - non-existing field');
 ok($parser->get_metadata_field('contig', 'ctg1', 'URL') =~ /ftp/, 'Multiple contigs');
 
-note "> Testing format validation";
+note "\n> Testing format validation";
 $parser->reset();
 $parser->shift_block;
 ok ($parser->validate(), "Validating vcf format");
