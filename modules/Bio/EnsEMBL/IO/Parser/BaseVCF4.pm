@@ -310,6 +310,7 @@ sub get_end {
     my $self = shift;
     my $info = $self->get_info;
     my $end;
+    my $alternatives = join(",", @{$self->get_alternatives});
     if (defined($info->{END})) {
       $end = $info->{END};
     }
