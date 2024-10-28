@@ -318,6 +318,9 @@ sub get_end {
       my $svlen = (split(',',$info->{SVLEN}))[0];
       $end = $self->get_start + abs($svlen) - 1;
     }
+    elsif(($self->get_raw_info && $self->get_raw_info =~ /SVTYPE/) || ($alternatives && $alternatives =~ /\<|\[|\]|\>/)) {
+      $end =  $self->get_start;
+    }
     else {
       $end = $self->get_raw_start + length($self->get_raw_reference) - 1;
     }
