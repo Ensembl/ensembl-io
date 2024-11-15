@@ -279,30 +279,18 @@ sub get_start {
 # Sequence end
 
 =head2 get_raw_end
-    Description : Return the end position of the feature
+    Description : Return the end position of the feature. Synonym to `get_end`
     Returntype  : Integer
 =cut
 
 sub get_raw_end {
     my $self = shift;
-    my $info = $self->get_info;
-    my $end;
-    if (defined($info->{END})) {
-      $end = $info->{END};
-    }
-    elsif(defined($info->{SVLEN})) {
-      my $svlen = (split(',',$info->{SVLEN}))[0];
-      $end = $self->get_raw_start + abs($svlen);
-    }
-    else {
-      $end = $self->get_raw_start + length($self->get_raw_reference) - 1;
-    }
-    return $end;
+    return $self->get_end;
 }
 
 
 =head2 get_end
-    Description : Return the adjusted end position of the feature
+    Description : Return the end position of the feature
     Returntype  : Integer
 =cut
 
@@ -310,17 +298,20 @@ sub get_end {
     my $self = shift;
     my $info = $self->get_info;
     my $end;
-    if (defined($info->{END})) {
-      $end = $info->{END};
-    }
-    elsif(defined($info->{SVLEN})) {
+    my $alternatives = join(",", @{$self->get_alternatives});
+    if(defined($info->{SVLEN})) {
       return unless $self->get_start;
       my $svlen = (split(',',$info->{SVLEN}))[0];
-      $end = $self->get_start + abs($svlen)-1;
+      $end = $self->get_start + abs($svlen) - 1;
+    }
+    elsif (defined($info->{END})) {
+      $end = $info->{END};
+    }
+    elsif (($self->get_raw_info && $self->get_raw_info =~ /SVTYPE/) || ($alternatives && $alternatives =~ /\<|\[|\]|\>/)) {
+      $end = $self->get_start;
     }
     else {
-      return unless $self->get_start;
-      $end = $self->get_start + length($self->get_raw_reference) - 1;
+      $end = $self->get_raw_start + length($self->get_raw_reference) - 1;
     }
     return $end;
 }
