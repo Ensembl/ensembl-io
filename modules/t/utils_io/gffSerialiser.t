@@ -111,7 +111,7 @@ OUT
 OUT
   $expected .= join("\t",
   qw/20      ensembl CDS  30274334        30274425        .       +       0/,
-  'ID=CDS:ENSP00000308980;Parent=transcript:ENST00000310998;protein_id=ENSP00000308980'
+  'ID=CDS:ENSP00000308980;Parent=transcript:ENST00000310998;protein_id=ENSP00000308980;version=1'
   );
   $expected .= "\n";
   my $cds = $gene->canonical_transcript->get_all_CDS();
