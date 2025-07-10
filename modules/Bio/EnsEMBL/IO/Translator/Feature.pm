@@ -368,8 +368,8 @@ sub gtf_attributes {
 
       if ( $object->isa('Bio::EnsEMBL::Transcript') ) {
         $transcript = $object;
-
-        foreach my $tag (qw/cds_end_NF cds_start_NF mRNA_end_NF mRNA_start_NF gencode_basic gencode_primary MANE_Select is_canonical MANE_Plus_Clinical/) {
+	
+        foreach my $tag (qw/cds_end_NF cds_start_NF mRNA_end_NF mRNA_start_NF gencode_basic gencode_primary MANE_Select is_canonical MANE_Plus_Clinical ens_canon_extended/) {
           my $attributes = $transcript->get_all_Attributes($tag);
           if(@{$attributes}) {
             my $value = $tag;
