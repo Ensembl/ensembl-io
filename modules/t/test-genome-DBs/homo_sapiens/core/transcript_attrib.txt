@@ -2,3 +2,4 @@
 21716	417	GENCODE basic
 21716	576	GENCODE primary
 21716	584	Ensembl Canonical Extended
+21716	218	readthrough transcript
