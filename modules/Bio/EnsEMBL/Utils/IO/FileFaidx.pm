@@ -64,6 +64,7 @@ use warnings;
 use Bio::EnsEMBL::Utils::Exception qw/throw warning/;
 use Bio::EnsEMBL::Utils::IO qw/iterate_lines work_with_file slurp/;
 use English qw/-no_match_vars/;
+use IO::Uncompress::Gunzip qw($GunzipError);
 require bytes;
 
 =head2 new
@@ -83,11 +84,97 @@ sub new {
   $uppercase_sequence //= 1;
   my $self = bless({}, ref($class)||$class);
   $self->file($fasta_file);
+  $self->check_if_compressed();
   $self->write_index_to_disk($write_index_to_disk);
   $self->persist_fh($persist_fh);
   $self->no_generation($no_generation);
   $self->uppercase_sequence($uppercase_sequence);
   return $self;
+}
+
+=head2 check_if_compressed
+
+  Description : Checks if the file name ends with '.gz',
+                if so treats it as a  BGZIP compressed one
+                and checks for FAI and GZI indeces presence
+  Exception   : Thrown if the FAI or GZI index files cannot be found
+
+=cut
+
+sub check_if_compressed {
+  my ($self) = @_;
+
+  $self->{_is_compressed} = 0;
+
+  my $file = $self->{file};
+  return 0 if ($file !~ m/\.gz$/);
+
+  my $index_suffix = $self->index_suffix();
+  throw "No FAI index file found at '${file}.${index_suffix}'. Required for compressed FASTA." unless -f $self->index_path($file);
+
+  my $gzi_index_suffix = $self->gzi_index_suffix();
+  throw "No GZI index file found at '${file}.${gzi_index_suffix}'. Required for compressed FASTA." unless -f $self->gzi_index_path($file);
+
+  $self->load_gzi_index($self->gzi_index_path($file));
+
+  $self->{_is_compressed} = 1;
+}
+
+=head2 load_gzi_index
+
+  Description : Checks if the file name ends with '.gz',
+                if so treats it as a  BGZIP compressed one
+                and checks for FAI and GZI indeces presence
+  Arg [1]     : String; $index_file. Path to the GZI index file
+  Exception   : Thrown if the GZI index file cannot be found,
+                or if the index file has format
+=cut
+
+
+sub load_gzi_index {
+  my ($self, $index_file) = @_;
+
+  work_with_file($index_file, '<:raw', sub {
+    my ($fh) = @_;
+
+    my $bytes;
+    my $bytes_in = read($fh, $bytes, 8);
+    throw("Cannot get number of entries from index file ${index_file}") if $bytes_in != 8;
+
+    my ($entries) = unpack('Q', $bytes);
+    $self->{_gzi_index_entries} = $entries;
+
+    $self->{_gzi_index} = [];
+
+    # some stats
+    my $prev_uncompressed; 
+    my $uncompressed_block_size = 0;
+
+    for (my $i = 0; $i < $entries; $i++) {
+      $bytes_in = read $fh, $bytes, 16;
+      throw("Cannot get pair $i") if $bytes_in != 16;
+      my ($compressed_offset, $uncompressed_offset) = unpack('QQ', $bytes);
+      $self->{_gzi_index}->[$i]->{uncompressed_offset_next} = $uncompressed_offset if ($i);
+      push @{$self->{_gzi_index}}, {
+        uncompressed_offset => $uncompressed_offset,
+        compressed_offset => $compressed_offset,
+        uncompressed_offset_next => 0,
+      };
+      # estimate block sizes
+      if (defined $prev_uncompressed) {
+        $uncompressed_block_size += $uncompressed_offset - $prev_uncompressed; 
+      }
+      $prev_uncompressed = $uncompressed_offset;
+    }
+
+    if ($entries > 1) {
+      $uncompressed_block_size = int($uncompressed_block_size / ($entries - 1));
+    }
+    warning("index has $entries entries, estimated uncompressed block size: $uncompressed_block_size");
+    $self->{_uncompressed_block_size} = $uncompressed_block_size;
+
+    return;
+  });
 }
 
 =head2 can_access_id
@@ -121,13 +208,18 @@ sub file {
 =head2 write_index_to_disk
   
   Arg [1]     : Boolean; $write_index_to_disk. Controls if we write the index back to disk
-  Description : Controls if we can write back to disk. Only run to generate the indexes
+  Description : Controls if we can write back to disk. Only run to generate the indexes. Resets to 0 for the compressed files
 
 =cut
 
 sub write_index_to_disk {
   my ($self, $write_index_to_disk) = @_;
   $self->{'write_index_to_disk'} = $write_index_to_disk if defined $write_index_to_disk;
+  if ($self->{_is_compressed}) {
+    warning("Reverting 'write_index_to_disk' to 0 for compressed files") if ($self->{write_index_to_disk});
+    $self->{write_index_to_disk} = 0;
+  }
+  $self->{'write_index_to_disk'} = 0 if ($self->{_is_compressed});
   return $self->{'write_index_to_disk'};
 }
 
@@ -147,13 +239,17 @@ sub persist_fh {
 =head2 no_generation
   
   Arg [1]     : Boolean; $no_generation
-  Description : Controls if we will attempt an index generation if a .fai file is missing
+  Description : Controls if we will attempt an index generation if a .fai file is missing. Resets to 1 for the compressed files
 
 =cut
 
 sub no_generation {
   my ($self, $no_generation) = @_;
   $self->{'no_generation'} = $no_generation if defined $no_generation;
+  if ($self->{_is_compressed}) {
+    warning("Reverting 'no_generation' to 1 for compressed files") if (!$self->{no_generation});
+    $self->{no_generation} = 1;
+  }
   return $self->{'no_generation'};
 }
 
@@ -195,6 +291,32 @@ sub index_suffix {
 sub index_path {
   my ($class, $path) = @_;
   my $suffix = $class->index_suffix();
+  return "${path}.${suffix}";
+}
+
+=head2 gzi_index_suffix
+
+  Description : Returns the GZI index suffix normally used (gzi)
+  Returntype  : String of the GZI index suffix
+
+=cut
+
+sub gzi_index_suffix {
+  my ($class) = @_;
+  return 'gzi';
+}
+
+=head2 gzi_index_path
+
+  Arg [1]     : String; $path. Path of the current gzi_index
+  Description : Returns the GZI index path (normally the given path plus an .gzi extension)
+  Returntype  : Path to the GZI index file
+
+=cut
+
+sub gzi_index_path {
+  my ($class, $path) = @_;
+  my $suffix = $class->gzi_index_suffix();
   return "${path}.${suffix}";
 }
 
@@ -455,11 +577,123 @@ sub _read_from_source {
   }
   
   my $seq;
-  seek($fh, $offset, 0);
-  read($fh, $seq, $length);
+  $self->_seek_read($fh, \$seq, $offset, $length);
   close $fh if ! $persist_fh;
   
   return \$seq;
+}
+
+=head2 _seek_read
+
+  Arg [1]     : File handle; $fh. File handle of the raw or bgzip compressed fasta file
+  Arg [2]     : Reference; $buf. Buffer to store the sequence to
+  Arg [3]     : Integer; $offset. The original (uncompressed) offset of the sequence
+  Arg [4]     : Integer; $length. The length of the sequence to retrieve
+  Description : Seek to the exact offset in the  the uncompressed string and read data
+                into the bufer $buf. If working with compressed data fall through into
+                the _seek_read_gz sub.
+
+=cut
+
+sub _seek_read {
+  my ($self, $fh, $buf, $offset, $length) = @_;
+ 
+  return $self->_seek_read_gz($fh, $buf, $offset, $length) if ($self->{_is_compressed}); 
+
+  seek($fh, $offset, 0);
+  read($fh, $$buf, $length);
+}
+
+=head2 _seek_read_gz
+
+  Arg [1]     : File handle; $fh. File handle of the bgzip compressed fasta file
+  Arg [2]     : Reference; $buf. Buffer to store the sequence to
+  Arg [3]     : Integer; $offset. The original (uncompressed) offset of the sequence
+  Arg [4]     : Integer; $length. The length of the sequence to retrieve
+  Description : For the given uncompressed offset find the corresponding block offset
+                in the compressed file. Read from the begining of the block until the
+                end of the fragment of interest, Splice away the leading prefix up to
+                the given uncompressed offset
+
+=cut
+
+sub _seek_read_gz {
+  my ($self, $fh, $buf, $offset, $length) = @_;
+
+  my ($gz_block_start, $uncompressed_offset) = $self->_compressed_block_offset($offset);
+
+  seek($fh, $gz_block_start, 0);
+
+  my $gz = IO::Uncompress::Gunzip->new($fh, -AutoClose => 0, -MultiStream => 1);
+  my $bytes_read = $gz->read($$buf, $length + $uncompressed_offset);
+  if ( $bytes_read != ($length + $uncompressed_offset) ) {
+      my $file = $self->{file};
+      throw "failed to read $length + $uncompressed_offset bytes from $file at $gz_block_start (uncompressed: $offset)";
+  }
+  $gz->close(); # no $fh closed, as '-AutoClose => 0'
+
+  $$buf = substr($$buf, -$length) if $uncompressed_offset;
+}
+
+
+=head2 _compressed_block_offset
+
+  Arg [1]     : Integer; $offset. Original offset in the uncompressed file
+  Description : For the given uncompressed offset find the corresponding block offset
+                in the compressed file. First estimate by dividing by _uncompressed_block_size.
+                Then try to fix by looking at the adjacent blocks.
+                Then give up and do the proper binary search.
+  Returntype  : (Integer, Integer): (Offset of the block in the compressed file, length of the prefix to skip).
+
+=cut
+
+sub _compressed_block_offset {
+  my ($self, $offset) = @_;
+  
+  my $i = 0;
+  if ($self->{_gzi_index_entries} > 1) {
+    # initial estimate
+    $i = int($offset / $self->{_uncompressed_block_size});
+    my $dir = $self->_offset_is_not_in_block($offset, $i);
+    # assume $dir cannot be negative for the fisrt block ($i == 0)
+    if ($dir) {
+      # +/- 1 for a start if we missed
+      $i += $dir;
+      # proper binary search
+      my ($start, $end) = (0, scalar(@{$self->{_gzi_index}}));
+      while ($dir = $self->_offset_is_not_in_block($offset, $i)) {
+        ($start, $end) = $dir > 0 ? ($i, $end) : ($start, $i);
+        $i = int(($start + $end) / 2);
+      }
+    }
+  }
+
+  my $block = $self->{_gzi_index}->[$i];
+  my $compressed_offset = $block->{compressed_offset};
+  my $uncompressed_offset = $block->{uncompressed_offset};
+
+  return ($compressed_offset, $offset - $uncompressed_offset);
+}
+
+=head2 _offset_is_not_in_block
+
+  Arg [1]     : Integer; $offset. Original offset in the uncompressed file
+  Arg [2]     : Integer; $i. Index of the block entry in the _gzi_index list.
+  Description : Check if the offset is not within the block entry at index $i.
+  Returntype  : Iinteger, (-1, 0 ,1)
+                If the $offset is in the block, return 0.
+                If the $offset is less then the block uncompressed offset return -1.
+                Otherwise return 1.
+
+=cut
+
+sub _offset_is_not_in_block {
+  my ($self, $offset, $i) = @_; 
+  my $start = $self->{_gzi_index}->[$i]->{uncompressed_offset};
+  my $end = $self->{_gzi_index}->[$i]->{uncompressed_offset_next};
+  return -1 if ($offset < $start);
+  return 1 if ($end && $offset >= $end);
+  return 0;
 }
 
 sub DESTROY {
