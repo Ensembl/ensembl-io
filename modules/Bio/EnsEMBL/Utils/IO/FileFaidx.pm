@@ -624,7 +624,7 @@ sub _seek_read {
 sub _seek_read_gz {
   my ($self, $fh, $buf, $offset, $length) = @_;
 
-  my ($gz_block_start, $uncompressed_offset) = $self->_compressed_block_offset($offset);
+  my ($gz_block_start, $uncompressed_offset) = $self->_compressed_block_offset($offset, $self->{_gzi_index});
 
   seek($fh, $gz_block_start, 0);
 
@@ -652,22 +652,30 @@ sub _seek_read_gz {
 =cut
 
 sub _compressed_block_offset {
-  my ($self, $offset) = @_;
+  my ($self, $offset, $index_blocks) = @_;
   
   my $i = 0;
-  my $index_size = scalar(@{$self->{_gzi_index}});
+  my $index_size = scalar(@{$index_blocks});
   if ($index_size > 1) {
     # initial estimate
     $i = int($offset / $self->{_uncompressed_block_size});
-    my $dir = $self->_offset_is_not_in_block($offset, $i);
-    # assume $dir cannot be negative for the fisrt block ($i == 0)
+    my $dir = $self->_offset_is_not_in_block($offset, $index_blocks->[$i]);
     if ($dir) {
+      # check if we have offset outside of the index boundaries
+      if ( ($dir < 0 && $i == 0) || ($dir > 0 && $i == $index_size-1) ) {
+        my $block = $index_blocks->[$i];
+        my $bl_start = $block->{uncompressed_offset};
+        my $bl_end = $block->{uncompressed_offset_next}; # can be 0 for the last block
+        throw "wrong direction $dir for offset $offset not in block $i [$bl_start:$bl_end), $index_size block(s) in total\n";
+      }
+
       # +/- 1 for a start if we missed a bit
       $i += $dir;
+
       # proper binary search
       my ($start, $end) = (0, $index_size-1);
       # warn "before iter offset $offset i $i start $start end $end dir $dir\n";
-      while (($dir = $self->_offset_is_not_in_block($offset, $i)) && $start != $end) {
+      while (($dir = $self->_offset_is_not_in_block($offset, $index_blocks->[$i])) && $start != $end) {
         # warn "offset $offset i $i start $start end $end dir $dir\n";
         ($start, $end) = $dir > 0 ? ($i+1, $end) : ($start, $i-1);
         $start = $end if $start > $end;
@@ -676,7 +684,7 @@ sub _compressed_block_offset {
       }
       # check if missed something
       if($start == $end && $dir != 0) {
-        throw "failed to locate offset $offset in blocki $i start $start end $end dir $dir\n";
+        throw "failed to locate offset $offset in block $i start $start end $end dir $dir\n";
       }
     }
   }
@@ -701,9 +709,9 @@ sub _compressed_block_offset {
 =cut
 
 sub _offset_is_not_in_block {
-  my ($self, $offset, $i) = @_; 
-  my $start = $self->{_gzi_index}->[$i]->{uncompressed_offset};
-  my $end = $self->{_gzi_index}->[$i]->{uncompressed_offset_next};
+  my ($self, $offset, $block) = @_;
+  my $start = $block->{uncompressed_offset};
+  my $end = $block->{uncompressed_offset_next};
   # warn "offset $offset in block $i [$start, $end)\n";
   return -1 if ($offset < $start);
   return 1 if ($end && $offset >= $end);
