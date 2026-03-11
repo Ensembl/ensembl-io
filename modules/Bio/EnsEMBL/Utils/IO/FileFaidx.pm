@@ -122,10 +122,10 @@ sub check_if_compressed {
 
 =head2 load_gzi_index
 
-  Description : Checks if the file name ends with '.gz',
-                if so treats it as a  BGZIP compressed one
-                and checks for FAI and GZI indeces presence
   Arg [1]     : String; $index_file. Path to the GZI index file
+  Description : Checks if the file name ends with '.gz', if so treats it as a  BGZIP compressed one
+                and checks for FAI and GZI indeces presence.
+                See https://www.htslib.org/doc/bgzip.html#GZI_FORMAT for the binary index description
   Exception   : Thrown if the GZI index file cannot be found,
                 or if the index file has format
 =cut
@@ -145,32 +145,36 @@ sub load_gzi_index {
     $self->{_gzi_index_entries} = $entries;
 
     $self->{_gzi_index} = [];
+    # initialise the first block, not included in GZI
+    push @{$self->{_gzi_index}}, {
+      uncompressed_offset => 0,
+      compressed_offset => 0,
+      uncompressed_offset_next => 0,
+    };
 
     # some stats
-    my $prev_uncompressed; 
+    my $prev_uncompressed = 0;
     my $uncompressed_block_size = 0;
-
-    for (my $i = 0; $i < $entries; $i++) {
+    for (my $i = 1; $i < $entries+1; $i++) {
       $bytes_in = read $fh, $bytes, 16;
       throw("Cannot get pair $i") if $bytes_in != 16;
       my ($compressed_offset, $uncompressed_offset) = unpack('QQ', $bytes);
-      $self->{_gzi_index}->[$i]->{uncompressed_offset_next} = $uncompressed_offset if ($i);
+      $self->{_gzi_index}->[-1]->{uncompressed_offset_next} = $uncompressed_offset;
       push @{$self->{_gzi_index}}, {
         uncompressed_offset => $uncompressed_offset,
         compressed_offset => $compressed_offset,
         uncompressed_offset_next => 0,
       };
       # estimate block sizes
-      if (defined $prev_uncompressed) {
-        $uncompressed_block_size += $uncompressed_offset - $prev_uncompressed; 
-      }
+      $uncompressed_block_size += $uncompressed_offset - $prev_uncompressed;
       $prev_uncompressed = $uncompressed_offset;
     }
 
-    if ($entries > 1) {
-      $uncompressed_block_size = int($uncompressed_block_size / ($entries - 1));
+    my $index_size = scalar(@{$self->{_gzi_index}});
+    if ($index_size > 1) {
+      $uncompressed_block_size = int($uncompressed_block_size / ($index_size - 1));
     }
-    warning("index has $entries entries, estimated uncompressed block size: $uncompressed_block_size");
+    warning("index file has $entries entries, index size $index_size, estimated uncompressed block size: $uncompressed_block_size");
     $self->{_uncompressed_block_size} = $uncompressed_block_size;
 
     return;
@@ -651,19 +655,28 @@ sub _compressed_block_offset {
   my ($self, $offset) = @_;
   
   my $i = 0;
-  if ($self->{_gzi_index_entries} > 1) {
+  my $index_size = scalar(@{$self->{_gzi_index}});
+  if ($index_size > 1) {
     # initial estimate
     $i = int($offset / $self->{_uncompressed_block_size});
     my $dir = $self->_offset_is_not_in_block($offset, $i);
     # assume $dir cannot be negative for the fisrt block ($i == 0)
     if ($dir) {
-      # +/- 1 for a start if we missed
+      # +/- 1 for a start if we missed a bit
       $i += $dir;
       # proper binary search
-      my ($start, $end) = (0, scalar(@{$self->{_gzi_index}}));
-      while ($dir = $self->_offset_is_not_in_block($offset, $i)) {
-        ($start, $end) = $dir > 0 ? ($i, $end) : ($start, $i);
+      my ($start, $end) = (0, $index_size-1);
+      # warn "before iter offset $offset i $i start $start end $end dir $dir\n";
+      while (($dir = $self->_offset_is_not_in_block($offset, $i)) && $start != $end) {
+        # warn "offset $offset i $i start $start end $end dir $dir\n";
+        ($start, $end) = $dir > 0 ? ($i+1, $end) : ($start, $i-1);
+        $start = $end if $start > $end;
+        $end = $start if $end < $start;
         $i = int(($start + $end) / 2);
+      }
+      # check if missed something
+      if($start == $end && $dir != 0) {
+        throw "failed to locate offset $offset in blocki $i start $start end $end dir $dir\n";
       }
     }
   }
@@ -691,6 +704,7 @@ sub _offset_is_not_in_block {
   my ($self, $offset, $i) = @_; 
   my $start = $self->{_gzi_index}->[$i]->{uncompressed_offset};
   my $end = $self->{_gzi_index}->[$i]->{uncompressed_offset_next};
+  # warn "offset $offset in block $i [$start, $end)\n";
   return -1 if ($offset < $start);
   return 1 if ($end && $offset >= $end);
   return 0;
