@@ -611,6 +611,9 @@ sub validate {
       last;
     }
 
+    $self->reset;
+    $self->next_block() if ($self->{'filename'});  # pre-load peek buffer
+
     return $valid;
 }
 

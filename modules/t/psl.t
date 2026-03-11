@@ -24,6 +24,7 @@ use FindBin;
 my $test_file = $FindBin::Bin . '/input/data.psl';
 
 my $parser = Bio::EnsEMBL::IO::Parser::Psl->open($test_file);
+ok ($parser->validate(), "Validating psl format");
 ok ($parser->next(), "Loading first record");
 my $test_desc = 'Fish BLAT';
 is_deeply($parser->get_metadata_value('description'), $test_desc, "Test track description");
