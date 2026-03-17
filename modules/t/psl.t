@@ -53,7 +53,9 @@ ok ($B->[0] eq 171, 'QStarts');
 my $C = $parser->get_tStarts();
 ok ($C->[0] eq 34674832, 'TStarts');
 ok ($parser->next(), "Loading second record");
+ok ($parser->get_tEnd() eq 13073747, "TEnd of second record");
 ok ($parser->next(), "Loading third record");
+ok ($parser->get_tEnd() eq 13073748, "TEnd of third record");
 ok (!$parser->next(), "Reaching end of file");
 ok ($parser->close(), "Closing file");
 
