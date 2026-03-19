@@ -85,6 +85,7 @@ sub new {
   my $self = bless({}, ref($class)||$class);
   $self->file($fasta_file);
   $self->check_if_compressed();
+  $self->set_seek_read_handler();
   $self->write_index_to_disk($write_index_to_disk);
   $self->persist_fh($persist_fh);
   $self->no_generation($no_generation);
@@ -120,19 +121,40 @@ sub check_if_compressed {
   $self->{_is_compressed} = 1;
 }
 
+=head2 set_seek_read_handler
+
+  Description : Pikcs the `_seek_read_handler` for raw or compressed fasta
+                to be called from `_read_from_source`
+
+=cut
+
+sub set_seek_read_handler {
+  my ($self) = @_;
+
+  $self->{_seek_read_handler} = \&_seek_read;
+  $self->{_seek_read_handler} = \&_seek_read_gz if ($self->{_is_compressed});
+}
+
 =head2 load_gzi_index
 
   Arg [1]     : String; $index_file. Path to the GZI index file
   Description : Checks if the file name ends with '.gz', if so treats it as a  BGZIP compressed one
                 and checks for FAI and GZI indeces presence.
                 See https://www.htslib.org/doc/bgzip.html#GZI_FORMAT for the binary index description
+                At the momemt of writing that was
+                    uint64_t number_entries (N.B. can be 0 !)
+                followed by number_entries pairs of:
+                    uint64_t compressed_offset
+                    uint64_t uncompressed_offset
+               N.B. Pair (0, 0) is ommitted
   Exception   : Thrown if the GZI index file cannot be found,
                 or if the index file has format
 =cut
 
-
 sub load_gzi_index {
   my ($self, $index_file) = @_;
+
+  $self->{_gzi_index_raw} = $self->empty_gzi_index();
 
   work_with_file($index_file, '<:raw', sub {
     my ($fh) = @_;
@@ -142,43 +164,140 @@ sub load_gzi_index {
     throw("Cannot get number of entries from index file ${index_file}") if $bytes_in != 8;
 
     my ($entries) = unpack('Q', $bytes);
-    $self->{_gzi_index_entries} = $entries;
 
-    $self->{_gzi_index} = [];
     # initialise the first block, not included in GZI
-    push @{$self->{_gzi_index}}, {
-      uncompressed_offset => 0,
-      compressed_offset => 0,
-      uncompressed_offset_next => 0,
-    };
+    $self->put_gzi_index_block($self->{_gzi_index_raw}, 0, 0);
 
-    # some stats
-    my $prev_uncompressed = 0;
-    my $uncompressed_block_size = 0;
     for (my $i = 1; $i < $entries+1; $i++) {
       $bytes_in = read $fh, $bytes, 16;
       throw("Cannot get pair $i") if $bytes_in != 16;
       my ($compressed_offset, $uncompressed_offset) = unpack('QQ', $bytes);
-      $self->{_gzi_index}->[-1]->{uncompressed_offset_next} = $uncompressed_offset;
-      push @{$self->{_gzi_index}}, {
-        uncompressed_offset => $uncompressed_offset,
-        compressed_offset => $compressed_offset,
-        uncompressed_offset_next => 0,
-      };
-      # estimate block sizes
-      $uncompressed_block_size += $uncompressed_offset - $prev_uncompressed;
-      $prev_uncompressed = $uncompressed_offset;
+      $self->update_gzi_index_prev_follower($self->{_gzi_index_raw}, $uncompressed_offset);
+      $self->put_gzi_index_block($self->{_gzi_index_raw}, $uncompressed_offset, $compressed_offset, 0);
     }
+    $self->{_gzi_index_raw}->{blocks} = [ sort { $a->{uncompressed_offset} <=> $b->{uncompressed_offset} } @{ $self->{_gzi_index_raw}->{blocks} } ];
+    $self->update_gzi_index_meta($self->{_gzi_index_raw});
 
-    my $index_size = scalar(@{$self->{_gzi_index}});
-    if ($index_size > 1) {
-      $uncompressed_block_size = int($uncompressed_block_size / ($index_size - 1));
-    }
+    my $index_size = $self->{_gzi_index_raw}->{size};
+    my $uncompressed_block_size = $self->{_gzi_index_raw}->{uncompressed_block_size};
     warning("index file has $entries entries, index size $index_size, estimated uncompressed block size: $uncompressed_block_size");
-    $self->{_uncompressed_block_size} = $uncompressed_block_size;
 
     return;
   });
+}
+
+=head2 empty_gzi_index
+
+  Description : Returns empty structure to store GZI index metada and blocks
+  Returntype  : Hash with the GZI index struct:
+                `blocks` -- reference to an empty list to store GZI index bblocks to
+                `uncompressed_offset_start` -- ucompressed offset of the first block
+                `uncompressed_block_size` -- estimated size of the uncompressed block to speed up hopping
+                `size` --  number of `blocks`
+                `name` --  name/tag of the structure
+=cut
+
+sub empty_gzi_index {
+  my ($self) = @_;
+  # prepare gzi_index_structure
+  return {
+    blocks => [],
+    uncompressed_offset_start => 0,
+    uncompressed_block_size => 0,
+    size   => 0,
+    name   => "",
+  };
+}
+
+=head2 put_gzi_index_block
+
+  Arg [1]     : Hash ref; $index. Reference to the GZI index structure being filled
+  Arg [2]     : Integer; $uncompressed_offset. Block's `uncompressed_offset`
+  Arg [3]     : Integer; $compressed_offset. Block's `compressed_offset`
+  Arg [4]     : Integer; $uncompressed_offset_next, default 0. `uncompressed_offset` of the following block, 0 -- for the last block
+  Description : Push a block with the specified values to the `$index->{blocks}` list
+
+=cut
+
+sub put_gzi_index_block {
+  my ($self, $index, $uncompressed_offset, $compressed_offset, $uncompressed_offset_next) = @_;
+  $uncompressed_offset_next //= 0;
+
+  push @{$index->{blocks}}, {
+    uncompressed_offset => $uncompressed_offset,
+    compressed_offset => $compressed_offset,
+    uncompressed_offset_next => $uncompressed_offset_next,
+  };
+}
+
+=head2 update_gzi_index_prev_follower
+
+  Arg [1]     : Hash ref; $index. Reference to the GZI index structure being filled
+  Arg [2]     : Integer; $uncompressed_offset_next. Value for `uncompressed_offset_next` of the last block an a list.
+  Description : Update `uncompressed_offset_next` of the last block an a list.
+
+=cut
+
+sub update_gzi_index_prev_follower {
+  my ($self, $index, $uncompressed_offset_next) = @_;
+
+  if (scalar(@{$index->{blocks}}) > 0) {
+    $index->{blocks}->[-1]->{uncompressed_offset_next} = $uncompressed_offset_next
+  }
+}
+
+=head2 update_gzi_index_meta
+
+  Arg [1]     : Hash ref; $index. Reference to the GZI index structure being filled
+  Arg [2]     : String; $name, defaults to "_raw_index". Index name/tag.
+  Description : Update GZI index metadata such as `size`, `uncompressed_offset_start`, `uncompressed_block_size`.
+
+=cut
+
+sub update_gzi_index_meta {
+  my ($self, $index, $name) = @_;
+  $index->{size} = scalar(@{$index->{blocks}});
+  if ($index->{size} > 0) {
+    $index->{uncompressed_offset_start} = $index->{blocks}->[0]->{uncompressed_offset};
+    $index->{uncompressed_block_size} = $self->estimate_gzi_index_block_size($index);
+    $index->{name} = $name // "_raw_index";
+  }
+}
+
+=head2 estimate_gzi_index_block_size
+
+  Description : Estimates the diference between adjacent GZI index blocks in the uncompressed stream
+  Returntype  : Integer; the estimated block size.
+                Returns 0 if there's only one on no blocks on the list.
+
+=cut
+
+sub estimate_gzi_index_block_size {
+  my ($self, $index) = @_;
+
+  return 0 if ($index->{size} < 2);
+
+  my $block_size = 0;
+  for (my $i = 0; $i < $index->{size} - 1; $i++) {
+    my $block = $index->{blocks}->[$i];
+    $block_size += ($block->{uncompressed_offset_next} - $block->{uncompressed_offset});
+  }
+
+  return int($block_size / ($index->{size} - 1));
+}
+
+=head2 update_gzi_index_meta
+
+  Arg [1]     : String; `id` of the sequence to get the GZI index descriptor for.
+  Description : Returns GZI index descriptor from `$seld->{lookup_gzi}` hash for existing `id`, undef otherwise.
+
+=cut
+
+sub get_gzi_index {
+  my ($self, $id) = @_;
+
+  return undef if (!exists $self->{lookup_gzi}->{$id});
+  return $self->{lookup_gzi}->{$id};
 }
 
 =head2 can_access_id
@@ -269,8 +388,6 @@ sub uppercase_sequence {
   $self->{'uppercase_sequence'} = $uppercase_sequence if defined $uppercase_sequence;
   return $self->{'uppercase_sequence'};
 }
-
-
 
 =head2 index_suffix
 
@@ -374,6 +491,9 @@ sub load_from_faindex {
   open my $fh, '<', \$contents or throw "Cannot open contents as an in-memory file: $!";
   my $lookup = $self->_load_faindex_from_fh($fh);
   close $fh;
+
+  $self->fill_lookup_gzi($lookup);
+
   return $lookup;
 }
 
@@ -395,6 +515,88 @@ sub _load_faindex_from_fh {
     $lookup{$id} = [$size+0, $location+0, $bases_per_line+0, $bytes_per_line+0, $id];
   });
   return \%lookup;
+}
+
+=head2 fill_lookup_gzi
+
+  Description : Loads the .fai index from a given file handle,
+                updates `$self->{lookup_gzi}` map.
+
+=cut
+
+sub fill_lookup_gzi {
+  my ($self, $lookup) = @_;
+
+  return if (!$self->{_is_compressed});
+
+  $self->{lookup_gzi} = {};
+
+  my $gzi_raw = $self->{_gzi_index_raw};
+  my $gzi_size = $gzi_raw->{size};
+
+  my $seq_starts = [ map { { id => $_, start => $lookup->{$_}->[1] } } keys %$lookup ];
+  $seq_starts = [ sort { $a->{start} <=> $b->{start} } @$seq_starts ];
+
+  my $gzi_i = 0;
+  my $i;
+  # preprocess all blocks but last
+  for ($i = 0; $i < scalar(@$seq_starts) - 1; $i++) {
+    my $id = $seq_starts->[$i]->{id};
+    my $seq_start = $seq_starts->[$i]->{start};
+    my $seq_end = $seq_starts->[$i+1]->{start};
+
+    # initialize index struct
+    $self->{lookup_gzi}->{$id} = $self->empty_gzi_index();
+    my $blocks = $self->{lookup_gzi}->{$id}->{blocks};
+
+    # there could be several seq_regions in one block
+    # assume uncompressed_offset_next == 0 only for the last block
+    while ($gzi_i < $gzi_size) {
+      my $block = $gzi_raw->{blocks}->[$gzi_i];
+      my $gzi_start = $block->{uncompressed_offset};
+      my $gzi_end = $block->{uncompressed_offset_next};
+
+      # if not the last gzi block
+      if ($gzi_end) {
+        # [ ]  )( -- in the middle
+        if ($gzi_end <= $seq_end ) {
+          push @$blocks, $block;
+          $gzi_i++;
+          next;
+        }
+        # $gzi_end > $seq_end
+        # [  )(  ] -- next sequnce start within the block
+        if ($gzi_start < $seq_end) {
+          push @$blocks, $block;
+          # switch to next sequence
+          last;
+        }
+        #   )([  ] -- start of the next block
+        if ($gzi_start >= $seq_end) {
+          # switch to next sequence
+          last;
+        }
+      } else {
+        # dealing with the last index block
+          push @$blocks, $block;
+          # switch to next sequence
+          last;
+      }
+    }
+    $self->update_gzi_index_meta( $self->{lookup_gzi}->{$id}, $id);
+  }
+
+  # keep the rest for the remaining sequence
+  {
+    my $id = $seq_starts->[$i]->{id};
+    $self->{lookup_gzi}->{$id} = $self->empty_gzi_index();
+    my $blocks = $self->{lookup_gzi}->{$id}->{blocks};
+    for (; $gzi_i < $gzi_size; $gzi_i++) {
+      my $block = $gzi_raw->{blocks}->[$gzi_i];
+      push @$blocks, $block;
+    }
+    $self->update_gzi_index_meta($self->{lookup_gzi}->{$id}, $id);
+  }
 }
 
 =head2 load_faindex_from_fasta
@@ -556,8 +758,11 @@ sub fetch_seq {
   my $end = $location + ($line_end * $bytes_per_line) + $line_end_position;
   my $length = ($end - $offset)+1;
 
+  # get list of blocks for the given $id
+  my $gzi_index = $self->get_gzi_index($id) if ($self->{_is_compressed});
+
   #Get sequence. ATMO this is a FH but why not a HTTP server in the future?
-  my $seq_ref = $self->_read_from_source($file, $offset, $length);
+  my $seq_ref = $self->_read_from_source($file, $offset, $length, $gzi_index);
   #Cleanup
   chomp ${$seq_ref};
   ${$seq_ref} =~ s/$INPUT_RECORD_SEPARATOR//g;
@@ -569,7 +774,7 @@ sub fetch_seq {
 # Override to read from alternative sources of FASTA formatted data
 # indexed using FAIDX from sources like HTTP
 sub _read_from_source {
-  my ($self, $location, $offset, $length) = @_;
+  my ($self, $location, $offset, $length, $gzi_index) = @_;
   my $persist_fh = $self->persist_fh();
   my $fh;
   if($persist_fh && exists $self->{fh}) {
@@ -581,7 +786,7 @@ sub _read_from_source {
   }
   
   my $seq;
-  $self->_seek_read($fh, \$seq, $offset, $length);
+  $self->{_seek_read_handler}->($self, $fh, \$seq, $offset, $length, $gzi_index);
   close $fh if ! $persist_fh;
   
   return \$seq;
@@ -593,6 +798,7 @@ sub _read_from_source {
   Arg [2]     : Reference; $buf. Buffer to store the sequence to
   Arg [3]     : Integer; $offset. The original (uncompressed) offset of the sequence
   Arg [4]     : Integer; $length. The length of the sequence to retrieve
+  Arg [5]     : Dict ref; $gzi_index. Gzi index descriptor
   Description : Seek to the exact offset in the  the uncompressed string and read data
                 into the bufer $buf. If working with compressed data fall through into
                 the _seek_read_gz sub.
@@ -600,9 +806,7 @@ sub _read_from_source {
 =cut
 
 sub _seek_read {
-  my ($self, $fh, $buf, $offset, $length) = @_;
- 
-  return $self->_seek_read_gz($fh, $buf, $offset, $length) if ($self->{_is_compressed}); 
+  my ($self, $fh, $buf, $offset, $length, $gzi_index) = @_;
 
   seek($fh, $offset, 0);
   read($fh, $$buf, $length);
@@ -614,6 +818,7 @@ sub _seek_read {
   Arg [2]     : Reference; $buf. Buffer to store the sequence to
   Arg [3]     : Integer; $offset. The original (uncompressed) offset of the sequence
   Arg [4]     : Integer; $length. The length of the sequence to retrieve
+  Arg [5]     : Dict ref; $gzi_index. Gzi index descriptor
   Description : For the given uncompressed offset find the corresponding block offset
                 in the compressed file. Read from the begining of the block until the
                 end of the fragment of interest, Splice away the leading prefix up to
@@ -622,10 +827,13 @@ sub _seek_read {
 =cut
 
 sub _seek_read_gz {
-  my ($self, $fh, $buf, $offset, $length) = @_;
+  my ($self, $fh, $buf, $offset, $length, $gzi_index) = @_;
 
-  my ($gz_block_start, $uncompressed_offset) = $self->_compressed_block_offset($offset, $self->{_gzi_index});
+  my ($gz_block_start, $uncompressed_offset) = $self->_compressed_block_offset($gzi_index, $offset);
 
+  # we loose quite some time on IO::Uncompress::Gunzip construction / destruction
+  # unfortunatly, it's not possible to change the offfset (backwards), once IO::Uncompress::Gunzip is initialise
+  # so we have to seek first and then recreate deflater for each compressed read
   seek($fh, $gz_block_start, 0);
 
   my $gz = IO::Uncompress::Gunzip->new($fh, -AutoClose => 0, -MultiStream => 1);
@@ -642,7 +850,8 @@ sub _seek_read_gz {
 
 =head2 _compressed_block_offset
 
-  Arg [1]     : Integer; $offset. Original offset in the uncompressed file
+  Arg [1]     : Dict ref; $gzi_index. Gzi index descriptor
+  Arg [2]     : Integer; $offset. Original offset in the uncompressed file
   Description : For the given uncompressed offset find the corresponding block offset
                 in the compressed file. First estimate by dividing by _uncompressed_block_size.
                 Then try to fix by looking at the adjacent blocks.
@@ -652,21 +861,26 @@ sub _seek_read_gz {
 =cut
 
 sub _compressed_block_offset {
-  my ($self, $offset, $index_blocks) = @_;
-  
+  my ($self, $index, $offset) = @_;
+
+  my $index_size = $index->{size};
+  my $index_blocks = $index->{blocks};
+
   my $i = 0;
-  my $index_size = scalar(@{$index_blocks});
   if ($index_size > 1) {
-    # initial estimate
-    $i = int($offset / $self->{_uncompressed_block_size});
+    # initial estimate, assuming $offset >= $index->{uncompressed_offset_start}
+    $i = int( ($offset - $index->{uncompressed_offset_start}) / $index->{uncompressed_block_size} );
+    $i = 0 if ($i < 0);
+    $i = ($index_size - 1) if ($i > $index_size - 1);
     my $dir = $self->_offset_is_not_in_block($offset, $index_blocks->[$i]);
     if ($dir) {
       # check if we have offset outside of the index boundaries
       if ( ($dir < 0 && $i == 0) || ($dir > 0 && $i == $index_size-1) ) {
+        my $index_name = $index->{name};
         my $block = $index_blocks->[$i];
         my $bl_start = $block->{uncompressed_offset};
         my $bl_end = $block->{uncompressed_offset_next}; # can be 0 for the last block
-        throw "wrong direction $dir for offset $offset not in block $i [$bl_start:$bl_end), $index_size block(s) in total\n";
+        throw "wrong direction $dir for offset $offset not in block $i [$bl_start:$bl_end), index $index_name has $index_size block(s) in total\n";
       }
 
       # +/- 1 for a start if we missed a bit
@@ -689,7 +903,7 @@ sub _compressed_block_offset {
     }
   }
 
-  my $block = $self->{_gzi_index}->[$i];
+  my $block = $index_blocks->[$i];
   my $compressed_offset = $block->{compressed_offset};
   my $uncompressed_offset = $block->{uncompressed_offset};
 
@@ -699,7 +913,7 @@ sub _compressed_block_offset {
 =head2 _offset_is_not_in_block
 
   Arg [1]     : Integer; $offset. Original offset in the uncompressed file
-  Arg [2]     : Integer; $i. Index of the block entry in the _gzi_index list.
+  Arg [2]     : Reference; $block. Block to check.
   Description : Check if the offset is not within the block entry at index $i.
   Returntype  : Iinteger, (-1, 0 ,1)
                 If the $offset is in the block, return 0.
@@ -712,7 +926,9 @@ sub _offset_is_not_in_block {
   my ($self, $offset, $block) = @_;
   my $start = $block->{uncompressed_offset};
   my $end = $block->{uncompressed_offset_next};
+
   # warn "offset $offset in block $i [$start, $end)\n";
+
   return -1 if ($offset < $start);
   return 1 if ($end && $offset >= $end);
   return 0;
